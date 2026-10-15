@@ -52,7 +52,9 @@ def program(
         t.key: TestFingerprint(runs=overrides.get(t.key, (out(t.expected), out(t.expected))))
         for t in SPEC.tests
     }
-    return ProgramFingerprint(label=label, compile=compile_result(), tests=tests)
+    return ProgramFingerprint(
+        label=label, compile=compile_result(), tests=tests, sanitizer_checked=True
+    )
 
 
 def fingerprints(
@@ -142,3 +144,20 @@ def test_infrastructure_errors_are_errors() -> None:
     ref = program(REFERENCE, {SPEC.tests[0].key: (infra, infra)})
     report = validate_fingerprints(SPEC, fingerprints(distinct_models(), ref))
     assert any("infrastructure error" in e for e in report.errors)
+
+
+def test_undefined_behaviour_in_a_model_is_an_error() -> None:
+    models = distinct_models()
+    key = SPEC.error_models[0].key
+    models[key] = models[key].model_copy(
+        update={"sanitizer_findings": {"empty": "heap-buffer-overflow"}}
+    )
+    report = validate_fingerprints(SPEC, fingerprints(models))
+    assert any("undefined behaviour" in e and "heap-buffer-overflow" in e for e in report.errors)
+
+
+def test_unchecked_sanitizer_warns() -> None:
+    ref = program(REFERENCE).model_copy(update={"sanitizer_checked": False})
+    report = validate_fingerprints(SPEC, fingerprints(distinct_models(), ref))
+    assert report.ok
+    assert any("sanitizer build unavailable" in w for w in report.warnings)

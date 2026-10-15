@@ -11,6 +11,7 @@ import asyncio
 from pydantic import BaseModel, ConfigDict
 
 from codeadapt.content.loader import LoadedProblem
+from codeadapt.evidence.reliability import sanitizer_finding
 from codeadapt.evidence.signature import Signature, signature_of
 from codeadapt.execution.backend import SandboxBackend
 from codeadapt.execution.models import BuildProfile, CompileResult, CompileStatus, EnvironmentInfo
@@ -40,6 +41,10 @@ class ProgramFingerprint(BaseModel):
     label: str
     compile: CompileResult
     tests: dict[str, TestFingerprint]  # empty when compilation failed
+    # Undefined behaviour found by the sanitizer build: test key -> finding kind.
+    # Fingerprints of programs with UB are not reproducible predictions.
+    sanitizer_checked: bool = False
+    sanitizer_findings: dict[str, str] = {}
 
     @property
     def compiled(self) -> bool:
@@ -76,6 +81,16 @@ async def fingerprint_program(
         signatures = await asyncio.gather(
             *(one(t.input.encode()) for t in tests for _ in range(repeats))
         )
+        findings: dict[str, str] = {}
+        sanitizer = await job.compile(problem.program(source), BuildProfile.SANITIZE)
+        checked = sanitizer.status is CompileStatus.OK
+        if checked:
+            sanitized = await asyncio.gather(
+                *(job.run(t.input.encode(), BuildProfile.SANITIZE) for t in tests)
+            )
+            for test, result in zip(tests, sanitized, strict=True):
+                if (finding := sanitizer_finding(result.stderr)) is not None:
+                    findings[test.key] = finding.kind
     return ProgramFingerprint(
         label=label,
         compile=compiled,
@@ -83,6 +98,8 @@ async def fingerprint_program(
             t.key: TestFingerprint(runs=tuple(signatures[i * repeats : (i + 1) * repeats]))
             for i, t in enumerate(tests)
         },
+        sanitizer_checked=checked,
+        sanitizer_findings=findings,
     )
 
 

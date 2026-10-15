@@ -248,16 +248,25 @@ def create_app(
             if diagnosis and diagnosis.fingerprint_set_id
             else None
         )
-        observations = (
-            list(session.scalars(select(TestObservation).where(TestObservation.run_id == run.id)))
-            if run
-            else []
+        runs = list(
+            session.scalars(
+                select(ExecutionRun)
+                .where(ExecutionRun.submission_id == sub.id)
+                .order_by(ExecutionRun.id)
+            )
+        )
+        observations = list(
+            session.scalars(
+                select(TestObservation)
+                .where(TestObservation.run_id.in_([r.id for r in runs]))
+                .order_by(TestObservation.run_id, TestObservation.id)
+            )
         )
         return TraceView(
             submission=_row(sub),
             job=_row(sub.job),
             environment=env.info if env else None,
-            execution_run=_row(run) if run else None,
+            execution_runs=[_row(r) for r in runs],
             observations=[_row(o) for o in observations],
             diagnosis=_row(diagnosis) if diagnosis else None,
             content_validation=fps.report if fps else None,

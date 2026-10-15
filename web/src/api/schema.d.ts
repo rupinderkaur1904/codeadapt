@@ -138,6 +138,11 @@ export interface components {
              * @default []
              */
             related_cases: string[];
+            /**
+             * Safety Findings
+             * @default []
+             */
+            safety_findings: string[];
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -237,7 +242,7 @@ export interface components {
          * TestVerdict
          * @enum {string}
          */
-        TestVerdict: "passed" | "wrong_output" | "runtime_error" | "time_limit" | "memory_limit" | "output_limit" | "not_evaluated";
+        TestVerdict: "passed" | "wrong_output" | "runtime_error" | "time_limit" | "memory_limit" | "output_limit" | "undefined_behaviour" | "inconsistent" | "not_evaluated";
         /**
          * TraceView
          * @description Researcher-only: the full evidence chain for one submission.
@@ -255,10 +260,10 @@ export interface components {
             environment: {
                 [key: string]: unknown;
             } | null;
-            /** Execution Run */
-            execution_run: {
+            /** Execution Runs */
+            execution_runs: {
                 [key: string]: unknown;
-            } | null;
+            }[];
             /** Job */
             job: {
                 [key: string]: unknown;

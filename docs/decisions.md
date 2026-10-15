@@ -115,3 +115,13 @@ mounts the host Docker socket so it can start sandbox containers. It is marked d
 because the socket is root-equivalent; the production layout is decided in M8. It uses
 SQLite on a shared volume because that is the tested configuration (PostgreSQL arrives with
 M8 and its own tests).
+
+## ADR-016 — Reliability channels: one repeat of failing tests, sanitiser build over all tests (2026-10-15)
+**Context:** undefined behaviour can make output wrong, or right by accident, and a timeout
+alone hides nothing about it. **Decision:** run the ASan + UBSan profile on every test, and
+repeat only *failing* tests, once, to detect non-determinism. Passing tests are not
+repeated: a non-deterministic pass is still a pass on that run, and the sanitiser covers
+the main cause. Sanitiser findings exclude a test; the diagnosis treats exclusions under
+rule 3. **Costs:** about twice the execution per submission, and the first fingerprint
+measurement for a content version takes about 90 s locally. **Limits:** uninitialised
+reads are not detected (no MSan in GCC).

@@ -6,6 +6,7 @@ import asyncio
 import hashlib
 import json
 import logging
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -29,8 +30,15 @@ from codeadapt.db.models import (
 )
 from codeadapt.diagnosis import DiagnosticInput, DiagnosticMethod, Observation
 from codeadapt.evidence import Signature, signature_of
+from codeadapt.evidence.reliability import assess
 from codeadapt.execution.backend import SandboxBackend, SandboxUnavailableError
-from codeadapt.execution.models import BuildProfile, CompileStatus, EnvironmentInfo, RunResult
+from codeadapt.execution.models import (
+    BuildProfile,
+    CompileResult,
+    CompileStatus,
+    EnvironmentInfo,
+    RunResult,
+)
 
 log = logging.getLogger(__name__)
 
@@ -84,54 +92,90 @@ class Pipeline:
         environment = self._environment(session, env_info)
         fingerprints, fps_row = await self._fingerprints(session, problem, environment)
 
+        reference = _predictions(fingerprints, None)
+        tests = problem.spec.tests
+        program = problem.program(submission.source)
         started = utcnow()
+        standard: dict[str, RunResult] = {}
+        repeats: dict[str, list[RunResult]] = {}
+        sanitized: dict[str, RunResult] | None = None
         async with self.sandbox.job() as job:
-            compiled = await job.compile(problem.program(submission.source), BuildProfile.STANDARD)
-            results: list[RunResult] = []
+            compiled = await job.compile(program, BuildProfile.STANDARD)
+            if compiled.status is CompileStatus.INFRASTRUCTURE_ERROR:
+                raise SandboxUnavailableError(compiled.detail or "compile container did not start")
+            sanitize_compile = None
             if compiled.status is CompileStatus.OK:
-                results = list(
-                    await asyncio.gather(
-                        *(
-                            job.run(t.input.encode(), BuildProfile.STANDARD)
-                            for t in problem.spec.tests
-                        )
+                standard = dict(
+                    zip(
+                        (t.key for t in tests),
+                        await asyncio.gather(
+                            *(job.run(t.input.encode(), BuildProfile.STANDARD) for t in tests)
+                        ),
+                        strict=True,
                     )
                 )
-        run = ExecutionRun(
-            submission_id=submission.id,
-            environment_id=environment.id,
-            profile=BuildProfile.STANDARD.value,
-            compile_status=compiled.status.value,
-            compile_flags=list(compiled.flags),
-            compile_exit_code=compiled.exit_code,
-            compile_diagnostics=compiled.diagnostics,
-            compile_diagnostics_truncated=compiled.diagnostics_truncated,
-            compile_wall_ms=compiled.wall_ms,
-            started_at=started,
-            finished_at=utcnow(),
-        )
+                # Reliability channel 1: rerun every failing test once (methodology §3).
+                failing = [t for t in tests if signature_of(standard[t.key]) != reference[t.key]]
+                again = await asyncio.gather(
+                    *(job.run(t.input.encode(), BuildProfile.STANDARD) for t in failing)
+                )
+                repeats = {t.key: [r] for t, r in zip(failing, again, strict=True)}
+                # Reliability channel 2: ASan + UBSan build over every test.
+                sanitize_compile = await job.compile(program, BuildProfile.SANITIZE)
+                if sanitize_compile.status is CompileStatus.OK:
+                    sanitized = dict(
+                        zip(
+                            (t.key for t in tests),
+                            await asyncio.gather(
+                                *(job.run(t.input.encode(), BuildProfile.SANITIZE) for t in tests)
+                            ),
+                            strict=True,
+                        )
+                    )
+        finished = utcnow()
+        run = _run_row(submission.id, environment.id, compiled, started, finished)
         session.add(run)
         session.flush()
-
+        assessment = assess(standard, repeats, sanitized)
         observations: list[Observation] = []
-        tests_run = problem.spec.tests if results else ()  # nothing runs if compilation failed
-        for test, result in zip(tests_run, results, strict=True):
+        for key, result in standard.items():
             sig = signature_of(result)
-            observations.append(Observation(test_key=test.key, signature=sig))
-            session.add(_observation_row(run.id, test.key, result, sig))
-
-        if compiled.status is CompileStatus.INFRASTRUCTURE_ERROR:
-            raise SandboxUnavailableError(compiled.detail or "compile container failed to start")
+            reason = assessment[key].excluded_reason
+            observations.append(Observation(test_key=key, signature=sig, excluded_reason=reason))
+            session.add(_observation_row(run.id, key, 0, result, sig, reason))
+            for i, rerun in enumerate(repeats.get(key, ()), start=1):
+                session.add(_observation_row(run.id, key, i, rerun, signature_of(rerun), None))
+        if sanitize_compile is not None:
+            sanitize_run = _run_row(
+                submission.id, environment.id, sanitize_compile, started, finished
+            )
+            session.add(sanitize_run)
+            session.flush()
+            for key, result in (sanitized or {}).items():
+                session.add(
+                    _observation_row(sanitize_run.id, key, 0, result, signature_of(result), None)
+                )
 
         diagnosis = self.method.diagnose(
             DiagnosticInput(
                 problem_version=problem.version,
                 compiled=compiled.status is CompileStatus.OK,
                 observations=tuple(observations),
-                reference=_predictions(fingerprints, None),
+                reference=reference,
                 models={k: _predictions(fingerprints, k) for k in fingerprints.models},
             )
         )
+        rationale = {
+            **diagnosis.rationale,
+            "reliability": {
+                "sanitizer_available": sanitized is not None,
+                "sanitizer_compile_status": (
+                    sanitize_compile.status.value if sanitize_compile is not None else None
+                ),
+                "repeated_tests": sorted(repeats),
+                "findings": {k: a.finding.model_dump() for k, a in assessment.items() if a.finding},
+            },
+        }
         row = DiagnosisRow(
             submission_id=submission.id,
             run_id=run.id,
@@ -142,7 +186,7 @@ class Pipeline:
             selected_model=diagnosis.selected_model,
             candidates=list(diagnosis.candidates),
             support=diagnosis.support,
-            rationale=diagnosis.rationale,
+            rationale=rationale,
         )
         session.add(row)
         session.commit()
@@ -224,13 +268,40 @@ def _predictions(fps: FingerprintSet, model: str | None) -> dict[str, Signature]
     return out
 
 
+def _run_row(
+    submission_id: str,
+    environment_id: int,
+    compiled: CompileResult,
+    started: datetime,
+    finished: datetime,
+) -> ExecutionRun:
+    return ExecutionRun(
+        submission_id=submission_id,
+        environment_id=environment_id,
+        profile=compiled.profile.value,
+        compile_status=compiled.status.value,
+        compile_flags=list(compiled.flags),
+        compile_exit_code=compiled.exit_code,
+        compile_diagnostics=compiled.diagnostics,
+        compile_diagnostics_truncated=compiled.diagnostics_truncated,
+        compile_wall_ms=compiled.wall_ms,
+        started_at=started,
+        finished_at=finished,
+    )
+
+
 def _observation_row(
-    run_id: int, test_key: str, result: RunResult, sig: Signature
+    run_id: int,
+    test_key: str,
+    repeat_index: int,
+    result: RunResult,
+    sig: Signature,
+    excluded_reason: str | None,
 ) -> TestObservation:
     return TestObservation(
         run_id=run_id,
         test_key=test_key,
-        repeat_index=0,
+        repeat_index=repeat_index,
         status=result.status.value,
         signature_kind=sig.kind.value,
         signature_detail=sig.detail,
@@ -244,5 +315,5 @@ def _observation_row(
         wall_ms=result.wall_ms,
         oom_killed=result.oom_killed,
         timed_out=result.timed_out,
-        excluded_reason=None,
+        excluded_reason=excluded_reason,
     )

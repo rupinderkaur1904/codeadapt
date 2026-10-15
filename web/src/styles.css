@@ -143,3 +143,6 @@ dl.sample {
 dl.sample dd {
   margin: 0;
 }
+.safety {
+  color: var(--fail);
+}

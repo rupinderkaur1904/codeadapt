@@ -60,6 +60,14 @@
             },
             "title": "Related Cases",
             "type": "array"
+          },
+          "safety_findings": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Safety Findings",
+            "type": "array"
           }
         },
         "required": [
@@ -353,6 +361,8 @@
           "time_limit",
           "memory_limit",
           "output_limit",
+          "undefined_behaviour",
+          "inconsistent",
           "not_evaluated"
         ],
         "title": "TestVerdict",
@@ -398,17 +408,13 @@
             ],
             "title": "Environment"
           },
-          "execution_run": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Execution Run"
+          "execution_runs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Execution Runs",
+            "type": "array"
           },
           "job": {
             "additionalProperties": true,
@@ -433,7 +439,7 @@
           "submission",
           "job",
           "environment",
-          "execution_run",
+          "execution_runs",
           "observations",
           "diagnosis",
           "content_validation"

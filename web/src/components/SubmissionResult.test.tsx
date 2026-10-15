@@ -27,6 +27,34 @@ describe("SubmissionResult", () => {
     expect(screen.queryByRole("table")).toBeNull();
   });
 
+  it("lists safety findings from the sanitizer", () => {
+    render(
+      <SubmissionResult
+        submission={{
+          ...supported,
+          feedback: {
+            kind: "inconsistent_behaviour",
+            message: "Your program has undefined behaviour.",
+            related_cases: [],
+            safety_findings: ["Your program overflows a signed integer. Seen in: Sample."],
+          },
+          tests: [
+            {
+              number: 2,
+              visibility: "hidden",
+              description: "The target is larger than every element.",
+              verdict: "undefined_behaviour",
+            },
+          ],
+        }}
+      />,
+    );
+    expect(screen.getByRole("list", { name: "Safety problems" })).toHaveTextContent(
+      "overflows a signed integer",
+    );
+    expect(screen.getByText("Undefined behaviour")).toBeInTheDocument();
+  });
+
   it.each([
     ["queued", "Waiting to run"],
     ["running", "Running your code"],
