@@ -21,9 +21,10 @@ to the evidence behind it.
 | M0 Repository foundation | done |
 | M1 Sandboxed execution core | done (dev isolation tier: Docker + runc) |
 | M2 Content model + first diagnostic problem | done |
-| M3 Backend vertical slice (API, worker, diagnosis v1) | next |
+| M3 Backend vertical slice (API, worker, diagnosis v1) | done |
+| M4 Student workspace (frontend) | next |
 
-There is no web application yet. The full plan is in [docs/roadmap.md](docs/roadmap.md).
+There is an HTTP API and a worker, but no browser UI yet. The full plan is in [docs/roadmap.md](docs/roadmap.md).
 **Do not deploy CodeAdapt where students can reach it** until milestone M8 (production
 isolation tier) is complete. See [docs/security.md](docs/security.md).
 

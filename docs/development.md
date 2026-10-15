@@ -38,6 +38,22 @@ Sandbox tests are **skipped with a stated reason** if Docker or the image is mis
 
 To test the production tier: `CODEADAPT_SANDBOX_RUNTIME=runsc uv run pytest -m sandbox`.
 
+## Running the API and worker locally
+
+```bash
+cd backend
+uv run alembic upgrade head                                   # creates ./codeadapt-dev.sqlite3
+uv run uvicorn codeadapt.api.app:create_app --factory --port 8000
+uv run codeadapt-worker            # second terminal; --once drains the queue and exits
+```
+
+Interactive API docs are at `http://localhost:8000/api/docs`. In `dev` and `test`
+environments the stub authentication uses the `X-Dev-Role: student|researcher` header
+(ADR-013). With `CODEADAPT_ENV=production`, every authenticated endpoint returns 503 until
+real authentication arrives in M8. The first submission for a problem takes about 45
+seconds locally, because the worker measures and caches that problem's fingerprints for
+the current environment. Later submissions take a few seconds.
+
 ## Tested environment
 
 Local results are evidence about *this* environment only.
@@ -58,3 +74,12 @@ Local results are evidence about *this* environment only.
 Same environment as M1. `pytest`: **106 passed, 0 skipped, 0 failed** (77 unit, 29 sandbox;
 about 92 s). `ruff check`, `ruff format --check` and `mypy --strict` were clean.
 `codeadapt-content validate ../content/demo` reported `RESULT ok` with no warnings.
+
+### M3 (2026-10-15)
+
+Same environment as M1. `pytest`: **138 passed, 0 skipped, 0 failed** (107 unit, 31 sandbox; about 3.5 min).
+`ruff check`, `ruff format --check` and `mypy --strict` were clean. A manual run with
+`alembic upgrade`, `uvicorn` and `codeadapt-worker --once` against SQLite processed a
+submission end to end. PostgreSQL is not exercised yet: the SQL is written to be portable
+and the queue uses conditional updates, but no test runs against PostgreSQL. This is
+tracked for M8.

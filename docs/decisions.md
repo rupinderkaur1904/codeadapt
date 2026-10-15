@@ -87,3 +87,17 @@ fingerprints, validation and diagnosis all use one definition of "behaves the sa
 Authors also write `expected` outputs, and the executed reference must match them, which
 catches harness and reference bugs. **Consequences:** a harness that prints
 non-deterministic text (addresses, timing) would be rejected by validation, which is intended.
+
+## ADR-013 — M3 slice conventions (2026-10-15)
+* **Dev-only auth stub:** in `dev`/`test`, the `X-Dev-Role` header selects a fixed dev account
+  (`data_class = dev`). It is disabled in production, where endpoints return 503 until M8.
+  This keeps the slice testable without building auth twice.
+* **Fingerprint cache:** the worker measures fingerprints the first time a
+  `(problem version, environment)` pair is seen. It stores them with their validation
+  report in `fingerprint_sets`, and refuses to diagnose against content that failed
+  validation.
+* **Queue claim:** an optimistic conditional `UPDATE` (expected state + attempt count). It is
+  portable across SQLite and PostgreSQL, so `SKIP LOCKED` is not required (refines ADR-004).
+* **Student projection:** hidden tests are shown only by number and `student_description`.
+  An error model's `student_hint` is shown only for `HYPOTHESIS_SUPPORTED`. Model keys and
+  descriptions never reach students. An end-to-end test asserts this.
