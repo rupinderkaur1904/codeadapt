@@ -101,3 +101,17 @@ non-deterministic text (addresses, timing) would be rejected by validation, whic
 * **Student projection:** hidden tests are shown only by number and `student_description`.
   An error model's `student_hint` is shown only for `HYPOTHESIS_SUPPORTED`. Model keys and
   descriptions never reach students. An end-to-end test asserts this.
+
+## ADR-014 — CodeMirror 6 instead of Monaco (2026-10-15; supersedes the editor choice in ADR-006)
+**Context:** Monaco is about 2–3 MB, loads web workers, and its React wrapper fetches from a
+CDN by default. That is a third-party runtime dependency and a CSP problem for a study
+deployment. **Decision:** CodeMirror 6 with `@codemirror/lang-cpp`, bundled locally and
+lazy-loaded with the practice page (about 210 kB gzipped). **Consequences:** it has no
+IntelliSense, which a learning platform does not want anyway.
+
+## ADR-015 — Development compose stack uses SQLite and the host Docker socket (2026-10-15)
+**Decision:** `compose.yaml` runs migrate, API, worker and the Vite dev server. The worker
+mounts the host Docker socket so it can start sandbox containers. It is marked dev-only,
+because the socket is root-equivalent; the production layout is decided in M8. It uses
+SQLite on a shared volume because that is the tested configuration (PostgreSQL arrives with
+M8 and its own tests).

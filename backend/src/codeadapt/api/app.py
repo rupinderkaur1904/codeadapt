@@ -164,6 +164,7 @@ def create_app(
             version=p.version,
             statement=p.statement,
             interface=p.spec.interface,
+            starter_code=_starter(p.spec.interface),
             sample_tests=[
                 SampleTest(
                     input=t.input, expected_output=t.expected, description=t.student_description
@@ -195,9 +196,7 @@ def create_app(
         session.commit()
         return SubmissionAccepted(id=sub.id, status=SubmissionStatus.QUEUED)
 
-    @app.get("/api/v1/submissions/{submission_id}", response_model=SubmissionView)
-    def get_submission(submission_id: str, session: DB, user: CurrentUser) -> SubmissionView:
-        sub = owned_submission(session, user, submission_id)
+    def submission_view(session: Session, sub: Submission) -> SubmissionView:
         problem = catalogue.by_version.get(sub.problem_version)
         slug = problem.spec.slug if problem else "unknown"
         view = SubmissionView(
@@ -216,6 +215,22 @@ def create_app(
             view.tests = feedback.test_views(problem, observations, reference)
         view.feedback = feedback.feedback_view(problem, diagnosis, view.tests)
         return view
+
+    @app.get("/api/v1/submissions", response_model=list[SubmissionView])
+    def list_submissions(
+        session: DB, user: CurrentUser, problem_slug: str | None = None, limit: int = 20
+    ) -> list[SubmissionView]:
+        """The current user's own submissions, newest first."""
+        query = select(Submission).where(Submission.user_id == user.id)
+        if problem_slug is not None:
+            versions = [p.version for p in catalogue.problems if p.spec.slug == problem_slug]
+            query = query.where(Submission.problem_version.in_(versions))
+        query = query.order_by(Submission.created_at.desc()).limit(max(1, min(limit, 50)))
+        return [submission_view(session, sub) for sub in session.scalars(query)]
+
+    @app.get("/api/v1/submissions/{submission_id}", response_model=SubmissionView)
+    def get_submission(submission_id: str, session: DB, user: CurrentUser) -> SubmissionView:
+        return submission_view(session, owned_submission(session, user, submission_id))
 
     # ------------------------------------------------------------------ research
     @app.get("/api/v1/research/submissions/{submission_id}/trace", response_model=TraceView)
@@ -283,3 +298,9 @@ def _reference(session: Session, diagnosis: DiagnosisRow) -> dict[str, tuple[str
 
 def _row(obj: Any) -> dict[str, Any]:
     return {c.key: getattr(obj, c.key) for c in obj.__table__.columns}
+
+
+def _starter(interface: str) -> str:
+    """Editor starting point derived from the interface declaration."""
+    signature = interface.strip().removesuffix(";")
+    return f"#include <vector>\n\n{signature} {{\n    // Your code here.\n}}\n"

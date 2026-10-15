@@ -1,0 +1,60 @@
+# Development stack: `docker compose up --build`, then open http://localhost:5173
+#
+# DEV ONLY. The worker mounts the host Docker socket, which is root-equivalent on the host.
+# Never expose this stack to students; see docs/security.md (production tier is M8).
+name: codeadapt
+
+x-backend: &backend
+  build: ./backend
+  image: codeadapt-backend:dev
+  environment:
+    CODEADAPT_ENV: dev
+    CODEADAPT_DATABASE_URL: sqlite:////data/codeadapt.sqlite3
+    CODEADAPT_CONTENT_DIR: /app/content/demo
+  volumes:
+    - ./content:/app/content:ro
+    - appdata:/data
+
+services:
+  sandbox-image:
+    # Builds the toolchain image the worker starts per compile/test; exits immediately.
+    build: ./sandbox
+    image: codeadapt-sandbox:gcc14.2-1
+    command: ["true"]
+
+  migrate:
+    <<: *backend
+    command: ["alembic", "upgrade", "head"]
+
+  api:
+    <<: *backend
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    ports: ["127.0.0.1:8000:8000"]
+
+  worker:
+    <<: *backend
+    command: ["codeadapt-worker"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      sandbox-image: { condition: service_completed_successfully }
+    volumes:
+      - ./content:/app/content:ro
+      - appdata:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  web:
+    image: node:22-alpine
+    working_dir: /app/web
+    command: ["sh", "-c", "npm ci && npx vite --host 0.0.0.0 --port 5173"]
+    environment:
+      CODEADAPT_API_URL: http://api:8000
+    volumes:
+      - ./web:/app/web
+      - webmodules:/app/web/node_modules
+    ports: ["127.0.0.1:5173:5173"]
+    depends_on: [api]
+
+volumes:
+  appdata:
+  webmodules:

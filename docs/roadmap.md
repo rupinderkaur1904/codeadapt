@@ -10,8 +10,8 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M1 | Sandboxed execution core | M0 | done (dev tier, runc) |
 | M2 | Content model + first problem with executed fingerprints | M1 | done |
 | M3 | Persistence, worker, API — backend vertical slice | M2 | done |
-| M4 | Student workspace (frontend) — full vertical slice | M3 | next |
-| M5 | Evidence reliability: sanitiser + repeat runs | M3 | planned |
+| M4 | Student workspace (frontend) — full vertical slice | M3 | done |
+| M5 | Evidence reliability: sanitiser + repeat runs | M3 | next |
 | M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | planned |
 | M7 | Researcher console + synthetic evaluation harness | M5, M6 | planned |
 | M8 | Auth hardening, production isolation tier, deployment | M4, M7 | planned |
@@ -81,6 +81,11 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 * **Tests:** Vitest components; Playwright submit→feedback end-to-end.
 * **Acceptance:** a new developer can `docker compose up`, open the app, solve/fail the demo
   problem and see feedback.
+* **Result (2026-10-15):** the Playwright test passes locally against the real API, worker
+  and sandbox. It submits a buggy solution, sees the targeted hint, submits a fix and sees
+  15/15 passing. 11 Vitest component tests pass. The compose stack could not be built in
+  the development container, because Docker Hub rate limits and blocked registries stopped
+  the base images from downloading, so a CI job builds it, starts it and submits through it.
 
 ### M5 — Evidence reliability
 * **Objective:** sanitiser build, repeat runs of failing tests, exclusion with reasons;

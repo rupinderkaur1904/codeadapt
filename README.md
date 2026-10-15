@@ -22,9 +22,10 @@ to the evidence behind it.
 | M1 Sandboxed execution core | done (dev isolation tier: Docker + runc) |
 | M2 Content model + first diagnostic problem | done |
 | M3 Backend vertical slice (API, worker, diagnosis v1) | done |
-| M4 Student workspace (frontend) | next |
+| M4 Student workspace (browser UI) | done |
+| M5 Evidence reliability (sanitiser, repeat runs) | next |
 
-There is an HTTP API and a worker, but no browser UI yet. The full plan is in [docs/roadmap.md](docs/roadmap.md).
+There is a working student workspace in the browser, an HTTP API and a sandboxed worker. The full plan is in [docs/roadmap.md](docs/roadmap.md).
 **Do not deploy CodeAdapt where students can reach it** until milestone M8 (production
 isolation tier) is complete. See [docs/security.md](docs/security.md).
 
@@ -42,7 +43,13 @@ isolation tier) is complete. See [docs/security.md](docs/security.md).
 
 ## Quick start
 
-Requirements: Docker, [uv](https://docs.astral.sh/uv/), Python 3.12+.
+With Docker only (development stack, never expose it publicly):
+
+```bash
+docker compose up --build        # then open http://localhost:5173
+```
+
+For development without compose (Docker, [uv](https://docs.astral.sh/uv/), Node 22):
 
 ```bash
 docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/

@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from codeadapt.content.loader import LoadedProblem, load_catalogue
@@ -39,4 +40,7 @@ class Catalogue:
                         title=p.spec.title,
                     )
                 )
-        session.commit()
+        try:
+            session.commit()
+        except IntegrityError:  # another process (API or worker) registered it concurrently
+            session.rollback()
