@@ -151,4 +151,3 @@ async def test_every_outcome_class_end_to_end(harness: Harness) -> None:
     hidden = [t for t in ref_view["tests"] if t["visibility"] == "hidden"]
     assert all(t["input"] and t["expected_output"] for t in samples)
     assert all(t["input"] is None and t["actual_output"] is None for t in hidden)
-
