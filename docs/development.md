@@ -142,4 +142,3 @@ skipped, 0 failed** (147 unit, 32 sandbox; about 14.6 min). `npm test`: 18 passe
 cases took about 8.5 min; two separate invocations produced byte-identical JSON and
 Markdown reports (saved as docs/evaluation/synthetic-2026-10-15.md). Lint, format, type and
 API-type drift checks were clean. No sandbox containers or volumes were left behind.
-
