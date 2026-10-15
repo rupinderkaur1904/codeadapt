@@ -32,18 +32,23 @@ class AttemptRecord(_Frozen):
     outcome: Outcome
     selected_model: str | None = None
     candidates: tuple[str, ...] = ()
+    # A supported diagnosis the method qualified (one behaviour group), or whose model
+    # documents a known collision. The policy passes this on; it never strengthens it.
+    qualified: bool = False
     # Empty when nothing ran (compile or execution error).
     tests: dict[str, TestStatus] = Field(default_factory=dict)
 
 
 class ProbeEvidence(_Frozen):
-    """One test outcome attributed to one skill through the problem's probe mapping."""
+    """One test outcome attributed to one skill (see ledger.build_ledger for the rules)."""
 
     skill: str
     problem_slug: str
     test_key: str
     submission_id: str
     status: TestStatus
+    # For a failure: the error model whose supported diagnosis explains it.
+    explained_by: str | None = None
 
 
 class Rule(StrEnum):
@@ -106,6 +111,20 @@ class ProbeComparison(_Frozen):
     followup: ProbeResult
 
 
+class Relation(StrEnum):
+    """What kind of evidence a follow-up is, by how its problem relates to the index's.
+
+    None of these is evidence of mastery. `transfer` only says the follow-up problem is
+    linked as a transfer problem in the curriculum; one passing attempt there is a single
+    observation, not demonstrated transfer.
+    """
+
+    SAME_PROBLEM = "same_problem"  # a retry: the student has already seen these tests fail
+    EQUIVALENT_PRACTICE = "equivalent_practice"  # linked equivalent, or same family
+    TRANSFER = "transfer"  # linked as a transfer problem
+    OTHER = "other"
+
+
 class FollowupEvaluation(_Frozen):
     method: str
     method_version: str
@@ -116,3 +135,4 @@ class FollowupEvaluation(_Frozen):
     failed: int = 0
     excluded: int = 0
     probes: tuple[ProbeComparison, ...] = ()
+    relation: Relation = Relation.OTHER

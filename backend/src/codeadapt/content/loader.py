@@ -99,9 +99,19 @@ def load_problem(root: Path) -> LoadedProblem:
 
 
 def load_catalogue(content_dir: Path) -> list[LoadedProblem]:
-    """Every problem directory (one containing problem.toml) directly under `content_dir`."""
-    return [
+    """Every problem directory (one containing problem.toml) directly under `content_dir`.
+
+    Curriculum links must name problems in the same catalogue.
+    """
+    problems = [
         load_problem(child)
         for child in sorted(content_dir.iterdir())
         if child.is_dir() and (child / PROBLEM_FILE).is_file()
     ]
+    slugs = {p.spec.slug for p in problems}
+    for p in problems:
+        c = p.spec.curriculum
+        missing = sorted({*c.prerequisites, *c.equivalents, *c.transfer} - slugs)
+        if missing:
+            raise ContentError(f"{p.spec.slug}: curriculum links to unknown problems {missing}")
+    return problems

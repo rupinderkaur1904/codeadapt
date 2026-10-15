@@ -1,0 +1,32 @@
+# Calibration cases (ADR-008: data_class = synthetic). Written AFTER the lower-bound design
+# analysis, to probe the collisions it predicted (docs/content-design/lower-bound.md 4.3)
+# and the weak-evidence models E2 and E5. They informed the review, so they are reported
+# separately and never counted as held-out results.
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+
+problem = "lower-bound"
+
+[[cases]]
+file = "clamp_to_last_index.cpp"
+truth = "unmodelled"
+note = "Clamps n to n - 1; returns -1 on the empty array. Predicted collision with hi_init_last_index."
+
+[[cases]]
+file = "clamp_with_empty_guard.cpp"
+truth = "unmodelled"
+note = "Clamp plus an empty-array guard; predicted to be indistinguishable from hi_init_last_index."
+
+[[cases]]
+file = "stop_on_match_upper_mid.cpp"
+truth = "stops_at_first_match"
+note = "Same conceptual error as stops_at_first_match, but a closed interval and a rounded-up midpoint, so it returns a different occurrence."
+
+[[cases]]
+file = "last_of_run.cpp"
+truth = "unmodelled"
+note = "Duplicate-only error of another kind: returns the last occurrence of a run."
+
+[[cases]]
+file = "exact_search_walk_back.cpp"
+truth = "unmodelled"
+note = "Exact search that handles duplicates correctly but returns -1 when absent."

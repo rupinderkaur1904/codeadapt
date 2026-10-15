@@ -1,6 +1,6 @@
 """Diagnostic methods: pure functions from evidence to an explained (or withheld) diagnosis."""
 
-from codeadapt.diagnosis.fingerprint_v1 import FingerprintConsistencyV1
+from codeadapt.diagnosis.fingerprint_v1 import METHODS, FingerprintConsistencyV1
 from codeadapt.diagnosis.models import (
     Diagnosis,
     DiagnosticInput,
@@ -10,6 +10,7 @@ from codeadapt.diagnosis.models import (
 )
 
 __all__ = [
+    "METHODS",
     "Diagnosis",
     "DiagnosticInput",
     "DiagnosticMethod",

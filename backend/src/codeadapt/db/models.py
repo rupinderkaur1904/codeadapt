@@ -246,4 +246,7 @@ class FollowupEvaluationRow(Base):
     failed: Mapped[int] = mapped_column(Integer)
     excluded: Mapped[int] = mapped_column(Integer)
     probes: Mapped[list[Any]]
+    # How the follow-up problem relates to the index problem (adaptation.models.Relation).
+    # Nullable: rows written before migration 0003 did not record it.
+    relation: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[datetime] = _ts()

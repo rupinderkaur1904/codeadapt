@@ -74,6 +74,7 @@ class Learner:
         failing: tuple[str, ...] = (),
         excluded: tuple[str, ...] = (),
         created_offset: timedelta | None = None,
+        strength: str | None = None,
     ) -> Step | None:
         """Record one diagnosed attempt and run the adaptation step on it."""
         self.clock += 1
@@ -130,7 +131,10 @@ class Learner:
                 selected_model=model,
                 candidates=[model] if model else [],
                 support=len(failing),
-                rationale={"tests": rows},
+                rationale={
+                    "tests": rows,
+                    **({"evidence_strength": strength} if strength else {}),
+                },
             )
             s.add(diagnosis)
             s.flush()
@@ -209,6 +213,7 @@ def test_compile_errors_keep_the_open_recommendation(sessions: sessionmaker[Sess
     assert step[3] == "criterion_met"
     with sessions() as s:
         assert s.scalar(select(FollowupEvaluationRow.passed)) == 7  # search-space tests
+        assert s.scalar(select(FollowupEvaluationRow.relation)) == "equivalent_practice"
 
 
 def test_a_new_attempt_elsewhere_supersedes_without_a_verdict(
@@ -301,6 +306,34 @@ def test_me_recommendation_shows_next_problem_and_verdict_without_internal_label
     # Another learner's state is not visible.
     other = client.get("/api/v1/me/recommendation", headers={"X-Dev-Role": "researcher"}).json()
     assert other == {"recommendation": None, "last_followup": None}
+
+
+def test_qualified_diagnosis_and_followup_wording_stay_within_the_evidence(
+    client: TestClient, sessions: sessionmaker[Session]
+) -> None:
+    me = Learner.create(sessions, "dev-student")
+    me.submit(
+        "lower-bound",
+        Outcome.HYPOTHESIS_SUPPORTED,
+        model="hi_init_last_index",
+        failing=("above_all", "single_above", "large_above_all"),
+        strength="single_behaviour",
+    )
+    with sessions() as s:
+        row = s.scalar(select(RecommendationRow))
+        assert row is not None
+        assert row.rationale["qualified_hypothesis"] is True
+    rec = client.get("/api/v1/me/recommendation", headers=STUDENT).json()["recommendation"]
+    assert "more than one possible cause" in rec["message"]
+    assert "the specific error" not in rec["message"]
+
+    me.submit("count-occurrences", Outcome.NO_FAILURE_OBSERVED)
+    follow = client.get("/api/v1/me/recommendation", headers=STUDENT).json()["last_followup"]
+    assert follow["verdict"] == "criterion_met"
+    assert "does not show the idea is fully learned" in follow["message"]
+    text = str(follow).lower()
+    for claim in ("mastered", "mastery", "transfer"):
+        assert claim not in text
 
 
 # ---------------------------------------------------------------------- researcher API

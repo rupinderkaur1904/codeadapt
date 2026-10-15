@@ -37,6 +37,11 @@ def recommendation_view(catalogue: Catalogue, row: RecommendationRow) -> Recomme
             "Every problem in this family has an attempt of yours with no failing tests. "
             "There is nothing further to recommend here yet."
         )
+    elif rule is Rule.HYPOTHESIS_SUPPORTED and row.rationale.get("qualified_hypothesis"):
+        message = (
+            "Your last attempt failed in a pattern that has more than one possible cause. "
+            f"{title} exercises the same idea."
+        )
     elif rule is Rule.HYPOTHESIS_SUPPORTED:
         message = (
             f"Your last attempt behaved as if it had the specific error described in its "
@@ -85,7 +90,8 @@ def followup_view(
     if verdict is FollowupVerdict.CRITERION_MET:
         message = (
             f"On {title}, your follow-up passed all {row.passed} tests related to the "
-            "recommended focus."
+            "recommended focus. That is one passing attempt on these tests; it does not show "
+            "the idea is fully learned, and later problems will check it in other settings."
         )
     elif verdict is FollowupVerdict.CRITERION_NOT_MET and row.failed:
         message = (

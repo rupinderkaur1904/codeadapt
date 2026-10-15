@@ -29,6 +29,11 @@ single_element = ["search_space_boundaries", "loop_termination"]
 two_elements = ["loop_termination"]
 large_input = ["loop_termination"]
 
+# Links to other problems by slug (docs/content-design/README.md section 1.6).
+[curriculum]
+assumes = ["indexing a sorted std::vector", "a loop invariant over a half-open range [lo, hi)"]
+equivalents = ["count-occurrences", "last-less-than"]
+
 [[tests]]
 key = "sample_present"
 visibility = "sample"
@@ -36,6 +41,8 @@ input = "L 4 1 3 5 7 5"
 expected = "2"
 probes = ["target_present_unique"]
 student_description = "The target appears once in the array."
+purpose = "Visible unique-target case; the first check most code meets."
+distinguishes = ["no_progress_update", "upper_bound_confusion"]
 
 [[tests]]
 key = "sample_absent"
@@ -44,6 +51,8 @@ input = "L 4 1 3 5 7 4"
 expected = "2"
 probes = ["target_absent_between"]
 student_description = "The target is absent and falls between two elements."
+purpose = "Visible absent-target case."
+distinguishes = ["exact_match_sentinel", "no_progress_update"]
 
 [[tests]]
 key = "empty"
@@ -51,6 +60,8 @@ input = "L 0 3"
 expected = "0"
 probes = ["empty_input"]
 student_description = "The array is empty."
+purpose = "Minimal input (n = 0); where code reading past the end faults."
+distinguishes = ["exact_match_sentinel"]
 
 [[tests]]
 key = "below_all"
@@ -58,6 +69,8 @@ input = "L 3 2 4 6 1"
 expected = "0"
 probes = ["target_below_all"]
 student_description = "The target is smaller than every element."
+purpose = "Answer 0 with the target absent."
+distinguishes = ["exact_match_sentinel"]
 
 [[tests]]
 key = "above_all"
@@ -65,6 +78,8 @@ input = "L 3 2 4 6 9"
 expected = "3"
 probes = ["target_above_all"]
 student_description = "The target is larger than every element."
+purpose = "Answer n: is the end position reachable?"
+distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update"]
 
 [[tests]]
 key = "equal_first"
@@ -72,6 +87,8 @@ input = "L 3 2 4 6 2"
 expected = "0"
 probes = ["target_present_unique"]
 student_description = "The target equals the first element."
+purpose = "Target at index 0; separates upper_bound_confusion from no_progress_update."
+distinguishes = ["upper_bound_confusion"]
 
 [[tests]]
 key = "equal_last"
@@ -79,6 +96,8 @@ input = "L 3 2 4 6 6"
 expected = "2"
 probes = ["target_present_unique"]
 student_description = "The target equals the last element."
+purpose = "Target at the last index; equality at the other end."
+distinguishes = ["no_progress_update", "upper_bound_confusion"]
 
 [[tests]]
 key = "duplicates_middle"
@@ -86,6 +105,8 @@ input = "L 6 1 2 2 2 2 3 2"
 expected = "1"
 probes = ["target_present_duplicates"]
 student_description = "The target appears several times in a row."
+purpose = "Run of equal targets in the middle; main small-input evidence for stops_at_first_match."
+distinguishes = ["exact_match_sentinel", "no_progress_update", "stops_at_first_match", "upper_bound_confusion"]
 
 [[tests]]
 key = "duplicates_all"
@@ -93,6 +114,8 @@ input = "D 7 5 5"
 expected = "0"
 probes = ["target_present_duplicates"]
 student_description = "Every element equals the target."
+purpose = "Every element equals the target; second behaviour group for stops_at_first_match."
+distinguishes = ["exact_match_sentinel", "stops_at_first_match", "upper_bound_confusion"]
 
 [[tests]]
 key = "single_equal"
@@ -100,6 +123,8 @@ input = "L 1 4 4"
 expected = "0"
 probes = ["single_element", "target_present_unique"]
 student_description = "A one-element array containing the target."
+purpose = "Smallest equality case (n = 1)."
+distinguishes = ["upper_bound_confusion"]
 
 [[tests]]
 key = "single_above"
@@ -107,6 +132,8 @@ input = "L 1 4 7"
 expected = "1"
 probes = ["single_element", "target_above_all"]
 student_description = "A one-element array whose element is smaller than the target."
+purpose = "Smallest case whose answer is n."
+distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update"]
 
 [[tests]]
 key = "two_between"
@@ -114,6 +141,8 @@ input = "L 2 1 9 5"
 expected = "1"
 probes = ["two_elements", "target_absent_between"]
 student_description = "A two-element array with the target between the elements."
+purpose = "Smallest input on which a non-shrinking update loops."
+distinguishes = ["exact_match_sentinel", "no_progress_update"]
 
 [[tests]]
 key = "large_absent"
@@ -121,6 +150,8 @@ input = "A 200000 0 2 99999"
 expected = "50000"
 probes = ["large_input", "target_absent_between"]
 student_description = "A large array where the target is absent."
+purpose = "Scale version of two_between. Does not test the O(log n) requirement."
+distinguishes = ["exact_match_sentinel", "no_progress_update"]
 
 [[tests]]
 key = "large_above_all"
@@ -128,6 +159,8 @@ input = "A 200000 0 2 1000000000"
 expected = "200000"
 probes = ["large_input", "target_above_all"]
 student_description = "A large array where the target is larger than every element."
+purpose = "Scale version of above_all. Does not test the O(log n) requirement."
+distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update"]
 
 [[tests]]
 key = "large_duplicates"
@@ -135,6 +168,8 @@ input = "D 200000 7 7"
 expected = "0"
 probes = ["large_input", "target_present_duplicates"]
 student_description = "A large array in which every element equals the target."
+purpose = "Scale version of duplicates_all. Does not test the O(log n) requirement."
+distinguishes = ["exact_match_sentinel", "stops_at_first_match", "upper_bound_confusion"]
 
 [[error_models]]
 key = "upper_bound_confusion"
@@ -149,6 +184,7 @@ file = "error_models/hi_init_last_index.cpp"
 skill = "search_space_boundaries"
 description = "Initialises hi = n - 1 with a half-open loop, so the answer n (no element >= target) is unreachable."
 student_hint = "Can your search ever return a.size()? Check the initial bounds of the search space."
+known_limitation = "Detected only by tests whose answer is n (one behaviour group). Any error that cannot return n, such as clamping the result to n - 1, produces identical outputs, so diagnoses are reported as qualified (docs/content-design/lower-bound.md section 4.3)."
 
 [[error_models]]
 key = "no_progress_update"

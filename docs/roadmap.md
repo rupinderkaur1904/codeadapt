@@ -16,7 +16,7 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M7 | Researcher console + synthetic evaluation harness | M5, M6 | done |
 | M8 | Auth hardening, production isolation tier, deployment | M4, M7 | next |
 | M9 | Pilot readiness (real-data separation, consent, study protocol) | M8 + owner input | planned |
-| CE | Content expansion, designed for diagnosis (docs/content-design) | M7 | next (CE0) |
+| CE | Content expansion, designed for diagnosis (docs/content-design) | M7 | CE0 done; CE1 waits on owner decisions (C6, C1–C2) |
 
 ---
 
@@ -128,6 +128,16 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   submission list with filters, outcome counts and a per-submission trace page in the web
   app; students see which problems they have passed. Cross-environment reproducibility
   and `POST /research/replay` are deferred.
+
+### CE0 — Content-design method, tooling and review resolution
+* **Objective:** the design method and its tooling (docs/content-design/README.md), plus the
+  owner's six review requirements on the lower-bound record.
+* **Result (2026-10-15):** met. Declared test intent agrees with the measurement for all 45
+  tests in the bank, reports regenerate byte-identically, and held-out outcomes are
+  unchanged under diagnosis v1.1. The ledger counts only explained failures (policy 1.1),
+  single-behaviour diagnoses are reported as qualified, and follow-ups record their
+  relation to the index problem. The C6 support rule was measured, not adopted. Details:
+  docs/content-design/review-resolution-2026-10-15.md, ADR-019.
 
 ### M8 — Hardening and deployment
 * **Objective:** real auth (Argon2id, sessions, CSRF, rate limits), audit log for researcher

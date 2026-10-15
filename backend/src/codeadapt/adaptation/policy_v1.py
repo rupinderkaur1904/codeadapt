@@ -32,7 +32,8 @@ _ABSTAINED = {
 @dataclass(frozen=True)
 class PolicyV1:
     name: str = "rule_policy"
-    version: str = "1"
+    # 1.1: the ledger counts only diagnosis-explained failures (ADR-019).
+    version: str = "1.1"
     # A problem is "recently attempted" if it appears among the learner's last N attempts.
     recent_window: int = 3
 
@@ -97,6 +98,10 @@ class PolicyV1:
         if index.outcome is Outcome.HYPOTHESIS_SUPPORTED:
             assert index.selected_model is not None  # noqa: S101 - invariant of the outcome
             skill = model_skill[index.selected_model]
+            limitation = next(
+                m.known_limitation for m in spec.error_models if m.key == index.selected_model
+            )
+            qualified = index.qualified or limitation is not None
             chosen, ranking = self._densest(family, {skill}, recent, spec)
             return make(
                 Rule.HYPOTHESIS_SUPPORTED,
@@ -109,7 +114,14 @@ class PolicyV1:
                     text=f"every reliable follow-up test probing {skill} passes, and the "
                     f"follow-up is not diagnosed with an error model of {skill}",
                 ),
-                rationale={"selected_model": index.selected_model, "ranking": ranking},
+                rationale={
+                    "selected_model": index.selected_model,
+                    # Weak or colliding evidence: the follow-up targets the skill, and no
+                    # wording may present the specific error as established.
+                    "qualified_hypothesis": qualified,
+                    **({"known_limitation": limitation} if limitation else {}),
+                    "ranking": ranking,
+                },
             )
 
         if index.outcome is Outcome.AMBIGUOUS:

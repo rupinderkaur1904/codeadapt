@@ -2,7 +2,9 @@
 
 The verdict is about the follow-up attempt's tests only. It is never a claim about
 learning: passing the follow-up's probes is consistent with improvement and with the
-follow-up problem simply being easier (methodology §5).
+follow-up problem simply being easier (methodology §5). Each evaluation also records how
+the follow-up problem relates to the index problem, so a retry, equivalent practice and a
+transfer problem are never counted as the same kind of evidence.
 """
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ from codeadapt.adaptation.models import (
     FollowupEvaluation,
     ProbeComparison,
     Recommendation,
+    Relation,
     TestStatus,
     Verdict,
 )
@@ -20,9 +23,31 @@ from codeadapt.content.models import ProblemSpec
 from codeadapt.diagnosis.models import Outcome
 
 METHOD = "criterion_check"
-METHOD_VERSION = "1"
+METHOD_VERSION = "1.1"  # 1.1: records the relation and states the scope of a pass
 
 _NOT_EVIDENCE = {Outcome.COMPILE_ERROR, Outcome.EXECUTION_ERROR, Outcome.UNRELIABLE_EVIDENCE}
+
+_SCOPE = {
+    Relation.SAME_PROBLEM: "on a retry of the same problem, whose failing tests the student "
+    "had already seen",
+    Relation.EQUIVALENT_PRACTICE: "on an equivalent practice problem",
+    Relation.TRANSFER: "on a problem linked as transfer; a single attempt is not evidence "
+    "of transfer",
+    Relation.OTHER: "on a problem with no curriculum link to the index problem",
+}
+
+
+def relation_of(index_spec: ProblemSpec | None, followup_spec: ProblemSpec) -> Relation:
+    if index_spec is None:
+        return Relation.OTHER
+    if followup_spec.slug == index_spec.slug:
+        return Relation.SAME_PROBLEM
+    links = index_spec.curriculum
+    if followup_spec.slug in links.transfer:
+        return Relation.TRANSFER
+    if followup_spec.slug in links.equivalents or followup_spec.family == index_spec.family:
+        return Relation.EQUIVALENT_PRACTICE
+    return Relation.OTHER
 
 
 def evaluate_followup(
@@ -32,6 +57,8 @@ def evaluate_followup(
     followup: AttemptRecord,
     followup_spec: ProblemSpec,
 ) -> FollowupEvaluation:
+    relation = relation_of(index_spec, followup_spec)
+
     def result(
         verdict: Verdict,
         reason: str,
@@ -48,6 +75,7 @@ def evaluate_followup(
             failed=failed,
             excluded=excluded,
             probes=table,
+            relation=relation,
         )
 
     criterion = recommendation.criterion
@@ -105,7 +133,9 @@ def evaluate_followup(
         )
     return result(
         Verdict.CRITERION_MET,
-        f"passed all {passed} reliable follow-up tests probing the targeted skills",
+        f"passed all {passed} reliable follow-up tests probing the targeted skills "
+        f"{_SCOPE[relation]}. This meets the recorded test criterion; it is not evidence "
+        "of mastery",
         counts,
         table,
     )

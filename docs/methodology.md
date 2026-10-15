@@ -113,6 +113,22 @@ Properties this gives us, each covered by a unit test:
 * A failing submission never gets forced into a category (rule 5).
 * Unreliable evidence is never diagnosed (rule 3).
 
+**Behaviour groups and qualified hypotheses (v1.1, ADR-019).** Tests that every modelled
+program passes together or fails together form one *behaviour group*; they carry one
+observation, however many there are. The rationale records `support_behaviours`, the
+number of groups among the supporting tests. v1.1 keeps v1's decisions, and a supported
+diagnosis resting on a single group is marked `evidence_strength = single_behaviour` with a
+qualification ("other errors that produce the same behaviour cannot be ruled out"). The
+candidate rule C6 (`v2-candidate`, `min_behaviours = 2`) extends rule 7 to
+`support < min_support` **or** `groups < min_behaviours`; it is evaluated, not deployed.
+
+**Not assessed: complexity.** The statements ask for O(log n), but no test, signature or
+diagnosis checks it. The large tests (200 000 elements) only exercise scale: a linear scan
+passes them, and wall time includes container start-up, so it cannot separate O(n) from
+O(log n). No output of CodeAdapt may claim that a solution meets, or fails, a complexity
+requirement until a separately validated mechanism exists (for example, counted
+comparisons through an instrumented harness).
+
 Strict consistency is deliberately conservative: a student whose code has *two* bugs, or
 one modelled bug plus noise, gets `UNMODELLED_BEHAVIOUR`. That costs coverage, buys
 precision, and is measurable. Later methods (e.g. likelihood scoring with an explicit
@@ -146,7 +162,14 @@ append-only `recommendations` and `followup_evaluations` tables.
 
 * *Ledger.* Built from each attempt's diagnosis-rationale test table: a reliable test that
   matched the reference is `passed`, a reliable test that did not is `failed`, anything
-  else is `excluded`. Each test is attributed to every skill its probes name.
+  else is `excluded`. Passed and excluded tests are attributed to every skill their probes
+  name. Since policy 1.1 (ADR-019, change C5) a failed test is skill evidence only when a
+  supported diagnosis explains it, and then only for the selected model's skill; other
+  failures are not attributed to any skill. In the demo bank all three problems probe the
+  same four skills, so this changes the ranking's evidence counts but no ranking decision.
+* *Qualified hypotheses.* When the diagnosis is single-behaviour or the model has a
+  `known_limitation`, the recommendation records `qualified_hypothesis` and the student
+  wording says the pattern has more than one possible cause. The target is the skill.
 * *Candidate problems* are those in the same `family` as the index problem. Skills are
   linked across problems by key, which is a content-authoring assumption.
 * *Recently attempted* means among the learner's last 3 attempts.
@@ -170,9 +193,17 @@ append-only `recommendations` and `followup_evaluations` tables.
   follow-up is diagnosed with an error model of an excluded skill; otherwise
   `criterion_met`.
 
+* *Relation (criterion_check 1.1).* Each evaluation records how the follow-up problem
+  relates to the index problem: `same_problem` (a retry, whose failing tests the student
+  has seen), `equivalent_practice` (a linked equivalent or the same family), `transfer` (a
+  linked transfer problem) or `other`. These are different kinds of evidence and are never
+  pooled. Equivalent practice and later transfer problems stay in the plan
+  (docs/content-design, gaps G1–G3); the demo bank has no transfer problem yet.
+
 **What a verdict does not mean.** `criterion_met` says the follow-up passed its targeted
 tests. It is equally consistent with learning, with the follow-up problem being easier, and
-with outside help; there is no comparison condition. The scripted synthetic trajectories in
+with outside help; there is no comparison condition. It is not mastery, and on a problem
+linked as transfer, one passing attempt is not demonstrated transfer. The scripted synthetic trajectories in
 `tests/unit/test_trajectories.py` check the mechanics of these rules and nothing about
 their effect on learners.
 
