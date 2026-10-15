@@ -17,6 +17,7 @@ codeadapt-run = "codeadapt.execution.cli:main"
 codeadapt-content = "codeadapt.content.cli:main"
 codeadapt-worker = "codeadapt.worker.main:main"
 codeadapt-openapi = "codeadapt.api.openapi_export:main"
+codeadapt-eval = "codeadapt.evaluation.cli:main"
 
 [dependency-groups]
 dev = [

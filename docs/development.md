@@ -30,6 +30,7 @@ On Windows, run the same commands in PowerShell (or WSL2). Use `copy` instead of
 | Lint / format / types | `uv run ruff check src tests` · `uv run ruff format src tests` · `uv run mypy` |
 | Dependency audit | `uv export --no-hashes --no-emit-project --format requirements-txt > req.txt && uvx pip-audit -r req.txt` |
 | Validate problem content (executes it) | `uv run codeadapt-content validate ../content/demo` |
+| Synthetic evaluation report (executes it; several minutes) | `uv run codeadapt-eval --json report.json --markdown report.md` |
 | Run code by hand | `uv run codeadapt-run main.cpp [harness.cpp] --input in1.txt [--sanitize]` |
 | Remove sandbox leftovers after a crash | `docker rm -f $(docker ps -aq --filter label=org.codeadapt.sandbox=1)`; `docker volume rm $(docker volume ls -q --filter label=org.codeadapt.sandbox=1)` |
 
@@ -132,3 +133,13 @@ measurement of three problems). `npm test`: 15 passed. `npx playwright test`: 1 
 (about 2.0 min). `codeadapt-content validate ../content/demo` reported `RESULT ok` for all
 three problems with no warnings. Lint, format, type and API-type drift checks were clean.
 No sandbox containers or volumes were left behind.
+
+### M7 (2026-10-15)
+
+Same environment as M1. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **179 passed, 0
+skipped, 0 failed** (147 unit, 32 sandbox; about 14.6 min). `npm test`: 18 passed.
+`npx playwright test`: 1 passed (about 1.8 min). `codeadapt-eval` over all 17 held-out
+cases took about 8.5 min; two separate invocations produced byte-identical JSON and
+Markdown reports (saved as docs/evaluation/synthetic-2026-10-15.md). Lint, format, type and
+API-type drift checks were clean. No sandbox containers or volumes were left behind.
+

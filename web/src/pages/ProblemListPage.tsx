@@ -18,6 +18,12 @@ export function ProblemListPage() {
           <li key={p.slug}>
             <Link to={`/practice/${p.slug}`}>{p.title}</Link>
             <span className="muted"> · {p.family}</span>
+            {p.no_failure_observed && (
+              <span className="badge-pass" title="You have an attempt with no failing tests">
+                {" "}
+                ✓ all tests passed
+              </span>
+            )}
           </li>
         ))}
       </ul>

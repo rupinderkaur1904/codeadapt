@@ -29,12 +29,11 @@ from codeadapt.db.models import (
     TestObservation,
     utcnow,
 )
-from codeadapt.diagnosis import DiagnosticInput, DiagnosticMethod, Observation
+from codeadapt.diagnosis import DiagnosticInput, DiagnosticMethod
 from codeadapt.evidence import Signature, signature_of
-from codeadapt.evidence.reliability import assess
+from codeadapt.evidence.collect import collect_evidence
 from codeadapt.execution.backend import SandboxBackend, SandboxUnavailableError
 from codeadapt.execution.models import (
-    BuildProfile,
     CompileResult,
     CompileStatus,
     EnvironmentInfo,
@@ -97,58 +96,27 @@ class Pipeline:
         fingerprints, fps_row = await self._fingerprints(session, problem, environment)
 
         reference = _predictions(fingerprints, None)
-        tests = problem.spec.tests
-        program = problem.program(submission.source)
         started = utcnow()
-        standard: dict[str, RunResult] = {}
-        repeats: dict[str, list[RunResult]] = {}
-        sanitized: dict[str, RunResult] | None = None
-        async with self.sandbox.job() as job:
-            compiled = await job.compile(program, BuildProfile.STANDARD)
-            if compiled.status is CompileStatus.INFRASTRUCTURE_ERROR:
-                raise SandboxUnavailableError(compiled.detail or "compile container did not start")
-            sanitize_compile = None
-            if compiled.status is CompileStatus.OK:
-                standard = dict(
-                    zip(
-                        (t.key for t in tests),
-                        await asyncio.gather(
-                            *(job.run(t.input.encode(), BuildProfile.STANDARD) for t in tests)
-                        ),
-                        strict=True,
-                    )
-                )
-                # Reliability channel 1: rerun every failing test once (methodology §3).
-                failing = [t for t in tests if signature_of(standard[t.key]) != reference[t.key]]
-                again = await asyncio.gather(
-                    *(job.run(t.input.encode(), BuildProfile.STANDARD) for t in failing)
-                )
-                repeats = {t.key: [r] for t, r in zip(failing, again, strict=True)}
-                # Reliability channel 2: ASan + UBSan build over every test.
-                sanitize_compile = await job.compile(program, BuildProfile.SANITIZE)
-                if sanitize_compile.status is CompileStatus.OK:
-                    sanitized = dict(
-                        zip(
-                            (t.key for t in tests),
-                            await asyncio.gather(
-                                *(job.run(t.input.encode(), BuildProfile.SANITIZE) for t in tests)
-                            ),
-                            strict=True,
-                        )
-                    )
+        evidence = await collect_evidence(self.sandbox, problem, submission.source, reference)
         finished = utcnow()
+        compiled, sanitize_compile = evidence.compiled, evidence.sanitize_compile
+        standard, repeats, sanitized = evidence.standard, evidence.repeats, evidence.sanitized
         run = _run_row(submission.id, environment.id, compiled, started, finished)
         session.add(run)
         session.flush()
-        assessment = assess(standard, repeats, sanitized)
-        observations: list[Observation] = []
-        for key, result in standard.items():
-            sig = signature_of(result)
-            reason = assessment[key].excluded_reason
-            observations.append(Observation(test_key=key, signature=sig, excluded_reason=reason))
-            session.add(_observation_row(run.id, key, 0, result, sig, reason))
-            for i, rerun in enumerate(repeats.get(key, ()), start=1):
-                session.add(_observation_row(run.id, key, i, rerun, signature_of(rerun), None))
+        assessment = evidence.assessment()
+        observations = evidence.observations()
+        for obs in observations:
+            result = standard[obs.test_key]
+            session.add(
+                _observation_row(
+                    run.id, obs.test_key, 0, result, obs.signature, obs.excluded_reason
+                )
+            )
+            for i, rerun in enumerate(repeats.get(obs.test_key, ()), start=1):
+                session.add(
+                    _observation_row(run.id, obs.test_key, i, rerun, signature_of(rerun), None)
+                )
         if sanitize_compile is not None:
             sanitize_run = _run_row(
                 submission.id, environment.id, sanitize_compile, started, finished

@@ -26,6 +26,8 @@ from codeadapt.db.models import (
     Environment,
     ExecutionRun,
     FollowupEvaluationRow,
+    Job,
+    JobState,
     RecommendationRow,
     Submission,
     User,
@@ -44,6 +46,7 @@ Step = tuple[str, str, str | None, str | None]  # (rule, action, problem, verdic
 class Learner:
     sessions: sessionmaker[Session]
     user_id: int
+    data_class: str = DataClass.SYNTHETIC.value
     clock: int = 0
     steps: list[Step] = field(default_factory=list)
 
@@ -60,7 +63,7 @@ class Learner:
                 )
                 s.add(user)
                 s.commit()
-            return cls(sessions, user.id)
+            return cls(sessions, user.id, data_class=user.data_class)
 
     def submit(
         self,
@@ -82,10 +85,12 @@ class Learner:
                 source="// synthetic",
                 source_sha256="0" * 64,
                 origin="synthetic",
-                data_class=DataClass.SYNTHETIC.value,
+                data_class=self.data_class,
                 created_at=utcnow() + (created_offset or timedelta(seconds=self.clock)),
             )
             s.add(sub)
+            s.flush()
+            s.add(Job(submission_id=sub.id, state=JobState.DONE.value, attempts=1))
             env = s.scalar(select(Environment)) or Environment(digest="0" * 64, info={})
             s.add(env)
             s.flush()
@@ -296,3 +301,77 @@ def test_me_recommendation_shows_next_problem_and_verdict_without_internal_label
     # Another learner's state is not visible.
     other = client.get("/api/v1/me/recommendation", headers={"X-Dev-Role": "researcher"}).json()
     assert other == {"recommendation": None, "last_followup": None}
+
+
+# ---------------------------------------------------------------------- researcher API
+RESEARCHER = {"X-Dev-Role": "researcher"}
+
+
+def test_research_list_and_metrics_are_researcher_only_and_filterable(
+    client: TestClient, sessions: sessionmaker[Session]
+) -> None:
+    for path in ("/api/v1/research/submissions", "/api/v1/research/metrics"):
+        assert client.get(path, headers=STUDENT).status_code == 403
+
+    synthetic = Learner.create(sessions, "synthetic-r")
+    synthetic.submit(
+        "lower-bound",
+        Outcome.HYPOTHESIS_SUPPORTED,
+        model="upper_bound_confusion",
+        failing=("sample_present", "equal_first"),
+    )
+    synthetic.submit("count-occurrences", Outcome.NO_FAILURE_OBSERVED)
+    dev = Learner.create(sessions, "dev-student", data_class=DataClass.DEV.value)
+    dev.submit("last-less-than", Outcome.UNMODELLED_BEHAVIOUR, failing=("empty",))
+
+    rows = client.get("/api/v1/research/submissions", headers=RESEARCHER).json()
+    assert len(rows) == 3
+    first = next(r for r in rows if r["problem_slug"] == "lower-bound")
+    assert first["username"] == "synthetic-r"
+    assert first["selected_model"] == "upper_bound_confusion"
+    assert first["recommended_problem"] == "count-occurrences"
+    follow = next(r for r in rows if r["problem_slug"] == "count-occurrences")
+    assert follow["followup_verdict"] == "criterion_met"
+
+    only = client.get(
+        "/api/v1/research/submissions?outcome=unmodelled_behaviour", headers=RESEARCHER
+    ).json()
+    assert [r["problem_slug"] for r in only] == ["last-less-than"]
+    assert only[0]["review_flag"] is True
+    by_problem = client.get(
+        "/api/v1/research/submissions?problem_slug=lower-bound", headers=RESEARCHER
+    ).json()
+    assert [r["problem_slug"] for r in by_problem] == ["lower-bound"]
+
+    metrics = client.get("/api/v1/research/metrics", headers=RESEARCHER).json()
+    assert metrics["submissions"] == 3
+    assert metrics["outcomes"] == {
+        "hypothesis_supported": 1,
+        "no_failure_observed": 1,
+        "unmodelled_behaviour": 1,
+    }
+    assert metrics["followup_verdicts"] == {"criterion_met": 1}
+    assert metrics["flagged_for_review"] == 1
+    synthetic_only = client.get(
+        "/api/v1/research/metrics?data_class=synthetic", headers=RESEARCHER
+    ).json()
+    assert synthetic_only["submissions"] == 2
+    assert "unmodelled_behaviour" not in synthetic_only["outcomes"]
+
+
+def test_problem_list_marks_problems_with_a_no_failure_attempt(
+    client: TestClient, sessions: sessionmaker[Session]
+) -> None:
+    problems = client.get("/api/v1/problems", headers=STUDENT).json()
+    assert not any(p["no_failure_observed"] for p in problems)
+    me = Learner.create(sessions, "dev-student", data_class=DataClass.DEV.value)
+    me.submit("count-occurrences", Outcome.NO_FAILURE_OBSERVED)
+    me.submit("lower-bound", Outcome.UNMODELLED_BEHAVIOUR, failing=("empty",))
+    marked = {
+        p["slug"]: p["no_failure_observed"]
+        for p in client.get("/api/v1/problems", headers=STUDENT).json()
+    }
+    assert marked == {"count-occurrences": True, "last-less-than": False, "lower-bound": False}
+    # Another user's results do not mark this user's list.
+    others = client.get("/api/v1/problems", headers=RESEARCHER).json()
+    assert not any(p["no_failure_observed"] for p in others)

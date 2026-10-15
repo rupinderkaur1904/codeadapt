@@ -223,6 +223,11 @@
             "title": "Family",
             "type": "string"
           },
+          "no_failure_observed": {
+            "default": false,
+            "title": "No Failure Observed",
+            "type": "boolean"
+          },
           "slug": {
             "title": "Slug",
             "type": "string"
@@ -308,6 +313,195 @@
           "created_at"
         ],
         "title": "RecommendationView",
+        "type": "object"
+      },
+      "ResearchMetrics": {
+        "additionalProperties": false,
+        "description": "Researcher-only operational counts. There is no ground truth here, so no accuracy.",
+        "properties": {
+          "data_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Class"
+          },
+          "flagged_for_review": {
+            "title": "Flagged For Review",
+            "type": "integer"
+          },
+          "followup_verdicts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Followup Verdicts",
+            "type": "object"
+          },
+          "outcomes": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Outcomes",
+            "type": "object"
+          },
+          "outcomes_by_problem": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "title": "Outcomes By Problem",
+            "type": "object"
+          },
+          "recommendations_by_rule": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Recommendations By Rule",
+            "type": "object"
+          },
+          "submissions": {
+            "title": "Submissions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "data_class",
+          "submissions",
+          "outcomes",
+          "outcomes_by_problem",
+          "recommendations_by_rule",
+          "flagged_for_review",
+          "followup_verdicts"
+        ],
+        "title": "ResearchMetrics",
+        "type": "object"
+      },
+      "ResearchSubmissionRow": {
+        "additionalProperties": false,
+        "description": "Researcher-only: one submission with its latest diagnosis and adaptation output.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "data_class": {
+            "title": "Data Class",
+            "type": "string"
+          },
+          "followup_verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Followup Verdict"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "problem_slug": {
+            "title": "Problem Slug",
+            "type": "string"
+          },
+          "recommendation_rule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation Rule"
+          },
+          "recommended_problem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Problem"
+          },
+          "review_flag": {
+            "title": "Review Flag",
+            "type": "boolean"
+          },
+          "selected_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Model"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubmissionStatus"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "username",
+          "data_class",
+          "origin",
+          "problem_slug",
+          "status",
+          "outcome",
+          "selected_model",
+          "support",
+          "recommendation_rule",
+          "recommended_problem",
+          "review_flag",
+          "followup_verdict"
+        ],
+        "title": "ResearchSubmissionRow",
         "type": "object"
       },
       "SampleTest": {
@@ -840,6 +1034,188 @@
           }
         },
         "summary": "Get Problem"
+      }
+    },
+    "/api/v1/research/metrics": {
+      "get": {
+        "description": "Counts over stored evidence; latest diagnosis per submission.",
+        "operationId": "research_metrics_api_v1_research_metrics_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "data_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Class"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-dev-role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Dev-Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchMetrics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Research Metrics"
+      }
+    },
+    "/api/v1/research/submissions": {
+      "get": {
+        "description": "Every user's submissions, newest first, with optional filters.",
+        "operationId": "research_submissions_api_v1_research_submissions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "problem_slug",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Problem Slug"
+            }
+          },
+          {
+            "in": "query",
+            "name": "outcome",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Outcome"
+            }
+          },
+          {
+            "in": "query",
+            "name": "data_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Class"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-dev-role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Dev-Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ResearchSubmissionRow"
+                  },
+                  "title": "Response Research Submissions Api V1 Research Submissions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Research Submissions"
       }
     },
     "/api/v1/research/submissions/{submission_id}/trace": {
