@@ -1,4 +1,8 @@
-"""M2 acceptance: the demo content is diagnosable when executed in the sandbox."""
+"""M2 acceptance: the demo content is diagnosable when executed in the sandbox.
+
+CE0: every declared `distinguishes` agrees with the measurement (a mismatch is an error),
+and the only weakness is the documented single-behaviour model.
+"""
 
 from codeadapt.content import load_catalogue
 from codeadapt.content.fingerprint import fingerprint_problem
@@ -14,6 +18,9 @@ async def test_demo_catalogue_validates(sandbox: DockerSandbox) -> None:
         report = validate_fingerprints(problem.spec, fps)
         assert report.ok, report.errors
         assert not report.warnings, report.warnings
+        weak = {m.key for m in report.models if m.behaviour_groups < 2}
+        assert weak == {"hi_init_last_index"}, weak
+        assert len(report.limitations) == 1
         # Every pair of error models is separable by at least one test.
         assert all(p.distinguishing_tests for p in report.pairs)
         # Predictions are measured, not authored: the non-terminating model really times out.

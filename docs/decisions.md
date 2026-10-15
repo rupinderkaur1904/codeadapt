@@ -155,3 +155,40 @@ Until real authentication exists (M8), the web app has a "development role" sele
 sets the `X-Dev-Role` header; the API ignores it outside development. **Limits:** the
 harness runs every case's evidence concurrently, so runtime grows with the sandbox host's
 capacity; cross-environment reproducibility is not yet measured.
+
+## ADR-019 — Evidence no stronger than its support: explained-failure ledger, behaviour groups, qualified hypotheses (2026-10-15)
+**Context:** the lower-bound design review found that (a) the ledger charged every failing
+test to every skill its probes name, whether or not anything explained the failure, and
+(b) `min_support` counts tests, so a model whose supporting tests all show one behaviour
+(E2 `hi_init_last_index`, in all three demo problems) looked better supported than it is.
+The owner asked for these to be fixed, and for the stricter support rule (C6) to be
+compared with v1 on held-out cases before any adoption. **Decision:**
+* *Ledger (C5).* A failed test enters the skill ledger only when a supported diagnosis
+  explains it, and then only under the selected model's skill (`explained_by` records the
+  model). Failures in ambiguous, unmodelled, insufficient or unreliable attempts stay in
+  the stored submission but are not skill evidence. Passed and excluded tests are
+  attributed through probes as before. Policy version → `rule_policy` 1.1.
+* *Behaviour groups.* `diagnosis/groups.py` measures them; validation and diagnosis share
+  it. Diagnosis v1.1 records `support_behaviours` and, for a supported diagnosis resting on
+  one group, `evidence_strength = single_behaviour` with a qualification. Its *decisions*
+  are those of v1. A supported diagnosis that is single-behaviour, or whose model has a
+  `known_limitation`, is a *qualified hypothesis*: the student sees "one possible cause to
+  check", the recommendation says the pattern "has more than one possible cause", and its
+  rationale carries `qualified_hypothesis`. The follow-up still targets the skill.
+* *C6 candidate.* `v2-candidate` (same method, `min_behaviours = 2`) turns single-group
+  diagnoses into `INSUFFICIENT_EVIDENCE`. It is selectable in `codeadapt-eval --method`
+  only; the worker keeps v1.1. Adoption is an owner decision (see the review-resolution
+  report for the measured trade-off).
+* *Follow-up relation.* Each evaluation records whether the follow-up was the same
+  problem, equivalent practice or a linked transfer problem (`criterion_check` 1.1,
+  migration 0003). A met criterion is reported as passing the follow-up's tests, never as
+  mastery or demonstrated transfer.
+* *Declared intent (C4).* `problem.toml` gains per-test `purpose` and `distinguishes`,
+  per-model `known_limitation` and `[curriculum]` links; validation errors on a declared
+  `distinguishes` that the measurement contradicts. Calibration cases (written after a
+  design analysis) live in `eval/calibration/` and are never pooled with held-out ones.
+**Costs:** behaviour groups are relative to the modelled programs, so adding a model can
+change a diagnosis's strength; content changes are therefore versioned as before.
+**Limits:** a qualified hypothesis is still a hypothesis from the modelled error space;
+the qualification describes the evidence, not the probability of being right. The O(log n)
+requirement is not assessed by any test (see methodology §4).

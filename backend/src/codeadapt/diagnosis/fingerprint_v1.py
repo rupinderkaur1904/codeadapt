@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from codeadapt.diagnosis.groups import count_groups, detection_patterns
 from codeadapt.diagnosis.models import Diagnosis, DiagnosticInput, Observation, Outcome
 from codeadapt.evidence.signature import OutcomeKind
 
@@ -15,19 +16,28 @@ CAVEAT = (
     "The observed behaviour is consistent with this error model; that is not proof of it, "
     "and explanations outside the modelled error space remain possible."
 )
+SINGLE_BEHAVIOUR = (
+    "Every failing test that supports this model exercises the same behaviour (one "
+    "behaviour group), so the evidence is one observation repeated. Other errors that "
+    "produce the same behaviour cannot be ruled out."
+)
 
 
 @dataclass(frozen=True)
 class FingerprintConsistencyV1:
     name: str = "fingerprint_consistency"
-    version: str = "1"
+    version: str = "1.1"
     min_support: int = 2
+    # Distinct behaviour groups the supporting tests must span (diagnosis/groups.py).
+    # 1 keeps v1's decisions and only reports the count; 2 is the C6 candidate rule.
+    min_behaviours: int = 1
     max_excluded_fraction: float = 0.34
 
     def diagnose(self, data: DiagnosticInput) -> Diagnosis:
         rationale: dict[str, Any] = {
             "parameters": {
                 "min_support": self.min_support,
+                "min_behaviours": self.min_behaviours,
                 "max_excluded_fraction": self.max_excluded_fraction,
             }
         }
@@ -101,13 +111,21 @@ class FingerprintConsistencyV1:
         # Rules 7 and 8
         (model,) = candidates
         prediction = data.models[model]
-        support = sum(1 for o in reliable if prediction[o.test_key] != data.reference[o.test_key])
-        rationale["supporting_tests"] = [
+        supporting = [
             o.test_key for o in reliable if prediction[o.test_key] != data.reference[o.test_key]
         ]
-        if support < self.min_support:
+        support = len(supporting)
+        behaviours = count_groups(supporting, detection_patterns(data.reference, data.models))
+        rationale["supporting_tests"] = supporting
+        rationale["support_behaviours"] = behaviours
+        if support < self.min_support or behaviours < self.min_behaviours:
             return result(Outcome.INSUFFICIENT_EVIDENCE, 7, candidates=candidates, support=support)
         rationale["caveat"] = CAVEAT
+        # A supported diagnosis resting on one behaviour is reported as qualified, never as
+        # established: consumers (feedback, policy, research views) read this field.
+        rationale["evidence_strength"] = "single_behaviour" if behaviours == 1 else "multiple"
+        if behaviours == 1:
+            rationale["qualification"] = SINGLE_BEHAVIOUR
         return result(
             Outcome.HYPOTHESIS_SUPPORTED,
             8,
@@ -137,3 +155,11 @@ class FingerprintConsistencyV1:
         """
         keys = sorted(data.reference)
         return [k for k in keys if len({str(data.models[c].get(k)) for c in candidates}) > 1]
+
+
+# Named parameter sets. "v1" is the deployed method; "v2-candidate" is change C6, kept
+# for evaluation until a decision adopts or rejects it (docs/decisions.md ADR-019).
+METHODS: dict[str, FingerprintConsistencyV1] = {
+    "v1": FingerprintConsistencyV1(),
+    "v2-candidate": FingerprintConsistencyV1(version="2-candidate", min_behaviours=2),
+}

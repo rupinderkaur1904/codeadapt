@@ -73,6 +73,17 @@ def test_unreferenced_files_do_not_change_version(problem_copy: Path) -> None:
         ('solution_file = "solution.cpp"', 'solution_file = "harness.cpp"', "harness.cpp"),
         ('slug = "lower-bound"', 'slug = "other"', "must equal the directory name"),
         ('title = "Lower bound"', 'title = "Lower bound"\nsurprise = 1', "Extra inputs"),
+        (
+            'distinguishes = ["upper_bound_confusion"]',
+            'distinguishes = ["nope"]',
+            "distinguishes unknown error model 'nope'",
+        ),
+        (
+            'equivalents = ["count-occurrences", "last-less-than"]',
+            'equivalents = ["lower-bound"]',
+            "invalid problem reference 'lower-bound'",
+        ),
+        ('equivalents = ["count-occurrences", "last-less-than"]', 'transfer = ["Bad"]', "'Bad'"),
     ],
 )
 def test_invalid_definitions_are_rejected(
@@ -123,3 +134,18 @@ def test_skills_probed_by() -> None:
         "loop_termination",
         "problem_specification",
     }
+
+
+def test_curriculum_links_must_name_problems_in_the_catalogue(tmp_path: Path) -> None:
+    catalogue = tmp_path / "bank"
+    shutil.copytree(DEMO_CONTENT, catalogue)
+    shutil.rmtree(catalogue / "last-less-than")
+    with pytest.raises(ContentError, match=r"unknown problems \['last-less-than'\]"):
+        load_catalogue(catalogue)
+
+
+def test_demo_curriculum_links() -> None:
+    specs = {p.spec.slug: p.spec for p in load_catalogue(DEMO_CONTENT)}
+    assert specs["lower-bound"].curriculum.equivalents == ("count-occurrences", "last-less-than")
+    assert specs["count-occurrences"].curriculum.prerequisites == ("lower-bound",)
+    assert all(t.distinguishes is not None and t.purpose for s in specs.values() for t in s.tests)

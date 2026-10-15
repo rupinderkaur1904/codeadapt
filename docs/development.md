@@ -142,3 +142,20 @@ skipped, 0 failed** (147 unit, 32 sandbox; about 14.6 min). `npm test`: 18 passe
 cases took about 8.5 min; two separate invocations produced byte-identical JSON and
 Markdown reports (saved as docs/evaluation/synthetic-2026-10-15.md). Lint, format, type and
 API-type drift checks were clean. No sandbox containers or volumes were left behind.
+
+### CE0 and review resolution (2026-10-15)
+
+Same environment as M1. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **200 passed, 1
+failed** in the full run (169 unit, 32 sandbox; about 14 min). The failure was
+`test_lower_bound_heldout_evaluation_is_reproducible`, aborted by
+`SandboxUnavailableError: docker kill timed out`: `docker kill` on a timed-out container
+exceeded its 15 s limit while the host's load average was about 8 on 4 cores. Re-run alone,
+it passed (1 passed, 2.8 min). The same timeout once aborted a `codeadapt-eval` run, and
+appeared in the Playwright run, where the worker requeued the job as designed. It is an
+infrastructure timeout, not a test result. The harness aborting on it, rather than
+recording an infrastructure error for the affected case, is a known limit for M8. No
+sandbox containers were left behind. `npm test`: 18 passed. `npx playwright test`:
+1 passed (2.3 min). `codeadapt-content report` produced byte-identical reports on two
+runs. Held-out and calibration reports for both methods are in
+docs/evaluation/review-2026-10-15/. Lint, format, type and API-type drift checks were
+clean.

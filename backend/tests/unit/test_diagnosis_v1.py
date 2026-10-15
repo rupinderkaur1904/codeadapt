@@ -3,6 +3,7 @@
 import pytest
 
 from codeadapt.diagnosis import (
+    METHODS,
     DiagnosticInput,
     FingerprintConsistencyV1,
     Observation,
@@ -150,3 +151,40 @@ def test_parameters_are_recorded_and_adjustable() -> None:
 def test_unknown_test_is_a_programming_error() -> None:
     with pytest.raises(ValueError, match="without a reference"):
         METHOD.diagnose(observe({"nope": out("x")}))
+
+
+# ------------------------------------------- behaviour-group support (ADR-019, change C6)
+def test_support_counts_behaviour_groups_and_qualifies_a_single_one() -> None:
+    # alpha's two supporting tests are failed by exactly the same models: one behaviour.
+    d = METHOD.diagnose(observe(MODELS["alpha"]))
+    assert d.outcome is Outcome.HYPOTHESIS_SUPPORTED  # v1 decisions are unchanged
+    assert (d.support, d.rationale["support_behaviours"]) == (2, 1)
+    assert d.rationale["evidence_strength"] == "single_behaviour"
+    assert "cannot be ruled out" in d.rationale["qualification"]
+
+
+def two_behaviour_input() -> DiagnosticInput:
+    # p fails t1-t3; q fails only t2, which splits p's tests into two behaviour groups.
+    models = {"p": behaviour(t1=out("p"), t2=out("p"), t3=out("p")), "q": behaviour(t2=out("q"))}
+    return observe(models["p"]).model_copy(update={"models": models})
+
+
+def test_multiple_behaviour_groups_are_not_qualified() -> None:
+    d = METHOD.diagnose(two_behaviour_input())
+    assert d.outcome is Outcome.HYPOTHESIS_SUPPORTED
+    assert d.rationale["support_behaviours"] == 2
+    assert d.rationale["evidence_strength"] == "multiple"
+    assert "qualification" not in d.rationale
+
+
+def test_v2_candidate_requires_two_behaviour_groups() -> None:
+    candidate = METHODS["v2-candidate"]
+    assert candidate.min_behaviours == 2
+    weak = candidate.diagnose(observe(MODELS["alpha"]))
+    assert weak.outcome is Outcome.INSUFFICIENT_EVIDENCE
+    assert weak.candidates == ("alpha",)
+    assert weak.rationale["rule"] == 7
+    assert weak.rationale["parameters"]["min_behaviours"] == 2
+    strong = candidate.diagnose(two_behaviour_input())
+    assert (strong.outcome, strong.selected_model) == (Outcome.HYPOTHESIS_SUPPORTED, "p")
+    assert METHODS["v1"].min_behaviours == 1

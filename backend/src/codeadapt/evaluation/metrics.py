@@ -22,6 +22,8 @@ LIMITATIONS = (
     "Selective accuracy here is an upper bound on what real students' code will show.",
     "These results are about the diagnostic method, not about learning; they are not "
     "evidence that CodeAdapt helps anyone learn.",
+    "No test checks the O(log n) requirement: a linear scan passes every suite, so nothing "
+    "here says anything about complexity.",
 )
 
 

@@ -26,6 +26,7 @@ to the evidence behind it.
 | M5 Evidence reliability (sanitiser, repeat runs) | done |
 | M6 Adaptive follow-up exercises | done |
 | M7 Researcher console + synthetic evaluation harness | done |
+| CE0 Content-design method, tooling, review resolution | done |
 | M8 Auth, gVisor isolation, Postgres, deployment | next |
 
 There is a working student workspace in the browser, an HTTP API and a sandboxed worker. The full plan is in [docs/roadmap.md](docs/roadmap.md).

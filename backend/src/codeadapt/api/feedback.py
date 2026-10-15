@@ -138,10 +138,23 @@ def _feedback(
             model = problem.error_model(diagnosis.selected_model or "")
             supporting = set(diagnosis.rationale.get("supporting_tests", []))
             related = [t.student_description for t in problem.spec.tests if t.key in supporting]
+            message = (
+                "Your code fails a group of cases in a pattern that a common mistake "
+                "produces. Your code behaves as if it has this mistake; check whether it does."
+            )
+            # Qualified hypothesis (ADR-019): one behaviour, or a documented collision.
+            if (
+                diagnosis.rationale.get("evidence_strength") == "single_behaviour"
+                or model.known_limitation
+            ):
+                message = (
+                    "Your code fails a group of cases in a pattern that a common mistake "
+                    "produces, but other mistakes can produce the same pattern. Treat the hint "
+                    "as one possible cause to check, not as the answer."
+                )
             return FeedbackView(
                 kind=FeedbackKind.RECOGNISED_PATTERN,
-                message="Your code fails a group of cases in a pattern that a common mistake "
-                "produces. Your code behaves as if it has this mistake; check whether it does.",
+                message=message,
                 hint=model.student_hint,
                 related_cases=related,
             )

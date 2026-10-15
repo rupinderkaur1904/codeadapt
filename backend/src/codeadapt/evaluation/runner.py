@@ -49,6 +49,8 @@ class EvaluationReport(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     data_class: str = "synthetic"
+    # "heldout" (reported results) or "calibration" (used while designing; never pooled).
+    case_set: str = "heldout"
     method: str
     method_version: str
     runs_per_case: int
@@ -117,6 +119,7 @@ async def evaluate(
     cases: list[HeldoutCase],
     method: DiagnosticMethod,
     runs: int = 2,
+    case_set: str = "heldout",
 ) -> EvaluationReport:
     if runs < 1:
         raise ValueError("runs must be >= 1")
@@ -184,6 +187,7 @@ async def evaluate(
         for r in all_results
     ]
     return EvaluationReport(
+        case_set=case_set,
         method=method.name,
         method_version=method.version,
         runs_per_case=runs,
@@ -218,8 +222,9 @@ def render_markdown(report: EvaluationReport) -> str:
     lines = [
         "# CodeAdapt synthetic evaluation report",
         "",
-        f"Method `{report.method}` v{report.method_version}; data class "
-        f"`{report.data_class}`; each case run {report.runs_per_case} times; "
+        f"Method `{report.method}` v{report.method_version}; case set "
+        f"`{report.case_set}`; data class `{report.data_class}`; "
+        f"each case run {report.runs_per_case} times; "
         f"{env['compiler_version']} on `{env['container_runtime']}`.",
         "",
         "## Overall",

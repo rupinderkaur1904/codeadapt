@@ -34,6 +34,11 @@ class TestCase(_Strict):
     probes: tuple[str, ...] = Field(min_length=1)
     visibility: Visibility = Visibility.HIDDEN
     student_description: str = Field(min_length=1)
+    # Design record (docs/content-design): why the test exists, and the error models it is
+    # meant to separate from the reference. Validation checks `distinguishes` against the
+    # measured fingerprints, so the declaration cannot drift from reality.
+    purpose: str | None = None
+    distinguishes: tuple[str, ...] | None = None
 
 
 class ErrorModelSpec(_Strict):
@@ -42,6 +47,18 @@ class ErrorModelSpec(_Strict):
     skill: str
     description: str = Field(min_length=1)  # researcher-facing
     student_hint: str = Field(min_length=1)  # shown only after a supported diagnosis
+    # A documented, accepted weakness (e.g. "evidence rests on one behaviour"). Turns the
+    # corresponding validation warning into a recorded limitation.
+    known_limitation: str | None = None
+
+
+class Curriculum(_Strict):
+    """Links to other problems by slug (docs/content-design §1.6)."""
+
+    assumes: tuple[str, ...] = ()  # prerequisite knowledge, in words
+    prerequisites: tuple[str, ...] = ()
+    equivalents: tuple[str, ...] = ()
+    transfer: tuple[str, ...] = ()
 
 
 class ProblemSpec(_Strict):
@@ -57,6 +74,7 @@ class ProblemSpec(_Strict):
     probes: dict[str, tuple[str, ...]] = Field(min_length=1)
     tests: tuple[TestCase, ...] = Field(min_length=1)
     error_models: tuple[ErrorModelSpec, ...] = ()
+    curriculum: Curriculum = Curriculum()
 
     @model_validator(mode="after")
     def _cross_references(self) -> Self:
@@ -82,13 +100,18 @@ class ProblemSpec(_Strict):
         problems += [
             f"duplicate test key {k!r}" for k in sorted(set(test_keys)) if test_keys.count(k) > 1
         ]
+        model_keys = [m.key for m in self.error_models]
         for test in self.tests:
             problems += [
                 f"test {test.key!r}: unknown probe {p!r}"
                 for p in test.probes
                 if p not in self.probes
             ]
-        model_keys = [m.key for m in self.error_models]
+            problems += [
+                f"test {test.key!r}: distinguishes unknown error model {m!r}"
+                for m in test.distinguishes or ()
+                if m not in model_keys
+            ]
         problems += [
             f"duplicate error model key {k!r}"
             for k in sorted(set(model_keys))
@@ -97,6 +120,10 @@ class ProblemSpec(_Strict):
         for model in self.error_models:
             if model.skill not in self.skills:
                 problems.append(f"error model {model.key!r}: unknown skill {model.skill!r}")
+        c = self.curriculum
+        for slug in (*c.prerequisites, *c.equivalents, *c.transfer):
+            if not re.fullmatch(_SLUG, slug) or slug == self.slug:
+                problems.append(f"curriculum: invalid problem reference {slug!r}")
         if self.solution_file == "harness.cpp":
             problems.append("solution_file must not be named harness.cpp")
         if not any(t.visibility is Visibility.SAMPLE for t in self.tests):

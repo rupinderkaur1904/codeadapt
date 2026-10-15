@@ -51,6 +51,7 @@ def attempt_record(submission: Submission, slug: str, diagnosis: DiagnosisRow) -
         outcome=Outcome(diagnosis.outcome),
         selected_model=diagnosis.selected_model,
         candidates=tuple(diagnosis.candidates),
+        qualified=diagnosis.rationale.get("evidence_strength") == "single_behaviour",
         tests=tests,
     )
 
@@ -143,6 +144,7 @@ def adapt(
                 failed=result.failed,
                 excluded=result.excluded,
                 probes=[p.model_dump(mode="json") for p in result.probes],
+                relation=result.relation.value,
             )
             session.add(evaluation)
     elif follows and index.outcome in _NO_EVIDENCE:

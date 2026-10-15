@@ -9,6 +9,11 @@ starting from what is actually in the repository. It covers two things:
 * **Proposed.** These candidate tests and bug models were measured the same way, in a
   scratch copy of the problem. They are not committed yet. Section 7 lists what changes.
 
+Since this record was written, `problem.toml` gained the design declarations (test
+`purpose` and `distinguishes`, E2's `known_limitation`, `[curriculum]`), which changes
+the content version hash (now `41dd7907bd39`). Tests, programs and measured outputs are unchanged; the live
+matrix is in [../content-reports/lower-bound.md](../content-reports/lower-bound.md).
+
 Notation: `·` means the same output as the reference. `TLE` is the `time_limit`
 signature. Numbers are the program's printed index.
 
@@ -173,7 +178,7 @@ candidates. The weakest pairs are:
 
 | Unmodelled error | Collides with | Consequence | Mitigation |
 | --- | --- | --- | --- |
-| `return min(lo, n - 1)` (clamps the end) | E2 on all three tests | False E2 diagnosis | None possible: both return `n - 1` exactly when the answer is `n`, so no input separates them. **Preserve the ambiguity.** E2's hint already says "can your search ever return `a.size()`?", which fits either cause, and the follow-up targets the skill rather than the specific bug. |
+| `return min(lo, n - 1)` (clamps the end) | E2 on all three tests | False E2 diagnosis | **Corrected by measurement (calibration, 2026-10-15).** Written naturally, the clamp returns `-1` on the empty array, which separates it from E2 (`UNMODELLED_BEHAVIOUR`). With an `if (a.empty()) return 0;` guard it is indistinguishable from E2 on every test and *is* diagnosed as E2 by v1. No input separates the guarded form. **Preserve the ambiguity:** diagnoses of E2 are now reported as qualified (ADR-019), E2's hint ("can your search ever return `a.size()`?") fits either cause, and the follow-up targets the skill rather than the specific bug. |
 | Any infinite loop elsewhere | E3 or E7 | A false termination diagnosis is possible if the loop happens on exactly E3's tests | Low risk: E3's pattern is specific (moving right with 2 candidates). Held-out cases for loops written in other styles are needed. |
 | Off-by-one only on duplicates (e.g. returns the last of a run) | E1 on duplicate tests | Separated by `equal_first` and `single_equal`, where E1 fails but this error does not | Already covered: strict consistency gives `UNMODELLED_BEHAVIOUR`. |
 
@@ -203,13 +208,12 @@ candidates. The weakest pairs are:
 | Matches no model | Unmodelled | **none claimed** | — | Do not invent a concept | Retry with test feedback; flagged for research review. |
 | All pass | — | — | Passing *these* tests | Says nothing about transfer | An equivalent problem not yet passed (policy v1), then a transfer problem (gap G3). |
 
-**Gap in the current implementation.** The evidence ledger (`adaptation/ledger.py`)
-attributes *every* failing test to every skill its probes name, whether or not a
-diagnosis explains the failure. Policy v1 only uses the ledger to *count* evidence when
-ranking problems, never to declare a skill weak, so nothing wrong is shown to students
-today. But this contradicts the rule above that an undistinguished failure is not
-concept-specific evidence. It must not be used as skill evidence until it records only
-outcomes that a diagnosis explains (§7, change C5).
+**Gap found in the implementation, now fixed (C5, ADR-019).** The evidence ledger
+(`adaptation/ledger.py`) attributed *every* failing test to every skill its probes name,
+whether or not a diagnosis explained the failure. Policy v1 only used the ledger to
+*count* evidence when ranking problems, so nothing wrong was shown to students, but it
+contradicted the rule above. Since policy 1.1 a failure is skill evidence only when a
+supported diagnosis explains it, and only for that model's skill.
 
 ## 6. Follow-up and curriculum links
 
@@ -245,13 +249,21 @@ Recommendation behaviour this design needs, compared with policy v1 today:
 | C5 | Ledger: record only diagnosis-explained outcomes as skill evidence | §5 gap | Changes adaptation inputs; needs an ADR and re-running the trajectories |
 | C6 | Diagnosis v2 candidate: count support by *distinct behaviour groups* rather than tests | §3 key finding (E2, E5) | Would turn E2 and E5 diagnoses into `INSUFFICIENT_EVIDENCE` unless more behaviours are added. Must be compared with v1 on the held-out set before adoption |
 
+**Status after the owner's review (2026-10-15).** C3, C4 and C5 are done. C6 was
+measured against v1 on the held-out and calibration sets and awaits an owner decision; the
+deployed method reports single-behaviour diagnoses as qualified instead. C1 and C2 remain
+proposals: they are not in `content/demo`, and need the owner's go-ahead because they
+change the content version. See
+[review-resolution-2026-10-15.md](review-resolution-2026-10-15.md).
+
 Applying C1 and C2 changes the content version. That starts a new fingerprint set and
 leaves old submissions tied to the old version, as designed. Regression check: the
 held-out results for lower-bound must be unchanged, or each change must be explained.
 
 ## 8. Known limitations of this problem as an instrument
 
-* E2's diagnosis rests on a single behaviour group, and E5's rests only on inputs with
+* E2's diagnosis rests on a single behaviour group (documented as `known_limitation`, and
+  reported to students as one possible cause), and E5's rests only on inputs with
   repeated targets. These are the diagnoses most likely to be wrong on real code.
 * The O(log n) requirement is stated but not assessed.
 * Uninitialised reads are not detected (no MSan in GCC).

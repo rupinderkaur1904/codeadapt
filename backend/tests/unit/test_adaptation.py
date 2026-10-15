@@ -7,8 +7,10 @@ from datetime import UTC, datetime, timedelta
 from codeadapt.adaptation import (
     Action,
     AttemptRecord,
+    Ledger,
     PolicyV1,
     ProbeResult,
+    Relation,
     Rule,
     TestStatus,
     Verdict,
@@ -32,6 +34,7 @@ def attempt(
     n: int = 0,
     model: str | None = None,
     candidates: tuple[str, ...] = (),
+    qualified: bool = False,
     failing: tuple[str, ...] = (),
     excluded: tuple[str, ...] = (),
 ) -> AttemptRecord:
@@ -52,6 +55,7 @@ def attempt(
         outcome=outcome,
         selected_model=model,
         candidates=candidates or ((model,) if model else ()),
+        qualified=qualified,
         tests=tests,
     )
 
@@ -268,3 +272,133 @@ def test_followups_without_usable_evidence_are_not_comparable() -> None:
     )
     follow = attempt("count-occurrences", Outcome.NO_FAILURE_OBSERVED, n=6)
     assert evaluate_followup(retry, follow, spec, follow, spec).verdict is Verdict.NOT_COMPARABLE
+
+
+# ------------------------------------------- ledger: explained failures only (ADR-019, C5)
+def failures(ledger: Ledger) -> dict[str, list[str]]:
+    return {
+        skill: [e.test_key for e in entries if e.status is TestStatus.FAILED]
+        for skill, entries in ledger.items()
+        if any(e.status is TestStatus.FAILED for e in entries)
+    }
+
+
+def test_ledger_attributes_explained_failures_only_to_the_models_skill() -> None:
+    looping = (
+        "sample_present",
+        "sample_absent",
+        "above_all",
+        "equal_last",
+        "duplicates_middle",
+        "single_above",
+        "two_between",
+        "large_absent",
+        "large_above_all",
+    )
+    a = attempt(
+        "lower-bound", Outcome.HYPOTHESIS_SUPPORTED, model="no_progress_update", failing=looping
+    )
+    ledger = build_ledger([a], PROBLEMS)
+    # These tests also probe equality, boundaries and specification; before C5 each
+    # failure was charged to all of them. Now only the diagnosed model's skill gets it.
+    assert failures(ledger) == {"loop_termination": list(looping)}
+    assert {
+        e.explained_by for e in ledger["loop_termination"] if e.status is TestStatus.FAILED
+    } == {"no_progress_update"}
+
+
+def test_unexplained_failures_are_not_skill_evidence() -> None:
+    failing = ("above_all", "single_above", "large_above_all", "equal_first")
+    for outcome in (
+        Outcome.AMBIGUOUS,
+        Outcome.UNMODELLED_BEHAVIOUR,
+        Outcome.INSUFFICIENT_EVIDENCE,
+        Outcome.UNRELIABLE_EVIDENCE,
+    ):
+        a = attempt(
+            "lower-bound",
+            outcome,
+            candidates=("hi_init_last_index", "upper_bound_confusion"),
+            failing=failing,
+        )
+        ledger = build_ledger([a], PROBLEMS)
+        assert failures(ledger) == {}, outcome
+        # Passing tests are still recorded under the skills their probes name.
+        passed = {e.test_key for e in ledger["equality_handling"]}
+        assert "equal_first" not in passed and "equal_last" in passed
+
+
+def test_failures_the_selected_model_does_not_own_are_never_reattributed() -> None:
+    # A supported diagnosis on a problem whose catalogue entry lacks the model (e.g. a
+    # stale record) cannot explain anything.
+    a = attempt("lower-bound", Outcome.HYPOTHESIS_SUPPORTED, model="gone", failing=("empty",))
+    assert failures(build_ledger([a], PROBLEMS)) == {}
+
+
+def test_policy_ranking_counts_only_explained_failures() -> None:
+    every_test = tuple(t.key for t in PROBLEMS["count-occurrences"].tests)
+    history = [
+        attempt("count-occurrences", Outcome.UNMODELLED_BEHAVIOUR, n=0, failing=every_test),
+        attempt("last-less-than", Outcome.UNMODELLED_BEHAVIOUR, n=1, failing=("empty",)),
+        attempt("lower-bound", Outcome.NO_FAILURE_OBSERVED, n=2),
+    ]
+    rec = POLICY.recommend(history[-1], history, PROBLEMS)
+    assert rec.policy_version == "1.1"
+    # Before C5 both problems counted 78 ledger entries: the 15 unexplained failures on
+    # count-occurrences and the 1 on last-less-than were charged to every probed skill.
+    assert [r["ledger_evidence"] for r in rec.rationale["ranking"]] == [48, 48]
+
+
+# ------------------------------------------- qualified hypotheses (ADR-019, review item 2)
+def test_qualified_or_documented_weak_diagnoses_are_passed_on_as_qualified() -> None:
+    weak = attempt(
+        "lower-bound",
+        Outcome.HYPOTHESIS_SUPPORTED,
+        model="hi_init_last_index",
+        failing=("above_all", "single_above", "large_above_all"),
+        qualified=True,
+    )
+    rec = POLICY.recommend(weak, [weak], PROBLEMS)
+    assert rec.rule is Rule.HYPOTHESIS_SUPPORTED
+    assert rec.rationale["qualified_hypothesis"] is True
+    assert "clamping" in rec.rationale["known_limitation"]
+    # The follow-up still targets the skill, never the specific error.
+    assert rec.target_skills == ("search_space_boundaries",)
+
+    strong = POLICY.recommend(LB_EQUALITY, [LB_EQUALITY], PROBLEMS)
+    assert strong.rationale["qualified_hypothesis"] is False
+    assert "known_limitation" not in strong.rationale
+
+
+# ------------------------------------------- follow-up relation (review item 5)
+def test_followup_records_its_relation_and_never_claims_mastery() -> None:
+    rec = POLICY.recommend(LB_EQUALITY, [LB_EQUALITY], PROBLEMS)
+    follow = attempt("count-occurrences", Outcome.NO_FAILURE_OBSERVED, n=5)
+    ev = evaluate_followup(
+        rec, LB_EQUALITY, PROBLEMS["lower-bound"], follow, PROBLEMS["count-occurrences"]
+    )
+    assert ev.relation is Relation.EQUIVALENT_PRACTICE
+    assert "equivalent practice problem" in ev.reason
+    assert "not evidence of mastery" in ev.reason
+
+    only = {"lower-bound": PROBLEMS["lower-bound"]}
+    retry_rec = POLICY.recommend(LB_EQUALITY, [LB_EQUALITY], only)
+    retry = attempt("lower-bound", Outcome.NO_FAILURE_OBSERVED, n=6)
+    ev = evaluate_followup(
+        retry_rec, LB_EQUALITY, PROBLEMS["lower-bound"], retry, PROBLEMS["lower-bound"]
+    )
+    assert ev.verdict is Verdict.CRITERION_MET
+    assert ev.relation is Relation.SAME_PROBLEM
+    assert "retry of the same problem" in ev.reason
+
+
+def test_transfer_links_are_reported_as_transfer_but_not_as_demonstrated() -> None:
+    lb = PROBLEMS["lower-bound"]
+    linked = lb.model_copy(
+        update={"curriculum": lb.curriculum.model_copy(update={"transfer": ("last-less-than",)})}
+    )
+    rec = POLICY.recommend(LB_EQUALITY, [LB_EQUALITY], PROBLEMS)
+    follow = attempt("last-less-than", Outcome.NO_FAILURE_OBSERVED, n=5)
+    ev = evaluate_followup(rec, LB_EQUALITY, linked, follow, PROBLEMS["last-less-than"])
+    assert ev.relation is Relation.TRANSFER
+    assert "not evidence of transfer" in ev.reason

@@ -28,6 +28,12 @@ single_element = ["search_space_boundaries", "loop_termination"]
 two_elements = ["loop_termination"]
 large_input = ["loop_termination"]
 
+# Links to other problems by slug (docs/content-design/README.md section 1.6).
+[curriculum]
+assumes = ["lower bound of a sorted array"]
+prerequisites = ["lower-bound"]
+equivalents = ["count-occurrences"]
+
 [[tests]]
 key = "sample_present"
 visibility = "sample"
@@ -35,6 +41,8 @@ input = "L 4 1 3 3 7 3"
 expected = "0"
 probes = ["target_present_duplicates"]
 student_description = "The target appears in the array."
+purpose = "Visible case with the target present."
+distinguishes = ["no_progress_update", "returns_insertion_point", "uses_le"]
 
 [[tests]]
 key = "sample_between"
@@ -43,6 +51,8 @@ input = "L 4 1 3 3 7 5"
 expected = "2"
 probes = ["target_absent_between"]
 student_description = "The target is absent and falls between two elements."
+purpose = "Visible absent-target case."
+distinguishes = ["no_progress_update", "returns_insertion_point"]
 
 [[tests]]
 key = "empty"
@@ -50,6 +60,8 @@ input = "L 0 3"
 expected = "-1"
 probes = ["empty_input"]
 student_description = "The array is empty."
+purpose = "Minimal input (n = 0): the answer is -1."
+distinguishes = ["clamps_to_zero", "returns_insertion_point"]
 
 [[tests]]
 key = "below_all"
@@ -57,6 +69,8 @@ input = "L 3 2 4 6 1"
 expected = "-1"
 probes = ["target_below_all"]
 student_description = "The target is smaller than every element."
+purpose = "No element is smaller: the answer is -1."
+distinguishes = ["clamps_to_zero", "returns_insertion_point"]
 
 [[tests]]
 key = "equal_first"
@@ -64,6 +78,8 @@ input = "L 3 2 4 6 2"
 expected = "-1"
 probes = ["target_below_all", "target_present_unique"]
 student_description = "The target equals the first element."
+purpose = "Only element equal or larger at index 0: -1, and separates uses_le."
+distinguishes = ["clamps_to_zero", "returns_insertion_point", "uses_le"]
 
 [[tests]]
 key = "above_all"
@@ -71,6 +87,8 @@ input = "L 3 2 4 6 9"
 expected = "2"
 probes = ["target_above_all"]
 student_description = "The target is larger than every element."
+purpose = "Answer is the last index: is n - 1 reachable?"
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_insertion_point"]
 
 [[tests]]
 key = "equal_last"
@@ -78,6 +96,8 @@ input = "L 3 2 4 6 6"
 expected = "1"
 probes = ["target_present_unique"]
 student_description = "The target equals the last element."
+purpose = "Target at the last index; equality at the other end."
+distinguishes = ["no_progress_update", "returns_insertion_point", "uses_le"]
 
 [[tests]]
 key = "duplicates_middle"
@@ -85,6 +105,8 @@ input = "L 6 1 2 2 2 2 3 2"
 expected = "0"
 probes = ["target_present_duplicates"]
 student_description = "The target appears several times in a row."
+purpose = "Run of the target; the answer is just before the run."
+distinguishes = ["no_progress_update", "returns_insertion_point", "uses_le"]
 
 [[tests]]
 key = "duplicates_all"
@@ -92,6 +114,8 @@ input = "D 7 5 5"
 expected = "-1"
 probes = ["target_present_duplicates", "target_below_all"]
 student_description = "Every element equals the target."
+purpose = "Every element equals the target: the answer is -1."
+distinguishes = ["clamps_to_zero", "returns_insertion_point", "uses_le"]
 
 [[tests]]
 key = "single_below"
@@ -99,6 +123,8 @@ input = "L 1 4 9"
 expected = "0"
 probes = ["single_element", "target_above_all"]
 student_description = "A one-element array whose element is smaller than the target."
+purpose = "Smallest case whose answer is the last index."
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_insertion_point"]
 
 [[tests]]
 key = "single_equal"
@@ -106,6 +132,8 @@ input = "L 1 4 4"
 expected = "-1"
 probes = ["single_element", "target_present_unique"]
 student_description = "A one-element array containing the target."
+purpose = "Smallest equality case: the answer is -1."
+distinguishes = ["clamps_to_zero", "returns_insertion_point", "uses_le"]
 
 [[tests]]
 key = "two_between"
@@ -113,6 +141,8 @@ input = "L 2 1 9 5"
 expected = "0"
 probes = ["two_elements", "target_absent_between"]
 student_description = "A two-element array with the target between the elements."
+purpose = "Smallest input on which a non-shrinking update loops."
+distinguishes = ["no_progress_update", "returns_insertion_point"]
 
 [[tests]]
 key = "large_between"
@@ -120,6 +150,8 @@ input = "A 200000 0 2 99999"
 expected = "49999"
 probes = ["large_input", "target_absent_between"]
 student_description = "A large array where the target is absent."
+purpose = "Scale, target absent. Does not test the O(log n) requirement."
+distinguishes = ["no_progress_update", "returns_insertion_point"]
 
 [[tests]]
 key = "large_above_all"
@@ -127,6 +159,8 @@ input = "A 200000 0 2 1000000000"
 expected = "199999"
 probes = ["large_input", "target_above_all"]
 student_description = "A large array where the target is larger than every element."
+purpose = "Scale version of above_all. Does not test the O(log n) requirement."
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_insertion_point"]
 
 [[tests]]
 key = "large_duplicates"
@@ -134,6 +168,8 @@ input = "D 200000 7 7"
 expected = "-1"
 probes = ["large_input", "target_present_duplicates"]
 student_description = "A large array in which every element equals the target."
+purpose = "Scale version of duplicates_all. Does not test the O(log n) requirement."
+distinguishes = ["clamps_to_zero", "returns_insertion_point", "uses_le"]
 
 [[error_models]]
 key = "uses_le"
@@ -162,6 +198,7 @@ file = "error_models/hi_init_last_index.cpp"
 skill = "search_space_boundaries"
 description = "Initialises hi = n - 1 with a half-open loop, so the boundary n is unreachable and the last index is never returned."
 student_hint = "Can your search ever return the last index? Check the initial bounds of the search space."
+known_limitation = "Detected only by tests whose answer is the last index (one behaviour group). Any error that cannot return n - 1 produces the same failures, so diagnoses are reported as qualified."
 
 [[error_models]]
 key = "no_progress_update"

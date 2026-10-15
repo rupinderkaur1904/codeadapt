@@ -2,6 +2,11 @@
 
 There is deliberately no latent "mastery" variable (methodology §5): the ledger is a
 reorganisation of stored evidence, nothing more.
+
+A failing test is evidence of a behavioural difference, not of a skill. So a failure enters
+the ledger only when a supported diagnosis explains it, and then only under the diagnosed
+model's skill (ADR-019, change C5). Failures in ambiguous, unmodelled, insufficient or
+unreliable attempts stay in the stored submission but are not skill evidence.
 """
 
 from __future__ import annotations
@@ -10,12 +15,18 @@ from collections.abc import Mapping, Sequence
 
 from codeadapt.adaptation.models import AttemptRecord, ProbeEvidence, ProbeResult, TestStatus
 from codeadapt.content.models import ProblemSpec
+from codeadapt.diagnosis.models import Outcome
 
 Ledger = dict[str, tuple[ProbeEvidence, ...]]
 
 
 def build_ledger(attempts: Sequence[AttemptRecord], problems: Mapping[str, ProblemSpec]) -> Ledger:
-    """Attribute every recorded test outcome to the skills its probes name.
+    """Attribute recorded test outcomes to skills.
+
+    Passed and excluded tests go to the skills their probes name (excluded ones stay
+    visible but are not counted). A failed test goes only to the skill of the error model
+    a supported diagnosis selected; with a supported diagnosis, strict consistency means
+    the model predicts every reliable failure. Other failures are left out.
 
     Attempts on problems missing from `problems`, and test keys the current spec does not
     define (an older content version), are skipped rather than guessed.
@@ -26,11 +37,24 @@ def build_ledger(attempts: Sequence[AttemptRecord], problems: Mapping[str, Probl
         if spec is None:
             continue
         by_key = {t.key: t for t in spec.tests}
+        model_skill = {m.key: m.skill for m in spec.error_models}
+        explaining = (
+            attempt.selected_model
+            if attempt.outcome is Outcome.HYPOTHESIS_SUPPORTED
+            and attempt.selected_model in model_skill
+            else None
+        )
         for key, status in attempt.tests.items():
             test = by_key.get(key)
             if test is None:
                 continue
-            for skill in sorted(spec.skills_probed_by(test)):
+            if status is TestStatus.FAILED:
+                if explaining is None:
+                    continue
+                skills = [model_skill[explaining]]
+            else:
+                skills = sorted(spec.skills_probed_by(test))
+            for skill in skills:
                 entries.setdefault(skill, []).append(
                     ProbeEvidence(
                         skill=skill,
@@ -38,6 +62,7 @@ def build_ledger(attempts: Sequence[AttemptRecord], problems: Mapping[str, Probl
                         test_key=key,
                         submission_id=attempt.submission_id,
                         status=status,
+                        explained_by=explaining if status is TestStatus.FAILED else None,
                     )
                 )
     return {skill: tuple(items) for skill, items in entries.items()}
