@@ -66,6 +66,8 @@ class TestVerdict(StrEnum):
     TIME_LIMIT = "time_limit"
     MEMORY_LIMIT = "memory_limit"
     OUTPUT_LIMIT = "output_limit"
+    UNDEFINED_BEHAVIOUR = "undefined_behaviour"  # sanitizer finding: output not trustworthy
+    INCONSISTENT = "inconsistent"  # repeated runs disagreed
     NOT_EVALUATED = "not_evaluated"
 
 
@@ -96,6 +98,8 @@ class FeedbackView(_Out):
     message: str
     hint: str | None = None
     related_cases: list[str] = []
+    # Undefined behaviour detected by the sanitizer build, phrased for students.
+    safety_findings: list[str] = []
 
 
 class CompileView(_Out):
@@ -124,7 +128,7 @@ class TraceView(_Out):
     submission: dict[str, Any]
     job: dict[str, Any]
     environment: dict[str, Any] | None
-    execution_run: dict[str, Any] | None
+    execution_runs: list[dict[str, Any]]  # standard build first, then the sanitizer build
     observations: list[dict[str, Any]]
     diagnosis: dict[str, Any] | None
     content_validation: dict[str, Any] | None

@@ -67,7 +67,21 @@ reason) when:
 * the observation is an `infrastructure_error`.
 
 UB found by the sanitiser is itself reported to the student as an actionable finding
-("reads past the end of the array on some inputs"), separately from the diagnosis.
+("reads or writes outside the bounds of an array or vector", with the cases where it
+occurred), separately from the diagnosis.
+
+**As implemented (M5).** Every test runs once in the standard build. Every test whose
+signature differs from the reference is run once more. If the second run disagrees, the
+test is excluded as non-deterministic. The ASan + UBSan build runs every test, and any test
+whose sanitiser report names a finding is excluded. Leak reports are ignored, and so are
+time-limit results that appear only under the slower sanitiser build. Content validation
+applies the same sanitiser build to the reference and every error model, and rejects
+content whose predictions rely on undefined behaviour.
+
+**Known blind spot.** GCC has no MemorySanitizer, so **reads of uninitialised variables
+are not detected directly**. Such reads are caught only when they make repeated runs
+disagree, which is not guaranteed. A clang/MSan build profile is the planned remedy, and it
+needs an MSan-instrumented standard library.
 
 ## 4. Diagnostic method v1: fingerprint consistency with abstention
 

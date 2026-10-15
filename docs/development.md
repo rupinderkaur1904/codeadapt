@@ -116,3 +116,10 @@ vulnerabilities. `npx playwright test`: 1 passed (about 1.2 min, most of it the 
 fingerprint measurement). **Not verified locally:** `docker compose build`, because base
 images could not be downloaded here (Docker Hub returned 429, GHCR was blocked, and PyPI was
 unreachable from build containers). The CI `compose` job covers it.
+
+### M5 (2026-10-15)
+
+Same environment as M1. `pytest`: **152 passed, 0 skipped, 0 failed** (122 unit, 30
+sandbox; about 5.7 min). `npm test`: 12 passed. `npx playwright test`: 1 passed (about
+1.9 min, because the first fingerprint measurement now includes the sanitiser build).
+Lint, format and type checks were clean.

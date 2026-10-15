@@ -18,6 +18,15 @@ from codeadapt.content.models import Visibility
 from codeadapt.db.models import DiagnosisRow, ExecutionRun, TestObservation
 from codeadapt.diagnosis import Outcome
 from codeadapt.evidence import OutcomeKind
+from codeadapt.evidence.reliability import GENERIC_PHRASE, STUDENT_PHRASES
+
+# Verdicts that are not evidence of a failure (passed, or excluded as unreliable).
+_NOT_FAILURES = {
+    TestVerdict.PASSED,
+    TestVerdict.NOT_EVALUATED,
+    TestVerdict.INCONSISTENT,
+    TestVerdict.UNDEFINED_BEHAVIOUR,
+}
 
 _KIND_VERDICT = {
     OutcomeKind.RUNTIME_ERROR.value: TestVerdict.RUNTIME_ERROR,
@@ -42,8 +51,14 @@ def test_views(
     views = []
     for number, test in enumerate(problem.spec.tests, start=1):
         obs = by_key.get(test.key)
-        if obs is None or obs.excluded_reason is not None:
+        if obs is None:
             verdict = TestVerdict.NOT_EVALUATED
+        elif obs.excluded_reason is not None:
+            verdict = (
+                TestVerdict.UNDEFINED_BEHAVIOUR
+                if obs.excluded_reason.startswith("sanitizer:")
+                else TestVerdict.INCONSISTENT
+            )
         elif (obs.signature_kind, obs.signature_detail) == reference.get(test.key):
             verdict = TestVerdict.PASSED
         else:
@@ -63,14 +78,36 @@ def test_views(
     return views
 
 
+def safety_findings(problem: LoadedProblem, diagnosis: DiagnosisRow) -> list[str]:
+    """One sentence per kind of undefined behaviour, naming the cases where it occurred."""
+    findings = diagnosis.rationale.get("reliability", {}).get("findings", {})
+    by_kind: dict[str, list[str]] = {}
+    for test in problem.spec.tests:
+        if test.key in findings:
+            by_kind.setdefault(findings[test.key]["kind"], []).append(test.student_description)
+    return [
+        f"Your program {STUDENT_PHRASES.get(kind, GENERIC_PHRASE)}. Seen in: {' '.join(cases)}"
+        for kind, cases in by_kind.items()
+    ]
+
+
 def feedback_view(
+    problem: LoadedProblem, diagnosis: DiagnosisRow, tests: list[TestResultView]
+) -> FeedbackView:
+    view = _feedback(problem, diagnosis, tests)
+    view.safety_findings = safety_findings(problem, diagnosis)
+    return view
+
+
+def _feedback(
     problem: LoadedProblem, diagnosis: DiagnosisRow, tests: list[TestResultView]
 ) -> FeedbackView:
     outcome = Outcome(diagnosis.outcome)
     failing = [
         t.description
         for t in tests
-        if t.verdict not in (TestVerdict.PASSED, TestVerdict.NOT_EVALUATED)
+        if t.verdict
+        not in (TestVerdict.PASSED, TestVerdict.NOT_EVALUATED, TestVerdict.INCONSISTENT)
     ]
     match outcome:
         case Outcome.COMPILE_ERROR:
@@ -87,9 +124,9 @@ def feedback_view(
         case Outcome.UNRELIABLE_EVIDENCE:
             return FeedbackView(
                 kind=FeedbackKind.INCONSISTENT_BEHAVIOUR,
-                message="Your program did not behave consistently, so we cannot draw conclusions "
-                "from these results. Look for reads of uninitialised variables or accesses "
-                "outside an array.",
+                message="Your program has undefined behaviour or did not behave consistently "
+                "between runs, so we cannot draw conclusions from its output. Fix the problems "
+                "listed below first.",
             )
         case Outcome.NO_FAILURE_OBSERVED:
             return FeedbackView(

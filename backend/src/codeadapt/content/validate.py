@@ -58,7 +58,10 @@ def _program_errors(fp: ProgramFingerprint) -> list[str]:
     if not fp.compiled:
         first = fp.compile.diagnostics.strip().splitlines()[:3]
         return [f"{who} does not compile ({fp.compile.status.value}): {' | '.join(first)}"]
-    errors = []
+    errors = [
+        f"{who} has undefined behaviour on test {key!r} (sanitizer: {kind})"
+        for key, kind in fp.sanitizer_findings.items()
+    ]
     for key, test in fp.tests.items():
         if not test.deterministic:
             runs = ", ".join(str(s) for s in test.runs)
@@ -79,6 +82,15 @@ def validate_fingerprints(
     warnings: list[str] = []
     for fp in fps.models.values():
         errors += _program_errors(fp)
+    unchecked = [
+        fp.label
+        for fp in (fps.reference, *fps.models.values())
+        if fp.compiled and not fp.sanitizer_checked
+    ]
+    if unchecked:
+        warnings.append(
+            f"sanitizer build unavailable; not checked for undefined behaviour: {unchecked}"
+        )
 
     ref = _signatures(fps.reference)
     for test in spec.tests:

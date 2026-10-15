@@ -7,6 +7,8 @@ const VERDICT_LABEL: Record<TestResultView["verdict"], string> = {
   time_limit: "Time limit exceeded",
   memory_limit: "Memory limit exceeded",
   output_limit: "Output limit exceeded",
+  undefined_behaviour: "Undefined behaviour",
+  inconsistent: "Inconsistent between runs",
   not_evaluated: "Not evaluated",
 };
 
@@ -67,6 +69,13 @@ function Feedback({ feedback }: { feedback: FeedbackView }) {
   return (
     <div className={`feedback feedback-${feedback.kind}`} data-testid="feedback">
       <p>{feedback.message}</p>
+      {feedback.safety_findings && feedback.safety_findings.length > 0 && (
+        <ul className="safety" aria-label="Safety problems">
+          {feedback.safety_findings.map((f) => (
+            <li key={f}>{f}</li>
+          ))}
+        </ul>
+      )}
       {feedback.hint && (
         <p className="hint">
           <strong>Hint:</strong> {feedback.hint}

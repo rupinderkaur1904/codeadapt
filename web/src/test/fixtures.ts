@@ -41,6 +41,7 @@ export const supported: SubmissionView = {
     message: "Your code fails a group of cases in a pattern.",
     hint: "Can your search ever return a.size()?",
     related_cases: ["The target is larger than every element."],
+    safety_findings: [],
   },
 };
 
@@ -51,5 +52,10 @@ export const compileError: SubmissionView = {
   created_at: "2026-10-15T05:01:00Z",
   compile: { ok: false, diagnostics: "solution.cpp:3: error: expected ';'" },
   tests: [],
-  feedback: { kind: "compile_error", message: "Your code did not compile.", related_cases: [] },
+  feedback: {
+    kind: "compile_error",
+    message: "Your code did not compile.",
+    related_cases: [],
+    safety_findings: [],
+  },
 };

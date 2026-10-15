@@ -11,8 +11,8 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M2 | Content model + first problem with executed fingerprints | M1 | done |
 | M3 | Persistence, worker, API — backend vertical slice | M2 | done |
 | M4 | Student workspace (frontend) — full vertical slice | M3 | done |
-| M5 | Evidence reliability: sanitiser + repeat runs | M3 | next |
-| M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | planned |
+| M5 | Evidence reliability: sanitiser + repeat runs | M3 | done |
+| M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | next |
 | M7 | Researcher console + synthetic evaluation harness | M5, M6 | planned |
 | M8 | Auth hardening, production isolation tier, deployment | M4, M7 | planned |
 | M9 | Pilot readiness (real-data separation, consent, study protocol) | M8 + owner input | planned |
@@ -92,6 +92,12 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   `UNRELIABLE_EVIDENCE` outcome; student-facing UB findings.
 * **Acceptance:** seeded UB submissions (OOB read, signed overflow, uninitialised read) are
   excluded/flagged rather than diagnosed.
+* **Result (2026-10-15):** partly met. An out-of-bounds read and a signed overflow are both
+  flagged and lead to `UNRELIABLE_EVIDENCE` with student-facing safety findings. The
+  overflow case matters because its outputs were all correct, so without the sanitiser it
+  would have looked like a clean pass. **An uninitialised read is not reliably detected,**
+  because GCC has no MemorySanitizer; this is documented in methodology §3. Content
+  validation now rejects reference solutions and error models that have undefined behaviour.
 
 ### M6 — Adaptation v1 and follow-up evaluation
 * **Objective:** second and third problems in the binary-search/boundaries family; ledger;

@@ -83,6 +83,11 @@ async def test_every_outcome_class_end_to_end(harness: Harness) -> None:
     assert all(t["verdict"] == "passed" for t in ref_view["tests"])
     assert ref_trace["content_validation"]["errors"] == []
     assert ref_trace["environment"]["compiler_version"].startswith("g++")
+    assert ref_view["feedback"]["safety_findings"] == []
+    reliability = ref_trace["diagnosis"]["rationale"]["reliability"]
+    assert reliability["sanitizer_available"] is True
+    assert reliability["findings"] == {}
+    assert [r["profile"] for r in ref_trace["execution_runs"]] == ["standard", "sanitize"]
 
     problem = harness.catalogue.by_slug["lower-bound"]
     for model in problem.spec.error_models:
@@ -113,6 +118,22 @@ async def test_every_outcome_class_end_to_end(harness: Harness) -> None:
     assert view["feedback"]["hint"] is None
     assert_student_view_is_safe(view)
 
+    # Undefined behaviour: out-of-bounds read. Failing tests are excluded, never diagnosed.
+    view, trace = await harness.submit((FIXTURES / "ub_out_of_bounds.cpp").read_text())
+    assert trace["diagnosis"]["outcome"] == "unreliable_evidence"
+    findings = trace["diagnosis"]["rationale"]["reliability"]["findings"]
+    assert findings["above_all"]["kind"] == "heap-buffer-overflow"
+    assert any("outside the bounds" in f for f in view["feedback"]["safety_findings"])
+    verdicts = {t["description"]: t["verdict"] for t in view["tests"]}
+    assert verdicts["The target is larger than every element."] == "undefined_behaviour"
+    assert view["feedback"]["hint"] is None
+    assert_student_view_is_safe(view)
+
+    # Undefined behaviour that does not change the output: still not a clean pass.
+    view, trace = await harness.submit((FIXTURES / "ub_signed_overflow.cpp").read_text())
+    assert trace["diagnosis"]["outcome"] == "unreliable_evidence"
+    assert any("signed integer" in f for f in view["feedback"]["safety_findings"])
+
     # Compilation failure.
     view, trace = await harness.submit((FIXTURES / "compile_error.cpp").read_text())
     assert trace["diagnosis"]["outcome"] == "compile_error"
@@ -120,14 +141,14 @@ async def test_every_outcome_class_end_to_end(harness: Harness) -> None:
     assert "expected ';'" in view["compile"]["diagnostics"]
     assert view["tests"] == []
 
+    # Wrong function signature: a link error, reported as a compile error, never diagnosed.
+    view, trace = await harness.submit("int lower_bound_index(int x) { return x; }\n")
+    assert trace["diagnosis"]["outcome"] == "compile_error"
+    assert view["feedback"]["kind"] == "compile_error"
+
     # Sample tests show input/expected/actual; hidden tests only their description.
     samples = [t for t in ref_view["tests"] if t["visibility"] == "sample"]
     hidden = [t for t in ref_view["tests"] if t["visibility"] == "hidden"]
     assert all(t["input"] and t["expected_output"] for t in samples)
     assert all(t["input"] is None and t["actual_output"] is None for t in hidden)
 
-
-async def test_wrong_signature_is_a_compile_error_not_a_diagnosis(harness: Harness) -> None:
-    view, trace = await harness.submit("int lower_bound_index(int x) { return x; }\n")
-    assert trace["diagnosis"]["outcome"] == "compile_error"
-    assert view["feedback"]["kind"] == "compile_error"
