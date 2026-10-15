@@ -199,6 +199,23 @@ heavily loaded, and it aborted one sandbox evaluation test. Re-run alone, that t
 Web: 18 unit tests passed; the end-to-end test passed. Details are in
 [../development.md](../development.md).
 
+**CI on commit d4c218a.** The web and compose jobs passed. Neither of the other two jobs
+passed on both attempts:
+
+* *Backend, first attempt:* 200 passed and 1 failed, from the same `docker kill`
+  timeout.
+* *Backend, re-run:* passed.
+* *End-to-end, on the re-run:* failed. While the worker was measuring lower-bound's
+  fingerprints, the error model `upper_bound_confusion` printed nothing on one run of
+  `large_absent` and `50000` on the other. Validation correctly refused the content as
+  non-deterministic, so nothing was diagnosed from it, but the student's submission
+  then failed.
+
+Neither failure is in code this change touches, but both point to the same open problem:
+under load, the sandbox sometimes loses a run's output or cannot kill a container in
+time. That needs its own investigation and fix in the execution layer. This change does
+not alter that layer.
+
 ## Decisions for you
 
 1. **C6.** Keep v1.1, where weak E2 diagnoses are reported as qualified, or adopt

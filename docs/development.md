@@ -159,3 +159,9 @@ sandbox containers were left behind. `npm test`: 18 passed. `npx playwright test
 runs. Held-out and calibration reports for both methods are in
 docs/evaluation/review-2026-10-15/. Lint, format, type and API-type drift checks were
 clean.
+
+On GitHub Actions (commit d4c218a), the web and compose jobs passed. The backend job
+failed once on the same `docker kill` timeout and passed on re-run. The end-to-end job
+then failed: `upper_bound_confusion` produced empty output on one run of `large_absent`,
+so worker-side validation rejected the content as non-deterministic and the job failed.
+Execution-layer reliability under load is an open issue.
