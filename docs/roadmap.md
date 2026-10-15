@@ -16,6 +16,7 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M7 | Researcher console + synthetic evaluation harness | M5, M6 | done |
 | M8 | Auth hardening, production isolation tier, deployment | M4, M7 | next |
 | M9 | Pilot readiness (real-data separation, consent, study protocol) | M8 + owner input | planned |
+| CE | Content expansion, designed for diagnosis (docs/content-design) | M7 | next (CE0) |
 
 ---
 
