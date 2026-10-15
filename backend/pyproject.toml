@@ -10,6 +10,7 @@ dependencies = [
 
 [project.scripts]
 codeadapt-run = "codeadapt.execution.cli:main"
+codeadapt-content = "codeadapt.content.cli:main"
 
 [dependency-groups]
 dev = [

@@ -29,6 +29,7 @@ On Windows, run the same commands in PowerShell (or WSL2). Use `copy` instead of
 | Sandbox tests only | `uv run pytest -m sandbox` |
 | Lint / format / types | `uv run ruff check src tests` · `uv run ruff format src tests` · `uv run mypy` |
 | Dependency audit | `uv export --no-hashes --no-emit-project --format requirements-txt > req.txt && uvx pip-audit -r req.txt` |
+| Validate problem content (executes it) | `uv run codeadapt-content validate ../content/demo` |
 | Run code by hand | `uv run codeadapt-run main.cpp [harness.cpp] --input in1.txt [--sanitize]` |
 | Remove sandbox leftovers after a crash | `docker rm -f $(docker ps -aq --filter label=org.codeadapt.sandbox=1)`; `docker volume rm $(docker volume ls -q --filter label=org.codeadapt.sandbox=1)` |
 
@@ -50,4 +51,10 @@ Local results are evidence about *this* environment only.
 | Sandbox image | `codeadapt-sandbox:gcc14.2-1` on `gcc:14.2.0@sha256:b99b86a2…f5d24c`; g++ 14.2.0 |
 | Python / uv | CPython 3.13.16 / uv 0.11.32 |
 | Results | `pytest`: **70 passed, 0 skipped, 0 failed** (42 unit, 28 sandbox; ≈ 49 s). `ruff check`, `ruff format --check`, `mypy --strict`: clean. `pip-audit`: no known vulnerabilities. No labelled containers or volumes left afterwards. |
-| Not tested | gVisor (`runsc`) runtime; cgroup v2 hosts; macOS/Windows Docker Desktop; arm64. CI (ubuntu-24.04, cgroup v2) is the second reference environment once it has run. |
+| Not tested | gVisor (`runsc`) runtime; cgroup v2 hosts; macOS/Windows Docker Desktop; arm64. GitHub Actions (ubuntu-24.04 runner) is the second reference environment: the M1 commit passed all CI steps there, including the sandbox tests. |
+
+### M2 (2026-10-15)
+
+Same environment as M1. `pytest`: **106 passed, 0 skipped, 0 failed** (77 unit, 29 sandbox;
+about 92 s). `ruff check`, `ruff format --check` and `mypy --strict` were clean.
+`codeadapt-content validate ../content/demo` reported `RESULT ok` with no warnings.

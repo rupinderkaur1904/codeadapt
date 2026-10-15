@@ -20,7 +20,8 @@ to the evidence behind it.
 | --- | --- |
 | M0 Repository foundation | done |
 | M1 Sandboxed execution core | done (dev isolation tier: Docker + runc) |
-| M2 Content model + first diagnostic problem | next |
+| M2 Content model + first diagnostic problem | done |
+| M3 Backend vertical slice (API, worker, diagnosis v1) | next |
 
 There is no web application yet. The full plan is in [docs/roadmap.md](docs/roadmap.md).
 **Do not deploy CodeAdapt where students can reach it** until milestone M8 (production
@@ -35,6 +36,7 @@ isolation tier) is complete. See [docs/security.md](docs/security.md).
 | [docs/methodology.md](docs/methodology.md) | diagnostic method, adaptation policy, evaluation plan |
 | [docs/roadmap.md](docs/roadmap.md) | milestones with acceptance criteria |
 | [docs/decisions.md](docs/decisions.md) | architecture decision log |
+| [docs/content-format.md](docs/content-format.md) | how problems, tests and error models are authored and validated |
 | [docs/development.md](docs/development.md) | setup, commands, tested environment |
 
 ## Quick start

@@ -274,7 +274,7 @@ web/             React frontend (from M4)
 
 | # | Risk / assumption | Mitigation / status |
 | --- | --- | --- |
-| R1 | **The GitHub repo is public.** Hidden tests, reference solutions and error models committed here are visible to students. | ADR-009: only `content/demo` lives here; real study content goes in a private content repository mounted via `CODEADAPT_CONTENT_DIR`. *Needs owner confirmation before a real study.* |
+| R1 | **The GitHub repo is public.** Hidden tests, reference solutions and error models committed here are visible to students. | ADR-009: only `content/demo` lives here; real study content goes in a private content repository mounted via `CODEADAPT_CONTENT_DIR`. Confirmed by the owner 2026-10-15. |
 | R2 | Container isolation (runc) shares the host kernel; a kernel exploit escapes. | Public deployment blocked until gVisor runtime + dedicated runner VM are in place and the M8 security checks pass (security.md §6). |
 | R3 | The error space for a problem is authored by us; unmodelled errors exist. | Method abstains with `UNMODELLED_BEHAVIOUR`; coverage is a reported metric, not hidden. |
 | R4 | Synthetic mutants are not real students. | Held-out mutants authored separately; real-data evaluation is a separate milestone with ethics/consent (needs owner's institutional context). |
