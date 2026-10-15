@@ -12,6 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
+from codeadapt.adaptation import PolicyV1
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.content.fingerprint import FingerprintSet, fingerprint_problem
 from codeadapt.content.loader import LoadedProblem
@@ -39,6 +40,7 @@ from codeadapt.execution.models import (
     EnvironmentInfo,
     RunResult,
 )
+from codeadapt.worker.adapt import adapt
 
 log = logging.getLogger(__name__)
 
@@ -54,11 +56,13 @@ class Pipeline:
         sessions: sessionmaker[Session],
         catalogue: Catalogue,
         method: DiagnosticMethod,
+        policy: PolicyV1 | None = None,
     ) -> None:
         self.sandbox = sandbox
         self.sessions = sessions
         self.catalogue = catalogue
         self.method = method
+        self.policy = policy or PolicyV1()
         self._fingerprint_lock = asyncio.Lock()
 
     # ------------------------------------------------------------------ job handling
@@ -190,6 +194,13 @@ class Pipeline:
         )
         session.add(row)
         session.commit()
+        # Adaptation runs on committed evidence; a failure here must not lose the diagnosis.
+        try:
+            adapt(session, submission, row, self.catalogue, self.policy)
+            session.commit()
+        except Exception:
+            log.exception("adaptation failed for submission %s", submission.id)
+            session.rollback()
         return row
 
     # ------------------------------------------------------------------ provenance

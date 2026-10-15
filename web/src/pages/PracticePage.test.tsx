@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
 import type { SubmissionView } from "../api/client";
-import { problem, supported } from "../test/fixtures";
+import { next, problem, supported } from "../test/fixtures";
 import { PracticePage } from "./PracticePage";
 
 // CodeMirror needs layout APIs jsdom lacks; a textarea keeps the contract.
@@ -55,6 +55,7 @@ describe("PracticePage", () => {
         return json({ id: "s1", status: "queued" }, 202);
       }
       if (url.endsWith("/submissions/s1")) return json(++polls < 2 ? queued : supported);
+      if (url.endsWith("/me/recommendation")) return json(next);
       throw new Error(`unexpected request ${url}`);
     });
 
@@ -68,6 +69,11 @@ describe("PracticePage", () => {
     expect(
       await screen.findByText(/Can your search ever return/, {}, { timeout: 4000 }),
     ).toBeInTheDocument();
+    // Once the attempt finishes, the next recommendation is shown with a link.
+    expect(await screen.findByRole("link", { name: "Go to Count occurrences" })).toHaveAttribute(
+      "href",
+      "/practice/count-occurrences",
+    );
     expect(posted).toEqual([{ problem_slug: "lower-bound", source: "int f() { return 1; }" }]);
     expect(polls).toBeGreaterThanOrEqual(2);
     // The draft is kept locally.

@@ -132,3 +132,44 @@ class TraceView(_Out):
     observations: list[dict[str, Any]]
     diagnosis: dict[str, Any] | None
     content_validation: dict[str, Any] | None
+    # The recommendation made after this submission, and the evaluation of the
+    # recommendation this submission followed (if any).
+    recommendation: dict[str, Any] | None = None
+    followup_evaluation: dict[str, Any] | None = None
+
+
+class RecommendationAction(StrEnum):
+    NEW_PROBLEM = "new_problem"
+    RETRY = "retry"
+    NONE = "none"
+
+
+class FollowupVerdict(StrEnum):
+    CRITERION_MET = "criterion_met"
+    CRITERION_NOT_MET = "criterion_not_met"
+    NOT_COMPARABLE = "not_comparable"
+
+
+class RecommendationView(_Out):
+    action: RecommendationAction
+    problem_slug: str | None
+    problem_title: str | None
+    message: str
+    # Student-facing descriptions of the targeted skills (never error-model keys).
+    focus: list[str]
+    based_on_submission_id: str
+    created_at: datetime
+
+
+class FollowupView(_Out):
+    verdict: FollowupVerdict
+    problem_slug: str
+    problem_title: str
+    message: str
+    submission_id: str
+    created_at: datetime
+
+
+class LearnerNext(_Out):
+    recommendation: RecommendationView | None
+    last_followup: FollowupView | None

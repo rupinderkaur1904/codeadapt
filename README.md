@@ -24,7 +24,8 @@ to the evidence behind it.
 | M3 Backend vertical slice (API, worker, diagnosis v1) | done |
 | M4 Student workspace (browser UI) | done |
 | M5 Evidence reliability (sanitiser, repeat runs) | done |
-| M6 Adaptive follow-up exercises | next |
+| M6 Adaptive follow-up exercises | done |
+| M7 Researcher console + synthetic evaluation harness | next |
 
 There is a working student workspace in the browser, an HTTP API and a sandboxed worker. The full plan is in [docs/roadmap.md](docs/roadmap.md).
 **Do not deploy CodeAdapt where students can reach it** until milestone M8 (production

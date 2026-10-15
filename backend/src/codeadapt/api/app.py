@@ -15,8 +15,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from codeadapt.api import feedback
+from codeadapt.api import feedback, recommendation
 from codeadapt.api.schemas import (
+    LearnerNext,
     ProblemDetail,
     ProblemSummary,
     SampleTest,
@@ -35,8 +36,10 @@ from codeadapt.db.models import (
     Environment,
     ExecutionRun,
     FingerprintSetRow,
+    FollowupEvaluationRow,
     Job,
     JobState,
+    RecommendationRow,
     Role,
     Submission,
     TestObservation,
@@ -232,6 +235,32 @@ def create_app(
     def get_submission(submission_id: str, session: DB, user: CurrentUser) -> SubmissionView:
         return submission_view(session, owned_submission(session, user, submission_id))
 
+    # ------------------------------------------------------------------ adaptation
+    @app.get("/api/v1/me/recommendation", response_model=LearnerNext)
+    def my_recommendation(session: DB, user: CurrentUser) -> LearnerNext:
+        """The current user's latest recommendation and latest follow-up verdict."""
+        rec = session.scalar(
+            select(RecommendationRow)
+            .where(RecommendationRow.user_id == user.id)
+            .order_by(RecommendationRow.id.desc())
+            .limit(1)
+        )
+        latest = session.execute(
+            select(FollowupEvaluationRow, RecommendationRow)
+            .join(
+                RecommendationRow, RecommendationRow.id == FollowupEvaluationRow.recommendation_id
+            )
+            .where(RecommendationRow.user_id == user.id)
+            .order_by(FollowupEvaluationRow.id.desc())
+            .limit(1)
+        ).first()
+        return LearnerNext(
+            recommendation=recommendation.recommendation_view(catalogue, rec) if rec else None,
+            last_followup=(
+                recommendation.followup_view(catalogue, latest[1], latest[0]) if latest else None
+            ),
+        )
+
     # ------------------------------------------------------------------ research
     @app.get("/api/v1/research/submissions/{submission_id}/trace", response_model=TraceView)
     def trace(
@@ -270,6 +299,12 @@ def create_app(
             observations=[_row(o) for o in observations],
             diagnosis=_row(diagnosis) if diagnosis else None,
             content_validation=fps.report if fps else None,
+            recommendation=_row(rec)
+            if (rec := _by_submission(session, RecommendationRow, sub.id))
+            else None,
+            followup_evaluation=(
+                _row(ev) if (ev := _by_submission(session, FollowupEvaluationRow, sub.id)) else None
+            ),
         )
 
     @app.get("/api/v1/health")
@@ -294,6 +329,14 @@ def _latest(session: Session, submission_id: str) -> DiagnosisRow | None:
         .where(DiagnosisRow.submission_id == submission_id)
         .order_by(DiagnosisRow.id.desc())
         .limit(1)
+    )
+
+
+def _by_submission(
+    session: Session, table: type[RecommendationRow] | type[FollowupEvaluationRow], sid: str
+) -> Any:
+    return session.scalar(
+        select(table).where(table.submission_id == sid).order_by(table.id.desc()).limit(1)
     )
 
 

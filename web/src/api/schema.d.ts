@@ -21,6 +21,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/recommendation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Recommendation
+         * @description The current user's latest recommendation and latest follow-up verdict.
+         */
+        get: operations["my_recommendation_api_v1_me_recommendation_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/problems": {
         parameters: {
             query?: never;
@@ -144,10 +164,37 @@ export interface components {
              */
             safety_findings: string[];
         };
+        /**
+         * FollowupVerdict
+         * @enum {string}
+         */
+        FollowupVerdict: "criterion_met" | "criterion_not_met" | "not_comparable";
+        /** FollowupView */
+        FollowupView: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Message */
+            message: string;
+            /** Problem Slug */
+            problem_slug: string;
+            /** Problem Title */
+            problem_title: string;
+            /** Submission Id */
+            submission_id: string;
+            verdict: components["schemas"]["FollowupVerdict"];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** LearnerNext */
+        LearnerNext: {
+            last_followup: components["schemas"]["FollowupView"] | null;
+            recommendation: components["schemas"]["RecommendationView"] | null;
         };
         /** ProblemDetail */
         ProblemDetail: {
@@ -174,6 +221,30 @@ export interface components {
             slug: string;
             /** Title */
             title: string;
+        };
+        /**
+         * RecommendationAction
+         * @enum {string}
+         */
+        RecommendationAction: "new_problem" | "retry" | "none";
+        /** RecommendationView */
+        RecommendationView: {
+            action: components["schemas"]["RecommendationAction"];
+            /** Based On Submission Id */
+            based_on_submission_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Focus */
+            focus: string[];
+            /** Message */
+            message: string;
+            /** Problem Slug */
+            problem_slug: string | null;
+            /** Problem Title */
+            problem_title: string | null;
         };
         /** SampleTest */
         SampleTest: {
@@ -264,6 +335,10 @@ export interface components {
             execution_runs: {
                 [key: string]: unknown;
             }[];
+            /** Followup Evaluation */
+            followup_evaluation?: {
+                [key: string]: unknown;
+            } | null;
             /** Job */
             job: {
                 [key: string]: unknown;
@@ -272,6 +347,10 @@ export interface components {
             observations: {
                 [key: string]: unknown;
             }[];
+            /** Recommendation */
+            recommendation?: {
+                [key: string]: unknown;
+            } | null;
             /** Submission */
             submission: {
                 [key: string]: unknown;
@@ -317,6 +396,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    my_recommendation_api_v1_me_recommendation_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-dev-role"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearnerNext"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -1,6 +1,7 @@
 """Relational schema (docs/architecture.md §4).
 
-Evidence tables (`execution_runs`, `test_observations`, `diagnoses`, `fingerprint_sets`)
+Evidence tables (`execution_runs`, `test_observations`, `diagnoses`, `fingerprint_sets`,
+`recommendations`, `followup_evaluations`)
 are append-only: the application inserts rows and never updates or deletes them. Only
 `jobs` carries mutable state.
 """
@@ -201,4 +202,48 @@ class DiagnosisRow(Base):
     candidates: Mapped[list[Any]]
     support: Mapped[int] = mapped_column(Integer)
     rationale: Mapped[dict[str, Any]]
+    created_at: Mapped[datetime] = _ts()
+
+
+class RecommendationRow(Base):
+    """Output of the adaptive policy after one diagnosis (append-only).
+
+    A learner's open recommendation is their latest one without a follow-up evaluation.
+    """
+
+    __tablename__ = "recommendations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    submission_id: Mapped[str] = mapped_column(ForeignKey("submissions.id"), index=True)
+    diagnosis_id: Mapped[int] = mapped_column(ForeignKey("diagnoses.id"))
+    policy: Mapped[str] = mapped_column(String(64))
+    policy_version: Mapped[str] = mapped_column(String(16))
+    rule: Mapped[str] = mapped_column(String(32))
+    action: Mapped[str] = mapped_column(String(16))
+    problem_slug: Mapped[str | None] = mapped_column(String(64))
+    target_skills: Mapped[list[Any]]
+    criterion: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    review_flag: Mapped[bool] = mapped_column(Boolean)
+    rationale: Mapped[dict[str, Any]]
+    created_at: Mapped[datetime] = _ts()
+
+
+class FollowupEvaluationRow(Base):
+    """Verdict on the first compiled attempt after a recommendation (append-only)."""
+
+    __tablename__ = "followup_evaluations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    recommendation_id: Mapped[int] = mapped_column(ForeignKey("recommendations.id"), unique=True)
+    submission_id: Mapped[str] = mapped_column(ForeignKey("submissions.id"), index=True)
+    diagnosis_id: Mapped[int] = mapped_column(ForeignKey("diagnoses.id"))
+    method: Mapped[str] = mapped_column(String(64))
+    method_version: Mapped[str] = mapped_column(String(16))
+    verdict: Mapped[str] = mapped_column(String(32))
+    reason: Mapped[str] = mapped_column(Text)
+    passed: Mapped[int] = mapped_column(Integer)
+    failed: Mapped[int] = mapped_column(Integer)
+    excluded: Mapped[int] = mapped_column(Integer)
+    probes: Mapped[list[Any]]
     created_at: Mapped[datetime] = _ts()

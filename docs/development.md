@@ -123,3 +123,12 @@ Same environment as M1. `pytest`: **152 passed, 0 skipped, 0 failed** (122 unit,
 sandbox; about 5.7 min). `npm test`: 12 passed. `npx playwright test`: 1 passed (about
 1.9 min, because the first fingerprint measurement now includes the sanitiser build).
 Lint, format and type checks were clean.
+
+### M6 (2026-10-15)
+
+Same environment as M1. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **173 passed, 0
+skipped, 0 failed** (142 unit, 31 sandbox; about 12.4 min, mostly the first fingerprint
+measurement of three problems). `npm test`: 15 passed. `npx playwright test`: 1 passed
+(about 2.0 min). `codeadapt-content validate ../content/demo` reported `RESULT ok` for all
+three problems with no warnings. Lint, format, type and API-type drift checks were clean.
+No sandbox containers or volumes were left behind.

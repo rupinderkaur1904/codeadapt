@@ -125,3 +125,20 @@ the main cause. Sanitiser findings exclude a test; the diagnosis treats exclusio
 rule 3. **Costs:** about twice the execution per submission, and the first fingerprint
 measurement for a content version takes about 90 s locally. **Limits:** uninitialised
 reads are not detected (no MSan in GCC).
+
+## ADR-017 — Adaptation v1: append-only recommendations, criterion verdicts (2026-10-15)
+**Context:** M6 needs a next-exercise policy and a way to judge the follow-up without
+claiming learning. **Decision:** the policy (`rule_policy` v1) and the evaluation
+(`criterion_check` v1) are pure functions over stored evidence. Their output goes into
+append-only `recommendations` and `followup_evaluations` tables; a learner's open
+recommendation is the latest one without an evaluation, so nothing is updated in place.
+Each recommendation records its success criterion *before* the follow-up exists. Verdicts
+are `criterion_met` / `criterion_not_met` / `not_comparable` rather than "improved",
+because without a comparison condition a met criterion is equally consistent with an
+easier problem. Candidate problems are limited to the index problem's family, and skills
+are matched by key across problems. Adaptation runs after the diagnosis is committed, so a
+failure in it is logged and never loses evidence. **Costs:** the ledger is rebuilt from
+the learner's whole history on every diagnosis (fine at pilot scale; index it later if
+needed). **Limits:** a recommendation can only target skills that the content's probes
+and error models name, and its ranking ties are broken by slug, which is arbitrary but
+deterministic.

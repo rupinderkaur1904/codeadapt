@@ -197,8 +197,8 @@ erDiagram
 | `execution_runs` | submission_id, environment_id, build profile, compile status/diagnostics, started/finished |
 | `test_observations` | run_id, test_case_id, status, stdout (capped) + sha256, stderr excerpt, exit_code, signal, wall_ms, oom, reliability flags, repeat_index |
 | `diagnoses` | submission_id, method, method_version, outcome enum, selected_error_model, candidates JSON, excluded tests JSON, rationale JSON |
-| `recommendations` | diagnosis_id, user_id, policy, policy_version, target problem_version, target skill, rationale JSON, success_criterion JSON |
-| `followup_evaluations` | recommendation_id, followup_submission_id, verdict (`improved`/`not_improved`/`not_comparable`), per-probe comparison JSON |
+| `recommendations` | user_id, submission_id, diagnosis_id, policy, policy_version, rule, action (`new_problem`/`retry`/`none`), problem_slug, target_skills JSON, criterion JSON, review_flag, rationale JSON |
+| `followup_evaluations` | recommendation_id (unique), submission_id, diagnosis_id, method, verdict (`criterion_met`/`criterion_not_met`/`not_comparable`), reason, passed/failed/excluded counts, per-probe comparison JSON |
 | `audit_events` | actor, action, object, at — for researcher access to student data |
 
 ## 5. API boundaries
@@ -213,7 +213,7 @@ with a stable machine `type` (e.g. `https://codeadapt.dev/errors/submission-too-
 | `GET /problems`, `GET /problems/{slug}` | student | statement, interface, sample tests only |
 | `POST /submissions` | student | `{problem_slug, source}` (current version resolved server-side); source ≤ 64 KiB; per-user rate limit (M8); returns 202 |
 | `GET /submissions/{id}` | owner | status + **student feedback projection** |
-| `GET /me/recommendations` | student | current recommended exercise + student-facing reason |
+| `GET /me/recommendation` | student | latest recommended exercise, student-facing reason and focus, and the latest follow-up verdict (M6) |
 | `GET /research/submissions?…` | researcher | filters: problem, outcome, data_class, method |
 | `GET /research/submissions/{id}/trace` | researcher | full evidence chain: observations, excluded tests, candidates, rationale, environment |
 | `GET /research/metrics?…` | researcher | coverage, abstention, selective accuracy (where ground truth exists) |
@@ -227,8 +227,8 @@ source are not present in the type, so they cannot leak by accident.
 
 `web/`: React + TS + Vite SPA. Routes: `/` (problem list) and `/practice/:slug`
 (statement, CodeMirror editor, submit, feedback panel, attempt history). `/research/*`
-(submission browser, trace viewer, metrics) comes in M7, and the recommended next exercise
-in M6. Data comes through a thin typed client over types generated from the OpenAPI schema
+(submission browser, trace viewer, metrics) comes in M7. Since M6 a "Recommended next" card
+appears on the problem list and after each finished attempt. Data comes through a thin typed client over types generated from the OpenAPI schema
 (`openapi-typescript`, checked for drift in CI), with TanStack Query for polling. There is
 no global state library. Drafts are kept in `localStorage` as a convenience only.
 

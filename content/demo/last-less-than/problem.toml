@@ -1,0 +1,171 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Real study problems live in a private content repository.
+
+slug = "last-less-than"
+title = "Last element less than"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp"
+interface = "int last_less_than(const std::vector<int>& a, int target);"
+
+[skills]
+search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+equality_handling = "Choosing the comparison so equal elements land on the correct side of the boundary."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# Probe -> skill mapping is a modelling assumption, not a fact.
+[probes]
+empty_input = ["search_space_boundaries", "problem_specification"]
+target_below_all = ["problem_specification"]
+target_above_all = ["search_space_boundaries"]
+target_present_unique = ["equality_handling"]
+target_present_duplicates = ["equality_handling"]
+target_absent_between = ["problem_specification"]
+single_element = ["search_space_boundaries", "loop_termination"]
+two_elements = ["loop_termination"]
+large_input = ["loop_termination"]
+
+[[tests]]
+key = "sample_present"
+visibility = "sample"
+input = "L 4 1 3 3 7 3"
+expected = "0"
+probes = ["target_present_duplicates"]
+student_description = "The target appears in the array."
+
+[[tests]]
+key = "sample_between"
+visibility = "sample"
+input = "L 4 1 3 3 7 5"
+expected = "2"
+probes = ["target_absent_between"]
+student_description = "The target is absent and falls between two elements."
+
+[[tests]]
+key = "empty"
+input = "L 0 3"
+expected = "-1"
+probes = ["empty_input"]
+student_description = "The array is empty."
+
+[[tests]]
+key = "below_all"
+input = "L 3 2 4 6 1"
+expected = "-1"
+probes = ["target_below_all"]
+student_description = "The target is smaller than every element."
+
+[[tests]]
+key = "equal_first"
+input = "L 3 2 4 6 2"
+expected = "-1"
+probes = ["target_below_all", "target_present_unique"]
+student_description = "The target equals the first element."
+
+[[tests]]
+key = "above_all"
+input = "L 3 2 4 6 9"
+expected = "2"
+probes = ["target_above_all"]
+student_description = "The target is larger than every element."
+
+[[tests]]
+key = "equal_last"
+input = "L 3 2 4 6 6"
+expected = "1"
+probes = ["target_present_unique"]
+student_description = "The target equals the last element."
+
+[[tests]]
+key = "duplicates_middle"
+input = "L 6 1 2 2 2 2 3 2"
+expected = "0"
+probes = ["target_present_duplicates"]
+student_description = "The target appears several times in a row."
+
+[[tests]]
+key = "duplicates_all"
+input = "D 7 5 5"
+expected = "-1"
+probes = ["target_present_duplicates", "target_below_all"]
+student_description = "Every element equals the target."
+
+[[tests]]
+key = "single_below"
+input = "L 1 4 9"
+expected = "0"
+probes = ["single_element", "target_above_all"]
+student_description = "A one-element array whose element is smaller than the target."
+
+[[tests]]
+key = "single_equal"
+input = "L 1 4 4"
+expected = "-1"
+probes = ["single_element", "target_present_unique"]
+student_description = "A one-element array containing the target."
+
+[[tests]]
+key = "two_between"
+input = "L 2 1 9 5"
+expected = "0"
+probes = ["two_elements", "target_absent_between"]
+student_description = "A two-element array with the target between the elements."
+
+[[tests]]
+key = "large_between"
+input = "A 200000 0 2 99999"
+expected = "49999"
+probes = ["large_input", "target_absent_between"]
+student_description = "A large array where the target is absent."
+
+[[tests]]
+key = "large_above_all"
+input = "A 200000 0 2 1000000000"
+expected = "199999"
+probes = ["large_input", "target_above_all"]
+student_description = "A large array where the target is larger than every element."
+
+[[tests]]
+key = "large_duplicates"
+input = "D 200000 7 7"
+expected = "-1"
+probes = ["large_input", "target_present_duplicates"]
+student_description = "A large array in which every element equals the target."
+
+[[error_models]]
+key = "uses_le"
+file = "error_models/uses_le.cpp"
+skill = "equality_handling"
+description = "Uses a[mid] <= target where a[mid] < target is required, so it returns the last element less than or equal to the target."
+student_hint = "Check whether an element equal to the target should count as less than it."
+
+[[error_models]]
+key = "returns_insertion_point"
+file = "error_models/returns_insertion_point.cpp"
+skill = "problem_specification"
+description = "Returns the boundary (the first index with a[i] >= target) instead of the index just before it."
+student_hint = "Re-read which index the specification asks for, relative to the boundary your search finds."
+
+[[error_models]]
+key = "clamps_to_zero"
+file = "error_models/clamps_to_zero.cpp"
+skill = "problem_specification"
+description = "Returns 0 instead of -1 when no element is less than the target."
+student_hint = "Re-read what should be returned when no element is less than the target."
+
+[[error_models]]
+key = "hi_init_last_index"
+file = "error_models/hi_init_last_index.cpp"
+skill = "search_space_boundaries"
+description = "Initialises hi = n - 1 with a half-open loop, so the boundary n is unreachable and the last index is never returned."
+student_hint = "Can your search ever return the last index? Check the initial bounds of the search space."
+
+[[error_models]]
+key = "no_progress_update"
+file = "error_models/no_progress_update.cpp"
+skill = "loop_termination"
+description = "Updates lo = mid instead of lo = mid + 1; when two candidates remain the search space stops shrinking and the loop does not terminate."
+student_hint = "Make sure every iteration of your loop strictly shrinks the search range."

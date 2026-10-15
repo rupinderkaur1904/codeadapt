@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { api } from "../api/client";
 import { ErrorMessage } from "../components/ErrorMessage";
+import { RecommendationCard } from "../components/RecommendationCard";
 
 export function ProblemListPage() {
   const problems = useQuery({ queryKey: ["problems"], queryFn: api.listProblems });
@@ -11,6 +12,7 @@ export function ProblemListPage() {
   return (
     <section>
       <h1>Problems</h1>
+      <RecommendationCard />
       <ul className="problem-list">
         {problems.data.map((p) => (
           <li key={p.slug}>

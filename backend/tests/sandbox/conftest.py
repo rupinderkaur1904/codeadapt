@@ -9,8 +9,11 @@ from __future__ import annotations
 import os
 
 import pytest
+from sqlalchemy.orm import Session, sessionmaker
 
+from codeadapt.config import Settings
 from codeadapt.execution import DockerSandbox, DockerSandboxConfig, SandboxUnavailableError
+from tests.sandbox.test_end_to_end import Harness
 
 
 @pytest.fixture(scope="session")
@@ -23,6 +26,12 @@ async def sandbox() -> DockerSandbox:
             pytest.fail(f"sandbox required but unavailable: {exc}")
         pytest.skip(f"sandbox unavailable: {exc}")
     return sb
+
+
+@pytest.fixture
+def harness(settings: Settings, sessions: sessionmaker[Session], sandbox: DockerSandbox) -> Harness:
+    """API + worker pipeline over a fresh database, driven by a synthetic dev student."""
+    return Harness(settings, sessions, sandbox)
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:

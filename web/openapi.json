@@ -77,6 +77,54 @@
         "title": "FeedbackView",
         "type": "object"
       },
+      "FollowupVerdict": {
+        "enum": [
+          "criterion_met",
+          "criterion_not_met",
+          "not_comparable"
+        ],
+        "title": "FollowupVerdict",
+        "type": "string"
+      },
+      "FollowupView": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "problem_slug": {
+            "title": "Problem Slug",
+            "type": "string"
+          },
+          "problem_title": {
+            "title": "Problem Title",
+            "type": "string"
+          },
+          "submission_id": {
+            "title": "Submission Id",
+            "type": "string"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/FollowupVerdict"
+          }
+        },
+        "required": [
+          "verdict",
+          "problem_slug",
+          "problem_title",
+          "message",
+          "submission_id",
+          "created_at"
+        ],
+        "title": "FollowupView",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -88,6 +136,37 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LearnerNext": {
+        "additionalProperties": false,
+        "properties": {
+          "last_followup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FollowupView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RecommendationView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "recommendation",
+          "last_followup"
+        ],
+        "title": "LearnerNext",
         "type": "object"
       },
       "ProblemDetail": {
@@ -159,6 +238,76 @@
           "family"
         ],
         "title": "ProblemSummary",
+        "type": "object"
+      },
+      "RecommendationAction": {
+        "enum": [
+          "new_problem",
+          "retry",
+          "none"
+        ],
+        "title": "RecommendationAction",
+        "type": "string"
+      },
+      "RecommendationView": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/RecommendationAction"
+          },
+          "based_on_submission_id": {
+            "title": "Based On Submission Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "focus": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Focus",
+            "type": "array"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "problem_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem Slug"
+          },
+          "problem_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem Title"
+          }
+        },
+        "required": [
+          "action",
+          "problem_slug",
+          "problem_title",
+          "message",
+          "focus",
+          "based_on_submission_id",
+          "created_at"
+        ],
+        "title": "RecommendationView",
         "type": "object"
       },
       "SampleTest": {
@@ -416,6 +565,18 @@
             "title": "Execution Runs",
             "type": "array"
           },
+          "followup_evaluation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Followup Evaluation"
+          },
           "job": {
             "additionalProperties": true,
             "title": "Job",
@@ -428,6 +589,18 @@
             },
             "title": "Observations",
             "type": "array"
+          },
+          "recommendation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation"
           },
           "submission": {
             "additionalProperties": true,
@@ -515,6 +688,53 @@
           }
         },
         "summary": "Health"
+      }
+    },
+    "/api/v1/me/recommendation": {
+      "get": {
+        "description": "The current user's latest recommendation and latest follow-up verdict.",
+        "operationId": "my_recommendation_api_v1_me_recommendation_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-dev-role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Dev-Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnerNext"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "My Recommendation"
       }
     },
     "/api/v1/problems": {
