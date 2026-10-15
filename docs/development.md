@@ -165,3 +165,9 @@ failed once on the same `docker kill` timeout and passed on re-run. The end-to-e
 then failed: `upper_bound_confusion` produced empty output on one run of `large_absent`,
 so worker-side validation rejected the content as non-deterministic and the job failed.
 Execution-layer reliability under load is an open issue.
+
+Follow-up (ADR-020): kill wait raised to 60 s, client/container exit mismatch classified as
+an infrastructure error, and fingerprint measurement re-measures infrastructure errors.
+Unit: 174 passed. Sandbox execution, security and demo-content tests: 29 passed. The lost
+output was not reproduced in 200 stressed local runs, so whether the mismatch check
+catches it is not yet shown.

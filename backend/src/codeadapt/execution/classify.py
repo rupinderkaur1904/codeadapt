@@ -24,6 +24,10 @@ class RawOutcome:
     oom_killed: bool
     timed_out: bool  # host-side wall deadline fired
     output_overflow: bool  # a capped stream exceeded its cap
+    # The `docker run` client's exit status disagreed with the container's own exit code
+    # on a run that finished by itself. The attached output streams cannot then be
+    # trusted (seen in CI: exit 0 with empty stdout), so the run is not evidence.
+    stream_mismatch: bool = False
 
 
 def signal_of(exit_code: int | None) -> int | None:
@@ -38,7 +42,7 @@ def signal_of(exit_code: int | None) -> int | None:
 
 
 def classify_run(raw: RawOutcome) -> RunStatus:
-    if not raw.started:
+    if not raw.started or raw.stream_mismatch:
         return RunStatus.INFRASTRUCTURE_ERROR
     # Order matters: resource-limit verdicts explain a subsequent non-zero exit.
     if raw.oom_killed:
@@ -55,7 +59,7 @@ def classify_run(raw: RawOutcome) -> RunStatus:
 
 
 def classify_compile(raw: RawOutcome) -> CompileStatus:
-    if not raw.started:
+    if not raw.started or raw.stream_mismatch:
         return CompileStatus.INFRASTRUCTURE_ERROR
     if raw.oom_killed:
         return CompileStatus.MEMORY_LIMIT
