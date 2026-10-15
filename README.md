@@ -42,6 +42,8 @@ isolation tier) is complete. See [docs/security.md](docs/security.md).
 | [docs/roadmap.md](docs/roadmap.md) | milestones with acceptance criteria |
 | [docs/decisions.md](docs/decisions.md) | architecture decision log |
 | [docs/content-format.md](docs/content-format.md) | how problems, tests and error models are authored and validated |
+| [docs/content-design/](docs/content-design/README.md) | how problems are designed for diagnosis; worked example (lower-bound); content-expansion milestone |
+| [docs/evaluation/](docs/evaluation/synthetic-2026-10-15.md) | synthetic evaluation reports (not evidence about real students) |
 | [docs/development.md](docs/development.md) | setup, commands, tested environment |
 
 ## Quick start
