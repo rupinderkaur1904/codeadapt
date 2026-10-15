@@ -5,15 +5,21 @@ description = "Evidence-driven adaptive C++ learning and diagnostic platform"
 requires-python = ">=3.12"
 license = { text = "Proprietary" }
 dependencies = [
+    "alembic>=1.14",
+    "fastapi>=0.115",
     "pydantic>=2.9,<3",
+    "sqlalchemy>=2.0.36",
+    "uvicorn>=0.32",
 ]
 
 [project.scripts]
 codeadapt-run = "codeadapt.execution.cli:main"
 codeadapt-content = "codeadapt.content.cli:main"
+codeadapt-worker = "codeadapt.worker.main:main"
 
 [dependency-groups]
 dev = [
+    "httpx2>=2.13.1",
     "mypy>=1.13",
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
@@ -39,7 +45,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "S108", "S603", "S607", "E501", "ASYNC221", "PT012"]
+"tests/**" = ["S101", "S108", "S603", "S607", "E501", "ASYNC221", "PT012", "PT018"]
 
 [tool.mypy]
 strict = true

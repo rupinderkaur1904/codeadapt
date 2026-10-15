@@ -9,8 +9,8 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M0 | Repository foundation | — | done |
 | M1 | Sandboxed execution core | M0 | done (dev tier, runc) |
 | M2 | Content model + first problem with executed fingerprints | M1 | done |
-| M3 | Persistence, worker, API — backend vertical slice | M2 | next |
-| M4 | Student workspace (frontend) — full vertical slice | M3 | planned |
+| M3 | Persistence, worker, API — backend vertical slice | M2 | done |
+| M4 | Student workspace (frontend) — full vertical slice | M3 | next |
 | M5 | Evidence reliability: sanitiser + repeat runs | M3 | planned |
 | M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | planned |
 | M7 | Researcher console + synthetic evaluation harness | M5, M6 | planned |
@@ -68,6 +68,12 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   `HYPOTHESIS_SUPPORTED` or a documented `AMBIGUOUS`; reference yields
   `NO_FAILURE_OBSERVED`; a non-compiling source yields `COMPILE_ERROR`; a held-out
   double-bug yields an abstention.
+* **Result (2026-10-15):** met. Through the API and worker with the real sandbox, all 5
+  error models gave `HYPOTHESIS_SUPPORTED` for the correct model (support ≥ 2), with no
+  `AMBIGUOUS` cases. The reference and a differently written correct solution gave
+  `NO_FAILURE_OBSERVED`. A held-out, differently written `<=` bug was recognised. A
+  double bug gave `UNMODELLED_BEHAVIOUR`. Syntax and signature errors gave `COMPILE_ERROR`.
+  These are synthetic checks of the mechanism, not accuracy measurements.
 
 ### M4 — Student workspace
 * **Objective:** browser workspace: statement, editor, submit, feedback panel with

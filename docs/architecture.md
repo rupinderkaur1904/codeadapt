@@ -211,7 +211,7 @@ with a stable machine `type` (e.g. `https://codeadapt.dev/errors/submission-too-
 | --- | --- | --- |
 | `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | any | session cookie; CSRF token header for state-changing requests |
 | `GET /problems`, `GET /problems/{slug}` | student | statement, interface, sample tests only |
-| `POST /submissions` | student | `{problem_version_id, source}`; source ≤ 64 KiB; per-user rate limit; returns 202 |
+| `POST /submissions` | student | `{problem_slug, source}` (current version resolved server-side); source ≤ 64 KiB; per-user rate limit (M8); returns 202 |
 | `GET /submissions/{id}` | owner | status + **student feedback projection** |
 | `GET /me/recommendations` | student | current recommended exercise + student-facing reason |
 | `GET /research/submissions?…` | researcher | filters: problem, outcome, data_class, method |
