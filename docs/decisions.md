@@ -142,3 +142,17 @@ the learner's whole history on every diagnosis (fine at pilot scale; index it la
 needed). **Limits:** a recommendation can only target skills that the content's probes
 and error models name, and its ranking ties are broken by slug, which is arbitrary but
 deterministic.
+
+## ADR-018 — Evaluation harness shares the worker's evidence path; dev role switch in the UI (2026-10-15)
+**Context:** M7 must report methodology §6.1 metrics, and a harness that collected
+evidence differently from the worker would measure a different system. **Decision:**
+evidence collection moved to `evidence/collect.py`, used by both the worker and
+`codeadapt-eval`. The harness writes no database rows and its reports carry no
+timestamps, so reruns compare byte for byte. Held-out cases live in `eval/heldout/` with a
+`cases.toml` manifest per problem (`truth` = error-model key, `correct` or `unmodelled`).
+The research API reports counts only, since stored submissions have no ground truth.
+Until real authentication exists (M8), the web app has a "development role" selector that
+sets the `X-Dev-Role` header; the API ignores it outside development. **Limits:** the
+harness runs every case's evidence concurrently, so runtime grows with the sandbox host's
+capacity; cross-environment reproducibility is not yet measured.
+

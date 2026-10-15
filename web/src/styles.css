@@ -158,3 +158,52 @@ dl.sample dd {
 .followup-criterion_met {
   color: var(--pass);
 }
+.app-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.app-header nav {
+  display: flex;
+  gap: 12px;
+}
+.dev-role {
+  margin-left: auto;
+  font-size: 0.85em;
+  color: var(--muted);
+}
+.badge-pass {
+  color: var(--pass);
+}
+.filters {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.counts {
+  padding-left: 18px;
+}
+table.research {
+  font-size: 0.9em;
+  overflow-x: auto;
+  display: block;
+}
+.fields div {
+  display: flex;
+  gap: 8px;
+}
+.fields dt {
+  font-weight: 600;
+  min-width: 160px;
+}
+.fields dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

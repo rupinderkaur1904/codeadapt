@@ -18,10 +18,11 @@ from codeadapt.db import queue
 from codeadapt.diagnosis import FingerprintConsistencyV1
 from codeadapt.execution import DockerSandbox
 from codeadapt.worker.pipeline import Pipeline
-from tests.paths import DEMO_CONTENT
+from tests.paths import DEMO_CONTENT, HELDOUT
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "lower_bound"
 PROBLEM_DIR = DEMO_CONTENT / "lower-bound"
+HELDOUT_LB = HELDOUT / "lower-bound"
 STUDENT = {"X-Dev-Role": "student"}
 RESEARCHER = {"X-Dev-Role": "researcher"}
 
@@ -98,16 +99,16 @@ async def test_every_outcome_class_end_to_end(harness: Harness) -> None:
         assert_student_view_is_safe(view)
 
     # A held-out variant written differently from the error model is still recognised.
-    _, trace = await harness.submit((FIXTURES / "heldout_upper_bound_closed.cpp").read_text())
+    _, trace = await harness.submit((HELDOUT_LB / "upper_bound_closed.cpp").read_text())
     assert trace["diagnosis"]["outcome"] == "hypothesis_supported"
     assert trace["diagnosis"]["selected_model"] == "upper_bound_confusion"
 
     # A different correct algorithm: no failure observed.
-    _, trace = await harness.submit((FIXTURES / "heldout_correct_iterative.cpp").read_text())
+    _, trace = await harness.submit((HELDOUT_LB / "correct_iterative.cpp").read_text())
     assert trace["diagnosis"]["outcome"] == "no_failure_observed"
 
     # Two bugs at once: outside the model space, so the method abstains.
-    view, trace = await harness.submit((FIXTURES / "heldout_double_bug.cpp").read_text())
+    view, trace = await harness.submit((HELDOUT_LB / "double_bug.cpp").read_text())
     assert trace["diagnosis"]["outcome"] == "unmodelled_behaviour"
     assert trace["diagnosis"]["selected_model"] is None
     assert view["feedback"]["kind"] == "failing_cases"

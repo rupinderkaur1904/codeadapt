@@ -214,10 +214,10 @@ with a stable machine `type` (e.g. `https://codeadapt.dev/errors/submission-too-
 | `POST /submissions` | student | `{problem_slug, source}` (current version resolved server-side); source ≤ 64 KiB; per-user rate limit (M8); returns 202 |
 | `GET /submissions/{id}` | owner | status + **student feedback projection** |
 | `GET /me/recommendation` | student | latest recommended exercise, student-facing reason and focus, and the latest follow-up verdict (M6) |
-| `GET /research/submissions?…` | researcher | filters: problem, outcome, data_class, method |
+| `GET /research/submissions?…` | researcher | filters: problem_slug, outcome, data_class; latest diagnosis, recommendation and follow-up per row (M7) |
 | `GET /research/submissions/{id}/trace` | researcher | full evidence chain: observations, excluded tests, candidates, rationale, environment |
-| `GET /research/metrics?…` | researcher | coverage, abstention, selective accuracy (where ground truth exists) |
-| `POST /research/replay` | researcher | re-run a diagnostic method version over stored evidence (no re-execution) |
+| `GET /research/metrics?data_class=` | researcher | counts of outcomes, recommendation rules, review flags and follow-up verdicts (M7). Accuracy metrics need ground truth and come from `codeadapt-eval`, not from this endpoint |
+| `POST /research/replay` | researcher | planned: re-run a diagnostic method version over stored evidence (no re-execution) |
 
 The student projection is a separate Pydantic model built by an explicit allow-list
 function; hidden inputs, expected outputs, error-model keys, fingerprints and harness

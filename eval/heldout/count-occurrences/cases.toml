@@ -1,0 +1,31 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# These were written separately from the error models but by the same author;
+# see docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "count-occurrences"
+
+[[cases]]
+file = "same_comparison_twice.cpp"
+truth = "upper_uses_strict"
+note = "Same strict comparison for both boundaries."
+
+[[cases]]
+file = "inclusive_end_formula.cpp"
+truth = "inclusive_count"
+note = "Adds one to a half-open difference."
+
+[[cases]]
+file = "bounded_by_last_index.cpp"
+truth = "hi_init_last_index"
+note = "Both searches start at the last index."
+
+[[cases]]
+file = "closed_interval_correct.cpp"
+truth = "correct"
+note = "Correct closed-interval searches."
+
+[[cases]]
+file = "presence_only.cpp"
+truth = "unmodelled"
+note = "Returns 1 if present, else 0."

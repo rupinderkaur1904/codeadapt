@@ -1,4 +1,5 @@
 /** Thin typed client over the CodeAdapt HTTP API. Types come from the generated OpenAPI schema. */
+import { getDevRole } from "../devRole";
 import type { components } from "./schema";
 
 export type ProblemSummary = components["schemas"]["ProblemSummary"];
@@ -8,6 +9,22 @@ export type SubmissionAccepted = components["schemas"]["SubmissionAccepted"];
 export type TestResultView = components["schemas"]["TestResultView"];
 export type FeedbackView = components["schemas"]["FeedbackView"];
 export type LearnerNext = components["schemas"]["LearnerNext"];
+export type ResearchSubmissionRow = components["schemas"]["ResearchSubmissionRow"];
+export type ResearchMetrics = components["schemas"]["ResearchMetrics"];
+export type TraceView = components["schemas"]["TraceView"];
+
+export interface ResearchFilters {
+  problem_slug?: string;
+  outcome?: string;
+  data_class?: string;
+}
+
+function query(params: object): string {
+  const entries = Object.entries(params).filter(
+    (e): e is [string, string] => typeof e[1] === "string" && e[1] !== "",
+  );
+  return entries.length ? `?${new URLSearchParams(entries).toString()}` : "";
+}
 
 /** RFC 9457 problem details returned by the API for every error. */
 export class ApiError extends Error {
@@ -26,7 +43,11 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`/api/v1${path}`, {
     ...init,
-    headers: { Accept: "application/json", ...(init?.headers ?? {}) },
+    headers: {
+      Accept: "application/json",
+      "X-Dev-Role": getDevRole(),
+      ...(init?.headers ?? {}),
+    },
   });
   if (!response.ok) {
     let body: { type?: string; title?: string; detail?: string } = {};
@@ -58,6 +79,12 @@ export const api = {
   listSubmissions: (problemSlug: string) =>
     request<SubmissionView[]>(`/submissions?problem_slug=${encodeURIComponent(problemSlug)}`),
   myRecommendation: () => request<LearnerNext>("/me/recommendation"),
+  researchSubmissions: (filters: ResearchFilters) =>
+    request<ResearchSubmissionRow[]>(`/research/submissions${query(filters)}`),
+  researchMetrics: (dataClass?: string) =>
+    request<ResearchMetrics>(`/research/metrics${query({ data_class: dataClass })}`),
+  trace: (id: string) =>
+    request<TraceView>(`/research/submissions/${encodeURIComponent(id)}/trace`),
 };
 
 export function isFinished(view: Pick<SubmissionView, "status">): boolean {

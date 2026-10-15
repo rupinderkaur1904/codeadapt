@@ -213,6 +213,32 @@ Limitations stated with every report: synthetic bugs come from the same authors 
 model; held-out ≠ real-world distribution; selective accuracy here is an *upper bound*
 on what real students' code will show.
 
+**As implemented (M7).** `codeadapt-eval` (`backend/src/codeadapt/evaluation/`) loads
+`eval/heldout/<problem>/cases.toml`, measures each problem's fingerprints, validates the
+content, then runs every case through the same evidence collection
+(`evidence/collect.py`) and diagnostic method as the worker, twice by default. It writes
+JSON and Markdown reports containing no timestamps, so two runs can be compared byte for
+byte. Definitions as computed:
+
+* *Buggy* cases are those whose truth is not `correct`; *modelled-bug* cases are those
+  whose truth is an error-model key.
+* Coverage = buggy cases diagnosed / buggy cases. Selective accuracy = diagnoses equal to
+  the truth / diagnoses. False negatives = modelled-bug cases not diagnosed / modelled-bug
+  cases. Correct code is reported separately as cases with `NO_FAILURE_OBSERVED`.
+* Reproducibility = cases whose outcome, selected model and every observed test
+  signature were identical across the repeated runs, in one environment. Cross-environment
+  reproducibility (runc vs runsc, two hosts) is not measured yet; it needs M8's gVisor host.
+* Suite discrimination is taken from content validation: identical model pairs, and the
+  number of tests detecting each model.
+* A ratio with a zero denominator is printed as `n/a`, never as 0% or 100%.
+
+The 2026-10-15 report is in [evaluation/synthetic-2026-10-15.md](evaluation/synthetic-2026-10-15.md).
+Its 14 new held-out cases were written before the method was run on them; the other 3
+date from M3 and had been run before. Several held-out cases are close in algorithm to
+their error model (for example, `classic_exact_search.cpp` is the same textbook search
+as `exact_match_sentinel`), which makes those diagnoses easy. That is a weakness of the
+set, not evidence of robustness.
+
 ### 6.2 Real students (needs owner/institution input)
 
 Only with consent and ethics approval. Adds: agreement of diagnoses with blinded expert

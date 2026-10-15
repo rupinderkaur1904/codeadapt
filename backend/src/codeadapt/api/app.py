@@ -5,6 +5,7 @@ Run in development:  uvicorn codeadapt.api.app:create_app --factory
 
 import hashlib
 import uuid
+from collections import Counter
 from collections.abc import Iterator
 from typing import Annotated, Any
 
@@ -20,6 +21,8 @@ from codeadapt.api.schemas import (
     LearnerNext,
     ProblemDetail,
     ProblemSummary,
+    ResearchMetrics,
+    ResearchSubmissionRow,
     SampleTest,
     SubmissionAccepted,
     SubmissionCreate,
@@ -39,6 +42,7 @@ from codeadapt.db.models import (
     FollowupEvaluationRow,
     Job,
     JobState,
+    ProblemVersion,
     RecommendationRow,
     Role,
     Submission,
@@ -46,6 +50,7 @@ from codeadapt.db.models import (
     User,
 )
 from codeadapt.db.session import as_utc, make_engine, make_session_factory
+from codeadapt.diagnosis import Outcome
 
 ERROR_BASE = "https://codeadapt.dev/errors/"
 PROBLEM_JSON = "application/problem+json"
@@ -150,9 +155,25 @@ def create_app(
 
     # ------------------------------------------------------------------ problems
     @app.get("/api/v1/problems", response_model=list[ProblemSummary])
-    def list_problems(_: CurrentUser) -> list[ProblemSummary]:
+    def list_problems(session: DB, user: CurrentUser) -> list[ProblemSummary]:
+        passed = set(
+            session.scalars(
+                select(ProblemVersion.slug)
+                .join(Submission, Submission.problem_version == ProblemVersion.version)
+                .join(DiagnosisRow, DiagnosisRow.submission_id == Submission.id)
+                .where(
+                    Submission.user_id == user.id,
+                    DiagnosisRow.outcome == Outcome.NO_FAILURE_OBSERVED.value,
+                )
+            )
+        )
         return [
-            ProblemSummary(slug=p.spec.slug, title=p.spec.title, family=p.spec.family)
+            ProblemSummary(
+                slug=p.spec.slug,
+                title=p.spec.title,
+                family=p.spec.family,
+                no_failure_observed=p.spec.slug in passed,
+            )
             for p in catalogue.problems
         ]
 
@@ -262,10 +283,112 @@ def create_app(
         )
 
     # ------------------------------------------------------------------ research
+    Researcher = Annotated[User, Depends(researcher)]  # noqa: N806 - type alias
+
+    @app.get("/api/v1/research/submissions", response_model=list[ResearchSubmissionRow])
+    def research_submissions(
+        session: DB,
+        _: Researcher,
+        problem_slug: str | None = None,
+        outcome: str | None = None,
+        data_class: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[ResearchSubmissionRow]:
+        """Every user's submissions, newest first, with optional filters."""
+        query = (
+            select(Submission, User, ProblemVersion.slug)
+            .join(User, User.id == Submission.user_id)
+            .join(ProblemVersion, ProblemVersion.version == Submission.problem_version)
+        )
+        if problem_slug:
+            query = query.where(ProblemVersion.slug == problem_slug)
+        if data_class:
+            query = query.where(Submission.data_class == data_class)
+        if outcome:
+            latest = (
+                select(DiagnosisRow.submission_id)
+                .where(DiagnosisRow.outcome == outcome)
+                .scalar_subquery()
+            )
+            query = query.where(Submission.id.in_(latest))
+        query = (
+            query.order_by(Submission.created_at.desc(), Submission.id)
+            .limit(max(1, min(limit, 200)))
+            .offset(max(0, offset))
+        )
+        rows = []
+        for sub, user, slug in session.execute(query):
+            diagnosis = _latest(session, sub.id)
+            rec = _by_submission(session, RecommendationRow, sub.id)
+            ev = _by_submission(session, FollowupEvaluationRow, sub.id)
+            rows.append(
+                ResearchSubmissionRow(
+                    id=sub.id,
+                    created_at=as_utc(sub.created_at),
+                    username=user.username,
+                    data_class=sub.data_class,
+                    origin=sub.origin,
+                    problem_slug=slug,
+                    status=_status(sub.job),
+                    outcome=diagnosis.outcome if diagnosis else None,
+                    selected_model=diagnosis.selected_model if diagnosis else None,
+                    support=diagnosis.support if diagnosis else None,
+                    recommendation_rule=rec.rule if rec else None,
+                    recommended_problem=rec.problem_slug if rec else None,
+                    review_flag=bool(rec and rec.review_flag),
+                    followup_verdict=ev.verdict if ev else None,
+                )
+            )
+        return rows
+
+    @app.get("/api/v1/research/metrics", response_model=ResearchMetrics)
+    def research_metrics(
+        session: DB, _: Researcher, data_class: str | None = None
+    ) -> ResearchMetrics:
+        """Counts over stored evidence; latest diagnosis per submission."""
+        subs = select(Submission.id, ProblemVersion.slug).join(
+            ProblemVersion, ProblemVersion.version == Submission.problem_version
+        )
+        if data_class:
+            subs = subs.where(Submission.data_class == data_class)
+        slugs: dict[str, str] = {row[0]: row[1] for row in session.execute(subs)}
+        outcomes: Counter[str] = Counter()
+        by_problem: dict[str, Counter[str]] = {}
+        latest: dict[str, str] = {}
+        for sid, value in session.execute(
+            select(DiagnosisRow.submission_id, DiagnosisRow.outcome)
+            .where(DiagnosisRow.submission_id.in_(list(slugs)))
+            .order_by(DiagnosisRow.id)
+        ):
+            latest[sid] = value
+        for sid, value in latest.items():
+            outcomes[value] += 1
+            by_problem.setdefault(slugs[sid], Counter())[value] += 1
+        recs = list(
+            session.scalars(
+                select(RecommendationRow).where(RecommendationRow.submission_id.in_(list(slugs)))
+            )
+        )
+        verdicts = Counter(
+            session.scalars(
+                select(FollowupEvaluationRow.verdict).where(
+                    FollowupEvaluationRow.submission_id.in_(list(slugs))
+                )
+            )
+        )
+        return ResearchMetrics(
+            data_class=data_class,
+            submissions=len(slugs),
+            outcomes=dict(sorted(outcomes.items())),
+            outcomes_by_problem={k: dict(sorted(v.items())) for k, v in sorted(by_problem.items())},
+            recommendations_by_rule=dict(sorted(Counter(r.rule for r in recs).items())),
+            flagged_for_review=sum(r.review_flag for r in recs),
+            followup_verdicts=dict(sorted(verdicts.items())),
+        )
+
     @app.get("/api/v1/research/submissions/{submission_id}/trace", response_model=TraceView)
-    def trace(
-        submission_id: str, session: DB, _: Annotated[User, Depends(researcher)]
-    ) -> TraceView:
+    def trace(submission_id: str, session: DB, _: Researcher) -> TraceView:
         sub = session.get(Submission, submission_id)
         if sub is None:
             raise ApiError(404, "not-found", "Submission not found")

@@ -75,6 +75,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/research/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Research Metrics
+         * @description Counts over stored evidence; latest diagnosis per submission.
+         */
+        get: operations["research_metrics_api_v1_research_metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Research Submissions
+         * @description Every user's submissions, newest first, with optional filters.
+         */
+        get: operations["research_submissions_api_v1_research_submissions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/research/submissions/{submission_id}/trace": {
         parameters: {
             query?: never;
@@ -217,6 +257,11 @@ export interface components {
         ProblemSummary: {
             /** Family */
             family: string;
+            /**
+             * No Failure Observed
+             * @default false
+             */
+            no_failure_observed: boolean;
             /** Slug */
             slug: string;
             /** Title */
@@ -245,6 +290,72 @@ export interface components {
             problem_slug: string | null;
             /** Problem Title */
             problem_title: string | null;
+        };
+        /**
+         * ResearchMetrics
+         * @description Researcher-only operational counts. There is no ground truth here, so no accuracy.
+         */
+        ResearchMetrics: {
+            /** Data Class */
+            data_class: string | null;
+            /** Flagged For Review */
+            flagged_for_review: number;
+            /** Followup Verdicts */
+            followup_verdicts: {
+                [key: string]: number;
+            };
+            /** Outcomes */
+            outcomes: {
+                [key: string]: number;
+            };
+            /** Outcomes By Problem */
+            outcomes_by_problem: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Recommendations By Rule */
+            recommendations_by_rule: {
+                [key: string]: number;
+            };
+            /** Submissions */
+            submissions: number;
+        };
+        /**
+         * ResearchSubmissionRow
+         * @description Researcher-only: one submission with its latest diagnosis and adaptation output.
+         */
+        ResearchSubmissionRow: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Data Class */
+            data_class: string;
+            /** Followup Verdict */
+            followup_verdict: string | null;
+            /** Id */
+            id: string;
+            /** Origin */
+            origin: string;
+            /** Outcome */
+            outcome: string | null;
+            /** Problem Slug */
+            problem_slug: string;
+            /** Recommendation Rule */
+            recommendation_rule: string | null;
+            /** Recommended Problem */
+            recommended_problem: string | null;
+            /** Review Flag */
+            review_flag: boolean;
+            /** Selected Model */
+            selected_model: string | null;
+            status: components["schemas"]["SubmissionStatus"];
+            /** Support */
+            support: number | null;
+            /** Username */
+            username: string;
         };
         /** SampleTest */
         SampleTest: {
@@ -482,6 +593,76 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProblemDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_metrics_api_v1_research_metrics_get: {
+        parameters: {
+            query?: {
+                data_class?: string | null;
+            };
+            header?: {
+                "x-dev-role"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchMetrics"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_submissions_api_v1_research_submissions_get: {
+        parameters: {
+            query?: {
+                problem_slug?: string | null;
+                outcome?: string | null;
+                data_class?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: {
+                "x-dev-role"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchSubmissionRow"][];
                 };
             };
             /** @description Validation Error */

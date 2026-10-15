@@ -20,6 +20,8 @@ class ProblemSummary(_Out):
     slug: str
     title: str
     family: str
+    # True when the current user has an attempt on this problem with no failing test.
+    no_failure_observed: bool = False
 
 
 class SampleTest(_Out):
@@ -173,3 +175,34 @@ class FollowupView(_Out):
 class LearnerNext(_Out):
     recommendation: RecommendationView | None
     last_followup: FollowupView | None
+
+
+class ResearchSubmissionRow(_Out):
+    """Researcher-only: one submission with its latest diagnosis and adaptation output."""
+
+    id: str
+    created_at: datetime
+    username: str
+    data_class: str
+    origin: str
+    problem_slug: str
+    status: SubmissionStatus
+    outcome: str | None
+    selected_model: str | None
+    support: int | None
+    recommendation_rule: str | None
+    recommended_problem: str | None
+    review_flag: bool
+    followup_verdict: str | None
+
+
+class ResearchMetrics(_Out):
+    """Researcher-only operational counts. There is no ground truth here, so no accuracy."""
+
+    data_class: str | None
+    submissions: int
+    outcomes: dict[str, int]
+    outcomes_by_problem: dict[str, dict[str, int]]
+    recommendations_by_rule: dict[str, int]
+    flagged_for_review: int
+    followup_verdicts: dict[str, int]

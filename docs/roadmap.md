@@ -13,8 +13,8 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M4 | Student workspace (frontend) — full vertical slice | M3 | done |
 | M5 | Evidence reliability: sanitiser + repeat runs | M3 | done |
 | M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | done |
-| M7 | Researcher console + synthetic evaluation harness | M5, M6 | next |
-| M8 | Auth hardening, production isolation tier, deployment | M4, M7 | planned |
+| M7 | Researcher console + synthetic evaluation harness | M5, M6 | done |
+| M8 | Auth hardening, production isolation tier, deployment | M4, M7 | next |
 | M9 | Pilot readiness (real-data separation, consent, study protocol) | M8 + owner input | planned |
 
 ---
@@ -117,6 +117,16 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 * **Objective:** researcher views (trace, filters, metrics) and `codeadapt-eval` that runs the
   held-out synthetic set and emits the methodology §6.1 metrics with counts.
 * **Acceptance:** report generated from a clean checkout; numbers reproduced on a second run.
+* **Result (2026-10-15):** met. `codeadapt-eval` ran all 17 held-out synthetic cases
+  twice in each of two invocations from the working tree, and the two JSON reports were
+  byte-identical. On this set: coverage 9/13 buggy cases, selective accuracy 9/9,
+  0 false-positive diagnoses, 0/9 modelled bugs missed, 4/4 correct programs with no
+  failure observed, 4 abstentions (all `unmodelled_behaviour`, all on cases outside the
+  model space), 17/17 reproducible. These numbers are from a small, same-author set and
+  are an upper bound, not an accuracy claim (methodology §6.1). Researchers get a
+  submission list with filters, outcome counts and a per-submission trace page in the web
+  app; students see which problems they have passed. Cross-environment reproducibility
+  and `POST /research/replay` are deferred.
 
 ### M8 — Hardening and deployment
 * **Objective:** real auth (Argon2id, sessions, CSRF, rate limits), audit log for researcher
