@@ -1,4 +1,4 @@
-import type { ProblemDetail, SubmissionView } from "../api/client";
+import type { LearnerNext, ProblemDetail, SubmissionView } from "../api/client";
 
 export const problem: ProblemDetail = {
   slug: "lower-bound",
@@ -57,5 +57,25 @@ export const compileError: SubmissionView = {
     message: "Your code did not compile.",
     related_cases: [],
     safety_findings: [],
+  },
+};
+
+export const next: LearnerNext = {
+  recommendation: {
+    action: "new_problem",
+    problem_slug: "count-occurrences",
+    problem_title: "Count occurrences",
+    message: "Your last attempt behaved as if it had the specific error described in its feedback.",
+    focus: ["Choosing the comparison so equal elements land on the correct side of the boundary."],
+    based_on_submission_id: "s1",
+    created_at: "2026-10-15T05:02:00Z",
+  },
+  last_followup: {
+    verdict: "criterion_met",
+    problem_slug: "lower-bound",
+    problem_title: "Lower bound",
+    message: "On Lower bound, your follow-up passed all 7 tests related to the recommended focus.",
+    submission_id: "s0",
+    created_at: "2026-10-15T05:00:00Z",
   },
 };

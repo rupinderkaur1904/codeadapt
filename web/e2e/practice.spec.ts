@@ -27,9 +27,16 @@ test("student submits, sees diagnosis feedback, fixes the bug and passes", async
   await expect(feedback).toContainText("The target is larger than every element.");
   // Internal labels never reach the student.
   await expect(page.locator("body")).not.toContainText("hi_init_last_index");
+  // The adaptive policy recommends another problem that probes the same skill.
+  const next = page.getByRole("complementary", { name: "Recommended next" });
+  await expect(next.getByRole("link", { name: "Go to Count occurrences" })).toBeVisible();
 
   await replaceCode(page, read("reference.cpp"));
   await page.getByRole("button", { name: "Submit" }).click();
   await expect(feedback).toContainText("passed all 15 tests");
   await expect(page.getByText("15/15 tests passed")).toBeVisible();
+  await expect(next).toContainText("Your last attempt passed every test.");
+
+  await next.getByRole("link", { name: "Go to Count occurrences" }).click();
+  await expect(page.getByRole("heading", { name: "Count occurrences", level: 1 })).toBeVisible();
 });

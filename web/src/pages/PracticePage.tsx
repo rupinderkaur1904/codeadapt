@@ -7,6 +7,7 @@ import { api, isFinished } from "../api/client";
 import { AttemptHistory } from "../components/AttemptHistory";
 import { CodeEditor } from "../components/CodeEditor";
 import { ErrorMessage } from "../components/ErrorMessage";
+import { RECOMMENDATION_KEY, RecommendationCard } from "../components/RecommendationCard";
 import { SubmissionResult } from "../components/SubmissionResult";
 import { loadDraft, saveDraft } from "../drafts";
 
@@ -58,7 +59,10 @@ function Workspace(props: { slug: string; title: string; statement: string; star
   const finished = selected.data !== undefined && isFinished(selected.data);
   useEffect(() => {
     // When the selected attempt finishes, refresh the history so its summary updates.
-    if (finished) void queryClient.invalidateQueries({ queryKey: ["submissions", slug] });
+    // The worker records the next recommendation before it marks the attempt finished.
+    if (!finished) return;
+    void queryClient.invalidateQueries({ queryKey: ["submissions", slug] });
+    void queryClient.invalidateQueries({ queryKey: RECOMMENDATION_KEY });
   }, [finished, queryClient, slug]);
 
   const pending = submit.isPending || (selected.data !== undefined && !finished);
@@ -95,6 +99,7 @@ function Workspace(props: { slug: string; title: string; statement: string; star
         {submit.isError && <ErrorMessage error={submit.error} />}
         {selected.isError && <ErrorMessage error={selected.error} />}
         {selected.data && <SubmissionResult submission={selected.data} />}
+        {finished && <RecommendationCard currentSlug={slug} />}
         <h2>Your attempts</h2>
         {history.isError ? (
           <ErrorMessage error={history.error} />

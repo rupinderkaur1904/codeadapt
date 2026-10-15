@@ -7,6 +7,7 @@ export type SubmissionView = components["schemas"]["SubmissionView"];
 export type SubmissionAccepted = components["schemas"]["SubmissionAccepted"];
 export type TestResultView = components["schemas"]["TestResultView"];
 export type FeedbackView = components["schemas"]["FeedbackView"];
+export type LearnerNext = components["schemas"]["LearnerNext"];
 
 /** RFC 9457 problem details returned by the API for every error. */
 export class ApiError extends Error {
@@ -56,6 +57,7 @@ export const api = {
   getSubmission: (id: string) => request<SubmissionView>(`/submissions/${encodeURIComponent(id)}`),
   listSubmissions: (problemSlug: string) =>
     request<SubmissionView[]>(`/submissions?problem_slug=${encodeURIComponent(problemSlug)}`),
+  myRecommendation: () => request<LearnerNext>("/me/recommendation"),
 };
 
 export function isFinished(view: Pick<SubmissionView, "status">): boolean {

@@ -146,3 +146,15 @@ dl.sample dd {
 .safety {
   color: var(--fail);
 }
+.recommendation {
+  background: var(--panel);
+  border-left: 4px solid var(--accent);
+  padding: 8px 12px;
+  margin: 12px 0;
+}
+.recommendation h2 {
+  margin-top: 4px;
+}
+.followup-criterion_met {
+  color: var(--pass);
+}

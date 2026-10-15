@@ -1,0 +1,163 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Real study problems live in a private content repository.
+
+slug = "count-occurrences"
+title = "Count occurrences"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp"
+interface = "int count_occurrences(const std::vector<int>& a, int target);"
+
+[skills]
+search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+equality_handling = "Choosing the comparison so equal elements land on the correct side of the boundary."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# Probe -> skill mapping is a modelling assumption, not a fact.
+[probes]
+empty_input = ["search_space_boundaries"]
+target_absent = ["problem_specification"]
+target_present_unique = ["equality_handling"]
+target_present_duplicates = ["equality_handling"]
+run_at_end = ["search_space_boundaries"]
+single_element = ["search_space_boundaries", "loop_termination"]
+two_elements = ["loop_termination"]
+large_input = ["loop_termination"]
+
+[[tests]]
+key = "sample_run"
+visibility = "sample"
+input = "L 5 1 2 2 2 5 2"
+expected = "3"
+probes = ["target_present_duplicates"]
+student_description = "The target appears several times in a row."
+
+[[tests]]
+key = "sample_absent"
+visibility = "sample"
+input = "L 5 1 2 2 2 5 3"
+expected = "0"
+probes = ["target_absent"]
+student_description = "The target is absent."
+
+[[tests]]
+key = "empty"
+input = "L 0 3"
+expected = "0"
+probes = ["empty_input", "target_absent"]
+student_description = "The array is empty."
+
+[[tests]]
+key = "below_all"
+input = "L 3 2 4 6 1"
+expected = "0"
+probes = ["target_absent"]
+student_description = "The target is smaller than every element."
+
+[[tests]]
+key = "above_all"
+input = "L 3 2 4 6 9"
+expected = "0"
+probes = ["target_absent"]
+student_description = "The target is larger than every element."
+
+[[tests]]
+key = "unique_middle"
+input = "L 3 2 4 6 4"
+expected = "1"
+probes = ["target_present_unique"]
+student_description = "The target appears once, in the middle."
+
+[[tests]]
+key = "run_at_start"
+input = "L 5 3 3 3 4 9 3"
+expected = "3"
+probes = ["target_present_duplicates"]
+student_description = "A run of the target starts the array."
+
+[[tests]]
+key = "run_at_end"
+input = "L 5 1 2 7 7 7 7"
+expected = "3"
+probes = ["target_present_duplicates", "run_at_end"]
+student_description = "A run of the target ends the array."
+
+[[tests]]
+key = "all_equal"
+input = "D 7 5 5"
+expected = "7"
+probes = ["target_present_duplicates", "run_at_end"]
+student_description = "Every element equals the target."
+
+[[tests]]
+key = "single_equal"
+input = "L 1 4 4"
+expected = "1"
+probes = ["single_element", "target_present_unique", "run_at_end"]
+student_description = "A one-element array containing the target."
+
+[[tests]]
+key = "single_other"
+input = "L 1 4 7"
+expected = "0"
+probes = ["single_element", "target_absent"]
+student_description = "A one-element array without the target."
+
+[[tests]]
+key = "two_equal"
+input = "L 2 6 6 6"
+expected = "2"
+probes = ["two_elements", "target_present_duplicates", "run_at_end"]
+student_description = "A two-element array whose elements both equal the target."
+
+[[tests]]
+key = "large_absent"
+input = "A 200000 0 2 99999"
+expected = "0"
+probes = ["large_input", "target_absent"]
+student_description = "A large array where the target is absent."
+
+[[tests]]
+key = "large_unique"
+input = "A 200000 0 2 99998"
+expected = "1"
+probes = ["large_input", "target_present_unique"]
+student_description = "A large array where the target appears once."
+
+[[tests]]
+key = "large_all_equal"
+input = "D 200000 7 7"
+expected = "200000"
+probes = ["large_input", "target_present_duplicates", "run_at_end"]
+student_description = "A large array in which every element equals the target."
+
+[[error_models]]
+key = "upper_uses_strict"
+file = "error_models/upper_uses_strict.cpp"
+skill = "equality_handling"
+description = "Both boundaries use a[mid] < target, so the upper boundary equals the lower one and the count is always 0."
+student_hint = "Check which side of each boundary the elements equal to the target end up on."
+
+[[error_models]]
+key = "hi_init_last_index"
+file = "error_models/hi_init_last_index.cpp"
+skill = "search_space_boundaries"
+description = "Initialises hi = n - 1 with a half-open loop, so a boundary can never reach n and runs of the target at the end of the array are undercounted."
+student_hint = "Can each of your searches return a.size()? Check the initial bounds of the search space."
+
+[[error_models]]
+key = "no_progress_update"
+file = "error_models/no_progress_update.cpp"
+skill = "loop_termination"
+description = "Updates lo = mid instead of lo = mid + 1; when two candidates remain the search space stops shrinking and the loop does not terminate."
+student_hint = "Make sure every iteration of your loop strictly shrinks the search range."
+
+[[error_models]]
+key = "inclusive_count"
+file = "error_models/inclusive_count.cpp"
+skill = "problem_specification"
+description = "Returns upper - lower + 1, treating two half-open boundaries as if they were inclusive indices."
+student_hint = "Check what the difference between your two boundaries counts, including when the target is absent."

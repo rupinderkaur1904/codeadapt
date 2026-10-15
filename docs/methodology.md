@@ -129,16 +129,52 @@ observations (test, problem, passed/failed, reliable?). No latent "mastery" vari
 
 | Diagnosis | Next activity | Success criterion recorded |
 | --- | --- | --- |
-| `HYPOTHESIS_SUPPORTED(M)` | exercise from the catalogue whose tests probe `M.skill` most densely and that the learner has not recently attempted | on the follow-up, all reliable tests probing `M.skill` pass, and the follow-up's diagnosis is not `M`'s analogue |
+| `HYPOTHESIS_SUPPORTED(M)` | exercise from the problem family whose tests probe `M.skill` most densely and that the learner has not recently attempted | on the follow-up, all reliable tests probing `M.skill` pass, and the follow-up's diagnosis is not `M`'s analogue |
 | `AMBIGUOUS(C)` | exercise whose test suite *discriminates* between the skills of the candidates | follow-up diagnosis resolves to one candidate's skill or to `NO_FAILURE_OBSERVED` on those probes |
 | `NO_FAILURE_OBSERVED` | next exercise in the family whose probes have the least evidence in the ledger | follow-up passes its probes |
 | `UNMODELLED` / `INSUFFICIENT` / `UNRELIABLE` | retry the same problem with the generic feedback; flagged for researcher review | none claimed (`not_comparable`) |
 | `COMPILE_ERROR` / `EXECUTION_ERROR` | retry the same problem | none |
 
 **Follow-up evaluation** compares, per probe of the targeted skill, the index attempt and
-the follow-up attempt, and records `improved` / `not_improved` / `not_comparable`, with
-the per-probe table. The UI wording is "passed all 4 boundary-condition checks on the
-follow-up exercise", never "mastered binary search".
+the follow-up attempt, and records `criterion_met` / `criterion_not_met` /
+`not_comparable`, with the per-probe table. The UI wording is "passed all 4 tests related
+to the recommended focus", never "mastered binary search".
+
+**As implemented (M6).** `adaptation/policy_v1.py` and `adaptation/followup.py` are pure
+functions; `worker/adapt.py` feeds them stored rows and stores their output in the
+append-only `recommendations` and `followup_evaluations` tables.
+
+* *Ledger.* Built from each attempt's diagnosis-rationale test table: a reliable test that
+  matched the reference is `passed`, a reliable test that did not is `failed`, anything
+  else is `excluded`. Each test is attributed to every skill its probes name.
+* *Candidate problems* are those in the same `family` as the index problem. Skills are
+  linked across problems by key, which is a content-authoring assumption.
+* *Recently attempted* means among the learner's last 3 attempts.
+* `HYPOTHESIS_SUPPORTED(M)`: rank by (recently attempted, −tests probing `M.skill`, slug).
+  If no problem probes the skill, retry the index problem.
+* `AMBIGUOUS(C)`: rank by (−number of candidate skills the problem has error models for,
+  recently attempted, −tests probing those skills, slug). The criterion is that every
+  reliable follow-up test probing those skills passes.
+* `NO_FAILURE_OBSERVED`: among family problems without a no-failure attempt by this
+  learner, rank by (recently attempted, reliable ledger entries for the problem's skills,
+  slug). When none remain the action is `none`; this is explicitly not a claim of
+  complete understanding.
+* A learner's *open* recommendation is their latest one without an evaluation. The first
+  later attempt on the recommended problem is the follow-up. Compile and execution errors
+  neither consume nor replace an open recommendation for the same problem; an attempt on
+  a different problem supersedes it without a verdict; an attempt created before the
+  recommendation existed is not its follow-up.
+* Verdicts: `not_comparable` when no criterion was recorded, when the follow-up's outcome
+  is `UNRELIABLE_EVIDENCE` (or a compile/execution error), or when no reliable follow-up
+  test probes the targeted skills; `criterion_not_met` when any such test failed or the
+  follow-up is diagnosed with an error model of an excluded skill; otherwise
+  `criterion_met`.
+
+**What a verdict does not mean.** `criterion_met` says the follow-up passed its targeted
+tests. It is equally consistent with learning, with the follow-up problem being easier, and
+with outside help; there is no comparison condition. The scripted synthetic trajectories in
+`tests/unit/test_trajectories.py` check the mechanics of these rules and nothing about
+their effect on learners.
 
 ### Why not BKT / knowledge tracing / learned classifiers now
 

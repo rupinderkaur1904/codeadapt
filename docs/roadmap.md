@@ -12,8 +12,8 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M3 | Persistence, worker, API — backend vertical slice | M2 | done |
 | M4 | Student workspace (frontend) — full vertical slice | M3 | done |
 | M5 | Evidence reliability: sanitiser + repeat runs | M3 | done |
-| M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | next |
-| M7 | Researcher console + synthetic evaluation harness | M5, M6 | planned |
+| M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | done |
+| M7 | Researcher console + synthetic evaluation harness | M5, M6 | next |
 | M8 | Auth hardening, production isolation tier, deployment | M4, M7 | planned |
 | M9 | Pilot readiness (real-data separation, consent, study protocol) | M8 + owner input | planned |
 
@@ -105,6 +105,13 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   follow-up evaluation on the next attempt.
 * **Acceptance:** scripted learner trajectories (synthetic) produce the expected
   recommendations and follow-up verdicts; every recommendation has a stored rationale.
+* **Result (2026-10-15):** met. Two new demo problems (`count-occurrences`,
+  `last-less-than`) validate with executed fingerprints, no warnings, and every pair of
+  error models separable. Six scripted synthetic trajectories produce exactly the expected
+  sequences of recommendations and verdicts, and a sandbox test runs one learner through
+  diagnosis, recommendation, a `criterion_not_met` follow-up and a `criterion_met` one.
+  Verdicts are named `criterion_met`/`criterion_not_met` rather than "improved" because
+  passing a different problem's tests is not, by itself, evidence of learning (ADR-017).
 
 ### M7 — Research console and evaluation harness
 * **Objective:** researcher views (trace, filters, metrics) and `codeadapt-eval` that runs the

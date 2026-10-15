@@ -8,7 +8,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -36,10 +35,12 @@ class Harness:
         self.sessions = sessions
         self.pipeline = Pipeline(sandbox, sessions, self.catalogue, FingerprintConsistencyV1())
 
-    async def submit(self, source: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    async def submit(
+        self, source: str, slug: str = "lower-bound"
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
         r = self.client.post(
             "/api/v1/submissions",
-            json={"problem_slug": "lower-bound", "source": source},
+            json={"problem_slug": slug, "source": source},
             headers=STUDENT,
         )
         assert r.status_code == 202, r.text
@@ -53,11 +54,6 @@ class Harness:
             f"/api/v1/research/submissions/{sub_id}/trace", headers=RESEARCHER
         ).json()
         return view, trace
-
-
-@pytest.fixture
-def harness(settings: Settings, sessions: sessionmaker[Session], sandbox: DockerSandbox) -> Harness:
-    return Harness(settings, sessions, sandbox)
 
 
 def assert_student_view_is_safe(view: dict[str, Any]) -> None:

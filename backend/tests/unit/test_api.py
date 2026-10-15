@@ -17,7 +17,7 @@ def client(settings: Settings) -> TestClient:
 
 def test_list_and_get_problem_exposes_only_samples(client: TestClient) -> None:
     problems = client.get("/api/v1/problems", headers=STUDENT).json()
-    assert [p["slug"] for p in problems] == ["lower-bound"]
+    assert [p["slug"] for p in problems] == ["count-occurrences", "last-less-than", "lower-bound"]
     detail = client.get("/api/v1/problems/lower-bound", headers=STUDENT).json()
     assert "lower_bound_index" in detail["interface"]
     assert len(detail["sample_tests"]) == 2

@@ -41,7 +41,11 @@ def test_program_bundles_solution_with_harness() -> None:
 
 
 def test_catalogue_lists_problem_directories() -> None:
-    assert [p.spec.slug for p in load_catalogue(DEMO_CONTENT)] == ["lower-bound"]
+    assert [p.spec.slug for p in load_catalogue(DEMO_CONTENT)] == [
+        "count-occurrences",
+        "last-less-than",
+        "lower-bound",
+    ]
 
 
 def test_version_is_stable_and_content_addressed(problem_copy: Path) -> None:
