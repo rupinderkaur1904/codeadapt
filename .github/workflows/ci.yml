@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install (locked)
+        run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check src tests
+      - name: Format
+        run: uv run ruff format --check src tests
+      - name: Type check
+        run: uv run mypy
+      - name: Build sandbox image
+        working-directory: .
+        run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
+      - name: Tests (sandbox tests required, never skipped in CI)
+        env:
+          CODEADAPT_REQUIRE_SANDBOX: "1"
+        run: uv run pytest
+      - name: Dependency audit
+        run: |
+          uv export --no-hashes --no-emit-project --format requirements-txt > /tmp/requirements.txt
+          uvx pip-audit -r /tmp/requirements.txt
+      - name: No sandbox leftovers
+        run: |
+          test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"
+          test -z "$(docker volume ls -q --filter label=org.codeadapt.sandbox=1)"
