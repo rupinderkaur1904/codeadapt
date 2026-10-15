@@ -28,6 +28,8 @@ def raw(**kw: object) -> RawOutcome:
         (raw(exit_code=137, output_overflow=True), RunStatus.OUTPUT_LIMIT),
         (raw(started=False, exit_code=None), RunStatus.INFRASTRUCTURE_ERROR),
         (raw(exit_code=None), RunStatus.INFRASTRUCTURE_ERROR),
+        # The client's streams disagree with the container: the output is not evidence.
+        (raw(stream_mismatch=True), RunStatus.INFRASTRUCTURE_ERROR),
         # Memory beats a later timeout: OOM explains why the program stopped making progress.
         (raw(exit_code=137, oom_killed=True, timed_out=True), RunStatus.MEMORY_LIMIT),
     ],
@@ -45,6 +47,7 @@ def test_classify_run(outcome: RawOutcome, expected: RunStatus) -> None:
         (raw(exit_code=137, oom_killed=True), CompileStatus.MEMORY_LIMIT),
         (raw(exit_code=1, timed_out=True), CompileStatus.TIME_LIMIT),
         (raw(started=False, exit_code=None), CompileStatus.INFRASTRUCTURE_ERROR),
+        (raw(stream_mismatch=True), CompileStatus.INFRASTRUCTURE_ERROR),
     ],
 )
 def test_classify_compile(outcome: RawOutcome, expected: CompileStatus) -> None:

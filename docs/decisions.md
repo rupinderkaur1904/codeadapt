@@ -192,3 +192,17 @@ change a diagnosis's strength; content changes are therefore versioned as before
 **Limits:** a qualified hypothesis is still a hypothesis from the modelled error space;
 the qualification describes the evidence, not the probability of being right. The O(log n)
 requirement is not assessed by any test (see methodology §4).
+
+## ADR-020 — Sandbox runs under load: longer kill wait, untrusted streams are infrastructure errors (2026-10-15)
+**Context:** on busy hosts (locally and on CI), `docker kill` of a timed-out container
+sometimes exceeded its 15 s limit, aborting a job, and once a run reported exit 0 with
+empty stdout, which made validated content look non-deterministic. 200 stressed local
+runs did not reproduce the lost output. **Decision:** the kill wait uses the general
+60 s CLI limit (the workload stays bounded by its CPU rlimit, memory and pids limits, and
+`rm -f` still runs afterwards). When the `docker run` client's exit status differs from
+the container's own exit code on a run that ended by itself, the run is classified as an
+infrastructure error, never as program output. Fingerprint measurement re-measures an
+infrastructure error up to 3 times; program behaviour is never re-measured, so real
+non-determinism is still reported. **Limits:** if a lost-output run reports matching exit
+statuses, this check does not catch it. A harness end-of-output marker would, but it
+changes every problem's output contract, so it is proposed rather than done.

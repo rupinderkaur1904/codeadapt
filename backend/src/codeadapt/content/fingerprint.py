@@ -12,11 +12,12 @@ from pydantic import BaseModel, ConfigDict
 
 from codeadapt.content.loader import LoadedProblem
 from codeadapt.evidence.reliability import sanitizer_finding
-from codeadapt.evidence.signature import Signature, signature_of
+from codeadapt.evidence.signature import OutcomeKind, Signature, signature_of
 from codeadapt.execution.backend import SandboxBackend
 from codeadapt.execution.models import BuildProfile, CompileResult, CompileStatus, EnvironmentInfo
 
 REFERENCE = "__reference__"
+INFRA_RETRIES = 3
 
 
 class TestFingerprint(BaseModel):
@@ -75,7 +76,14 @@ async def fingerprint_program(
             return ProgramFingerprint(label=label, compile=compiled, tests={})
 
         async def one(stdin: bytes) -> Signature:
-            return signature_of(await job.run(stdin, BuildProfile.STANDARD))
+            # An infrastructure error says nothing about the program, so it is measured
+            # again (at most INFRA_RETRIES times). Program behaviour is never retried:
+            # differing outputs still surface as non-determinism.
+            for _ in range(INFRA_RETRIES):
+                sig = signature_of(await job.run(stdin, BuildProfile.STANDARD))
+                if sig.kind is not OutcomeKind.INFRASTRUCTURE_ERROR:
+                    return sig
+            return sig
 
         tests = problem.spec.tests
         signatures = await asyncio.gather(

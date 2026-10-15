@@ -287,7 +287,9 @@ class DockerSandbox:
         argv = [self._binary(), "run", "-i", "--name", name, *docker_args]
 
         async def kill() -> None:
-            await self._cli("kill", name, limit_seconds=15)
+            # The workload is already bounded by its CPU rlimit, memory and pids limits;
+            # this limit only bounds how long we wait for a busy daemon to confirm.
+            await self._cli("kill", name, limit_seconds=_DOCKER_CLI_TIMEOUT)
 
         async with self._slots:
             try:
@@ -312,14 +314,30 @@ class DockerSandbox:
             started = not str(st.get("StartedAt", "")).startswith("0001-")
             exit_code = int(st["ExitCode"]) if started else None
             oom = bool(st.get("OOMKilled", False))
+        overflow = kill_on_overflow and (proc.stdout_overflow or proc.stderr_overflow)
         raw = RawOutcome(
             started=started,
             exit_code=exit_code,
             oom_killed=oom,
             timed_out=proc.timed_out,
-            output_overflow=kill_on_overflow and (proc.stdout_overflow or proc.stderr_overflow),
+            output_overflow=overflow,
+            stream_mismatch=(
+                started
+                and not proc.timed_out
+                and not overflow
+                and exit_code is not None
+                and proc.returncode != exit_code
+            ),
         )
         return proc, raw
+
+
+def _infra_detail(raw: RawOutcome, kind: str) -> str:
+    if not raw.started:
+        return f"{kind} container did not start"
+    if raw.stream_mismatch:
+        return f"{kind} output stream disagreed with the container's exit status"
+    return ""
 
 
 class DockerSandboxJob:
@@ -384,7 +402,7 @@ class DockerSandboxJob:
             diagnostics=_decode(proc.stderr),
             diagnostics_truncated=proc.stderr_overflow,
             wall_ms=proc.wall_ms,
-            detail="" if raw.started else "compile container did not start",
+            detail=_infra_detail(raw, "compile"),
         )
 
     async def run(
@@ -433,7 +451,7 @@ class DockerSandboxJob:
             wall_ms=proc.wall_ms,
             oom_killed=raw.oom_killed,
             timed_out=raw.timed_out,
-            detail="" if raw.started else "run container did not start",
+            detail=_infra_detail(raw, "run"),
         )
 
     async def close(self) -> None:
