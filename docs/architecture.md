@@ -47,7 +47,7 @@ The system never stores or displays "the student misunderstands X" or "has maste
 | Job queue | **Database-backed queue + separate worker process** | One fewer moving part than Redis/Celery; jobs are durable evidence anyway. Revisit only if throughput demands it. (ADR-004) |
 | Sandboxed execution | **Docker/OCI container per compile and per test**, hardened flags, pinned toolchain image; **gVisor (`runsc`) runtime required for any public deployment** | Portable for developers on Linux/macOS/Windows; well-understood primitives (namespaces, cgroups, seccomp, capabilities). (ADR-003, security.md) |
 | C++ toolchain | **GCC 14.2** in image `gcc:14.2.0` pinned by digest, `-std=c++20` | Reproducibility: every run records the image digest, compiler version, flags and limits. |
-| Frontend | **React + TypeScript + Vite**, Monaco editor, client types generated from OpenAPI | Monaco needs a JS app anyway; TS keeps the API contract checked end-to-end. Built in M4, not before the backend loop works. (ADR-006) |
+| Frontend | **React + TypeScript + Vite**, CodeMirror 6 editor (ADR-014), client types generated from OpenAPI | Monaco needs a JS app anyway; TS keeps the API contract checked end-to-end. Built in M4, not before the backend loop works. (ADR-006) |
 | Auth | Server-side sessions (HTTP-only, SameSite cookies), Argon2id password hashes, roles `student` / `researcher` / `admin` | Simple, no third-party IdP dependency; sufficient for a cohort study. (ADR-007) |
 | Tooling | **uv** (lockfile), **ruff** (lint + format), **mypy --strict**, **pytest**; ESLint/Prettier/tsc/Vitest for `web/`; GitHub Actions CI | Reproducible installs from a fresh clone. |
 | Deployment | `docker compose` for dev; production = API host + **isolated runner VM** with gVisor | Keeps the Docker socket (root-equivalent) off the API host. |
@@ -62,7 +62,7 @@ API ↔ runner worker, because it *is* a trust boundary.
 ```mermaid
 flowchart LR
   subgraph Browser
-    SW[Student workspace<br/>React + Monaco]
+    SW[Student workspace<br/>React + CodeMirror]
     RW[Researcher console<br/>React]
   end
 
@@ -225,11 +225,12 @@ source are not present in the type, so they cannot leak by accident.
 
 ## 6. Frontend architecture (M4)
 
-`web/`: React + TS + Vite SPA. Routes: `/practice/:slug` (statement, Monaco editor,
-submit, feedback panel), `/progress` (attempt history, recommended next exercise),
-`/research/*` (submission browser, trace viewer, metrics) behind role guard. Data via a
-thin typed client generated from the OpenAPI schema (`openapi-typescript`) and TanStack
-Query for polling. No global state library.
+`web/`: React + TS + Vite SPA. Routes: `/` (problem list) and `/practice/:slug`
+(statement, CodeMirror editor, submit, feedback panel, attempt history). `/research/*`
+(submission browser, trace viewer, metrics) comes in M7, and the recommended next exercise
+in M6. Data comes through a thin typed client over types generated from the OpenAPI schema
+(`openapi-typescript`, checked for drift in CI), with TanStack Query for polling. There is
+no global state library. Drafts are kept in `localStorage` as a convenience only.
 
 ## 7. Error handling, logging, configuration
 

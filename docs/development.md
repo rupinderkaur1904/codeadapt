@@ -54,6 +54,30 @@ real authentication arrives in M8. The first submission for a problem takes abou
 seconds locally, because the worker measures and caches that problem's fingerprints for
 the current environment. Later submissions take a few seconds.
 
+## Web frontend (`web/`)
+
+```bash
+cd web
+npm ci
+npm run dev            # http://localhost:5173, proxies /api to http://127.0.0.1:8000
+```
+
+| Purpose | Command |
+| --- | --- |
+| Lint / format / types | `npm run lint` · `npm run format:check` · `npm run typecheck` |
+| Component tests | `npm test` |
+| Browser end-to-end test (starts its own API, worker and preview server; needs Docker + sandbox image) | `npx playwright install chromium` once, then `npm run e2e` |
+| Regenerate API types after changing the backend API | `(cd ../backend && uv run codeadapt-openapi) > openapi.json && npm run api:types` |
+
+CI fails if `openapi.json` or `src/api/schema.d.ts` is out of date.
+
+## Docker compose (development only)
+
+`docker compose up --build` builds the sandbox image, runs migrations, and starts the API
+(port 8000), the worker and the Vite dev server (port 5173). Data persists in the `appdata`
+volume; `docker compose down -v` removes it. The worker mounts the host Docker socket, which
+is root-equivalent, so never run this stack where untrusted users can reach it.
+
 ## Tested environment
 
 Local results are evidence about *this* environment only.
@@ -83,3 +107,12 @@ Same environment as M1. `pytest`: **138 passed, 0 skipped, 0 failed** (107 unit,
 submission end to end. PostgreSQL is not exercised yet: the SQL is written to be portable
 and the queue uses conditional updates, but no test runs against PostgreSQL. This is
 tracked for M8.
+
+### M4 (2026-10-15)
+
+Same environment as M1, plus Node 22.22.0 and Chromium (Playwright 1.56.1). `npm test`:
+11 passed. Lint, format check, `tsc` and `vite build` were clean, and `npm audit` found 0
+vulnerabilities. `npx playwright test`: 1 passed (about 1.2 min, most of it the first
+fingerprint measurement). **Not verified locally:** `docker compose build`, because base
+images could not be downloaded here (Docker Hub returned 429, GHCR was blocked, and PyPI was
+unreachable from build containers). The CI `compose` job covers it.

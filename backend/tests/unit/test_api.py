@@ -92,3 +92,26 @@ def test_dev_auth_is_disabled_in_production(settings: Settings) -> None:
     assert r.status_code == 503
     assert r.json()["type"].endswith("/auth-not-configured")
     assert client.get("/api/v1/health").status_code == 200
+
+
+def test_starter_code_and_own_submission_history(client: TestClient) -> None:
+    detail = client.get("/api/v1/problems/lower-bound", headers=STUDENT).json()
+    assert (
+        "int lower_bound_index(const std::vector<int>& a, int target) {" in detail["starter_code"]
+    )
+    ids = [
+        client.post(
+            "/api/v1/submissions",
+            json={"problem_slug": "lower-bound", "source": f"// {i}"},
+            headers=STUDENT,
+        ).json()["id"]
+        for i in range(3)
+    ]
+    client.post(
+        "/api/v1/submissions",
+        json={"problem_slug": "lower-bound", "source": "// other user"},
+        headers=RESEARCHER,
+    )
+    history = client.get("/api/v1/submissions?problem_slug=lower-bound", headers=STUDENT).json()
+    assert {h["id"] for h in history} == set(ids)
+    assert client.get("/api/v1/submissions?problem_slug=nope", headers=STUDENT).json() == []

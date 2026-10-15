@@ -29,3 +29,7 @@ exports/
 .idea/
 .vscode/
 .DS_Store
+
+# Web test output
+web/playwright-report/
+web/test-results/

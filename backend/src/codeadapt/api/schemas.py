@@ -34,6 +34,7 @@ class ProblemDetail(_Out):
     version: str
     statement: str
     interface: str
+    starter_code: str
     sample_tests: list[SampleTest]
 
 

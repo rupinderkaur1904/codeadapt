@@ -1,5 +1,3 @@
-# Lower bound
-
 Implement
 
 ```cpp
