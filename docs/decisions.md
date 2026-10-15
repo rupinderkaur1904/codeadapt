@@ -63,8 +63,8 @@ silently mix into real-learner statistics.
 models must not be visible to study participants. **Decision:** this repo ships
 `content/demo/` (explicitly *not secret*) for development and CI; real study content
 lives in a separate private repository mounted through `CODEADAPT_CONTENT_DIR`.
-**Open:** owner may prefer making this repository private instead; either works with the
-same code.
+**Status:** confirmed by the owner on 2026-10-15 (chose public repo + private content repo
+over making this repository private).
 
 ## ADR-010 — uv, ruff, mypy strict, pytest (2026-10-15)
 **Decision:** uv lockfile for reproducible installs; ruff for lint+format; mypy `--strict`
@@ -77,3 +77,13 @@ signals, so the CPU rlimit (SIGXCPU) could not stop it. **Decision:** every sand
 container uses `--init` (Docker's bundled tini). **Consequences:** the program is an
 ordinary process; one extra PID counts against `--pids-limit`; signal exit statuses are
 reported as 128 + N by the init and classified accordingly.
+
+## ADR-012 — Content as TOML + C++ files; outcome signatures as the comparison unit (2026-10-15)
+**Context:** problems need tests, probes, skills and executable error models in a format
+authors can review in a diff. **Decision:** `problem.toml` (stdlib `tomllib`, no extra
+dependency) plus plain C++ files; versions are content hashes. Behaviour is compared through
+*outcome signatures* (normalised stdout, or runtime-error signal/exit, or limit kind), so
+fingerprints, validation and diagnosis all use one definition of "behaves the same".
+Authors also write `expected` outputs, and the executed reference must match them, which
+catches harness and reference bugs. **Consequences:** a harness that prints
+non-deterministic text (addresses, timing) would be rejected by validation, which is intended.

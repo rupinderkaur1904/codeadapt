@@ -8,8 +8,8 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | --- | --- | --- | --- |
 | M0 | Repository foundation | — | done |
 | M1 | Sandboxed execution core | M0 | done (dev tier, runc) |
-| M2 | Content model + first problem with executed fingerprints | M1 | next |
-| M3 | Persistence, worker, API — backend vertical slice | M2 | planned |
+| M2 | Content model + first problem with executed fingerprints | M1 | done |
+| M3 | Persistence, worker, API — backend vertical slice | M2 | next |
 | M4 | Student workspace (frontend) — full vertical slice | M3 | planned |
 | M5 | Evidence reliability: sanitiser + repeat runs | M3 | planned |
 | M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | planned |
@@ -50,6 +50,9 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   reference, deterministic); discrimination report (which model pairs are separable).
 * **Acceptance:** `codeadapt-content validate content/demo` passes; fingerprint report shows
   every error model detectable and lists any indistinguishable pairs.
+* **Result (2026-10-15):** `lower-bound` has 15 tests and 5 error models. Every model is
+  detected by ≥ 3 tests and every model pair is separated by ≥ 5 tests; no warnings.
+  Format documented in [content-format.md](content-format.md).
 
 ### M3 — Backend vertical slice
 * **Objective:** POST a submission → worker executes → evidence stored → diagnosis v1
