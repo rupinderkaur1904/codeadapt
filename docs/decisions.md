@@ -155,4 +155,3 @@ Until real authentication exists (M8), the web app has a "development role" sele
 sets the `X-Dev-Role` header; the API ignores it outside development. **Limits:** the
 harness runs every case's evidence concurrently, so runtime grows with the sandbox host's
 capacity; cross-environment reproducibility is not yet measured.
-
