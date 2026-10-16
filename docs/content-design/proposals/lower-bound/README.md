@@ -5,7 +5,10 @@ were measured in a scratch copy of the problem with `codeadapt-content validate`
 kept here, outside `content/`, so the catalogue never loads them: nothing in this folder
 is served, fingerprinted for students or used by a diagnosis.
 
-Applying C1 and C2 needs the owner's decision, because it changes the content version.
+**C1 and C2 were applied on 2026-10-16** with the owner's approval: the three model files
+and two tests are now in `content/demo/lower-bound` (content version `871602bc2bba…`), with
+measured `distinguishes` declarations. The copies here are kept as the record of what was
+proposed. E9 and E10 (C3) remain rejected and are not in the catalogue.
 
 | File | Proposal | Measured status |
 | --- | --- | --- |

@@ -80,7 +80,7 @@ def test_supported_hypothesis_targets_the_models_skill_on_the_densest_problem() 
     assert rec.criterion.skills == ("equality_handling",)
     assert rec.criterion.excluded_model_skills == ("equality_handling",)
     ranking = {r["problem"]: r["probing_tests"] for r in rec.rationale["ranking"]}
-    assert ranking == {"count-occurrences": 9, "last-less-than": 7, "lower-bound": 7}
+    assert ranking == {"count-occurrences": 9, "last-less-than": 7, "lower-bound": 8}
 
 
 def test_recently_attempted_problems_are_avoided() -> None:
@@ -344,9 +344,10 @@ def test_policy_ranking_counts_only_explained_failures() -> None:
     ]
     rec = POLICY.recommend(history[-1], history, PROBLEMS)
     assert rec.policy_version == "1.1"
-    # Before C5 both problems counted 78 ledger entries: the 15 unexplained failures on
+    # Before C5 both problems counted 81 ledger entries: the 15 unexplained failures on
     # count-occurrences and the 1 on last-less-than were charged to every probed skill.
-    assert [r["ledger_evidence"] for r in rec.rationale["ranking"]] == [48, 48]
+    # (48 and 78 before content change C1 added three probe observations to lower-bound.)
+    assert [r["ledger_evidence"] for r in rec.rationale["ranking"]] == [51, 51]
 
 
 # ------------------------------------------- qualified hypotheses (ADR-019, review item 2)

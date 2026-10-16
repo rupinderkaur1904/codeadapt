@@ -74,7 +74,7 @@ def test_unreferenced_files_do_not_change_version(problem_copy: Path) -> None:
         ('slug = "lower-bound"', 'slug = "other"', "must equal the directory name"),
         ('title = "Lower bound"', 'title = "Lower bound"\nsurprise = 1', "Extra inputs"),
         (
-            'distinguishes = ["upper_bound_confusion"]',
+            'distinguishes = ["exact_match_sentinel", "returns_wrong_pointer"]',
             'distinguishes = ["nope"]',
             "distinguishes unknown error model 'nope'",
         ),
