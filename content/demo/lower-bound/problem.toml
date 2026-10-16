@@ -42,7 +42,7 @@ expected = "2"
 probes = ["target_present_unique"]
 student_description = "The target appears once in the array."
 purpose = "Visible unique-target case; the first check most code meets."
-distinguishes = ["no_progress_update", "upper_bound_confusion"]
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_wrong_pointer", "upper_bound_confusion"]
 
 [[tests]]
 key = "sample_absent"
@@ -52,7 +52,7 @@ expected = "2"
 probes = ["target_absent_between"]
 student_description = "The target is absent and falls between two elements."
 purpose = "Visible absent-target case."
-distinguishes = ["exact_match_sentinel", "no_progress_update"]
+distinguishes = ["closed_loop_hi_mid", "exact_match_sentinel", "hi_skips_candidate", "no_progress_update", "returns_wrong_pointer"]
 
 [[tests]]
 key = "empty"
@@ -61,7 +61,7 @@ expected = "0"
 probes = ["empty_input"]
 student_description = "The array is empty."
 purpose = "Minimal input (n = 0); where code reading past the end faults."
-distinguishes = ["exact_match_sentinel"]
+distinguishes = ["exact_match_sentinel", "returns_wrong_pointer"]
 
 [[tests]]
 key = "below_all"
@@ -70,7 +70,7 @@ expected = "0"
 probes = ["target_below_all"]
 student_description = "The target is smaller than every element."
 purpose = "Answer 0 with the target absent."
-distinguishes = ["exact_match_sentinel"]
+distinguishes = ["closed_loop_hi_mid", "exact_match_sentinel", "returns_wrong_pointer"]
 
 [[tests]]
 key = "above_all"
@@ -79,7 +79,7 @@ expected = "3"
 probes = ["target_above_all"]
 student_description = "The target is larger than every element."
 purpose = "Answer n: is the end position reachable?"
-distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update"]
+distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update", "returns_wrong_pointer"]
 
 [[tests]]
 key = "equal_first"
@@ -88,7 +88,7 @@ expected = "0"
 probes = ["target_present_unique"]
 student_description = "The target equals the first element."
 purpose = "Target at index 0; separates upper_bound_confusion from no_progress_update."
-distinguishes = ["upper_bound_confusion"]
+distinguishes = ["closed_loop_hi_mid", "returns_wrong_pointer", "upper_bound_confusion"]
 
 [[tests]]
 key = "equal_last"
@@ -97,7 +97,7 @@ expected = "2"
 probes = ["target_present_unique"]
 student_description = "The target equals the last element."
 purpose = "Target at the last index; equality at the other end."
-distinguishes = ["no_progress_update", "upper_bound_confusion"]
+distinguishes = ["closed_loop_hi_mid", "no_progress_update", "returns_wrong_pointer", "upper_bound_confusion"]
 
 [[tests]]
 key = "duplicates_middle"
@@ -106,7 +106,7 @@ expected = "1"
 probes = ["target_present_duplicates"]
 student_description = "The target appears several times in a row."
 purpose = "Run of equal targets in the middle; main small-input evidence for stops_at_first_match."
-distinguishes = ["exact_match_sentinel", "no_progress_update", "stops_at_first_match", "upper_bound_confusion"]
+distinguishes = ["closed_loop_hi_mid", "exact_match_sentinel", "hi_skips_candidate", "no_progress_update", "returns_wrong_pointer", "stops_at_first_match", "upper_bound_confusion"]
 
 [[tests]]
 key = "duplicates_all"
@@ -115,7 +115,7 @@ expected = "0"
 probes = ["target_present_duplicates"]
 student_description = "Every element equals the target."
 purpose = "Every element equals the target; second behaviour group for stops_at_first_match."
-distinguishes = ["exact_match_sentinel", "stops_at_first_match", "upper_bound_confusion"]
+distinguishes = ["closed_loop_hi_mid", "exact_match_sentinel", "returns_wrong_pointer", "stops_at_first_match", "upper_bound_confusion"]
 
 [[tests]]
 key = "single_equal"
@@ -124,7 +124,7 @@ expected = "0"
 probes = ["single_element", "target_present_unique"]
 student_description = "A one-element array containing the target."
 purpose = "Smallest equality case (n = 1)."
-distinguishes = ["upper_bound_confusion"]
+distinguishes = ["closed_loop_hi_mid", "returns_wrong_pointer", "upper_bound_confusion"]
 
 [[tests]]
 key = "single_above"
@@ -133,7 +133,7 @@ expected = "1"
 probes = ["single_element", "target_above_all"]
 student_description = "A one-element array whose element is smaller than the target."
 purpose = "Smallest case whose answer is n."
-distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update"]
+distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update", "returns_wrong_pointer"]
 
 [[tests]]
 key = "two_between"
@@ -142,7 +142,7 @@ expected = "1"
 probes = ["two_elements", "target_absent_between"]
 student_description = "A two-element array with the target between the elements."
 purpose = "Smallest input on which a non-shrinking update loops."
-distinguishes = ["exact_match_sentinel", "no_progress_update"]
+distinguishes = ["closed_loop_hi_mid", "exact_match_sentinel", "hi_skips_candidate", "no_progress_update", "returns_wrong_pointer"]
 
 [[tests]]
 key = "large_absent"
@@ -151,7 +151,7 @@ expected = "50000"
 probes = ["large_input", "target_absent_between"]
 student_description = "A large array where the target is absent."
 purpose = "Scale version of two_between. Does not test the O(log n) requirement."
-distinguishes = ["exact_match_sentinel", "no_progress_update"]
+distinguishes = ["closed_loop_hi_mid", "exact_match_sentinel", "no_progress_update", "returns_wrong_pointer"]
 
 [[tests]]
 key = "large_above_all"
@@ -160,7 +160,7 @@ expected = "200000"
 probes = ["large_input", "target_above_all"]
 student_description = "A large array where the target is larger than every element."
 purpose = "Scale version of above_all. Does not test the O(log n) requirement."
-distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update"]
+distinguishes = ["exact_match_sentinel", "hi_init_last_index", "no_progress_update", "returns_wrong_pointer"]
 
 [[tests]]
 key = "large_duplicates"
@@ -169,7 +169,25 @@ expected = "0"
 probes = ["large_input", "target_present_duplicates"]
 student_description = "A large array in which every element equals the target."
 purpose = "Scale version of duplicates_all. Does not test the O(log n) requirement."
-distinguishes = ["exact_match_sentinel", "stops_at_first_match", "upper_bound_confusion"]
+distinguishes = ["closed_loop_hi_mid", "exact_match_sentinel", "returns_wrong_pointer", "stops_at_first_match", "upper_bound_confusion"]
+
+[[tests]]
+key = "pair_equal_target"
+input = "L 2 5 5 5"
+expected = "0"
+probes = ["target_present_duplicates", "two_elements"]
+student_description = "A two-element array whose elements both equal the target."
+purpose = "Smallest input with a repeated target; small-input evidence for stops_at_first_match beside the scale test."
+distinguishes = ["closed_loop_hi_mid", "returns_wrong_pointer", "stops_at_first_match", "upper_bound_confusion"]
+
+[[tests]]
+key = "absent_after_duplicates"
+input = "L 6 1 2 2 4 4 5 3"
+expected = "3"
+probes = ["target_absent_between"]
+student_description = "The target is absent and falls just after a run of repeated values."
+purpose = "Absent target right of a run; evidence for hi_skips_candidate outside the middle cases."
+distinguishes = ["closed_loop_hi_mid", "exact_match_sentinel", "hi_skips_candidate", "no_progress_update", "returns_wrong_pointer"]
 
 [[error_models]]
 key = "upper_bound_confusion"
@@ -206,3 +224,24 @@ file = "error_models/stops_at_first_match.cpp"
 skill = "equality_handling"
 description = "Returns as soon as a[mid] == target, which is not necessarily the first occurrence when values repeat."
 student_hint = "If the target appears several times, which occurrence should be returned?"
+
+[[error_models]]
+key = "hi_skips_candidate"
+file = "error_models/hi_skips_candidate.cpp"
+skill = "search_space_boundaries"
+description = "Half-open loop that sets hi = mid - 1 when a[mid] >= target, discarding a[mid], which may itself be the answer."
+student_hint = "When a[mid] could itself be the answer, does your update keep it in the search range?"
+
+[[error_models]]
+key = "closed_loop_hi_mid"
+file = "error_models/closed_loop_hi_mid.cpp"
+skill = "loop_termination"
+description = "Closed-interval loop (lo <= hi, hi = n - 1) with the half-open update hi = mid; once lo == hi and a[mid] >= target the range stops shrinking and the loop does not terminate."
+student_hint = "Check that your loop condition and your updates describe the same kind of interval, so every iteration shrinks the range."
+
+[[error_models]]
+key = "returns_wrong_pointer"
+file = "error_models/returns_wrong_pointer.cpp"
+skill = "problem_specification"
+description = "Correct closed-interval search that returns hi instead of lo; on exit hi == lo - 1, the last index whose element is below the target."
+student_hint = "When your loop ends, which of your two indices holds the position the specification asks for?"

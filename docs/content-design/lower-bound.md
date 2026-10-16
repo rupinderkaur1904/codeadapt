@@ -7,11 +7,13 @@ starting from what is actually in the repository. It covers two things:
   (version `c1d29a35f97d`), using g++ 14.2.0 under runc, with the
   `codeadapt-content validate` pipeline.
 * **Proposed.** These candidate tests and bug models were measured the same way, in a
-  scratch copy of the problem. They are not committed yet. Section 7 lists what changes.
+  scratch copy of the problem. Section 7 lists what changes. C1 and C2 (tests
+  `pair_equal_target` and `absent_after_duplicates`, models E6–E8) were applied on
+  2026-10-16; the rest of this record keeps the labels "candidate" and "new" for history.
 
 Since this record was written, `problem.toml` gained the design declarations (test
 `purpose` and `distinguishes`, E2's `known_limitation`, `[curriculum]`), which changes
-the content version hash (now `41dd7907bd39`). Tests, programs and measured outputs are unchanged; the live
+the content version hash (`41dd7907bd39`); C1–C2 changed it again to `871602bc2bba`. The live
 matrix is in [../content-reports/lower-bound.md](../content-reports/lower-bound.md).
 
 Notation: `·` means the same output as the reference. `TLE` is the `time_limit`
@@ -92,7 +94,7 @@ comes from the measured matrix in §4, not from intent.
 | *`pair_equal_target`* (new) | `n = 2`, both equal | 0 | E1, E5, E7*, E8* | equality, termination | Gives E5 a small non-scale test (support 3 → 4). | Medium. |
 | *`absent_after_duplicates`* (new) | absent, right of a run | 3 | E3, E4, E6*, E7*, E8* | specification | Gives E6 a test outside the "middle" cases. | High. |
 
-\* candidate models (§2 E6–E8), measured in scratch.
+\* models E6–E8, added by C2 on 2026-10-16 (first measured in scratch).
 
 **Determinism.** Every reference and model output was identical across repeated runs,
 and the sanitizer build found no undefined behaviour in the reference or the five
@@ -125,8 +127,10 @@ plausible false positive the held-out set does not test (§4.3).
 ## 4. Discrimination matrix (measured)
 
 Columns: E1 `upper_bound_confusion`, E2 `hi_init_last_index`, E3 `no_progress_update`,
-E4 `exact_match_sentinel`, E5 `stops_at_first_match`, then the candidates E6
-`hi_skips_candidate`, E7 `closed_loop_hi_mid` and E8 `returns_wrong_pointer`.
+E4 `exact_match_sentinel`, E5 `stops_at_first_match`, E6 `hi_skips_candidate`,
+E7 `closed_loop_hi_mid` and E8 `returns_wrong_pointer`. E6–E8 and the two starred tests
+were added by C1–C2 on 2026-10-16 (content version `871602bc2bba…`); the generated
+[report](../content-reports/lower-bound.md) is the authoritative copy of this matrix.
 
 | Test | Ref | E1 | E2 | E3 | E4 | E5 | E6 | E7 | E8 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -148,26 +152,30 @@ E4 `exact_match_sentinel`, E5 `stops_at_first_match`, then the candidates E6
 | pair_equal_target* | 0 | 2 | · | · | · | 1 | · | TLE | -1 |
 | absent_after_duplicates* | 3 | · | · | TLE | -1 | · | 2 | TLE | 2 |
 
-\* proposed tests.
+\* added by C1 (2026-10-16), appended so earlier test numbers are unchanged.
 
 ### 4.1 Separation from the reference (number of detecting tests)
 
 | | E1 | E2 | E3 | E4 | E5 | E6 | E7 | E8 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Current 15 tests | 7 | 3 | 9 | 11 | 3 | 4 | 12 | 15 |
-| With the 2 proposed tests | 8 | 3 | 10 | 12 | 4 | 5 | 13 | 17 |
+| Original 15 tests | 7 | 3 | 9 | 11 | 3 | 4 | 12 | 15 |
+| All 17 tests (current) | 8 | 3 | 10 | 12 | 4 | 5 | 13 | 17 |
 | Behaviour groups behind them (committed models, 15 tests) | 4 | **1** | 4 | 5 | **2** | — | — | — |
-| Behaviour groups (all 8 models, 17 tests) | 6 | **1** | 6 | 7 | 3 | 3 | 9 | 11 |
+| Behaviour groups (all 8 models, 17 tests; current) | 6 | **1** | 6 | 7 | 3 | 3 | 9 | 11 |
 
 Behaviour groups are defined in §3. E2 rests on a single group whatever is added, and E5
-rests on tests that all contain repeated targets.
+rests on tests that all contain repeated targets. More tests cannot fix E2: an unmodelled
+error that clamps the answer to `n - 1` produces exactly E2's outputs on every input, so
+the two are indistinguishable by behaviour, and E2 stays a documented limitation. E5's
+three groups are all "repeated target" inputs, so they separate E5 from the other models
+but not from other duplicate-handling errors (§4.3).
 
 ### 4.2 Pairwise separation
 
 There are no identical pairs, either among the five committed models or with the
 candidates. The weakest pairs are:
 
-* **E2 and E5:** 6 distinguishing tests (7 with the proposed tests). Both pass most tests,
+* **E2 and E5:** 7 distinguishing tests (6 before C1). Both pass most tests,
   but they fail *disjoint* sets of tests, so they are never confused with each other.
 * **E3 and E7:** both produce TLE, but on different tests. `below_all`, `equal_first`,
   `single_equal` and `duplicates_all` loop only for E7; `above_all` and `single_above`
@@ -251,14 +259,17 @@ Recommendation behaviour this design needs, compared with policy v1 today:
 
 **Status after the owner's review (2026-10-15).** C3, C4 and C5 are done. C6 was
 measured against v1 on the held-out and calibration sets and awaits an owner decision; the
-deployed method reports single-behaviour diagnoses as qualified instead. C1 and C2 remain
-proposals: they are not in `content/demo`, and need the owner's go-ahead because they
-change the content version. See
-[review-resolution-2026-10-15.md](review-resolution-2026-10-15.md).
+deployed method reports single-behaviour diagnoses as qualified instead.
 
-Applying C1 and C2 changes the content version. That starts a new fingerprint set and
-leaves old submissions tied to the old version, as designed. Regression check: the
-held-out results for lower-bound must be unchanged, or each change must be explained.
+**C1 and C2 applied (2026-10-16, owner approval).** Each new model is a one- to three-line
+change from the reference (sources in `content/demo/lower-bound/error_models/`), and its
+measured behaviour matches the intended error: E6 discards a candidate answer (wrong output
+on 5 tests), E7 loops forever whenever the search ends on an element `>= target` (TLE on
+13 tests), and E8 returns `lower_bound - 1` on every test. Validation with 3 repeats
+reported every model deterministic, sanitizer-clean, and separable from every other model,
+and every declared `distinguishes` agrees with the measurement. The content version
+changed from `41dd7907bd39…` to `871602bc2bba…`; submissions record the version they were
+diagnosed against, so earlier submissions stay tied to the old fingerprints.
 
 ## 8. Known limitations of this problem as an instrument
 

@@ -21,14 +21,17 @@ from tests.paths import DEMO_CONTENT
 
 LOADED = load_problem(DEMO_CONTENT / "lower-bound")
 # The real spec without its design declarations: each test below declares what its own
-# synthetic fingerprints measure (see `declared`), or deliberately does not.
+# synthetic fingerprints measure (see `declared`), or deliberately does not. The shape is
+# pinned to 15 tests and 5 models so the synthetic patterns below do not depend on how much
+# content the demo problem grows.
 SPEC: ProblemSpec = LOADED.spec.model_copy(
     update={
         "tests": tuple(
-            t.model_copy(update={"distinguishes": None, "purpose": None}) for t in LOADED.spec.tests
+            t.model_copy(update={"distinguishes": None, "purpose": None})
+            for t in LOADED.spec.tests[:15]
         ),
         "error_models": tuple(
-            m.model_copy(update={"known_limitation": None}) for m in LOADED.spec.error_models
+            m.model_copy(update={"known_limitation": None}) for m in LOADED.spec.error_models[:5]
         ),
     }
 )
