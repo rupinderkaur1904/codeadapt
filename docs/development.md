@@ -171,3 +171,11 @@ an infrastructure error, and fingerprint measurement re-measures infrastructure 
 Unit: 174 passed. Sandbox execution, security and demo-content tests: 29 passed. The lost
 output was not reproduced in 200 stressed local runs, so whether the mismatch check
 catches it is not yet shown.
+
+### C1–C2, C6 comparison and ADR-020 regression tests (2026-10-16)
+Same environment. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **214 passed, 0 skipped,
+0 failed** (≈ 15 min). `ruff check`, `ruff format --check`, `mypy --strict`: clean.
+`codeadapt-content validate --repeats 3` on lower-bound after C1–C2: valid, 0 errors,
+0 warnings, 1 documented limitation (E2). Held-out and calibration comparisons:
+docs/evaluation/c6-2026-10-16/. The ADR-020 regression tests use a fake `docker` binary;
+they do not reproduce the original CI lost-output failure.
