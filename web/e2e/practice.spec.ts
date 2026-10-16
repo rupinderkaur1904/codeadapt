@@ -33,8 +33,8 @@ test("student submits, sees diagnosis feedback, fixes the bug and passes", async
 
   await replaceCode(page, read("reference.cpp"));
   await page.getByRole("button", { name: "Submit" }).click();
-  await expect(feedback).toContainText("passed all 15 tests");
-  await expect(page.getByText("15/15 tests passed")).toBeVisible();
+  await expect(feedback).toContainText("passed all 17 tests");
+  await expect(page.getByText("17/17 tests passed")).toBeVisible();
   await expect(next).toContainText("Your last attempt passed every test.");
 
   await next.getByRole("link", { name: "Go to Count occurrences" }).click();
