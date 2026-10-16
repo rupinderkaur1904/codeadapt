@@ -206,6 +206,17 @@ infrastructure error up to 3 times; program behaviour is never re-measured, so r
 non-determinism is still reported. **Limits:** if a lost-output run reports matching exit
 statuses, this check does not catch it. A harness end-of-output marker would, but it
 changes every problem's output contract, so it is proposed rather than done.
+**Status (2026-10-16):** the original CI lost-output failure is **not shown to be fixed**:
+it was never reproduced, so no test reproduces it. CI has passed since this change, which
+is consistent with a fix but does not demonstrate one. `tests/unit/test_docker_cli.py`
+drives `DockerSandbox` through a scripted fake `docker` binary and checks how the two
+observed conditions are *reported*: a client/container exit-status disagreement becomes an
+infrastructure error, a kill slower than the old 15 s limit (scaled down) still yields a
+time limit, and a kill slower than the wait raises `SandboxUnavailableError`. That last
+test found a defect: when the workload kill itself failed, the local `docker run` client
+was left running. `run_bounded` now always stops the client in that case (the container
+is still removed by `rm -f`). These tests use a fake daemon, so they say nothing about
+whether real Docker loses output under load.
 
 ## ADR-021 — Modelling architecture: deterministic diagnosis plus a later Bayesian learner model (2026-10-16)
 **Context:** the owner set the long-term direction (project chat, 2026-10-16): keep the
@@ -237,3 +248,19 @@ real students or as learning gains. **Supersedes** the methodology §5 note that
 BKT only after a cohort study: BKT is part of the intended architecture, gated on the
 evidence layer and the reviewed interface, and its parameters stay assumptions until real
 data validates them.
+
+## ADR-022 — lower-bound content change C1–C2 (2026-10-16)
+**Context:** the owner approved design proposals C1 and C2 (docs/content-design/lower-bound.md
+§7) on condition that validation confirmed each model's intended behaviour. **Decision:**
+add tests `pair_equal_target` and `absent_after_duplicates` (appended, so earlier test
+numbers are unchanged) and error models `hi_skips_candidate` (E6), `closed_loop_hi_mid`
+(E7) and `returns_wrong_pointer` (E8). Validation with 3 repeats: every model
+deterministic and sanitizer-clean, every pair separable, every declared `distinguishes`
+equal to the measurement. The content version changes from `41dd7907bd39…` to
+`871602bc2bba…`; submissions and fingerprints are keyed by version, so earlier
+submissions stay tied to the old fingerprints. **Effect:** E5 now rests on 3 behaviour
+groups (was 2), all with repeated targets; E2 still rests on 1, and no test can change
+that, because an unmodelled clamp to `n - 1` behaves identically on every input. The
+held-out and calibration results for lower-bound are unchanged case for case under both
+v1.1 and the C6 candidate (docs/evaluation/c6-2026-10-16/). The new models add no new
+diagnoses on those cases, which says nothing about how often students make these errors.
