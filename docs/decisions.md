@@ -206,3 +206,34 @@ infrastructure error up to 3 times; program behaviour is never re-measured, so r
 non-determinism is still reported. **Limits:** if a lost-output run reports matching exit
 statuses, this check does not catch it. A harness end-of-output marker would, but it
 changes every problem's output contract, so it is proposed rather than done.
+
+## ADR-021 — Modelling architecture: deterministic diagnosis plus a later Bayesian learner model (2026-10-16)
+**Context:** the owner set the long-term direction (project chat, 2026-10-16): keep the
+execution-grounded diagnosis, and add Bayesian learner modelling later as a separate layer.
+**Decision:** four components with separate responsibilities, each testable on its own:
+1. *Diagnostic engine* (fingerprint consistency, ADR-005/019). It identifies which known
+   implementation-error patterns are consistent with one submission's execution evidence,
+   or abstains. It stays deterministic. It is not to be replaced by an ML or LLM bug
+   classifier: there is no labelled real-student dataset, and the current method is
+   reproducible, interpretable and traceable.
+2. *Skill-evidence layer* (today: the ledger, `adaptation/ledger.py`). It maps reliable,
+   diagnosis-supported observations to skills, keeps their uncertainty, and makes no
+   unsupported attribution. Since ADR-019, failures from ambiguous, unmodelled,
+   insufficient or unreliable attempts are not skill evidence; infrastructure failures
+   never reach it.
+3. *Bayesian learner model* (planned, **not implemented**). It updates estimated skill
+   mastery as valid evidence accumulates across attempts and problems.
+4. *Recommendation policy* (today: `rule_policy`). It chooses next activities from the
+   learner model, prerequisites, curriculum links and available exercises.
+
+A diagnosed implementation pattern is never treated as proof of a misconception or of a
+lack of mastery. **Sequencing:** the interface between the four components (the evidence
+each receives, how uncertainty is represented, which observations are excluded) is
+documented first, for the owner's review. Only when the evidence layer is reliable enough is a
+separate, testable BKT milestone proposed. Its initial probabilities and its transition,
+guess and slip parameters are documented as assumptions until validated. Synthetic
+experiments may test implementation behaviour, but are never presented as calibration on
+real students or as learning gains. **Supersedes** the methodology §5 note that placed
+BKT only after a cohort study: BKT is part of the intended architecture, gated on the
+evidence layer and the reviewed interface, and its parameters stay assumptions until real
+data validates them.

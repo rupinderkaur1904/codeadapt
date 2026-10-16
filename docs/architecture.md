@@ -57,6 +57,13 @@ API ↔ runner worker, because it *is* a trust boundary.
 
 ## 3. Target architecture
 
+**Modelling layers (ADR-021).** Diagnosis, skill evidence, learner model and recommendation
+are separate components: the deterministic fingerprint engine diagnoses one submission;
+the skill-evidence layer (the ledger) keeps only diagnosis-supported observations; a
+Bayesian learner model is planned but not implemented; the recommendation policy chooses
+the next activity. Their interface is documented for review before any learner model is
+built.
+
 ### 3.1 Components
 
 ```mermaid

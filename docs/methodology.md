@@ -209,6 +209,13 @@ their effect on learners.
 
 ### Why not BKT / knowledge tracing / learned classifiers now
 
+**Direction (ADR-021).** Bayesian knowledge tracing *is* part of the intended
+architecture, as a learner model that sits between the skill-evidence layer and the
+recommendation policy, while fingerprint diagnosis stays the diagnostic engine. It is not
+implemented yet: the interface between the components is documented and reviewed first,
+and the table below lists what its parameters would need before they are more than
+assumptions.
+
 | Method | Value | Prerequisite we don't yet have | Earliest sensible milestone |
 | --- | --- | --- | --- |
 | BKT / programming knowledge tracing | principled skill-state estimate over many attempts | many attempts per learner per skill; a validated probe→skill Q-matrix; real data to fit and check parameters | after a real cohort study (post-M9) |
