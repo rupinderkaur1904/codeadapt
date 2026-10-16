@@ -85,6 +85,7 @@ async def run_bounded(
     overflow_task = asyncio.create_task(overflow.wait())
 
     timed_out = False
+    kill_attempted = False
     try:
         watch = {wait_task, overflow_task} if kill_on_overflow else {wait_task}
         done, _ = await asyncio.wait(
@@ -92,6 +93,7 @@ async def run_bounded(
         )
         if wait_task not in done:
             timed_out = not done  # nothing finished → deadline; otherwise overflow
+            kill_attempted = True
             await kill()
             try:
                 await asyncio.wait_for(asyncio.shield(wait_task), kill_grace_seconds)
@@ -100,9 +102,15 @@ async def run_bounded(
         await wait_task
     finally:
         overflow_task.cancel()
-        if not wait_task.done():  # cancelled from outside: make sure nothing survives
-            await kill()
-            proc.kill()
+        # Cancelled from outside, or the workload kill itself failed (ADR-020: a slow
+        # daemon): make sure nothing survives, and never leave the client running.
+        if not wait_task.done():
+            try:
+                if not kill_attempted:
+                    await kill()
+            finally:
+                with contextlib.suppress(ProcessLookupError):
+                    proc.kill()
         feed_task.cancel()
         with contextlib.suppress(asyncio.CancelledError, BrokenPipeError, ConnectionResetError):
             await feed_task
