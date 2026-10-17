@@ -232,8 +232,12 @@ only `skill_observations()` (§5 and docs/component-interfaces.md §6).
   problem *version* counts. Compile errors, execution errors and unreliable evidence do not
   use up that attempt. A later attempt on the same version is a retry after feedback; its
   observations stay listed as uncounted, with a reason. An abstaining first attempt
-  (ambiguous, unmodelled, insufficient) does use it up, because the learner saw its
-  feedback.
+  (ambiguous, unmodelled, insufficient, or qualified) does use it up when execution was
+  reliable and feedback was delivered, even though it yields no observation for the skill
+  (owner confirmation, 2026-10-17). An attempt made unreliable as a whole, for example by
+  inconclusive runs, does not. An otherwise reliable attempt with some inconclusive tests
+  does use it up: it was evaluated and its feedback delivered, and only the excluded tests'
+  skills lack an observation.
 - **Display threshold:** no value is shown below 3 counted observations from 2 distinct
   problems. Problems are counted by identity (slug), so several versions of one problem
   count once, while each observation keeps its exact version.

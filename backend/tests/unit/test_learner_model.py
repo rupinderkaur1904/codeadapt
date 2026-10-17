@@ -113,11 +113,34 @@ def test_first_reliable_attempt_per_problem_version_counts_and_retries_do_not() 
     assert eq.observations[-1].p_known_after == pytest.approx(expected)
 
 
-def test_an_abstaining_first_attempt_still_uses_up_the_counted_attempt() -> None:
-    # The learner saw feedback on the ambiguous attempt, so the next one is a retry.
-    first = at(attempt("lower-bound", Outcome.AMBIGUOUS, failing=("equal_first",)), 0)
-    eq = skill([first, passing("lower-bound", 1)])
-    assert [t.counted for t in eq.observations] == [False]
+# Owner rule (2026-10-17): a first attempt whose execution was reliable and whose feedback
+# was delivered uses up the counted opportunity even when it yields no skill observation;
+# an inconclusive or otherwise unreliable execution does not.
+@pytest.mark.parametrize(
+    "first",
+    [
+        attempt("lower-bound", Outcome.AMBIGUOUS, failing=("equal_first",)),
+        attempt("lower-bound", Outcome.UNMODELLED_BEHAVIOUR, failing=("equal_first",)),
+        attempt("lower-bound", Outcome.INSUFFICIENT_EVIDENCE, failing=("equal_first",)),
+        attempt(
+            "lower-bound",
+            Outcome.HYPOTHESIS_SUPPORTED,
+            model="hi_init_last_index",
+            failing=("above_all", "single_above", "large_above_all"),
+            qualified=True,
+        ),
+    ],
+    ids=["ambiguous", "unmodelled", "insufficient", "qualified"],
+)
+def test_a_reliable_abstaining_first_attempt_uses_up_the_counted_attempt(
+    first: AttemptRecord,
+) -> None:
+    eq = skill([at(first, 0), passing("lower-bound", 1)])
+    # Whatever the first attempt said about equality (nothing, for the abstentions), the
+    # retry's observation is listed but not counted.
+    retry = next(t for t in eq.observations if t.observation.submission_id == "s1")
+    assert not retry.counted and retry.reason == RETRY_REASON
+    assert all(t.observation.value != "incorrect" for t in eq.observations)
 
 
 @pytest.mark.parametrize(
@@ -128,6 +151,24 @@ def test_attempts_not_reliably_evaluated_do_not_use_up_the_counted_attempt(
 ) -> None:
     eq = skill([at(attempt("lower-bound", outcome), 0), passing("lower-bound", 1)])
     assert [(t.observation.submission_id, t.counted) for t in eq.observations] == [("s1", True)]
+
+
+def test_an_attempt_made_unreliable_by_inconclusive_runs_does_not_use_it_up() -> None:
+    # Every test stopped by the wall clock twice (ADR-023 D1): excluded, so the diagnosis
+    # is unreliable_evidence and the next attempt is still the counted one.
+    keys = tuple(t.key for t in PROBLEMS["lower-bound"].tests)
+    stalled = at(attempt("lower-bound", Outcome.UNRELIABLE_EVIDENCE, excluded=keys), 0)
+    eq = skill([stalled, at(LB_EQUALITY, 1)])
+    assert [(t.observation.submission_id, t.counted) for t in eq.observations] == [("s1", True)]
+    assert eq.observations[0].observation.value == "incorrect"
+
+
+def test_a_reliable_attempt_with_some_inconclusive_tests_still_uses_it_up() -> None:
+    # The attempt as a whole was evaluated and its feedback delivered; only the excluded
+    # tests' skills lack an observation. The next attempt is a retry.
+    partial = at(attempt("lower-bound", Outcome.NO_FAILURE_OBSERVED, excluded=("equal_first",)), 0)
+    eq = skill([partial, passing("lower-bound", 1)])
+    assert [(t.observation.submission_id, t.counted) for t in eq.observations] == [("s1", False)]
 
 
 # ------------------------------------------------------------------- excluded evidence
