@@ -83,7 +83,7 @@ so it did **not** reproduce the CI event (a trivial `stops_at_first_match` run r
 a time limit). That event most likely came from a multi-second stall in container start-up
 or the Docker daemon, which this measurement does not exercise.
 
-### 3.2 Outcome classes (`evidence_rules_version` 1, implemented in EV1)
+### 3.2 Outcome classes (`evidence_rules_version` 1 in EV1; 2 adds the end-of-output marker, ADR-024)
 
 | Class | Condition | Evidence about the program? |
 | --- | --- | --- |
