@@ -179,3 +179,12 @@ Same environment. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **214 passed, 0 s
 0 warnings, 1 documented limitation (E2). Held-out and calibration comparisons:
 docs/evaluation/c6-2026-10-16/. The ADR-020 regression tests use a fake `docker` binary;
 they do not reproduce the original CI lost-output failure.
+
+### EV1: trustworthy skill evidence (2026-10-17)
+Same environment. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **241 passed, 0 skipped,
+0 failed** (≈ 15 min). `ruff check`, `ruff format --check`, `mypy --strict`: clean.
+`npx playwright test`: 1 passed. Held-out and calibration comparisons: identical case for
+case to docs/evaluation/c6-2026-10-16 (after C1–C2). The loaded-timeout sandbox test (12
+concurrent infinite loops plus host CPU load) needed the stall re-run on 12 of 12 runs
+locally and ended every one as a CPU-limit time limit. Not tested: gVisor; the original CI
+stall and lost-output events (neither reproduced).

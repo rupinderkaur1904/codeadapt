@@ -53,10 +53,11 @@ Each test run becomes an **observation** with an *outcome signature*:
 | --- | --- |
 | `output:<normalised stdout>` | exited 0; stdout after whitespace normalisation |
 | `runtime_error:<signal or exit code>` | non-zero exit or signal |
-| `time_limit` | CPU or wall limit exceeded |
+| `time_limit` | stopped by its CPU-time limit (the program itself used the CPU; ADR-023) |
 | `memory_limit` | killed by the memory cgroup |
 | `output_limit` | exceeded output cap |
-| `infrastructure_error` | sandbox failure — not evidence about the program |
+| `inconclusive` | stopped by the wall clock without reaching its CPU limit, also after one re-run with a 10 s start-up grace; a host stall looks the same, so not evidence (ADR-023) |
+| `infrastructure_error` | sandbox failure — not evidence about the program; student runs re-measure it up to 3 times |
 
 **Reliability marking.** A test observation is excluded (and listed as excluded, with the
 reason) when:
@@ -167,6 +168,13 @@ append-only `recommendations` and `followup_evaluations` tables.
   supported diagnosis explains it, and then only for the selected model's skill; other
   failures are not attributed to any skill. In the demo bank all three problems probe the
   same four skills, so this changes the ranking's evidence counts but no ranking decision.
+  Since policy 1.2 (ADR-023) the diagnosis must also be unqualified (two or more behaviour
+  groups and no documented collision), and every attempt is attributed with the skill-map
+  snapshot of its own content version; a version without one contributes nothing.
+* *Skill observations (learner-model input, ADR-023).* `skill_observations` reduces each
+  attempt to at most one `correct` or `incorrect` observation per skill, under the rules of
+  docs/component-interfaces.md §5. Nothing consumes them yet; they are the contract a
+  learner model will read.
 * *Qualified hypotheses.* When the diagnosis is single-behaviour or the model has a
   `known_limitation`, the recommendation records `qualified_hypothesis` and the student
   wording says the pattern has more than one possible cause. The target is the skill.

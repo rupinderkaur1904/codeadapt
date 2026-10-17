@@ -343,7 +343,7 @@ def test_policy_ranking_counts_only_explained_failures() -> None:
         attempt("lower-bound", Outcome.NO_FAILURE_OBSERVED, n=2),
     ]
     rec = POLICY.recommend(history[-1], history, PROBLEMS)
-    assert rec.policy_version == "1.1"
+    assert rec.policy_version == "1.2"
     # Before C5 both problems counted 81 ledger entries: the 15 unexplained failures on
     # count-occurrences and the 1 on last-less-than were charged to every probed skill.
     # (48 and 78 before content change C1 added three probe observations to lower-bound.)

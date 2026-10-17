@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -30,6 +30,9 @@ class AttemptRecord(_Frozen):
     problem_slug: str
     created_at: datetime
     outcome: Outcome
+    # The content version the attempt was diagnosed against; skills are attributed with
+    # that version's skill map (ADR-023, D4). None only for synthetic trajectories.
+    problem_version: str | None = None
     selected_model: str | None = None
     candidates: tuple[str, ...] = ()
     # A supported diagnosis the method qualified (one behaviour group), or whose model
@@ -49,6 +52,27 @@ class ProbeEvidence(_Frozen):
     status: TestStatus
     # For a failure: the error model whose supported diagnosis explains it.
     explained_by: str | None = None
+
+
+class SkillObservation(_Frozen):
+    """One attempt's evidence about one skill: the learner-model input (ADR-023, D3).
+
+    `incorrect` means an unqualified supported diagnosis selected an error model of this
+    skill; `correct` means every reliable test probing the skill passed. Neither is a
+    statement about mastery or about what the learner was thinking.
+    """
+
+    skill: str
+    value: Literal["correct", "incorrect"]
+    basis: str
+    submission_id: str
+    problem_slug: str
+    problem_version: str | None
+    created_at: datetime
+    test_keys: tuple[str, ...]
+    # 1 for the learner's first attempt on this problem, 2 for the next, ... A retry is not
+    # independent of the earlier attempt: the learner has seen which tests failed.
+    attempt_ordinal: int
 
 
 class Rule(StrEnum):

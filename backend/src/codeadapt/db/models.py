@@ -90,6 +90,9 @@ class ProblemVersion(Base):
     slug: Mapped[str] = mapped_column(String(64), index=True)
     family: Mapped[str] = mapped_column(String(64))
     title: Mapped[str] = mapped_column(String(200))
+    # Skill-map snapshot (adaptation.skillmap.SkillMap); None for versions registered
+    # before ADR-023 that are no longer in the catalogue: they contribute no skill evidence.
+    skill_map: Mapped[dict[str, Any] | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = _ts()
 
 

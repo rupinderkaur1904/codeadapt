@@ -265,12 +265,21 @@ held-out and calibration results for lower-bound are unchanged case for case und
 v1.1 and the C6 candidate (docs/evaluation/c6-2026-10-16/). The new models add no new
 diagnoses on those cases, which says nothing about how often students make these errors.
 
-## ADR-023 — Component interfaces and evidence rules (2026-10-17, **proposed**)
+## ADR-023 — Component interfaces and evidence rules (2026-10-17)
 **Context:** ADR-021 requires the contracts between the diagnostic engine, the
 skill-evidence layer, the learner model and the recommendation policy before any Bayesian
 work, and the owner required that a load-induced timeout never becomes student-failure
 evidence. **Proposal:** docs/component-interfaces.md: CPU-limit timeouts are program
 evidence; wall-deadline-only timeouts are re-run and otherwise `inconclusive`; ledger
 policy 1.2 (qualified diagnoses add no failure evidence; one observation per attempt and
-skill); a skill-map snapshot per content version; an end-of-output marker later. Status:
-awaiting the owner's review; nothing implemented. The lost-output failure stays unconfirmed.
+skill); a skill-map snapshot per content version; an end-of-output marker later.
+**Status (2026-10-17, milestone EV1):** D1–D4 implemented, within the authority the owner
+set that day (D2 approved in principle the same day). `evidence_rules_version` 1 and ledger
+policy 1.2 are recorded with each diagnosis and recommendation. Held-out and calibration
+results are unchanged case for case. A sandbox test drives 12 concurrent infinite loops
+under host CPU load: locally each first hit the wall deadline, and each ended as a CPU-limit
+time limit after the re-run. The CI event (a trivial run recorded as a time limit) was not
+reproduced, so R2 is shown to classify a scripted stall correctly, not shown against that
+event. Not done: D5 (end-of-output marker, needs the owner's review); the lost-output
+failure stays unconfirmed. gVisor delivery of SIGXCPU is untested: if `runsc` did not
+deliver it, genuine timeouts there would become inconclusive (evidence lost, not invented).
