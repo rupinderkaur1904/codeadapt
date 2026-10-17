@@ -158,7 +158,8 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 * **Result:** implemented; tests cover arithmetic, both outcomes, parameter constraints,
   determinism, excluded evidence, retries, version identity, display threshold and the
   unchanged student API. Nothing about real learners is validated.
-* **Next:** CE1 (content expansion), which is what would make estimates informative.
+* **Next:** CE1, proposed in docs/proposals/ce1-content-expansion.md (audit, staged scope,
+  acceptance criteria); awaiting owner review.
 
 ### M8 — Hardening and deployment
 * **Objective:** real auth (Argon2id, sessions, CSRF, rate limits), audit log for researcher
