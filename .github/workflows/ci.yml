@@ -107,10 +107,13 @@ jobs:
         run: |
           id=$(curl -fs -X POST http://127.0.0.1:8000/api/v1/submissions -H 'Content-Type: application/json' \
             --data "$(jq -n --rawfile s content/demo/lower-bound/reference.cpp '{problem_slug:"lower-bound",source:$s}')" | jq -r .id)
-          for i in $(seq 1 90); do
+          # The first submission measures the problem's fingerprints; on a 2-vCPU runner
+          # wall-only stops are re-run (ADR-023 D1), so allow up to 15 minutes.
+          for i in $(seq 1 450); do
             status=$(curl -fs http://127.0.0.1:8000/api/v1/submissions/$id | jq -r .status)
             [ "$status" = completed ] && break; sleep 2
           done
+          echo "status after $((i * 2)) s: $status"
           curl -fs http://127.0.0.1:8000/api/v1/submissions/$id | jq -e '.feedback.kind == "all_tests_passed"'
       - name: Logs on failure
         if: failure()
