@@ -308,3 +308,46 @@ kills its parent process makes its runs infrastructure errors (no evidence, neve
 evidence). **Cost observed:** the CI backend job on d3919b0 took 1670 s against about
 1000 s before EV1, consistent with the ADR-023 stall re-runs of looping models on a busy
 runner.
+
+## ADR-025 — LM1: researcher-only Bayesian knowledge tracing (2026-10-17)
+**Context:** EV1 made skill observations reliable, behaviour-level and tied to content
+versions (ADR-023, ADR-024). ADR-021 called for a separate, testable BKT milestone after
+that. The proposal is in docs/proposals/lm1-learner-model.md. The owner approved it on
+2026-10-17 with these decisions:
+- L1(a): count only the first reliably evaluated attempt per problem version;
+- L2: the proposed parameters, explicitly as assumptions;
+- L3: estimates visible to researchers only;
+- L4: build LM1 before CE1.
+
+**Decision:** `codeadapt.learner.bkt` implements standard BKT per skill (model
+`bkt-standard` 1) over `skill_observations()` with parameter set `bkt-params-assumed-1`
+(P(L0) 0.3, P(T) 0.1, P(G) 0.2, P(S) 0.1, not fitted or calibrated). The rules:
+- Attempts that were not reliably evaluated (compile error, execution error, unreliable
+  evidence) do not use up the counted attempt.
+- Retries stay listed as uncounted, with a reason.
+- Distinct problems are counted by slug, while each observation keeps its exact version.
+- No value is shown below 3 counted observations from 2 problems. This is a display
+  threshold, not an accuracy criterion.
+
+Estimates are computed on read and not persisted. They are exposed only at
+`GET /api/v1/research/learner-model` and on the console page, always labelled "estimated
+under assumed parameters". Student responses, diagnosis, feedback and recommendation
+policy v1.2 are unchanged. A test checks that only the API module imports the learner
+model.
+
+**Validated technically:**
+- update arithmetic against hand calculations, for both outcomes and for a two-step
+  sequence;
+- parameter constraints;
+- deterministic recomputation, independent of input order;
+- excluded evidence never changes an estimate;
+- retry counting, version identity and the display threshold;
+- student responses unchanged.
+
+**Not validated:**
+- whether any estimate reflects what a learner knows;
+- the parameter values;
+- the skill map;
+- BKT's independence, no-forgetting and shared-parameter assumptions.
+
+All of these need real-learner data, which the project does not have.

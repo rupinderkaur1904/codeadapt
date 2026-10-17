@@ -4,8 +4,14 @@ import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
-import type { ResearchMetrics, ResearchSubmissionRow, TraceView } from "../api/client";
+import type {
+  LearnerModelView,
+  ResearchMetrics,
+  ResearchSubmissionRow,
+  TraceView,
+} from "../api/client";
 import { setDevRole } from "../devRole";
+import { LearnerModelPage } from "./LearnerModelPage";
 import { ProblemListPage } from "./ProblemListPage";
 import { ResearchPage } from "./ResearchPage";
 import { TracePage } from "./TracePage";
@@ -65,6 +71,58 @@ const trace: TraceView = {
   followup_evaluation: null,
 };
 
+function observation(id: string, problem: string, value: "correct" | "incorrect") {
+  return {
+    skill: "equality_handling",
+    value,
+    basis: "every reliable test probing the skill passed",
+    submission_id: id,
+    problem_slug: problem,
+    problem_version: `${problem}-v1`,
+    created_at: "2026-10-15T05:00:00Z",
+    test_keys: ["equal_first"],
+    attempt_ordinal: 1,
+  };
+}
+
+const learnerModel: LearnerModelView = {
+  username: "synthetic-a",
+  data_class: "synthetic",
+  attempts: 3,
+  estimate: {
+    model: "bkt-standard",
+    model_version: "1",
+    parameter_set: "bkt-params-assumed-1",
+    label: "estimated under assumed parameters",
+    assumptions: ["no forgetting"],
+    min_observations: 3,
+    min_problems: 2,
+    skills: [
+      {
+        skill: "equality_handling",
+        state: "insufficient_data",
+        p_known: null,
+        counted: 1,
+        distinct_problems: 1,
+        observations: [
+          {
+            observation: observation("s1", "lower-bound", "incorrect"),
+            counted: true,
+            reason: null,
+            p_known_after: 0.146,
+          },
+          {
+            observation: observation("s2", "lower-bound", "correct"),
+            counted: false,
+            reason: "retry: not the first reliably evaluated attempt on this problem version",
+            p_known_after: null,
+          },
+        ],
+      },
+    ],
+  },
+};
+
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -97,6 +155,7 @@ describe("researcher pages", () => {
       if (url.includes("/research/submissions/s1/trace")) return json(trace);
       if (url.includes("/research/submissions")) return json([row]);
       if (url.includes("/research/metrics")) return json(metrics);
+      if (url.includes("/research/learner-model?username=synthetic-a")) return json(learnerModel);
       if (url.endsWith("/problems"))
         return json([
           {
@@ -146,6 +205,19 @@ describe("researcher pages", () => {
     expect(screen.getByText("output: 1")).toBeInTheDocument();
     expect(screen.getAllByText("upper_bound_confusion").length).toBeGreaterThan(0);
     expect(screen.getByText("count-occurrences")).toBeInTheDocument();
+  });
+
+  it("shows learner-model estimates with their label and uncounted retries", async () => {
+    renderAt(
+      "/research/learners/synthetic-a",
+      <LearnerModelPage />,
+      "/research/learners/:username",
+    );
+    expect(await screen.findByText(/Insufficient data/)).toBeInTheDocument();
+    expect(screen.getAllByText(/estimated under assumed parameters/).length).toBeGreaterThan(0);
+    expect(screen.getByText("0.146")).toBeInTheDocument();
+    expect(screen.getByText(/no \(retry/)).toBeInTheDocument();
+    expect(screen.queryByText(/master/i)).toBeNull();
   });
 
   it("marks problems with an attempt that had no failing tests", async () => {

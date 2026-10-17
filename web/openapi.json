@@ -138,6 +138,96 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "LearnerEstimate": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "default": [
+              "parameters are assumed, not fitted to or calibrated on learner data",
+              "skills are independent of each other",
+              "no forgetting",
+              "the same parameters for every problem",
+              "observations come from author-written tests and an author-assigned skill map"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "label": {
+            "default": "estimated under assumed parameters",
+            "title": "Label",
+            "type": "string"
+          },
+          "min_observations": {
+            "default": 3,
+            "title": "Min Observations",
+            "type": "integer"
+          },
+          "min_problems": {
+            "default": 2,
+            "title": "Min Problems",
+            "type": "integer"
+          },
+          "model": {
+            "default": "bkt-standard",
+            "title": "Model",
+            "type": "string"
+          },
+          "model_version": {
+            "default": "1",
+            "title": "Model Version",
+            "type": "string"
+          },
+          "parameter_set": {
+            "title": "Parameter Set",
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillEstimate"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "parameter_set",
+          "skills"
+        ],
+        "title": "LearnerEstimate",
+        "type": "object"
+      },
+      "LearnerModelView": {
+        "additionalProperties": false,
+        "description": "Researcher-only LM1 output for one learner and one data class (ADR-025).\n\nEstimates are \"estimated under assumed parameters\": not fitted, not calibrated, never\nshown to the learner and not used by any policy.",
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "data_class": {
+            "title": "Data Class",
+            "type": "string"
+          },
+          "estimate": {
+            "$ref": "#/components/schemas/LearnerEstimate"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "data_class",
+          "attempts",
+          "estimate"
+        ],
+        "title": "LearnerModelView",
+        "type": "object"
+      },
       "LearnerNext": {
         "additionalProperties": false,
         "properties": {
@@ -528,6 +618,129 @@
         "title": "SampleTest",
         "type": "object"
       },
+      "SkillEstimate": {
+        "additionalProperties": false,
+        "properties": {
+          "counted": {
+            "title": "Counted",
+            "type": "integer"
+          },
+          "distinct_problems": {
+            "title": "Distinct Problems",
+            "type": "integer"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/TracedObservation"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "p_known": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Known"
+          },
+          "skill": {
+            "title": "Skill",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "estimated",
+              "insufficient_data"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skill",
+          "state",
+          "p_known",
+          "counted",
+          "distinct_problems",
+          "observations"
+        ],
+        "title": "SkillEstimate",
+        "type": "object"
+      },
+      "SkillObservation": {
+        "additionalProperties": false,
+        "description": "One attempt's evidence about one skill: the learner-model input (ADR-023, D3).\n\n`incorrect` means an unqualified supported diagnosis selected an error model of this\nskill; `correct` means every reliable test probing the skill passed. Neither is a\nstatement about mastery or about what the learner was thinking.",
+        "properties": {
+          "attempt_ordinal": {
+            "title": "Attempt Ordinal",
+            "type": "integer"
+          },
+          "basis": {
+            "title": "Basis",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "problem_slug": {
+            "title": "Problem Slug",
+            "type": "string"
+          },
+          "problem_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem Version"
+          },
+          "skill": {
+            "title": "Skill",
+            "type": "string"
+          },
+          "submission_id": {
+            "title": "Submission Id",
+            "type": "string"
+          },
+          "test_keys": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Test Keys",
+            "type": "array"
+          },
+          "value": {
+            "enum": [
+              "correct",
+              "incorrect"
+            ],
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skill",
+          "value",
+          "basis",
+          "submission_id",
+          "problem_slug",
+          "problem_version",
+          "created_at",
+          "test_keys",
+          "attempt_ordinal"
+        ],
+        "title": "SkillObservation",
+        "type": "object"
+      },
       "SubmissionAccepted": {
         "additionalProperties": false,
         "properties": {
@@ -814,6 +1027,46 @@
         "title": "TraceView",
         "type": "object"
       },
+      "TracedObservation": {
+        "additionalProperties": false,
+        "properties": {
+          "counted": {
+            "title": "Counted",
+            "type": "boolean"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/SkillObservation"
+          },
+          "p_known_after": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Known After"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "observation",
+          "counted"
+        ],
+        "title": "TracedObservation",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -1034,6 +1287,62 @@
           }
         },
         "summary": "Get Problem"
+      }
+    },
+    "/api/v1/research/learner-model": {
+      "get": {
+        "description": "LM1 estimates for one learner, over the submissions of the learner's data class.",
+        "operationId": "learner_model_api_v1_research_learner_model_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "title": "Username",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-dev-role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Dev-Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnerModelView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Learner Model"
       }
     },
     "/api/v1/research/metrics": {

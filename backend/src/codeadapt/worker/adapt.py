@@ -60,15 +60,19 @@ def attempt_record(submission: Submission, slug: str, diagnosis: DiagnosisRow) -
     )
 
 
-def learner_attempts(session: Session, user_id: int) -> dict[str, AttemptRecord]:
+def learner_attempts(
+    session: Session, user_id: int, data_class: str | None = None
+) -> dict[str, AttemptRecord]:
     """Every diagnosed submission by the learner, using its latest diagnosis."""
-    rows = session.execute(
+    query = (
         select(Submission, DiagnosisRow, ProblemVersion.slug)
         .join(DiagnosisRow, DiagnosisRow.submission_id == Submission.id)
         .join(ProblemVersion, ProblemVersion.version == Submission.problem_version)
         .where(Submission.user_id == user_id)
-        .order_by(Submission.created_at, DiagnosisRow.id)
     )
+    if data_class is not None:
+        query = query.where(Submission.data_class == data_class)
+    rows = session.execute(query.order_by(Submission.created_at, DiagnosisRow.id))
     return {sub.id: attempt_record(sub, slug, diag) for sub, diag, slug in rows}
 
 

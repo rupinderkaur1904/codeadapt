@@ -194,3 +194,15 @@ fingerprinting): `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **244 passed, 0 sk
 0 failed** (≈ 15 min); ruff, format and mypy clean. Held-out and calibration comparisons
 unchanged. The marker check is tested with a fake docker that drops the marker; the real
 lost-output event has not been reproduced locally, so the root cause is still unknown.
+
+### LM1: researcher-only learner model (2026-10-17)
+Same environment.
+- Backend: `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1` gave **266 passed, 0 skipped, 0
+  failed** (about 15 min). Of these, 22 are new: 21 in `tests/unit/test_learner_model.py`
+  and one API test in `test_trajectories.py`.
+- Web: `vitest` gave 19 passed, including the new learner-model page test.
+- Browser: `npx playwright test` gave 1 passed.
+- `ruff check`, `ruff format --check`, `mypy --strict`, `tsc` and `eslint` are clean.
+
+These tests check the arithmetic and the counting rules on synthetic attempts. They say
+nothing about whether the estimates describe real learners.

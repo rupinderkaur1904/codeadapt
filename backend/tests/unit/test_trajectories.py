@@ -408,3 +408,44 @@ def test_problem_list_marks_problems_with_a_no_failure_attempt(
     # Another user's results do not mark this user's list.
     others = client.get("/api/v1/problems", headers=RESEARCHER).json()
     assert not any(p["no_failure_observed"] for p in others)
+
+
+def test_learner_model_is_researcher_only_and_leaves_student_responses_unchanged(
+    client: TestClient, sessions: sessionmaker[Session]
+) -> None:
+    me = Learner.create(sessions, "dev-student", data_class=DataClass.DEV.value)
+    me.submit(
+        "lower-bound",
+        Outcome.HYPOTHESIS_SUPPORTED,
+        model="upper_bound_confusion",
+        failing=("sample_present", "equal_first"),
+    )
+    before = client.get("/api/v1/me/recommendation", headers=STUDENT).json()
+    me.submit("lower-bound", Outcome.NO_FAILURE_OBSERVED)  # a retry: not counted
+    me.submit("count-occurrences", Outcome.NO_FAILURE_OBSERVED)
+    me.submit("last-less-than", Outcome.NO_FAILURE_OBSERVED)
+
+    path = "/api/v1/research/learner-model?username=dev-student"
+    assert client.get(path, headers=STUDENT).status_code == 403
+    assert (
+        client.get("/api/v1/research/learner-model?username=nobody", headers=RESEARCHER).status_code
+        == 404
+    )
+    body = client.get(path, headers=RESEARCHER).json()
+    assert body["data_class"] == "dev" and body["attempts"] == 4
+    est = body["estimate"]
+    assert est["parameter_set"] == "bkt-params-assumed-1"
+    assert est["label"] == "estimated under assumed parameters"
+    eq = next(s for s in est["skills"] if s["skill"] == "equality_handling")
+    assert [o["counted"] for o in eq["observations"]] == [True, False, True, True]
+    assert eq["observations"][0]["observation"]["problem_version"] == (
+        CATALOGUE.by_slug["lower-bound"].version
+    )
+    assert eq["state"] == "estimated" and 0 < eq["p_known"] < 1
+
+    # Student-facing responses carry no learner-model output.
+    after = client.get("/api/v1/me/recommendation", headers=STUDENT).json()
+    assert set(after) == set(before) == {"recommendation", "last_followup"}
+    student_text = str(after) + str(client.get("/api/v1/problems", headers=STUDENT).json())
+    for internal in ("p_known", "bkt", "assumed parameters", "estimate", "mastered"):
+        assert internal not in student_text.lower()
