@@ -146,8 +146,10 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 * **Objective:** the evidence contracts of docs/component-interfaces.md (ADR-023 D1–D4), so
   every skill observation a learner model could read is reliable, diagnosis-justified,
   per attempt and tied to its content version. No learner model.
-* **Result:** met; see ADR-023 status and docs/development.md. Open: D5 (end-of-output
-  marker, owner review), lost-output failure unconfirmed, gVisor untested.
+* **Result:** met; see ADR-023 status and docs/development.md. CI on d3919b0 then showed
+  the lost-output failure (ADR-020) on a fingerprinting run, so the end-of-output marker
+  was added in the runner (ADR-024; no content version changes). Open: lost-output root
+  cause unknown, marker validated only against a scripted reproduction, gVisor untested.
 * **Next:** propose the smallest BKT milestone for review (ADR-021), reading only
   `skill_observations`.
 

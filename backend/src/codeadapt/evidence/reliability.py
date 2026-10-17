@@ -51,7 +51,8 @@ GENERIC_PHRASE = "performs an operation with undefined behaviour"
 # Version of the execution-evidence rules (docs/component-interfaces.md §3), recorded with
 # every diagnosis. 1: CPU-limit timeouts are evidence; wall-only stops are re-run once and
 # are otherwise inconclusive.
-EVIDENCE_RULES_VERSION = "1"
+# 2: a run whose streams lack the end-of-output marker is an infrastructure error (ADR-024).
+EVIDENCE_RULES_VERSION = "2"
 INCONCLUSIVE_REASON = (
     "inconclusive: stopped by the wall clock without reaching the CPU limit, twice"
 )

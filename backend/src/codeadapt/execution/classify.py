@@ -28,6 +28,9 @@ class RawOutcome:
     # on a run that finished by itself. The attached output streams cannot then be
     # trusted (seen in CI: exit 0 with empty stdout), so the run is not evidence.
     stream_mismatch: bool = False
+    # The run ended by itself but its streams lacked the end-of-output marker the run script
+    # writes last: output was lost between the container and the host (ADR-024).
+    output_incomplete: bool = False
 
 
 def signal_of(exit_code: int | None) -> int | None:
@@ -42,7 +45,7 @@ def signal_of(exit_code: int | None) -> int | None:
 
 
 def classify_run(raw: RawOutcome) -> RunStatus:
-    if not raw.started or raw.stream_mismatch:
+    if not raw.started or raw.stream_mismatch or raw.output_incomplete:
         return RunStatus.INFRASTRUCTURE_ERROR
     # Order matters: resource-limit verdicts explain a subsequent non-zero exit.
     if raw.oom_killed:

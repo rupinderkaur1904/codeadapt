@@ -16,7 +16,7 @@ import tarfile
 import uuid
 from collections.abc import AsyncIterator, Sequence
 from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from codeadapt.execution.backend import SandboxUnavailableError
 from codeadapt.execution.classify import RawOutcome, classify_compile, classify_run, signal_of
@@ -59,6 +59,17 @@ PROFILE_FLAGS: dict[BuildProfile, tuple[str, ...]] = {
 }
 
 _COMPILE_SCRIPT = 'tar -x -f - -C /work/src && cd /work/src && exec "$@"'
+# Runs the test binary, then writes a per-run end-of-output marker to stdout and stderr and
+# exits with the binary's status (128 + N if it died from signal N, as with tini). A run
+# that ends by itself without both markers lost output on the way to the host (seen in CI:
+# exit 0, empty stdout), so its streams are not evidence (ADR-024). Perl (always present in
+# the Debian-based image) is used instead of sh because dash adds "Segmentation fault"-style
+# notices to stderr; the program's own output, stdin and exit status are unchanged.
+_RUN_SCRIPT = (
+    "my $m = shift; my $r = system { $ARGV[0] } @ARGV; "
+    "my $c = $r == -1 ? 127 : ($r & 127) ? 128 + ($r & 127) : $r >> 8; "
+    "print STDOUT $m; print STDERR $m; exit $c"
+)
 
 
 @dataclass(frozen=True)
@@ -336,11 +347,39 @@ class DockerSandbox:
         return proc, raw
 
 
+def _check_end_markers(
+    proc: ProcessOutcome, raw: RawOutcome, marker: bytes, stdout_cap: int, stderr_cap: int
+) -> tuple[ProcessOutcome, RawOutcome]:
+    """Strip the end-of-output markers, and flag a run that ended without them.
+
+    The streams were read with room for the marker; without it they are clipped back to
+    the configured caps, so the caps students and researchers see are unchanged.
+    """
+    out_ok = proc.stdout.endswith(marker)
+    err_ok = proc.stderr.endswith(marker)
+    stripped = replace(
+        proc,
+        stdout=proc.stdout[: -len(marker)] if out_ok else proc.stdout[:stdout_cap],
+        stderr=proc.stderr[: -len(marker)] if err_ok else proc.stderr[:stderr_cap],
+    )
+    # Timeouts, overflows and OOM kills stop the script before it writes the markers.
+    ended_by_itself = (
+        raw.started
+        and raw.exit_code is not None
+        and not raw.timed_out
+        and not raw.output_overflow
+        and not raw.oom_killed
+    )
+    return stripped, replace(raw, output_incomplete=ended_by_itself and not (out_ok and err_ok))
+
+
 def _infra_detail(raw: RawOutcome, kind: str) -> str:
     if not raw.started:
         return f"{kind} container did not start"
     if raw.stream_mismatch:
         return f"{kind} output stream disagreed with the container's exit status"
+    if raw.output_incomplete:
+        return f"{kind} output stream ended without its end-of-output marker"
     return ""
 
 
@@ -439,6 +478,7 @@ class DockerSandboxJob:
         return result
 
     async def _run_once(self, stdin: bytes, profile: BuildProfile, limits: RunLimits) -> RunResult:
+        marker = f"<codeadapt-end:{uuid.uuid4().hex}>".encode()
         docker_args = [
             *self._sandbox._hardening(
                 memory_mib=limits.memory_mib,
@@ -452,6 +492,10 @@ class DockerSandboxJob:
             "--workdir",
             "/",
             self._sandbox.config.image,
+            "perl",
+            "-e",
+            _RUN_SCRIPT,
+            marker.decode(),
             f"/work/bin/{profile.value}",
         ]
         proc, raw = await self._sandbox._run_container(
@@ -459,10 +503,11 @@ class DockerSandboxJob:
             docker_args=docker_args,
             stdin=stdin,
             deadline=limits.wall_seconds,
-            stdout_cap=limits.stdout_bytes,
-            stderr_cap=limits.stderr_bytes,
+            stdout_cap=limits.stdout_bytes + len(marker),
+            stderr_cap=limits.stderr_bytes + len(marker),
             kill_on_overflow=True,
         )
+        proc, raw = _check_end_markers(proc, raw, marker, limits.stdout_bytes, limits.stderr_bytes)
         return RunResult(
             status=classify_run(raw),
             exit_code=raw.exit_code,

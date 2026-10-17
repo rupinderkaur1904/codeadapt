@@ -34,6 +34,7 @@ def raw(**kw: object) -> RawOutcome:
         (raw(exit_code=None), RunStatus.INFRASTRUCTURE_ERROR),
         # The client's streams disagree with the container: the output is not evidence.
         (raw(stream_mismatch=True), RunStatus.INFRASTRUCTURE_ERROR),
+        (raw(output_incomplete=True), RunStatus.INFRASTRUCTURE_ERROR),
         # Memory beats a later timeout: OOM explains why the program stopped making progress.
         (raw(exit_code=137, oom_killed=True, timed_out=True), RunStatus.MEMORY_LIMIT),
     ],
