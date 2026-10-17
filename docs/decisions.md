@@ -264,3 +264,13 @@ that, because an unmodelled clamp to `n - 1` behaves identically on every input.
 held-out and calibration results for lower-bound are unchanged case for case under both
 v1.1 and the C6 candidate (docs/evaluation/c6-2026-10-16/). The new models add no new
 diagnoses on those cases, which says nothing about how often students make these errors.
+
+## ADR-023 — Component interfaces and evidence rules (2026-10-17, **proposed**)
+**Context:** ADR-021 requires the contracts between the diagnostic engine, the
+skill-evidence layer, the learner model and the recommendation policy before any Bayesian
+work, and the owner required that a load-induced timeout never becomes student-failure
+evidence. **Proposal:** docs/component-interfaces.md: CPU-limit timeouts are program
+evidence; wall-deadline-only timeouts are re-run and otherwise `inconclusive`; ledger
+policy 1.2 (qualified diagnoses add no failure evidence; one observation per attempt and
+skill); a skill-map snapshot per content version; an end-of-output marker later. Status:
+awaiting the owner's review; nothing implemented. The lost-output failure stays unconfirmed.
