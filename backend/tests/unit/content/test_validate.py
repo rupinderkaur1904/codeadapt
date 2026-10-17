@@ -280,3 +280,16 @@ def test_report_is_deterministic_and_shows_agreement() -> None:
     assert "| NO |" not in text
     assert "## Behaviour groups" in text
     assert text.count("| yes |") == len(spec.tests)
+
+
+def test_inconclusive_measurement_is_an_error() -> None:
+    # A model's predicted time limit must be a CPU-limit stop; a wall-clock stop that
+    # persisted through re-measurement leaves the content unusable (fail closed).
+    stall = Signature(kind=OutcomeKind.INCONCLUSIVE)
+    models = distinct_models()
+    key = SPEC.error_models[0].key
+    first = SPEC.tests[0].key
+    models[key] = program(key, {first: (stall, stall)})
+    report = validate_fingerprints(SPEC, fingerprints(models))
+    assert not report.ok
+    assert any("inconclusive run" in e and key in e for e in report.errors)

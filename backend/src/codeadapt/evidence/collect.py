@@ -15,7 +15,18 @@ from codeadapt.diagnosis import Observation
 from codeadapt.evidence.reliability import TestReliability, assess
 from codeadapt.evidence.signature import Signature, signature_of
 from codeadapt.execution.backend import SandboxBackend, SandboxUnavailableError
-from codeadapt.execution.models import BuildProfile, CompileResult, CompileStatus, RunResult
+from codeadapt.execution.models import (
+    BuildProfile,
+    CompileResult,
+    CompileStatus,
+    RunResult,
+    RunStatus,
+)
+
+# A run-level infrastructure error says nothing about the submission, so it is measured
+# again, at most this many times in total (the same bound as fingerprinting). A persistent
+# one still makes the whole attempt an execution error (methodology §4, rule 2).
+INFRA_ATTEMPTS = 3
 
 
 @dataclass
@@ -68,8 +79,15 @@ async def collect_evidence(
         if compiled.status is not CompileStatus.OK:
             return evidence
 
+        async def run(stdin: bytes, profile: BuildProfile) -> RunResult:
+            for _ in range(INFRA_ATTEMPTS):
+                result = await job.run(stdin, profile)
+                if result.status is not RunStatus.INFRASTRUCTURE_ERROR:
+                    break
+            return result
+
         async def run_all(profile: BuildProfile) -> dict[str, RunResult]:
-            results = await asyncio.gather(*(job.run(t.input.encode(), profile) for t in tests))
+            results = await asyncio.gather(*(run(t.input.encode(), profile) for t in tests))
             return dict(zip((t.key for t in tests), results, strict=True))
 
         evidence.standard = await run_all(BuildProfile.STANDARD)
@@ -78,7 +96,7 @@ async def collect_evidence(
             t for t in tests if signature_of(evidence.standard[t.key]) != reference.get(t.key)
         ]
         again = await asyncio.gather(
-            *(job.run(t.input.encode(), BuildProfile.STANDARD) for t in failing)
+            *(run(t.input.encode(), BuildProfile.STANDARD) for t in failing)
         )
         evidence.repeats = {t.key: [r] for t, r in zip(failing, again, strict=True)}
         # Reliability channel 2: ASan + UBSan build over every test.

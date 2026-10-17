@@ -49,8 +49,13 @@ def classify_run(raw: RawOutcome) -> RunStatus:
         return RunStatus.MEMORY_LIMIT
     if raw.output_overflow:
         return RunStatus.OUTPUT_LIMIT
-    if raw.timed_out or signal_of(raw.exit_code) == SIGXCPU:
+    # Only the CPU-time limit shows that the program itself ran too long: CPU time is
+    # charged to the program's own process, so host load cannot produce it. A wall-clock
+    # stop without it is what a stalled host looks like too (measured, ADR-023).
+    if signal_of(raw.exit_code) == SIGXCPU:
         return RunStatus.TIME_LIMIT
+    if raw.timed_out:
+        return RunStatus.INCONCLUSIVE
     if raw.exit_code == 0:
         return RunStatus.OK
     if raw.exit_code is None:

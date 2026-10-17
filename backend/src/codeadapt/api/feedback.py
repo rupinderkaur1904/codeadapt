@@ -33,6 +33,7 @@ _KIND_VERDICT = {
     OutcomeKind.TIME_LIMIT.value: TestVerdict.TIME_LIMIT,
     OutcomeKind.MEMORY_LIMIT.value: TestVerdict.MEMORY_LIMIT,
     OutcomeKind.OUTPUT_LIMIT.value: TestVerdict.OUTPUT_LIMIT,
+    OutcomeKind.INCONCLUSIVE.value: TestVerdict.NOT_EVALUATED,
     OutcomeKind.INFRASTRUCTURE_ERROR.value: TestVerdict.NOT_EVALUATED,
 }
 
@@ -54,11 +55,12 @@ def test_views(
         if obs is None:
             verdict = TestVerdict.NOT_EVALUATED
         elif obs.excluded_reason is not None:
-            verdict = (
-                TestVerdict.UNDEFINED_BEHAVIOUR
-                if obs.excluded_reason.startswith("sanitizer:")
-                else TestVerdict.INCONSISTENT
-            )
+            if obs.excluded_reason.startswith("sanitizer:"):
+                verdict = TestVerdict.UNDEFINED_BEHAVIOUR
+            elif obs.excluded_reason.startswith("inconclusive:"):
+                verdict = TestVerdict.NOT_EVALUATED
+            else:
+                verdict = TestVerdict.INCONSISTENT
         elif (obs.signature_kind, obs.signature_detail) == reference.get(test.key):
             verdict = TestVerdict.PASSED
         else:

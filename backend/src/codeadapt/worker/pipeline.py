@@ -32,6 +32,7 @@ from codeadapt.db.models import (
 from codeadapt.diagnosis import DiagnosticInput, DiagnosticMethod
 from codeadapt.evidence import Signature, signature_of
 from codeadapt.evidence.collect import collect_evidence
+from codeadapt.evidence.reliability import EVIDENCE_RULES_VERSION
 from codeadapt.execution.backend import SandboxBackend, SandboxUnavailableError
 from codeadapt.execution.models import (
     CompileResult,
@@ -140,6 +141,7 @@ class Pipeline:
         rationale = {
             **diagnosis.rationale,
             "reliability": {
+                "evidence_rules_version": EVIDENCE_RULES_VERSION,
                 "sanitizer_available": sanitized is not None,
                 "sanitizer_compile_status": (
                     sanitize_compile.status.value if sanitize_compile is not None else None

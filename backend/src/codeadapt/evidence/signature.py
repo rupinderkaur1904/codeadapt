@@ -19,6 +19,7 @@ class OutcomeKind(StrEnum):
     TIME_LIMIT = "time_limit"
     MEMORY_LIMIT = "memory_limit"
     OUTPUT_LIMIT = "output_limit"
+    INCONCLUSIVE = "inconclusive"
     INFRASTRUCTURE_ERROR = "infrastructure_error"
 
 
@@ -31,11 +32,14 @@ class Signature(BaseModel):
 
     @property
     def is_evidence(self) -> bool:
-        """Infrastructure failures say nothing about the program."""
-        return self.kind is not OutcomeKind.INFRASTRUCTURE_ERROR
+        """Infrastructure failures and inconclusive runs say nothing about the program."""
+        return self.kind not in NOT_EVIDENCE
 
     def __str__(self) -> str:
         return f"{self.kind.value}:{self.detail}" if self.detail else self.kind.value
+
+
+NOT_EVIDENCE = frozenset({OutcomeKind.INFRASTRUCTURE_ERROR, OutcomeKind.INCONCLUSIVE})
 
 
 def normalise_output(stdout: str) -> str:
@@ -63,5 +67,7 @@ def signature_of(result: RunResult) -> Signature:
             return Signature(kind=OutcomeKind.MEMORY_LIMIT)
         case RunStatus.OUTPUT_LIMIT:
             return Signature(kind=OutcomeKind.OUTPUT_LIMIT)
+        case RunStatus.INCONCLUSIVE:
+            return Signature(kind=OutcomeKind.INCONCLUSIVE)
         case RunStatus.INFRASTRUCTURE_ERROR:
             return Signature(kind=OutcomeKind.INFRASTRUCTURE_ERROR, detail=result.detail)

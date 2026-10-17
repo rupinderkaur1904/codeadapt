@@ -23,7 +23,11 @@ def raw(**kw: object) -> RawOutcome:
         (raw(exit_code=1), RunStatus.RUNTIME_ERROR),
         (raw(exit_code=139), RunStatus.RUNTIME_ERROR),  # SIGSEGV
         (raw(exit_code=152), RunStatus.TIME_LIMIT),  # SIGXCPU from the CPU rlimit
-        (raw(exit_code=137, timed_out=True), RunStatus.TIME_LIMIT),
+        # Wall deadline without the CPU limit: a stalled host looks the same (ADR-023).
+        (raw(exit_code=137, timed_out=True), RunStatus.INCONCLUSIVE),
+        (raw(exit_code=None, timed_out=True), RunStatus.INCONCLUSIVE),
+        # The CPU limit decides even if the wall deadline also fired.
+        (raw(exit_code=152, timed_out=True), RunStatus.TIME_LIMIT),
         (raw(exit_code=137, oom_killed=True), RunStatus.MEMORY_LIMIT),
         (raw(exit_code=137, output_overflow=True), RunStatus.OUTPUT_LIMIT),
         (raw(started=False, exit_code=None), RunStatus.INFRASTRUCTURE_ERROR),

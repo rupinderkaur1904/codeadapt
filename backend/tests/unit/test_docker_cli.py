@@ -4,7 +4,9 @@ A fake `docker` binary scripts the two failure modes seen under load:
 
 * the attached `docker run -i` client and `docker inspect` disagree about how the
   container ended (the CI e2e run that lost its output);
-* `docker kill` is slow to confirm.
+* `docker kill` is slow to confirm;
+* a run is stopped by the wall clock without reaching its CPU limit (a host stall looks
+  like this), which ADR-023 re-runs once and otherwise reports as inconclusive.
 
 This tests how `DockerSandbox` *reports* those conditions. It does not reproduce the
 original CI failure, whose root cause is still unconfirmed (ADR-020).
@@ -31,7 +33,15 @@ if cmd == "run":
     with open(os.path.join(state, "run.pid"), "w") as f:
         f.write(str(os.getpid()))
     sys.stdin.read()
-    time.sleep(float(os.environ.get("FAKE_RUN_SECONDS", "0")))
+    # FAKE_RUN_SECONDS is a comma-separated list: one entry per successive run.
+    seq = os.environ.get("FAKE_RUN_SECONDS", "0").split(",")
+    count_file = os.path.join(state, "runs")
+    n = int(open(count_file).read()) if os.path.exists(count_file) else 0
+    with open(count_file, "w") as f:
+        f.write(str(n + 1))
+    if os.path.exists(os.path.join(state, "killed")):
+        os.remove(os.path.join(state, "killed"))
+    time.sleep(float(seq[min(n, len(seq) - 1)]))
     sys.stdout.write(os.environ.get("FAKE_RUN_STDOUT", ""))
     sys.exit(int(os.environ.get("FAKE_CLIENT_EXIT", "0")))
 elif cmd == "inspect":
@@ -93,18 +103,58 @@ async def test_exit_status_disagreement_is_an_infrastructure_error(
     assert "disagreed" in result.detail
 
 
-async def test_slow_kill_within_the_wait_still_reports_a_time_limit(
+def _runs() -> int:
+    return int((Path(os.environ["FAKE_DOCKER_STATE"]) / "runs").read_text())
+
+
+async def test_slow_kill_within_the_wait_still_reports_the_stop(
     fake_docker: DockerSandbox, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     # Before ADR-020 the kill wait was 15 s; a daemon slower than that aborted the run.
-    # Scaled down: the kill takes 1.5 s and the wait allows 5 s.
+    # Scaled down: the kill takes 1.5 s and the wait allows 5 s. No stall re-run here.
     monkeypatch.setattr(docker_module, "_DOCKER_CLI_TIMEOUT", 5.0)
+    monkeypatch.setattr(docker_module, "STALL_RETRY_GRACE_SECONDS", 0.5)
     monkeypatch.setenv("FAKE_RUN_SECONDS", "30")
     monkeypatch.setenv("FAKE_KILL_SECONDS", "1.5")
     result = await _job(fake_docker).run(b"in", limits=FAST)
-    assert result.status is RunStatus.TIME_LIMIT
+    assert result.status is RunStatus.INCONCLUSIVE
     assert result.timed_out
-    assert result.detail == ""
+    assert _runs() == 1
+
+
+async def test_cpu_limit_is_a_time_limit_without_a_rerun(
+    fake_docker: DockerSandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FAKE_CLIENT_EXIT", "152")  # 128 + SIGXCPU
+    monkeypatch.setenv("FAKE_CONTAINER_EXIT", "152")
+    result = await _job(fake_docker).run(b"in", limits=FAST)
+    assert result.status is RunStatus.TIME_LIMIT
+    assert _runs() == 1
+
+
+async def test_stalled_trivial_run_is_rerun_and_never_a_time_limit(
+    fake_docker: DockerSandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The CI event: a trivial program stalls past the wall deadline once. The re-run
+    # (longer start-up grace, same CPU limit) completes, and its output is the evidence.
+    monkeypatch.setattr(docker_module, "STALL_RETRY_GRACE_SECONDS", 2.0)
+    monkeypatch.setenv("FAKE_RUN_SECONDS", "30,0")
+    monkeypatch.setenv("FAKE_RUN_STDOUT", "3\n")
+    result = await _job(fake_docker).run(b"in", limits=FAST)
+    assert result.status is RunStatus.OK
+    assert result.stdout == "3\n"
+    assert "re-run after a wall-clock stop" in result.detail
+    assert _runs() == 2
+
+
+async def test_repeated_stall_is_inconclusive(
+    fake_docker: DockerSandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(docker_module, "STALL_RETRY_GRACE_SECONDS", 1.0)
+    monkeypatch.setenv("FAKE_RUN_SECONDS", "30")
+    result = await _job(fake_docker).run(b"in", limits=FAST)
+    assert result.status is RunStatus.INCONCLUSIVE
+    assert _runs() == 2
 
 
 async def test_kill_slower_than_the_wait_is_reported_not_classified(
@@ -113,6 +163,7 @@ async def test_kill_slower_than_the_wait_is_reported_not_classified(
     # A daemon that never confirms the kill is surfaced as an unavailable sandbox, so the
     # caller retries or fails the job; it never becomes a student-facing verdict.
     monkeypatch.setattr(docker_module, "_DOCKER_CLI_TIMEOUT", 0.5)
+    monkeypatch.setattr(docker_module, "STALL_RETRY_GRACE_SECONDS", 0.5)
     monkeypatch.setenv("FAKE_RUN_SECONDS", "30")
     monkeypatch.setenv("FAKE_KILL_SECONDS", "5")
     with pytest.raises(SandboxUnavailableError, match="docker kill timed out"):

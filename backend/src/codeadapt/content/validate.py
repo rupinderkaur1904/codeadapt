@@ -88,6 +88,8 @@ def _program_errors(fp: ProgramFingerprint) -> list[str]:
             errors.append(f"{who} is non-deterministic on test {key!r}: {runs}")
         elif any(s.kind is OutcomeKind.INFRASTRUCTURE_ERROR for s in test.runs):
             errors.append(f"{who}: infrastructure error on test {key!r}")
+        elif any(s.kind is OutcomeKind.INCONCLUSIVE for s in test.runs):
+            errors.append(f"{who}: inconclusive run on test {key!r} (wall-clock stop)")
     return errors
 
 
