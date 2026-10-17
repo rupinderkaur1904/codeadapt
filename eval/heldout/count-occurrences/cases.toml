@@ -29,3 +29,11 @@ note = "Correct closed-interval searches."
 file = "presence_only.cpp"
 truth = "unmodelled"
 note = "Returns 1 if present, else 0."
+
+# Added 2026-10-17 (CE1.0) for the model without a held-out case. Written and committed
+# before the method was run on it, by the models' author in a different style.
+
+[[cases]]
+file = "two_searches_stalled_left.cpp"
+truth = "no_progress_update"
+note = "Two inline loops; the left edge moves to the midpoint, not past it."
