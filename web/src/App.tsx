@@ -15,6 +15,9 @@ const ResearchPage = lazy(() =>
   import("./pages/ResearchPage").then((m) => ({ default: m.ResearchPage })),
 );
 const TracePage = lazy(() => import("./pages/TracePage").then((m) => ({ default: m.TracePage })));
+const LearnerModelPage = lazy(() =>
+  import("./pages/LearnerModelPage").then((m) => ({ default: m.LearnerModelPage })),
+);
 
 export function App() {
   const queryClient = useQueryClient();
@@ -53,6 +56,7 @@ export function App() {
             <Route path="/practice/:slug" element={<PracticePage />} />
             <Route path="/research" element={<ResearchPage />} />
             <Route path="/research/submissions/:id" element={<TracePage />} />
+            <Route path="/research/learners/:username" element={<LearnerModelPage />} />
             <Route path="*" element={<p>Page not found.</p>} />
           </Routes>
         </Suspense>

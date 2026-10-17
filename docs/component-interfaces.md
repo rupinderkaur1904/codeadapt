@@ -208,7 +208,7 @@ basis. No mastery value exists here.
 failures. Policy v1.1's recommendation ranking can keep reading the per-test ledger, so its
 behaviour is unchanged except that qualified failures stop counting.
 
-## 6. Contract 3: skill evidence → Bayesian learner model (planned; not implemented)
+## 6. Contract 3: skill evidence → Bayesian learner model (LM1, researcher-only; ADR-025)
 
 **Input:** the ordered `SkillObservation` stream of one learner, one data class. Nothing
 else: no raw runs, no diagnoses, no excluded observations.

@@ -215,14 +215,58 @@ linked as transfer, one passing attempt is not demonstrated transfer. The script
 `tests/unit/test_trajectories.py` check the mechanics of these rules and nothing about
 their effect on learners.
 
-### Why not BKT / knowledge tracing / learned classifiers now
+### Learner model LM1: researcher-only BKT (ADR-025)
 
-**Direction (ADR-021).** Bayesian knowledge tracing *is* part of the intended
-architecture, as a learner model that sits between the skill-evidence layer and the
-recommendation policy, while fingerprint diagnosis stays the diagnostic engine. It is not
-implemented yet: the interface between the components is documented and reviewed first,
-and the table below lists what its parameters would need before they are more than
-assumptions.
+`codeadapt.learner.bkt` traces each skill with standard Bayesian knowledge tracing, using
+only `skill_observations()` (§5 and docs/component-interfaces.md §6).
+
+**What it is.**
+- **Parameters:** one parameter set, `bkt-params-assumed-1`, for every skill: P(L0) = 0.3,
+  P(T) = 0.1, P(G) = 0.2, P(S) = 0.1. These are the author's placeholder values. They are
+  not fitted, not taken from validated learner data and not calibrated. The set enforces
+  0 < p < 1 and P(G), P(S) < 0.5.
+- **Update:** each counted observation is conditioned by Bayes' rule, then the learn
+  transition is applied. The reported P(known) is the value after the last counted
+  observation and its transition.
+- **Counting (owner decision L1):** only the first reliably evaluated attempt on each
+  problem *version* counts. Compile errors, execution errors and unreliable evidence do not
+  use up that attempt. A later attempt on the same version is a retry after feedback; its
+  observations stay listed as uncounted, with a reason. An abstaining first attempt
+  (ambiguous, unmodelled, insufficient) does use it up, because the learner saw its
+  feedback.
+- **Display threshold:** no value is shown below 3 counted observations from 2 distinct
+  problems. Problems are counted by identity (slug), so several versions of one problem
+  count once, while each observation keeps its exact version.
+- **Why the threshold:** it controls display only. Meeting it says nothing about whether
+  the estimate is accurate.
+
+**Where it is visible.** Only in the researcher console (`/research/learners/<user>`,
+API `GET /api/v1/research/learner-model`), always labelled "estimated under assumed
+parameters". No student response and no policy reads it. Feedback, diagnosis and
+recommendation are unchanged.
+
+**Assumptions and limits kept explicit.**
+- Standard BKT assumes independent skills, no forgetting, and the same parameters for
+  every problem. None of these has been checked here.
+- Observations are derived from author-written tests through an author-assigned skill
+  map:
+  - a `correct` observation means every reliable probing test passed, which can happen by
+    coincidence (weak evidence);
+  - an `incorrect` observation means an unqualified supported diagnosis, which is a
+    behavioural pattern, not proof of a misconception.
+- Counting per version means a learner who meets a revised version of a problem gets a
+  new counted attempt, although they may remember the earlier one.
+- With three demo problems, every estimate is dominated by its prior.
+- The tests check the arithmetic and the rules on synthetic attempts. They are not
+  evidence about real learners.
+
+### Why not fitted knowledge tracing or learned classifiers now
+
+**Direction (ADR-021).** Bayesian knowledge tracing is part of the intended architecture,
+as a learner model between the skill-evidence layer and the recommendation policy, while
+fingerprint diagnosis stays the diagnostic engine. LM1 above implements it with assumed
+parameters. The table lists what is needed before the parameters are more than
+assumptions, or before the estimates may drive anything.
 
 | Method | Value | Prerequisite we don't yet have | Earliest sensible milestone |
 | --- | --- | --- | --- |

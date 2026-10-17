@@ -18,6 +18,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from codeadapt.api import feedback, recommendation
 from codeadapt.api.schemas import (
+    LearnerModelView,
     LearnerNext,
     ProblemDetail,
     ProblemSummary,
@@ -51,6 +52,8 @@ from codeadapt.db.models import (
 )
 from codeadapt.db.session import as_utc, make_engine, make_session_factory
 from codeadapt.diagnosis import Outcome
+from codeadapt.learner import estimate
+from codeadapt.worker.adapt import learner_attempts, skill_maps_for
 
 ERROR_BASE = "https://codeadapt.dev/errors/"
 PROBLEM_JSON = "application/problem+json"
@@ -428,6 +431,21 @@ def create_app(
             followup_evaluation=(
                 _row(ev) if (ev := _by_submission(session, FollowupEvaluationRow, sub.id)) else None
             ),
+        )
+
+    @app.get("/api/v1/research/learner-model", response_model=LearnerModelView)
+    def learner_model(username: str, session: DB, _: Researcher) -> LearnerModelView:
+        """LM1 estimates for one learner, over the submissions of the learner's data class."""
+        learner = session.scalar(select(User).where(User.username == username))
+        if learner is None:
+            raise ApiError(404, "not-found", "User not found")
+        attempts = list(learner_attempts(session, learner.id, learner.data_class).values())
+        problems = {p.spec.slug: p.spec for p in catalogue.problems}
+        return LearnerModelView(
+            username=learner.username,
+            data_class=learner.data_class,
+            attempts=len(attempts),
+            estimate=estimate(attempts, problems, skill_maps_for(session, attempts)),
         )
 
     @app.get("/api/v1/health")

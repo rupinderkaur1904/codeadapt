@@ -123,7 +123,11 @@ export function ResearchPage() {
                     {new Date(r.created_at).toLocaleString()}
                   </Link>
                 </td>
-                <td>{r.username}</td>
+                <td>
+                  <Link to={`/research/learners/${encodeURIComponent(r.username)}`}>
+                    {r.username}
+                  </Link>
+                </td>
                 <td>{r.data_class}</td>
                 <td>{r.problem_slug}</td>
                 <td>{r.outcome ?? r.status}</td>

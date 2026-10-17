@@ -75,6 +75,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/research/learner-model": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Learner Model
+         * @description LM1 estimates for one learner, over the submissions of the learner's data class.
+         */
+        get: operations["learner_model_api_v1_research_learner_model_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/research/metrics": {
         parameters: {
             query?: never;
@@ -231,6 +251,65 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** LearnerEstimate */
+        LearnerEstimate: {
+            /**
+             * Assumptions
+             * @default [
+             *       "parameters are assumed, not fitted to or calibrated on learner data",
+             *       "skills are independent of each other",
+             *       "no forgetting",
+             *       "the same parameters for every problem",
+             *       "observations come from author-written tests and an author-assigned skill map"
+             *     ]
+             */
+            assumptions: string[];
+            /**
+             * Label
+             * @default estimated under assumed parameters
+             */
+            label: string;
+            /**
+             * Min Observations
+             * @default 3
+             */
+            min_observations: number;
+            /**
+             * Min Problems
+             * @default 2
+             */
+            min_problems: number;
+            /**
+             * Model
+             * @default bkt-standard
+             */
+            model: string;
+            /**
+             * Model Version
+             * @default 1
+             */
+            model_version: string;
+            /** Parameter Set */
+            parameter_set: string;
+            /** Skills */
+            skills: components["schemas"]["SkillEstimate"][];
+        };
+        /**
+         * LearnerModelView
+         * @description Researcher-only LM1 output for one learner and one data class (ADR-025).
+         *
+         *     Estimates are "estimated under assumed parameters": not fitted, not calibrated, never
+         *     shown to the learner and not used by any policy.
+         */
+        LearnerModelView: {
+            /** Attempts */
+            attempts: number;
+            /** Data Class */
+            data_class: string;
+            estimate: components["schemas"]["LearnerEstimate"];
+            /** Username */
+            username: string;
+        };
         /** LearnerNext */
         LearnerNext: {
             last_followup: components["schemas"]["FollowupView"] | null;
@@ -366,6 +445,58 @@ export interface components {
             /** Input */
             input: string;
         };
+        /** SkillEstimate */
+        SkillEstimate: {
+            /** Counted */
+            counted: number;
+            /** Distinct Problems */
+            distinct_problems: number;
+            /** Observations */
+            observations: components["schemas"]["TracedObservation"][];
+            /** P Known */
+            p_known: number | null;
+            /** Skill */
+            skill: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "estimated" | "insufficient_data";
+        };
+        /**
+         * SkillObservation
+         * @description One attempt's evidence about one skill: the learner-model input (ADR-023, D3).
+         *
+         *     `incorrect` means an unqualified supported diagnosis selected an error model of this
+         *     skill; `correct` means every reliable test probing the skill passed. Neither is a
+         *     statement about mastery or about what the learner was thinking.
+         */
+        SkillObservation: {
+            /** Attempt Ordinal */
+            attempt_ordinal: number;
+            /** Basis */
+            basis: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Problem Slug */
+            problem_slug: string;
+            /** Problem Version */
+            problem_version: string | null;
+            /** Skill */
+            skill: string;
+            /** Submission Id */
+            submission_id: string;
+            /** Test Keys */
+            test_keys: string[];
+            /**
+             * Value
+             * @enum {string}
+             */
+            value: "correct" | "incorrect";
+        };
         /** SubmissionAccepted */
         SubmissionAccepted: {
             /** Id */
@@ -466,6 +597,16 @@ export interface components {
             submission: {
                 [key: string]: unknown;
             };
+        };
+        /** TracedObservation */
+        TracedObservation: {
+            /** Counted */
+            counted: boolean;
+            observation: components["schemas"]["SkillObservation"];
+            /** P Known After */
+            p_known_after?: number | null;
+            /** Reason */
+            reason?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -593,6 +734,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProblemDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    learner_model_api_v1_research_learner_model_get: {
+        parameters: {
+            query: {
+                username: string;
+            };
+            header?: {
+                "x-dev-role"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearnerModelView"];
                 };
             };
             /** @description Validation Error */

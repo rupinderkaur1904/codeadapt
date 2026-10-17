@@ -12,6 +12,7 @@ export type LearnerNext = components["schemas"]["LearnerNext"];
 export type ResearchSubmissionRow = components["schemas"]["ResearchSubmissionRow"];
 export type ResearchMetrics = components["schemas"]["ResearchMetrics"];
 export type TraceView = components["schemas"]["TraceView"];
+export type LearnerModelView = components["schemas"]["LearnerModelView"];
 
 export interface ResearchFilters {
   problem_slug?: string;
@@ -85,6 +86,8 @@ export const api = {
     request<ResearchMetrics>(`/research/metrics${query({ data_class: dataClass })}`),
   trace: (id: string) =>
     request<TraceView>(`/research/submissions/${encodeURIComponent(id)}/trace`),
+  learnerModel: (username: string) =>
+    request<LearnerModelView>(`/research/learner-model${query({ username })}`),
 };
 
 export function isFinished(view: Pick<SubmissionView, "status">): boolean {

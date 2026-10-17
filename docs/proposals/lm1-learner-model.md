@@ -1,6 +1,8 @@
 # Proposal: milestone LM1, a first Bayesian learner model (for owner review)
 
-Status: **proposed, not implemented** (2026-10-17). No learner-model code exists. This
+Status: **approved 2026-10-17 with decisions L1(a), L2, L3, L4; implemented as ADR-025.**
+The owner added that problem identity (slug) and content-version identity are kept apart:
+versions of one problem do not count as distinct problems. Original proposal follows. This
 follows ADR-021 (a separate, testable BKT milestone once the evidence layer is reliable)
 and contract 3 of docs/component-interfaces.md §6. EV1 (ADR-023, ADR-024) delivered the
 input it needs: `skill_observations()`.

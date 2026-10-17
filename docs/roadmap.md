@@ -150,8 +150,15 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   the lost-output failure (ADR-020) on a fingerprinting run, so the end-of-output marker
   was added in the runner (ADR-024; no content version changes). Open: lost-output root
   cause unknown, marker validated only against a scripted reproduction, gVisor untested.
-* **Next:** LM1, a researcher-only BKT over `skill_observations`, proposed in
-  docs/proposals/lm1-learner-model.md and awaiting owner review (ADR-021). No code yet.
+* **Next:** LM1.
+
+### LM1 — Researcher-only learner model (2026-10-17)
+* **Objective:** standard BKT per skill over `skill_observations`, with assumed parameters,
+  visible only to researchers (ADR-025; owner decisions L1–L4). No policy or student change.
+* **Result:** implemented; tests cover arithmetic, both outcomes, parameter constraints,
+  determinism, excluded evidence, retries, version identity, display threshold and the
+  unchanged student API. Nothing about real learners is validated.
+* **Next:** CE1 (content expansion), which is what would make estimates informative.
 
 ### M8 — Hardening and deployment
 * **Objective:** real auth (Argon2id, sessions, CSRF, rate limits), audit log for researcher

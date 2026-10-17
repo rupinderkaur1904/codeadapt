@@ -9,6 +9,8 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from codeadapt.learner import LearnerEstimate
+
 MAX_SOURCE_BYTES = 64 * 1024
 
 
@@ -206,3 +208,16 @@ class ResearchMetrics(_Out):
     recommendations_by_rule: dict[str, int]
     flagged_for_review: int
     followup_verdicts: dict[str, int]
+
+
+class LearnerModelView(_Out):
+    """Researcher-only LM1 output for one learner and one data class (ADR-025).
+
+    Estimates are "estimated under assumed parameters": not fitted, not calibrated, never
+    shown to the learner and not used by any policy.
+    """
+
+    username: str
+    data_class: str
+    attempts: int
+    estimate: LearnerEstimate
