@@ -6,6 +6,8 @@ their inputs and their outputs into rows.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -18,6 +20,7 @@ from codeadapt.adaptation import (
     evaluate_followup,
 )
 from codeadapt.adaptation.models import Action, Rule
+from codeadapt.adaptation.skillmap import SkillMap
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.db.models import (
     DiagnosisRow,
@@ -47,6 +50,7 @@ def attempt_record(submission: Submission, slug: str, diagnosis: DiagnosisRow) -
     return AttemptRecord(
         submission_id=submission.id,
         problem_slug=slug,
+        problem_version=submission.problem_version,
         created_at=as_utc(submission.created_at),
         outcome=Outcome(diagnosis.outcome),
         selected_model=diagnosis.selected_model,
@@ -66,6 +70,14 @@ def learner_attempts(session: Session, user_id: int) -> dict[str, AttemptRecord]
         .order_by(Submission.created_at, DiagnosisRow.id)
     )
     return {sub.id: attempt_record(sub, slug, diag) for sub, diag, slug in rows}
+
+
+def skill_maps_for(session: Session, attempts: Iterable[AttemptRecord]) -> dict[str, SkillMap]:
+    """The stored skill-map snapshot of every content version the attempts were made on."""
+    versions = {a.problem_version for a in attempts if a.problem_version is not None}
+    rows = session.scalars(select(ProblemVersion).where(ProblemVersion.version.in_(versions)))
+    maps = {row.version: SkillMap.from_stored(row.skill_map) for row in rows}
+    return {version: smap for version, smap in maps.items() if smap is not None}
 
 
 def open_recommendation(session: Session, user_id: int) -> RecommendationRow | None:
@@ -150,7 +162,8 @@ def adapt(
     elif follows and index.outcome in _NO_EVIDENCE:
         return None, None  # keep the open recommendation; nothing new was learned
 
-    rec = policy.recommend(index, list(attempts.values()), problems)
+    history = list(attempts.values())
+    rec = policy.recommend(index, history, problems, skill_maps_for(session, history))
     row = RecommendationRow(
         user_id=submission.user_id,
         submission_id=submission.id,

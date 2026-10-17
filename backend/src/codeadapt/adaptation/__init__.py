@@ -1,7 +1,7 @@
 """Adaptive policy and follow-up evaluation: pure functions over stored evidence."""
 
 from codeadapt.adaptation.followup import evaluate_followup
-from codeadapt.adaptation.ledger import Ledger, build_ledger
+from codeadapt.adaptation.ledger import Ledger, build_ledger, skill_observations
 from codeadapt.adaptation.models import (
     Action,
     AttemptRecord,
@@ -10,11 +10,13 @@ from codeadapt.adaptation.models import (
     Recommendation,
     Relation,
     Rule,
+    SkillObservation,
     SuccessCriterion,
     TestStatus,
     Verdict,
 )
 from codeadapt.adaptation.policy_v1 import PolicyV1
+from codeadapt.adaptation.skillmap import SkillMap
 
 __all__ = [
     "Action",
@@ -26,9 +28,12 @@ __all__ = [
     "Recommendation",
     "Relation",
     "Rule",
+    "SkillMap",
+    "SkillObservation",
     "SuccessCriterion",
     "TestStatus",
     "Verdict",
     "build_ledger",
     "evaluate_followup",
+    "skill_observations",
 ]

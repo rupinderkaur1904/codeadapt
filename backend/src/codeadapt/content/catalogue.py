@@ -28,18 +28,30 @@ class Catalogue:
         return cls(load_catalogue(content_dir))
 
     def sync(self, session: Session) -> None:
-        """Register every current problem version (append-only; old versions are kept)."""
-        known = set(session.scalars(select(ProblemVersion.version)))
+        """Register every current problem version (append-only; old versions are kept).
+
+        Each current version also gets its skill-map snapshot, including versions registered
+        before snapshots existed. A version's content is fixed by its hash, so its snapshot
+        never changes once written.
+        """
+        from codeadapt.adaptation.skillmap import SkillMap
+
+        known = {row.version: row for row in session.scalars(select(ProblemVersion))}
         for p in self.problems:
-            if p.version not in known:
+            snapshot = SkillMap.from_spec(p.spec, p.version).model_dump(mode="json")
+            row = known.get(p.version)
+            if row is None:
                 session.add(
                     ProblemVersion(
                         version=p.version,
                         slug=p.spec.slug,
                         family=p.spec.family,
                         title=p.spec.title,
+                        skill_map=snapshot,
                     )
                 )
+            elif row.skill_map is None:
+                row.skill_map = snapshot
         try:
             session.commit()
         except IntegrityError:  # another process (API or worker) registered it concurrently

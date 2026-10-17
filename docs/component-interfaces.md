@@ -1,9 +1,10 @@
 # Component interfaces: diagnosis, skill evidence, learner model, recommendation
 
-**Status: proposal for the owner's review (2026-10-17).** It implements ADR-021's
-sequencing step: the four components' contracts are defined before any Bayesian code. A
-rule marked *current* is what the code does today; a rule marked *proposed* is not
-implemented. Nothing in this document is evidence that any rule is accurate for real
+**Status (2026-10-17):** written as a proposal; D1–D4 (§10) were then implemented in
+milestone EV1, and the sections below say so where it applies. D5 and the learner model are
+not implemented. It implements ADR-021's sequencing step: the four components' contracts
+are defined before any Bayesian code. A rule marked *current* is what the code does today;
+a rule marked *proposed* is not implemented. Nothing in this document is evidence that any rule is accurate for real
 students.
 
 Owner decisions this builds on (2026-10-17): student-facing explanations keep diagnosis
@@ -35,8 +36,8 @@ become student-failure evidence; the original lost-output failure stays unconfir
 | `environment` digest | compiler, image digest, runtime, kernel | current |
 | `fingerprint_set_id` | the measured predictions used, keyed by (version, environment) | current |
 | `method`, `method_version` | diagnostic engine version | current |
-| `evidence_rules_version` | the execution-classification rules of §3 | **proposed** |
-| `skill_evidence_policy` | ledger policy (1.1 now, 1.2 below) | current as `policy_version` |
+| `evidence_rules_version` | the execution-classification rules of §3 | current (EV1), in the diagnosis rationale |
+| `skill_evidence_policy` | ledger policy 1.2 (§5) | current as `policy_version` |
 | `learner_model`, `learner_model_version`, parameter set id | planned | **proposed** |
 
 **Content-version identity rules.**
@@ -44,12 +45,12 @@ become student-failure evidence; the original lost-output failure stays unconfir
 * *Current:* a submission is diagnosed only against fingerprints of its own content
   version, measured in the same environment. A version whose fingerprints fail validation
   yields no diagnosis (fail closed: the job fails, nothing reaches the ledger).
-* *Current gap:* the ledger resolves skills through the *current* spec by slug
+* *Gap before EV1:* the ledger resolved skills through the *current* spec by slug
   (`worker/adapt.py` builds `problems` by slug), so an old attempt is mapped with today's
   probes. It skips test keys that no longer exist, but a probe that changed meaning under
   the same key would be misattributed. C1–C2 did not change any existing test's probes, so
   no stored attempt is affected today.
-* *Proposed (V1):* store a skill-map snapshot per content version (test → probes → skills;
+* *Current since EV1 (V1):* store a skill-map snapshot per content version (test → probes → skills;
   model → skill; model `known_limitation`) in `problem_versions`, and resolve every attempt
   through its own version's snapshot. A version without a snapshot contributes no skill
   evidence.
@@ -82,7 +83,7 @@ so it did **not** reproduce the CI event (a trivial `stops_at_first_match` run r
 a time limit). That event most likely came from a multi-second stall in container start-up
 or the Docker daemon, which this measurement does not exercise.
 
-### 3.2 Outcome classes (proposed evidence rules, `evidence_rules_version` 1)
+### 3.2 Outcome classes (`evidence_rules_version` 1, implemented in EV1)
 
 | Class | Condition | Evidence about the program? |
 | --- | --- | --- |
@@ -108,8 +109,8 @@ Rules:
 * **R3 (infrastructure).** *Current:* a compile container that did not start requeues the
   job; any run-level infrastructure error makes the whole attempt `execution_error` (no
   diagnosis, no skill evidence); fingerprinting re-measures infrastructure errors up to 3
-  times. *Proposed:* student runs get the same bounded re-measurement before the attempt is
-  declared `execution_error`.
+  times. *Since EV1:* student runs get the same bounded re-measurement (3 attempts) before
+  the attempt is declared `execution_error`.
 * **R4 (repeat rule, current).** Every failing test is run again; if the two signatures
   differ, the observation is excluded as non-deterministic. This is what kept the CI event
   out of student evidence: it happened during fingerprinting, one of two runs disagreed,
@@ -158,14 +159,17 @@ a qualified diagnosis is shown as "one possible cause to check, not the answer".
 skill-evidence layer applies the stricter rule in §5. These are two thresholds on the same
 diagnosis by design (owner decision, 2026-10-17).
 
-## 5. Contract 2: diagnosis → skill-evidence layer (ledger policy 1.2, proposed)
+## 5. Contract 2: diagnosis → skill-evidence layer (ledger policy 1.2, implemented in EV1)
 
-**Unit of evidence (proposed):** one `SkillObservation` per (attempt, skill), not one per
-test. Tests in the same behaviour group are not independent, so counting them separately
-would overstate the evidence. Fields: identity (§2), `skill`, `value ∈ {correct,
-incorrect}`, `basis` (which rule below), the contributing test keys, `relation` to the
-previous attempt (same problem, equivalent practice, transfer, other), and the attempt's
-ordinal on that problem version.
+**Unit of evidence:** one `SkillObservation` per (attempt, skill), not one per test
+(`adaptation.ledger.skill_observations`). Tests in the same behaviour group are not
+independent, so counting them separately would overstate the evidence. Fields:
+`submission_id`, `problem_slug`, `problem_version`, `created_at`, `skill`, `value ∈
+{correct, incorrect}`, `basis` (which rule below), the contributing test keys, and the
+attempt's ordinal on that problem (1 for the first attempt). The relation to an earlier
+recommendation is stored with follow-up evaluations, not on the observation. Nothing
+consumes these observations yet; policy v1 still ranks with the per-test ledger, which
+applies the same 1.2 failure rule.
 
 **Rules**, evaluated with the attempt's own skill-map snapshot (V1):
 
@@ -273,6 +277,11 @@ measurement.
 10. **No real-student data.** None of these rules has been validated on real students.
 
 ## 10. Decisions requested
+
+**Outcome (2026-10-17):** D1–D4 implemented in milestone EV1 (ADR-023 status). D5 awaits
+the owner's review. A further limit found while implementing: a gVisor (`runsc`) host has
+not been tested, and R1 assumes it delivers SIGXCPU from the CPU rlimit; if it does not,
+genuine timeouts there become `inconclusive` (lost, not invented).
 
 | ID | Proposal | Recommendation |
 | --- | --- | --- |

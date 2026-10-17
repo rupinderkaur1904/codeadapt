@@ -11,7 +11,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from codeadapt.adaptation.ledger import build_ledger, reliable_count, tests_probing
+from codeadapt.adaptation.ledger import SkillMaps, build_ledger, reliable_count, tests_probing
 from codeadapt.adaptation.models import (
     Action,
     AttemptRecord,
@@ -33,7 +33,9 @@ _ABSTAINED = {
 class PolicyV1:
     name: str = "rule_policy"
     # 1.1: the ledger counts only diagnosis-explained failures (ADR-019).
-    version: str = "1.1"
+    # 1.2 (ADR-023): qualified diagnoses add no failure evidence; attempts are attributed
+    # with their own content version's skill map.
+    version: str = "1.2"
     # A problem is "recently attempted" if it appears among the learner's last N attempts.
     recent_window: int = 3
 
@@ -42,11 +44,13 @@ class PolicyV1:
         index: AttemptRecord,
         history: Sequence[AttemptRecord],
         problems: Mapping[str, ProblemSpec],
+        skill_maps: SkillMaps | None = None,
     ) -> Recommendation:
         """Choose the next activity after `index`.
 
         `history` is every diagnosed attempt by the learner (it may include `index`);
-        `problems` is the catalogue, by slug.
+        `problems` is the catalogue, by slug; `skill_maps` holds the stored skill-map
+        snapshot of each content version the attempts were diagnosed against.
         """
         spec = problems[index.problem_slug]
         attempts = sorted(
@@ -153,7 +157,7 @@ class PolicyV1:
                     "observed on its tests. That is not evidence of complete understanding."
                 },
             )
-        ledger = build_ledger(attempts, problems)
+        ledger = build_ledger(attempts, problems, skill_maps)
 
         def evidence(p: ProblemSpec) -> int:
             return sum(reliable_count(ledger, s) for s in _skills(p))
