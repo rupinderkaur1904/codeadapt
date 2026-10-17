@@ -158,8 +158,16 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 * **Result:** implemented; tests cover arithmetic, both outcomes, parameter constraints,
   determinism, excluded evidence, retries, version identity, display threshold and the
   unchanged student API. Nothing about real learners is validated.
-* **Next:** CE1, proposed in docs/proposals/ce1-content-expansion.md (audit, staged scope,
-  acceptance criteria); awaiting owner review.
+* **Next:** CE1 (approved 2026-10-17: E1 staged scope, E2 `recommendable` flag, E3 G1–G3).
+
+### CE1 — Binary-search family completion (2026-10-17, in progress)
+* **Plan:** docs/proposals/ce1-content-expansion.md. Stages run one at a time and stop at
+  each gate for owner review.
+* **CE1.0 (done, at gate):** held-out cases for all 8 model instances that had none
+  (committed before evaluation), all 8 diagnosed correctly; earlier held-out and
+  calibration results identical; design records for count-occurrences and last-less-than.
+  Proposed, not applied: C3/C4, a `hi_skips_candidate` boundary model for those two
+  problems (2 behaviour groups each, measured in a scratch copy).
 
 ### M8 — Hardening and deployment
 * **Objective:** real auth (Argon2id, sessions, CSRF, rate limits), audit log for researcher
