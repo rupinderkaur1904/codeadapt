@@ -6,6 +6,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import time
 from datetime import datetime
 
 from sqlalchemy import select
@@ -211,8 +212,15 @@ class Pipeline:
                     problem.spec.slug,
                     environment.id,
                 )
+                started = time.monotonic()
                 fps = await fingerprint_problem(self.sandbox, problem)
                 report = validate_fingerprints(problem.spec, fps)
+                log.info(
+                    "measured fingerprints for %s in %.0f s (valid: %s)",
+                    problem.spec.slug,
+                    time.monotonic() - started,
+                    report.ok,
+                )
                 row = FingerprintSetRow(
                     problem_version=problem.version,
                     environment_id=environment.id,
