@@ -53,10 +53,12 @@ Measured behaviour-group support for each model (from the reports):
    There is no exercise in which a terminating but wrong update is visible in the output.
 5. **Validation debt on existing content.**
    - count-occurrences and last-less-than have no design records.
-   - 5 of the 17 models have no held-out case: `no_progress_update`,
-     `stops_at_first_match`, `hi_skips_candidate`, `closed_loop_hi_mid` and
-     `returns_wrong_pointer`. Their diagnosis rate is untested beyond the authors'
-     fingerprints.
+   - 8 of the 17 model instances have no held-out case: in lower-bound
+     `no_progress_update`, `stops_at_first_match`, `hi_skips_candidate`,
+     `closed_loop_hi_mid` and `returns_wrong_pointer`; in count-occurrences
+     `no_progress_update`; in last-less-than `hi_init_last_index` and
+     `no_progress_update`. The proposal first said "5 of 17", counting by model name
+     within lower-bound only; this was corrected in CE1.0.
 6. **One family, and skills defined only in binary-search terms.** The learner model's
    "distinct problems" threshold is met entirely inside one family. This is CE2's job,
    not CE1's, but it limits what any estimate can mean.
@@ -98,7 +100,7 @@ priority order.
 
 | Stage | Content | Gap addressed |
 | --- | --- | --- |
-| CE1.0 | Design records for count-occurrences and last-less-than. Held-out cases for the 5 models without one, written before running the method. No content-version change unless a record proposes one. | 5 |
+| CE1.0 | Design records for count-occurrences and last-less-than. Held-out cases for the 8 model instances without one, written before running the method. No content-version change unless a record proposes one. | 5 |
 | CE1.1 | **G1, "first true"**: return the first index of a monotone boolean array (a partition point). It isolates boundaries and termination from equality handling. Target: at least two boundary models with ≥ 2 behaviour groups each, so boundary failures become observable outside lower-bound. | 1, 2 |
 | CE1.2 | **G2, "integer square root"** (floor √x for 0 ≤ x ≤ 2³¹−1, using 64-bit arithmetic): a search over an answer range in which a wrong but terminating update gives a wrong output, not only a time limit. Signed-overflow variants are undefined behaviour, so they are not modelled; they are recorded as unmodelled. | 4, 1 |
 | CE1.3 | **G3, "minimum feasible capacity"**: the smallest capacity that ships ordered packages within D days. It is a search over the answer space with a feasibility check, transferring all four skills to a new context. | 3 |
