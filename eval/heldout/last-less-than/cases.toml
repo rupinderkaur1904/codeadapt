@@ -29,3 +29,16 @@ note = "Correct closed-interval search."
 file = "le_and_clamped.cpp"
 truth = "unmodelled"
 note = "Two modelled bugs at once."
+
+# Added 2026-10-17 (CE1.0) for models without a held-out case. Written and committed before
+# the method was run on them, by the models' author in a different style.
+
+[[cases]]
+file = "closed_from_last_index.cpp"
+truth = "hi_init_last_index"
+note = "Upper edge starts at n - 1, so the answer n - 1 is unreachable."
+
+[[cases]]
+file = "while_true_stalls.cpp"
+truth = "no_progress_update"
+note = "while (true) with an early return; the left edge moves to the midpoint only."

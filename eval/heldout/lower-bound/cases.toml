@@ -39,3 +39,31 @@ note = "Two modelled bugs at once."
 file = "empty_returns_minus_one.cpp"
 truth = "unmodelled"
 note = "Special-cases empty input wrongly; no error model describes it."
+
+# Added 2026-10-17 (CE1.0) for models without a held-out case. Written and committed before
+# the method was run on them, by the models' author in a different style.
+
+[[cases]]
+file = "size_t_stuck_left.cpp"
+truth = "no_progress_update"
+note = "Unsigned for(;;) loop; left update keeps the midpoint."
+
+[[cases]]
+file = "recursive_early_equal.cpp"
+truth = "stops_at_first_match"
+note = "Recursive search that returns on the first equal element it meets."
+
+[[cases]]
+file = "reversed_test_drops_mid.cpp"
+truth = "hi_skips_candidate"
+note = "Target-first comparison; the left branch sets right = m - 1 in a half-open loop."
+
+[[cases]]
+file = "negated_closed_loop.cpp"
+truth = "closed_loop_hi_mid"
+note = "Closed loop written as !(l > r) with the half-open update r = m."
+
+[[cases]]
+file = "answer_var_returns_right.cpp"
+truth = "returns_wrong_pointer"
+note = "Closed search with reversed comparison that returns the right edge."
