@@ -188,3 +188,9 @@ case to docs/evaluation/c6-2026-10-16 (after C1–C2). The loaded-timeout sandbo
 concurrent infinite loops plus host CPU load) needed the stall re-run on 12 of 12 runs
 locally and ended every one as a CPU-limit time limit. Not tested: gVisor; the original CI
 stall and lost-output events (neither reproduced).
+
+ADR-024 (end-of-output marker, after CI on d3919b0 showed lost output during
+fingerprinting): `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **244 passed, 0 skipped,
+0 failed** (≈ 15 min); ruff, format and mypy clean. Held-out and calibration comparisons
+unchanged. The marker check is tested with a fake docker that drops the marker; the real
+lost-output event has not been reproduced locally, so the root cause is still unknown.

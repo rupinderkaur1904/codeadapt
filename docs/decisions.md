@@ -280,6 +280,31 @@ results are unchanged case for case. A sandbox test drives 12 concurrent infinit
 under host CPU load: locally each first hit the wall deadline, and each ended as a CPU-limit
 time limit after the re-run. The CI event (a trivial run recorded as a time limit) was not
 reproduced, so R2 is shown to classify a scripted stall correctly, not shown against that
-event. Not done: D5 (end-of-output marker, needs the owner's review); the lost-output
-failure stays unconfirmed. gVisor delivery of SIGXCPU is untested: if `runsc` did not
+event. D5 was superseded by ADR-024 (a runner-level marker that changes no content version). gVisor delivery of SIGXCPU is untested: if `runsc` did not
 deliver it, genuine timeouts there would become inconclusive (evidence lost, not invented).
+
+## ADR-024 — End-of-output marker in the runner (2026-10-17)
+**Context:** CI on commit d3919b0 rejected the lower-bound content: `hi_skips_candidate`
+on test `empty` produced one run with exit 0 and **empty stdout** and one run printing
+`0`. The program is deterministic (n = 0, the loop never runs) and was validated with 3
+repeats locally. The client and the container reported the same exit status, so the
+ADR-020 mismatch check did not fire. This is the lost-output failure of ADR-020 observed
+again, and it shows that the mismatch check alone does not catch it. Its root cause
+(somewhere in the attached-stream path between container and host) is still unknown.
+**Decision:** each test run now executes the binary under a small Perl wrapper that,
+after the binary exits, writes a random per-run marker to stdout and stderr and exits
+with the binary's status (128 + N for signal N, as before). A run that ended by itself
+without both markers is an infrastructure error (`output_incomplete`), re-measured like
+any infrastructure error and never evidence. This is done in the runner, not in the
+problem harness, so no content version changes (the D5 alternative in
+docs/component-interfaces.md would have changed all of them). `evidence_rules_version`
+becomes 2. Perl is used instead of `sh` because dash appends "Segmentation fault"-style
+notices to stderr. **Validated:** a fake-docker test reproduces the observed shape (exit 0
+from both sides, empty stdout) and it is classified as an infrastructure error; program
+stdout, stderr and exit status are unchanged on real runs (normal, segfault, abort,
+non-zero exit, CPU limit); held-out and calibration results unchanged. **Not validated:**
+that the marker catches the real event (it has not recurred since); a submission that
+kills its parent process makes its runs infrastructure errors (no evidence, never false
+evidence). **Cost observed:** the CI backend job on d3919b0 took 1670 s against about
+1000 s before EV1, consistent with the ADR-023 stall re-runs of looping models on a busy
+runner.

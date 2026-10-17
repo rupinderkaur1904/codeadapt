@@ -5,6 +5,8 @@ A fake `docker` binary scripts the two failure modes seen under load:
 * the attached `docker run -i` client and `docker inspect` disagree about how the
   container ended (the CI e2e run that lost its output);
 * `docker kill` is slow to confirm;
+* a run ends normally but its output never reaches the host (exit 0, empty stdout), which
+  the end-of-output marker reveals (ADR-024);
 * a run is stopped by the wall clock without reaching its CPU limit (a host stall looks
   like this), which ADR-023 re-runs once and otherwise reports as inconclusive.
 
@@ -43,6 +45,10 @@ if cmd == "run":
         os.remove(os.path.join(state, "killed"))
     time.sleep(float(seq[min(n, len(seq) - 1)]))
     sys.stdout.write(os.environ.get("FAKE_RUN_STDOUT", ""))
+    if not os.environ.get("FAKE_DROP_MARKER"):  # the run script's end-of-output markers
+        marker = sys.argv[sys.argv.index("-e") + 2]
+        sys.stdout.write(marker)
+        sys.stderr.write(marker)
     sys.exit(int(os.environ.get("FAKE_CLIENT_EXIT", "0")))
 elif cmd == "inspect":
     killed = os.path.exists(os.path.join(state, "killed"))
@@ -88,6 +94,27 @@ async def test_agreeing_client_and_container_are_evidence(
     assert result.status is RunStatus.OK
     assert result.stdout == "42\n"
     assert result.detail == ""
+
+
+async def test_output_without_the_end_marker_is_an_infrastructure_error(
+    fake_docker: DockerSandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The CI event of 2026-10-17: exit 0 from both client and container, empty stdout.
+    # The exit statuses agree, so only the missing end-of-output marker reveals it.
+    monkeypatch.setenv("FAKE_DROP_MARKER", "1")
+    result = await _job(fake_docker).run(b"in")
+    assert result.status is RunStatus.INFRASTRUCTURE_ERROR
+    assert "end-of-output marker" in result.detail
+
+
+async def test_markers_are_stripped_and_output_is_unchanged(
+    fake_docker: DockerSandbox, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("FAKE_RUN_STDOUT", "no newline")
+    result = await _job(fake_docker).run(b"in")
+    assert result.status is RunStatus.OK
+    assert result.stdout == "no newline"
+    assert result.stderr == ""
 
 
 @pytest.mark.parametrize(("client", "container"), [(0, 1), (1, 0), (0, 139)])

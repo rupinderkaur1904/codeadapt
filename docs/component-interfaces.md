@@ -116,7 +116,7 @@ Rules:
   out of student evidence: it happened during fingerprinting, one of two runs disagreed,
   and the content was rejected (fail closed). The remaining gap is two consecutive stalls,
   which R2 closes for timeouts.
-* **R5 (lost output, unconfirmed).** A run that exits 0 with empty output, with client and
+* **R5 (lost output; superseded by ADR-024, which implements the marker in the runner).** A run that exits 0 with empty output, with client and
   container agreeing, is indistinguishable from a program that prints nothing. Only R4
   protects against it. The robust fix is a harness end-of-output marker (proposed in
   ADR-020): a run that exits 0 without the marker is an infrastructure error. It changes
@@ -254,8 +254,10 @@ measurement.
 
 ## 9. Remaining risks
 
-1. **Lost output is unconfirmed** (R5). Without an end-of-output marker, a recurring loss
-   that also repeats on the second run would be stored as a genuine empty-output failure.
+1. **Lost output occurs; its cause is unknown** (R5, ADR-024). CI showed it again on
+   2026-10-17. The runner's end-of-output marker now turns such a run into an
+   infrastructure error, but that is shown only against a scripted reproduction, not yet
+   against a real recurrence. Partial loss that keeps the marker would not be caught.
 2. **R2 is not tested against the real CI event.** The event was not reproduced, so R2 is
    a mitigation by construction. The timeout distinction itself is measured (§3.1).
 3. **Wall-only timeouts of genuinely slow programs** become `inconclusive` if they stall
@@ -278,8 +280,10 @@ measurement.
 
 ## 10. Decisions requested
 
-**Outcome (2026-10-17):** D1–D4 implemented in milestone EV1 (ADR-023 status). D5 awaits
-the owner's review. A further limit found while implementing: a gVisor (`runsc`) host has
+**Outcome (2026-10-17):** D1–D4 implemented in milestone EV1 (ADR-023 status). D5 was
+replaced by ADR-024: CI then showed the lost-output failure again (exit 0, empty stdout,
+exit statuses agreeing), and the marker was added in the runner instead of the harness, so
+no content version changed. A further limit found while implementing: a gVisor (`runsc`) host has
 not been tested, and R1 assumes it delivers SIGXCPU from the CPU rlimit; if it does not,
 genuine timeouts there become `inconclusive` (lost, not invented).
 
