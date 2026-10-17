@@ -150,8 +150,8 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   the lost-output failure (ADR-020) on a fingerprinting run, so the end-of-output marker
   was added in the runner (ADR-024; no content version changes). Open: lost-output root
   cause unknown, marker validated only against a scripted reproduction, gVisor untested.
-* **Next:** propose the smallest BKT milestone for review (ADR-021), reading only
-  `skill_observations`.
+* **Next:** LM1, a researcher-only BKT over `skill_observations`, proposed in
+  docs/proposals/lm1-learner-model.md and awaiting owner review (ADR-021). No code yet.
 
 ### M8 — Hardening and deployment
 * **Objective:** real auth (Argon2id, sessions, CSRF, rate limits), audit log for researcher
