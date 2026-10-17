@@ -96,3 +96,15 @@ async def test_differing_program_outputs_are_not_retried() -> None:
     job = ScriptedJob({first.input: [result(RunStatus.OK, "1"), result(RunStatus.OK, "2")]})
     fp = await fingerprint_program(ScriptedSandbox(job), PROBLEM, "x", "", repeats=2)  # type: ignore[arg-type]
     assert not fp.tests[first.key].deterministic
+
+
+STALL = result(RunStatus.INCONCLUSIVE)
+
+
+async def test_inconclusive_runs_are_measured_again() -> None:
+    first = PROBLEM.spec.tests[0]
+    job = ScriptedJob({first.input: [STALL, result(RunStatus.OK, "7")]})
+    fp = await fingerprint_program(ScriptedSandbox(job), PROBLEM, "x", "", repeats=1)  # type: ignore[arg-type]
+    sig = fp.tests[first.key].signature
+    assert sig is not None
+    assert (sig.kind, sig.detail) == (OutcomeKind.OUTPUT, "7")

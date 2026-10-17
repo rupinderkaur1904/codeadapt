@@ -1,8 +1,9 @@
 """Reliability marking: decide which observations may be used as evidence.
 
 Pure functions over run results (docs/methodology.md §3). An observation is excluded when
-a sanitizer build reports undefined behaviour on that test, or when a repeated run of
-the same binary on the same input produced a different outcome signature.
+a sanitizer build reports undefined behaviour on that test, when a repeated run of the
+same binary on the same input produced a different outcome signature, or when the run was
+inconclusive (stopped by the wall clock without reaching its CPU limit, ADR-023).
 """
 
 from __future__ import annotations
@@ -12,7 +13,7 @@ from collections.abc import Mapping, Sequence
 
 from pydantic import BaseModel, ConfigDict
 
-from codeadapt.evidence.signature import Signature, signature_of
+from codeadapt.evidence.signature import OutcomeKind, Signature, signature_of
 from codeadapt.execution.models import RunResult
 
 _ASAN = re.compile(r"ERROR: AddressSanitizer: ([a-z-]+)")
@@ -46,6 +47,14 @@ STUDENT_PHRASES: dict[str, str] = {
     "invalid-value": "reads a value that is not valid for its type (often uninitialised)",
 }
 GENERIC_PHRASE = "performs an operation with undefined behaviour"
+
+# Version of the execution-evidence rules (docs/component-interfaces.md §3), recorded with
+# every diagnosis. 1: CPU-limit timeouts are evidence; wall-only stops are re-run once and
+# are otherwise inconclusive.
+EVIDENCE_RULES_VERSION = "1"
+INCONCLUSIVE_REASON = (
+    "inconclusive: stopped by the wall clock without reaching the CPU limit, twice"
+)
 
 
 def _ubsan_kind(message: str) -> str:
@@ -110,6 +119,8 @@ def assess(
         reason: str | None = None
         if finding is not None:
             reason = f"sanitizer: {finding.kind}"
+        elif sig.kind is OutcomeKind.INCONCLUSIVE:
+            reason = INCONCLUSIVE_REASON
         elif any(s != sig for s in again):
             reason = "non-deterministic: repeated run produced a different outcome"
         out[key] = TestReliability(

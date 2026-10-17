@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 import subprocess
+import sys
 import time
 import uuid
 from pathlib import Path
@@ -169,10 +171,42 @@ async def test_cpu_bound_infinite_loop_times_out(sandbox: DockerSandbox) -> None
 
 
 async def test_blocking_program_hits_wall_deadline(sandbox: DockerSandbox) -> None:
+    # Still stopped by the wall deadline (the workload is bounded). It never reaches its
+    # CPU limit, which is also what a stalled host looks like, so after one re-run with a
+    # longer deadline it is reported as inconclusive, not as a time limit (ADR-023).
     src = "#include <unistd.h>\nint main() { for (;;) pause(); }"
+    start = time.monotonic()
     result = await compile_and_run(sandbox, src)
-    assert result.status is RunStatus.TIME_LIMIT
+    assert result.status is RunStatus.INCONCLUSIVE
     assert result.timed_out
+    assert "re-run after a wall-clock stop" in result.detail
+    assert time.monotonic() - start < 30
+
+
+async def test_cpu_bound_loop_is_a_time_limit_even_under_host_load(
+    sandbox: DockerSandbox,
+) -> None:
+    # Under CPU contention a genuine infinite loop first reaches the wall deadline
+    # (measured, docs/evaluation/sandbox-timeouts-2026-10-17). The stall re-run keeps the
+    # CPU limit, so the loop must still end as a time limit, never as inconclusive.
+    src = "int main() { volatile unsigned long x = 0; for (;;) ++x; }"
+    hogs = [
+        await asyncio.create_subprocess_exec(sys.executable, "-c", "while True: pass")
+        for _ in range(2 * (os.cpu_count() or 2))
+    ]
+    try:
+        async with sandbox.job() as job:
+            compiled = await job.compile([SourceFile(name="main.cpp", content=src)])
+            assert compiled.status is CompileStatus.OK
+            # Concurrent runs add contention, so some first reach the wall deadline.
+            results = await asyncio.gather(*(job.run(b"") for _ in range(12)))
+    finally:
+        for hog in hogs:
+            hog.kill()
+            await hog.wait()
+    assert all(r.status is RunStatus.TIME_LIMIT and r.signal == 24 for r in results), [
+        (r.status, r.detail) for r in results
+    ]
 
 
 async def test_output_flood_is_capped(sandbox: DockerSandbox) -> None:

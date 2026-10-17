@@ -28,6 +28,7 @@ from codeadapt.execution.models import (
     EnvironmentInfo,
     RunLimits,
     RunResult,
+    RunStatus,
     SourceFile,
 )
 from codeadapt.execution.process import ProcessOutcome, run_bounded
@@ -38,6 +39,9 @@ DEFAULT_IMAGE = "codeadapt-sandbox:gcc14.2-1"
 MAX_SOURCE_FILES = 8
 MAX_SOURCE_BYTES = 256 * 1024  # all files of one compile, including private harness code
 _DOCKER_CLI_TIMEOUT = 60.0
+# A run stopped by the wall deadline without reaching its CPU limit is run once more with
+# this much start-up grace before it is reported as inconclusive (ADR-023, rule R2).
+STALL_RETRY_GRACE_SECONDS = 10.0
 _MIB = 1024 * 1024
 
 # Flags are part of the evidence provenance; change them only with a new profile name.
@@ -416,6 +420,25 @@ class DockerSandboxJob:
         limits = limits or self._sandbox.config.run_limits
         if len(stdin) > limits.stdin_bytes:
             raise ValueError(f"stdin exceeds {limits.stdin_bytes} bytes")
+        result = await self._run_once(stdin, profile, limits)
+        if (
+            result.status is RunStatus.INCONCLUSIVE
+            and limits.startup_grace_seconds < STALL_RETRY_GRACE_SECONDS
+        ):
+            # The CPU limit is unchanged, so a genuine infinite loop still ends as a
+            # time limit; only the allowance for a stalled host grows.
+            longer = limits.model_copy(update={"startup_grace_seconds": STALL_RETRY_GRACE_SECONDS})
+            again = await self._run_once(stdin, profile, longer)
+            note = (
+                f"re-run after a wall-clock stop at {result.wall_ms} ms "
+                f"without reaching the CPU limit"
+            )
+            result = again.model_copy(
+                update={"detail": f"{note}; {again.detail}" if again.detail else note}
+            )
+        return result
+
+    async def _run_once(self, stdin: bytes, profile: BuildProfile, limits: RunLimits) -> RunResult:
         docker_args = [
             *self._sandbox._hardening(
                 memory_mib=limits.memory_mib,

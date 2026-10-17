@@ -188,3 +188,28 @@ def test_v2_candidate_requires_two_behaviour_groups() -> None:
     strong = candidate.diagnose(two_behaviour_input())
     assert (strong.outcome, strong.selected_model) == (Outcome.HYPOTHESIS_SUPPORTED, "p")
     assert METHODS["v1"].min_behaviours == 1
+
+
+# ------------------------------------------- inconclusive runs (ADR-023, rule R2)
+STALL = Signature(kind=OutcomeKind.INCONCLUSIVE)
+STALL_REASON = "inconclusive: stopped by the wall clock without reaching the CPU limit, twice"
+
+
+def test_inconclusive_runs_never_support_a_timeout_model() -> None:
+    # beta predicts time limits on t3-t5. Wall-clock stops there are not evidence of it.
+    sigs = behaviour(t3=STALL, t4=STALL, t5=STALL)
+    d = METHOD.diagnose(observe(sigs, dict.fromkeys(("t3", "t4", "t5"), STALL_REASON)))
+    assert d.outcome is Outcome.UNRELIABLE_EVIDENCE
+    assert d.selected_model is None
+
+
+def test_inconclusive_run_is_not_reliable_even_without_a_reason() -> None:
+    obs = Observation(test_key="t1", signature=STALL)
+    assert not obs.reliable
+
+
+def test_one_stalled_test_does_not_change_a_supported_diagnosis() -> None:
+    sigs = {**MODELS["alpha"], "t6": STALL}
+    d = METHOD.diagnose(observe(sigs, {"t6": STALL_REASON}))
+    assert d.outcome is Outcome.HYPOTHESIS_SUPPORTED
+    assert d.selected_model == "alpha"

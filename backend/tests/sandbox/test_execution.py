@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import time
 
 import pytest
 
@@ -125,8 +126,11 @@ async def test_concurrent_jobs_are_independent(sandbox: DockerSandbox) -> None:
 
 
 async def test_custom_run_limits_apply(sandbox: DockerSandbox) -> None:
-    src = "#include <thread>\n#include <chrono>\nint main(){ std::this_thread::sleep_for(std::chrono::seconds(3)); }"
+    src = "int main() { volatile unsigned long x = 0; for (;;) ++x; }"
+    start = time.monotonic()
     result = await compile_and_run(
         sandbox, src, limits=RunLimits(cpu_seconds=1, startup_grace_seconds=1.0)
     )
     assert result.status is RunStatus.TIME_LIMIT
+    assert result.signal == 24  # the 1 s CPU limit, not the default 2 s
+    assert time.monotonic() - start < 20

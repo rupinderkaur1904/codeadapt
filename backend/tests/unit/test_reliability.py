@@ -81,3 +81,13 @@ def test_sanitizer_takes_precedence_and_absence_is_tolerated() -> None:
     unavailable = assess(standard, {}, None)
     assert unavailable["a"].excluded_reason is None
     assert unavailable["a"].finding is None
+
+
+def test_inconclusive_run_is_excluded_even_when_its_repeat_agrees() -> None:
+    from codeadapt.evidence.reliability import INCONCLUSIVE_REASON
+
+    stalled = run("", status=RunStatus.INCONCLUSIVE)
+    result = assess({"a": stalled, "b": run(status=RunStatus.TIME_LIMIT)}, {"a": [stalled]}, None)
+    assert result["a"].excluded_reason == INCONCLUSIVE_REASON
+    # A CPU-limit time limit is program behaviour, so it stays evidence.
+    assert result["b"].excluded_reason is None

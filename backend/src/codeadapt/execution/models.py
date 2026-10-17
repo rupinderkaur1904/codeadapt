@@ -57,6 +57,10 @@ class RunStatus(StrEnum):
     TIME_LIMIT = "time_limit"
     MEMORY_LIMIT = "memory_limit"
     OUTPUT_LIMIT = "output_limit"
+    # Stopped by the host wall-clock deadline without reaching its CPU-time limit, even
+    # after a re-run with a longer deadline. A host stall looks exactly like this, so it
+    # says nothing reliable about the program (docs/component-interfaces.md §3, R2).
+    INCONCLUSIVE = "inconclusive"
     INFRASTRUCTURE_ERROR = "infrastructure_error"
 
 
