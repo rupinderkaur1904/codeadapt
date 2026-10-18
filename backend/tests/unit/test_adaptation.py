@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 from codeadapt.adaptation import (
     Action,
@@ -21,6 +23,7 @@ from codeadapt.content import load_catalogue
 from codeadapt.content.models import ProblemSpec
 from codeadapt.diagnosis import Outcome
 from tests.paths import DEMO_CONTENT
+from tests.unit.policy_cases import ORIGINAL, attempts_for, histories, recommendations, record
 
 PROBLEMS: dict[str, ProblemSpec] = {p.spec.slug: p.spec for p in load_catalogue(DEMO_CONTENT)}
 T0 = datetime(2026, 1, 1, tzinfo=UTC)
@@ -343,7 +346,7 @@ def test_policy_ranking_counts_only_explained_failures() -> None:
         attempt("lower-bound", Outcome.NO_FAILURE_OBSERVED, n=2),
     ]
     rec = POLICY.recommend(history[-1], history, PROBLEMS)
-    assert rec.policy_version == "1.2"
+    assert rec.policy_version == "1.3"
     # Before C5 both problems counted 81 ledger entries: the 15 unexplained failures on
     # count-occurrences and the 1 on last-less-than were charged to every probed skill.
     # (48 and 78 before content change C1 added three probe observations to lower-bound.)
@@ -403,3 +406,33 @@ def test_transfer_links_are_reported_as_transfer_but_not_as_demonstrated() -> No
     ev = evaluate_followup(rec, LB_EQUALITY, linked, follow, PROBLEMS["last-less-than"])
     assert ev.relation is Relation.TRANSFER
     assert "not evidence of transfer" in ev.reason
+
+
+# ---------------------------------------------------------------------- policy 1.3 (E2)
+GOLDEN = Path(__file__).parents[1] / "fixtures" / "policy_v1_golden.json"
+
+
+def test_policy_1_3_reproduces_policy_1_2_on_the_original_problems() -> None:
+    # Golden recommendations were produced by policy 1.2 at commit 89a7803, before any
+    # non-recommendable problem existed (tests/unit/policy_cases.py says how).
+    golden = json.loads(GOLDEN.read_text())
+    assert len(golden) == 286
+    assert recommendations(PROBLEMS) == golden
+    assert recommendations({s: PROBLEMS[s] for s in ORIGINAL}) == golden
+
+
+def test_non_recommendable_problems_are_never_chosen_but_stay_in_the_catalogue() -> None:
+    hidden = {s for s, p in PROBLEMS.items() if not p.recommendable}
+    assert hidden, "the demo catalogue has a non-recommendable problem (first-true)"
+    for slug in hidden:
+        spec = PROBLEMS[slug]
+        for outcome, kw in attempts_for(spec):
+            rec = POLICY.recommend(record(spec, 0, outcome, kw), [], PROBLEMS)
+            # Only the index problem itself can come back, as a retry fallback.
+            assert rec.problem_slug is None or rec.problem_slug not in hidden - {slug}
+            if rec.problem_slug == slug:
+                assert rec.action is Action.RETRY
+        for history in histories(PROBLEMS):
+            rec = POLICY.recommend(history[-1], history, PROBLEMS)
+            assert rec.problem_slug not in hidden
+    assert POLICY.version == "1.3"
