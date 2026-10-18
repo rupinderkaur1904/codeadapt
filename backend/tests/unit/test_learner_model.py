@@ -266,3 +266,24 @@ def test_no_policy_or_student_code_reads_the_learner_model() -> None:
     # The only route that calls it is the researcher-only one.
     assert app.count("estimate(") == 1
     assert '"/api/v1/research/learner-model"' in app
+
+
+# ------------------------------------------------------------------- CE1.1 (decision E2)
+def test_a_non_recommendable_problem_still_feeds_the_learner_model() -> None:
+    # first-true is excluded from policy v1's candidates, not from skill evidence.
+    assert not PROBLEMS["first-true"].recommendable
+    ft = at(
+        attempt(
+            "first-true",
+            Outcome.HYPOTHESIS_SUPPORTED,
+            model="hi_skips_candidate",
+            failing=("sample_interior", "two_false_true", "second_index", "last_index"),
+        ),
+        0,
+    )
+    history = [ft, passing("lower-bound", 1), passing("count-occurrences", 2)]
+    b = skill(history, "search_space_boundaries")
+    assert [(t.observation.problem_slug, t.observation.value, t.counted) for t in b.observations][
+        0
+    ] == ("first-true", "incorrect", True)
+    assert (b.counted, b.distinct_problems, b.state) == (3, 3, "estimated")

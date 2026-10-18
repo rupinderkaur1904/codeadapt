@@ -17,13 +17,23 @@ def client(settings: Settings) -> TestClient:
 
 def test_list_and_get_problem_exposes_only_samples(client: TestClient) -> None:
     problems = client.get("/api/v1/problems", headers=STUDENT).json()
-    assert [p["slug"] for p in problems] == ["count-occurrences", "last-less-than", "lower-bound"]
+    # first-true is not recommendable by policy v1 (CE1 decision E2) but stays listed.
+    assert [p["slug"] for p in problems] == [
+        "count-occurrences",
+        "first-true",
+        "last-less-than",
+        "lower-bound",
+    ]
+    assert all("recommendable" not in p for p in problems)
     detail = client.get("/api/v1/problems/lower-bound", headers=STUDENT).json()
     assert "lower_bound_index" in detail["interface"]
     assert len(detail["sample_tests"]) == 2
     text = str(detail)
     for secret in ("harness", "reference", "error_model", "upper_bound_confusion", "D 200000"):
         assert secret not in text
+    first_true = str(client.get("/api/v1/problems/first-true", headers=STUDENT).json())
+    for secret in ("P 200000", "hi_skips_candidate", "recommendable", "known_limitation"):
+        assert secret not in first_true
 
 
 def test_submission_lifecycle_until_worker_runs(client: TestClient) -> None:
