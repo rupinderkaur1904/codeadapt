@@ -166,8 +166,8 @@ append-only `recommendations` and `followup_evaluations` tables.
   else is `excluded`. Passed and excluded tests are attributed to every skill their probes
   name. Since policy 1.1 (ADR-019, change C5) a failed test is skill evidence only when a
   supported diagnosis explains it, and then only for the selected model's skill; other
-  failures are not attributed to any skill. In the demo bank all three problems probe the
-  same four skills, so this changes the ranking's evidence counts but no ranking decision.
+  failures are not attributed to any skill. In the demo bank the three original problems probe
+  the same four skills (first-true probes three of them), so this changes the ranking's evidence counts but no ranking decision.
   Since policy 1.2 (ADR-023) the diagnosis must also be unqualified (two or more behaviour
   groups and no documented collision), and every attempt is attributed with the skill-map
   snapshot of its own content version; a version without one contributes nothing.
@@ -179,7 +179,9 @@ append-only `recommendations` and `followup_evaluations` tables.
   `known_limitation`, the recommendation records `qualified_hypothesis` and the student
   wording says the pattern has more than one possible cause. The target is the skill.
 * *Candidate problems* are those in the same `family` as the index problem. Skills are
-  linked across problems by key, which is a content-authoring assumption.
+  linked across problems by key, which is a content-authoring assumption. Since policy 1.3
+  (ADR-026) problems marked `recommendable = false` (first-true) are left out; their
+  attempts still enter the ledger.
 * *Recently attempted* means among the learner's last 3 attempts.
 * `HYPOTHESIS_SUPPORTED(M)`: rank by (recently attempted, −tests probing `M.skill`, slug).
   If no problem probes the skill, retry the index problem.

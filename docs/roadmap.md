@@ -16,7 +16,7 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M7 | Researcher console + synthetic evaluation harness | M5, M6 | done |
 | M8 | Auth hardening, production isolation tier, deployment | M4, M7 | next |
 | M9 | Pilot readiness (real-data separation, consent, study protocol) | M8 + owner input | planned |
-| CE | Content expansion, designed for diagnosis (docs/content-design) | M7 | CE0 done; C1–C2 applied (ADR-022); C6 revision adopted for skill evidence (ADR-023); CE1 not started |
+| CE | Content expansion, designed for diagnosis (docs/content-design) | M7 | CE0 done; C1–C2 applied (ADR-022); C6 revision adopted for skill evidence (ADR-023); CE1.0–CE1.1 done |
 
 ---
 
@@ -168,6 +168,15 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   calibration results identical; design records for count-occurrences and last-less-than.
   Proposed, not applied: C3/C4, a `hi_skips_candidate` boundary model for those two
   problems (2 behaviour groups each, measured in a scratch copy).
+  Owner accepted CE1.0 on 2026-10-18; C3/C4 deferred.
+* **CE1.1 (done, at gate):** first-true (G1), not recommendable by policy v1.3 (ADR-026).
+  - Design record committed before measurement; held-out cases committed before evaluation.
+  - Boundary target met: `hi_skips_candidate` (2 groups) and `lo_init_one` (3 groups).
+  - Held-out: 2/3 modelled diagnosed, 0 wrong, 1 false negative (`returns_any_true`,
+    midpoint-dependent), both unmodelled abstained, both correct passed.
+  - Earlier problems' versions, held-out and calibration results, and policy
+    recommendations are unchanged.
+  - Results: docs/evaluation/ce1.1-2026-10-18.
 
 ### M8 — Hardening and deployment
 * **Objective:** real auth (Argon2id, sessions, CSRF, rate limits), audit log for researcher

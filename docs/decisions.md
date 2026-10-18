@@ -351,3 +351,25 @@ model.
 - BKT's independence, no-forgetting and shared-parameter assumptions.
 
 All of these need real-learner data, which the project does not have.
+
+## ADR-026 — Policy v1.3: non-recommendable problems (CE1 decision E2, 2026-10-18)
+
+**Context.** Policy v1 chooses follow-ups from every problem in the index problem's family.
+Adding CE1's problems to `binary-search` would change which problems it recommends with no
+policy decision. The owner chose option (b) on 2026-10-17: new problems stay out of v1's
+candidate set until a separate policy decision on prerequisite step-back and transfer.
+
+**Decision.**
+- Content gains `recommendable` (default `true`). First-true is the first problem with
+  `recommendable = false`.
+- Policy v1.3 drops non-recommendable problems from its candidate set. No rule changes. A
+  non-recommendable index problem can still be the retry fallback, as in v1.2 when no
+  candidate probes the skill.
+- A non-recommendable problem stays in the problem list. Its attempts are diagnosed, enter
+  the evidence ledger and skill observations, and feed the researcher-only learner model.
+- The flag is not shown to students.
+
+**Check.** A golden file of 286 synthetic recommendations, produced by policy 1.2 at
+`89a7803` over the three original problems, must be reproduced exactly with first-true in
+the catalogue (`tests/unit/test_adaptation.py`). These histories are synthetic and exercise
+the rules; they are not learner data.

@@ -206,3 +206,17 @@ Same environment.
 
 These tests check the arithmetic and the counting rules on synthetic attempts. They say
 nothing about whether the estimates describe real learners.
+
+### CE1.1: first-true (2026-10-18)
+Same environment.
+- Backend: `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1` gave **274 passed, 0 skipped, 0
+  failed** (about 19 min). New tests:
+  - the policy 1.3 golden regression (286 recommendations from policy 1.2 at `89a7803`);
+  - non-recommendable problems are never chosen;
+  - first-true stays listed and does not leak to students;
+  - first-true feeds the learner model.
+- Web: `vitest` gave 19 passed. Browser: `npx playwright test` gave 1 passed.
+- `ruff check`, `ruff format --check`, `mypy --strict`, `tsc` and `eslint` are clean.
+  OpenAPI is unchanged.
+- Content: `codeadapt-content validate ../content/demo` is valid for all four problems, and
+  the first-true report regenerates identically.
