@@ -23,6 +23,7 @@ lower-bound/
 | `interface` | the function signature the student implements (shown to students) |
 | `[skills]` | `key = "description"`: skills that error models and probes refer to |
 | `[probes]` | `key = ["skill", …]`: input properties a test exercises, and the skills whose errors they can expose. A modelling assumption, recorded so it can be questioned. |
+| `recommendable` | optional, default `true`. When `false`, recommendation policy v1 never chooses the problem as a follow-up; it stays in the problem list and its attempts still produce skill evidence (ADR-026). Not shown to students. |
 | `[curriculum]` | optional links by slug: `prerequisites`, `equivalents`, `transfer`, plus `assumes` (prior knowledge, in words). Every slug must name a problem in the same catalogue, and never the problem itself. |
 | `[[tests]]` | `key`, `input` (stdin for the harness), `expected` (author's expected stdout), `probes`, `visibility` (`sample` or `hidden`, default hidden), `student_description` (the only thing students may see about a hidden test), and the design record: `purpose` (why the test exists) and `distinguishes` (the error models it is meant to separate from the reference, checked against the measurement) |
 | `[[error_models]]` | `key`, `file`, `skill`, `description` (researcher-facing), `student_hint` (shown only after a supported diagnosis), optional `known_limitation` (a documented, accepted weakness such as a known collision) |

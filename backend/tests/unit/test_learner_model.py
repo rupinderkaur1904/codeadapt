@@ -283,7 +283,10 @@ def test_a_non_recommendable_problem_still_feeds_the_learner_model() -> None:
     )
     history = [ft, passing("lower-bound", 1), passing("count-occurrences", 2)]
     b = skill(history, "search_space_boundaries")
-    assert [(t.observation.problem_slug, t.observation.value, t.counted) for t in b.observations][
-        0
-    ] == ("first-true", "incorrect", True)
+    first = b.observations[0]
+    assert (first.observation.problem_slug, first.observation.value, first.counted) == (
+        "first-true",
+        "incorrect",
+        True,
+    )
     assert (b.counted, b.distinct_problems, b.state) == (3, 3, "estimated")

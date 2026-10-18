@@ -1,7 +1,8 @@
 # Content design record: `first-true` (CE1.1, gap G1)
 
-**Status.** The design record was committed before the problem's content was measured and
-before any held-out case was run. The matrix in §4 is a **design-time prediction**: a
+**Status.** The design record was committed (`89a7803`) before the problem's content was
+measured and before any held-out case was run. §4.2 and §7 were completed after
+measurement. The matrix in §4 is a **design-time prediction**: a
 Python re-implementation of each planned model, used to choose tests. It is not the
 sandbox measurement. The measured matrix is added in §4.2 after validation, and wherever
 the two disagree, the measurement wins.
@@ -140,10 +141,54 @@ by `n − k` ones.
 
 The weakest pair is `hi_skips_candidate` / `stops_one_early`, separated by 3 tests.
 
-### 4.2 Measured
+### 4.2 Measured (2026-10-18, content `b69c5efa3b39`, g++ 14.2.0 under runc)
 
-To be filled from `codeadapt-content validate` and the generated report
-(`docs/content-reports/first-true.md`).
+The live matrix is in [../content-reports/first-true.md](../content-reports/first-true.md).
+Validation passes with 0 errors, 0 warnings and 1 documented limitation (`hi_init_last_index`).
+
+**Where the prediction was wrong.** The prediction was wrong for `stops_one_early` on 6
+tests: `sample_interior`, `two_false`, `three_last`, `ten_answer_three`, `large_interior`
+and `large_none`. The C++ model, written to the description in §2, returns `lo` unchecked
+and so also fails every answer-`n` test and every interior answer at `lo + 1`. The Python
+re-implementation used at design time did not. The six `distinguishes` declarations were
+corrected to the measurement. Every other cell matched the prediction.
+
+| Model | Tests | Behaviour groups (measured) | Predicted groups |
+| --- | --- | --- | --- |
+| `hi_init_last_index` | 4 | **1** (documented limitation) | 2 |
+| `hi_skips_candidate` | 7 | **2** | 3 |
+| `lo_init_one` | 5 | **3** | 3 |
+| `no_progress_update` | 14 | 5 | 7 |
+| `closed_loop_hi_mid` | 14 | 6 | 7 |
+| `stops_one_early` | 14 | 5 | 3 |
+| `none_sentinel` | 5 | 2 | 3 |
+| `returns_last_false` | 19 | 8 | 10 |
+| `returns_any_true` | 6 | 3 | 3 |
+
+There are 8 behaviour groups in all.
+- The weakest pair is `returns_last_false` / `stops_one_early`: 5 distinguishing tests.
+- Next is `hi_skips_candidate` / `stops_one_early`: 7.
+- No pair is inseparable.
+
+`no_progress_update` and `stops_one_early` fail the same 14 tests. They are separated by
+signature, a time limit versus a wrong output, not by which tests fail.
+
+**CE1.1 boundary target: met.** Two boundary models have at least 2 measured groups:
+`hi_skips_candidate` (2) and `lo_init_one` (3). `hi_init_last_index` lost its predicted
+second group, because `stops_one_early` now fails the same answer-`n` tests. It stays a
+qualified, documented collision, as planned.
+
+**F6 against the boundary models.** `stops_one_early` is not confused with any boundary
+model: it differs from `hi_skips_candidate` on 7 tests and from `hi_init_last_index` on 10.
+Its `loop_termination` assignment stands.
+
+**Held-out (v1.1).**
+- 2 of 3 modelled cases diagnosed correctly: `hi_skips_candidate` and `lo_init_one`.
+- `returns_any_true` abstained (false negative).
+- Both unmodelled cases abstained.
+- Both correct cases passed.
+- 7 of 7 reproducible.
+- Details: [../evaluation/ce1.1-2026-10-18/](../evaluation/ce1.1-2026-10-18/README.md).
 
 ### 4.3 Ambiguity analysis (before measurement)
 
@@ -206,6 +251,16 @@ To be filled from `codeadapt-content validate` and the generated report
 They are written and committed after the content and before `codeadapt-eval` runs on them.
 They live in `eval/heldout/first-true/`. No calibration cases are planned. If any are
 written, they go in `eval/calibration/first-true/` and are reported separately.
+
+**Measured limitation: F9's midpoint dependence.** The held-out case
+`classic_found_return.cpp` is a closed-interval search that returns the first 1 it lands
+on. It abstained because "some 1" depends on the midpoint convention, and the model covers
+only the half-open one. Two options, neither applied:
+- C7: add a closed-interval variant of F9. This needs a fresh held-out case written before
+  evaluating it, because the existing one has been seen.
+- Accept it as a documented limitation.
+
+Either way, abstaining here is safe: no wrong diagnosis is shown.
 
 **Known limitations, before measurement.**
 - F1 collides by design.
