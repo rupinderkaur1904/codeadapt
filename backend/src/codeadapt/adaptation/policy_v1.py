@@ -35,7 +35,9 @@ class PolicyV1:
     # 1.1: the ledger counts only diagnosis-explained failures (ADR-019).
     # 1.2 (ADR-023): qualified diagnoses add no failure evidence; attempts are attributed
     # with their own content version's skill map.
-    version: str = "1.2"
+    # 1.3 (CE1 decision E2): only problems marked `recommendable` are candidates. The rules
+    # are unchanged; a non-recommendable index problem can still be the retry fallback.
+    version: str = "1.3"
     # A problem is "recently attempted" if it appears among the learner's last N attempts.
     recent_window: int = 3
 
@@ -58,7 +60,8 @@ class PolicyV1:
         )
         recent = [a.problem_slug for a in attempts[-self.recent_window :]]
         family = sorted(
-            (p for p in problems.values() if p.family == spec.family), key=lambda p: p.slug
+            (p for p in problems.values() if p.family == spec.family and p.recommendable),
+            key=lambda p: p.slug,
         )
         base: dict[str, Any] = {
             "index_submission": index.submission_id,

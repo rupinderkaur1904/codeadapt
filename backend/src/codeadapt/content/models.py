@@ -75,6 +75,10 @@ class ProblemSpec(_Strict):
     tests: tuple[TestCase, ...] = Field(min_length=1)
     error_models: tuple[ErrorModelSpec, ...] = ()
     curriculum: Curriculum = Curriculum()
+    # Whether recommendation policy v1 may choose this problem as a follow-up (CE1 decision
+    # E2). A non-recommendable problem stays in the problem list, and its attempts still
+    # produce skill evidence; only the policy's candidate set leaves it out.
+    recommendable: bool = True
 
     @model_validator(mode="after")
     def _cross_references(self) -> Self:
