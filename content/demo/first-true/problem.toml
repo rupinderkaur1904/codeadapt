@@ -1,0 +1,273 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/first-true.md (CE1.1, gap G1).
+
+slug = "first-true"
+title = "First true"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int first_true(const std::vector<int>& flags);"
+# CE1 decision E2: recommendation policy v1 never chooses this problem as a follow-up. It
+# stays in the problem list and its attempts are diagnosed and produce skill evidence.
+recommendable = false
+
+[skills]
+search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# A probe is a property of an input that a test exercises. Each probe names the skills
+# whose errors it can expose; this mapping is a modelling assumption, not a fact.
+[probes]
+empty_input = ["search_space_boundaries"]
+answer_at_start = ["search_space_boundaries"]
+answer_none = ["search_space_boundaries", "problem_specification"]
+answer_last_index = ["search_space_boundaries"]
+answer_interior = ["problem_specification"]
+single_element = ["search_space_boundaries", "loop_termination"]
+two_elements = ["loop_termination"]
+large_input = ["loop_termination"]
+
+# Links to other problems by slug (docs/content-design/README.md section 1.6). The reverse
+# prerequisite link from lower-bound is deferred: it would change lower-bound's version.
+[curriculum]
+assumes = ["indexing a std::vector", "while loops and integer division"]
+
+[[tests]]
+key = "sample_interior"
+visibility = "sample"
+input = "L 5 0 0 1 1 1"
+expected = "2"
+probes = ["answer_interior"]
+student_description = "The first 1 is in the middle of the array."
+purpose = "Visible interior answer; the first check most code meets."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "sample_none"
+visibility = "sample"
+input = "L 3 0 0 0"
+expected = "3"
+probes = ["answer_none"]
+student_description = "The array contains no 1."
+purpose = "Visible answer-n case: the specification's 'not found' value."
+distinguishes = ["hi_init_last_index", "no_progress_update", "none_sentinel", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "empty"
+input = "L 0"
+expected = "0"
+probes = ["empty_input"]
+student_description = "The array is empty."
+purpose = "Minimal input (n = 0): the answer is 0, which is also n."
+distinguishes = ["lo_init_one", "none_sentinel", "returns_last_false"]
+
+[[tests]]
+key = "all_true"
+input = "L 4 1 1 1 1"
+expected = "0"
+probes = ["answer_at_start"]
+student_description = "Every element is 1."
+purpose = "Answer 0 on a small array: is index 0 a candidate?"
+distinguishes = ["closed_loop_hi_mid", "lo_init_one", "returns_any_true", "returns_last_false"]
+
+[[tests]]
+key = "single_true"
+input = "L 1 1"
+expected = "0"
+probes = ["single_element", "answer_at_start"]
+student_description = "The array has one element, which is 1."
+purpose = "Smallest answer-0 case."
+distinguishes = ["closed_loop_hi_mid", "lo_init_one", "returns_last_false"]
+
+[[tests]]
+key = "single_false"
+input = "L 1 0"
+expected = "1"
+probes = ["single_element", "answer_none"]
+student_description = "The array has one element, which is 0."
+purpose = "Smallest answer-n case with a non-empty array."
+distinguishes = ["hi_init_last_index", "no_progress_update", "none_sentinel", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "two_false_true"
+input = "L 2 0 1"
+expected = "1"
+probes = ["two_elements", "answer_last_index"]
+student_description = "The array has two elements and the first 1 is the last element."
+purpose = "Smallest input on which a non-shrinking left update loops; answer n - 1."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "two_true"
+input = "L 2 1 1"
+expected = "0"
+probes = ["two_elements", "answer_at_start"]
+student_description = "The array has two elements, both 1."
+purpose = "Answer 0 with two candidates; separates 'some 1' from 'the first 1'."
+distinguishes = ["closed_loop_hi_mid", "lo_init_one", "returns_any_true", "returns_last_false"]
+
+[[tests]]
+key = "two_false"
+input = "L 2 0 0"
+expected = "2"
+probes = ["two_elements", "answer_none"]
+student_description = "The array has two elements, both 0."
+purpose = "Answer n with two elements."
+distinguishes = ["hi_init_last_index", "no_progress_update", "none_sentinel", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "three_last"
+input = "L 3 0 0 1"
+expected = "2"
+probes = ["answer_last_index"]
+student_description = "The array has three elements and only the last is 1."
+purpose = "Answer n - 1 that hi = mid - 1 still reaches; splits its evidence."
+distinguishes = ["closed_loop_hi_mid", "no_progress_update", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "three_middle"
+input = "L 3 0 1 1"
+expected = "1"
+probes = ["answer_interior"]
+student_description = "The array has three elements and the first 1 is in the middle."
+purpose = "Interior answer at lo + 1 after the first step."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "second_index"
+input = "L 6 0 1 1 1 1 1"
+expected = "1"
+probes = ["answer_interior"]
+student_description = "The first 1 is the second element."
+purpose = "Answer 1 in a longer run of 1s; separates 'some 1' from 'the first 1'."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_any_true", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "last_index"
+input = "L 5 0 0 0 0 1"
+expected = "4"
+probes = ["answer_last_index"]
+student_description = "Only the last element is 1."
+purpose = "Answer n - 1 on an odd-length array."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "interior_odd"
+input = "L 7 0 0 0 1 1 1 1"
+expected = "3"
+probes = ["answer_interior"]
+student_description = "The first 1 is in the middle of an odd-length array."
+purpose = "Interior answer at the first midpoint of an odd-length array."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "ten_answer_three"
+input = "L 10 0 0 0 1 1 1 1 1 1 1"
+expected = "3"
+probes = ["answer_interior"]
+student_description = "The first 1 is near the start of a longer array."
+purpose = "Interior answer that hi = mid - 1 is predicted to pass; splits its evidence."
+distinguishes = ["closed_loop_hi_mid", "no_progress_update", "returns_any_true", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "large_interior"
+input = "P 200000 123457"
+expected = "123457"
+probes = ["large_input", "answer_interior"]
+student_description = "A large array with the first 1 in the interior."
+purpose = "Scale case; not a complexity test."
+distinguishes = ["closed_loop_hi_mid", "no_progress_update", "returns_any_true", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "large_none"
+input = "P 200000 200000"
+expected = "200000"
+probes = ["large_input", "answer_none"]
+student_description = "A large array with no 1."
+purpose = "Answer n at scale."
+distinguishes = ["hi_init_last_index", "no_progress_update", "none_sentinel", "returns_last_false", "stops_one_early"]
+
+[[tests]]
+key = "large_all_true"
+input = "P 200000 0"
+expected = "0"
+probes = ["large_input", "answer_at_start"]
+student_description = "A large array of 1s only."
+purpose = "Answer 0 at scale."
+distinguishes = ["closed_loop_hi_mid", "lo_init_one", "returns_any_true", "returns_last_false"]
+
+[[tests]]
+key = "large_last"
+input = "P 200000 199999"
+expected = "199999"
+probes = ["large_input", "answer_last_index"]
+student_description = "A large array whose only 1 is the last element."
+purpose = "Answer n - 1 at scale."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_last_false", "stops_one_early"]
+
+[[error_models]]
+key = "hi_init_last_index"
+file = "error_models/hi_init_last_index.cpp"
+skill = "search_space_boundaries"
+description = "Initialises hi = n - 1 with a half-open loop, so the answer n (no 1 present) is unreachable."
+student_hint = "Can your search ever return flags.size()? Check the initial bounds of the search space."
+known_limitation = "Detected only by tests whose answer is n. Any error that cannot return n, such as clamping the result to n - 1, produces identical outputs, so diagnoses are reported as qualified (docs/content-design/first-true.md section 4.3)."
+
+[[error_models]]
+key = "hi_skips_candidate"
+file = "error_models/hi_skips_candidate.cpp"
+skill = "search_space_boundaries"
+description = "In a half-open loop, a 1 at mid sets hi = mid - 1, discarding flags[mid], which may itself be the first 1."
+student_hint = "When flags[mid] is 1, could mid itself be the answer? Check that your update keeps it in the search space."
+
+[[error_models]]
+key = "lo_init_one"
+file = "error_models/lo_init_one.cpp"
+skill = "search_space_boundaries"
+description = "Initialises lo = 1, so index 0 is never a candidate answer."
+student_hint = "Can your search ever return 0? Check the initial bounds of the search space."
+
+[[error_models]]
+key = "no_progress_update"
+file = "error_models/no_progress_update.cpp"
+skill = "loop_termination"
+description = "Sets lo = mid instead of lo = mid + 1, so the range stops shrinking when two candidates remain."
+student_hint = "Check that every iteration makes the search space strictly smaller."
+
+[[error_models]]
+key = "closed_loop_hi_mid"
+file = "error_models/closed_loop_hi_mid.cpp"
+skill = "loop_termination"
+description = "Uses a closed range with lo <= hi but updates hi = mid, so the loop never ends once lo == hi on a 1."
+student_hint = "Check that your loop condition and your updates use the same kind of range, so the loop can end."
+
+[[error_models]]
+key = "stops_one_early"
+file = "error_models/stops_one_early.cpp"
+skill = "loop_termination"
+description = "Loops while hi - lo > 1 and returns lo unchecked, so the answer is wrong when it is lo + 1."
+student_hint = "Check when your loop stops: is the remaining candidate the answer, or does it still need checking?"
+
+[[error_models]]
+key = "none_sentinel"
+file = "error_models/none_sentinel.cpp"
+skill = "problem_specification"
+description = "Returns -1 instead of flags.size() when there is no 1."
+student_hint = "Re-read what the function must return when the array contains no 1."
+
+[[error_models]]
+key = "returns_last_false"
+file = "error_models/returns_last_false.cpp"
+skill = "problem_specification"
+description = "Returns the index of the last 0 (one less than the first 1)."
+student_hint = "Check whether you return the first 1 or the position just before it."
+
+[[error_models]]
+key = "returns_any_true"
+file = "error_models/returns_any_true.cpp"
+skill = "problem_specification"
+description = "Returns as soon as flags[mid] is 1, which is some 1 but not necessarily the first."
+student_hint = "Finding a 1 is not the end: could there be an earlier one?"

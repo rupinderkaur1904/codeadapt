@@ -43,6 +43,7 @@ def test_program_bundles_solution_with_harness() -> None:
 def test_catalogue_lists_problem_directories() -> None:
     assert [p.spec.slug for p in load_catalogue(DEMO_CONTENT)] == [
         "count-occurrences",
+        "first-true",
         "last-less-than",
         "lower-bound",
     ]

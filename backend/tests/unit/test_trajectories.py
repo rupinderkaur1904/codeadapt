@@ -404,7 +404,12 @@ def test_problem_list_marks_problems_with_a_no_failure_attempt(
         p["slug"]: p["no_failure_observed"]
         for p in client.get("/api/v1/problems", headers=STUDENT).json()
     }
-    assert marked == {"count-occurrences": True, "last-less-than": False, "lower-bound": False}
+    assert marked == {
+        "count-occurrences": True,
+        "first-true": False,
+        "last-less-than": False,
+        "lower-bound": False,
+    }
     # Another user's results do not mark this user's list.
     others = client.get("/api/v1/problems", headers=RESEARCHER).json()
     assert not any(p["no_failure_observed"] for p in others)
