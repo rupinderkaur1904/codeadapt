@@ -1,0 +1,42 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE1.1 (2026-10-18) by the models' author, in styles different from the
+# models, and committed before the method was run on them. See docs/methodology.md §6.1
+# for what that does and does not allow us to claim.
+
+problem = "first-true"
+
+[[cases]]
+file = "closed_interval_answer_var.cpp"
+truth = "correct"
+note = "Closed interval with a running answer."
+
+[[cases]]
+file = "power_of_two_steps.cpp"
+truth = "correct"
+note = "Decreasing power-of-two steps over the zeros (no lo/hi pair)."
+
+[[cases]]
+file = "right_drops_mid.cpp"
+truth = "hi_skips_candidate"
+note = "For-loop form; a 1 at mid moves the right edge to mid - 1."
+
+[[cases]]
+file = "recursive_from_one.cpp"
+truth = "lo_init_one"
+note = "Recursive search whose first call starts at index 1."
+
+[[cases]]
+file = "classic_found_return.cpp"
+truth = "returns_any_true"
+note = "Closed-interval textbook search returning the first 1 it lands on."
+
+[[cases]]
+file = "skips_and_sentinel.cpp"
+truth = "unmodelled"
+note = "Two modelled bugs at once: hi = mid - 1 and -1 for none."
+
+[[cases]]
+file = "empty_minus_one.cpp"
+truth = "unmodelled"
+note = "Correct except for an empty-array special case returning -1."
