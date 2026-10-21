@@ -1,6 +1,9 @@
 # Proposed ADR-027: time-limit evidence is a symptom, not a named error (for owner approval)
 
-**Status: proposed, not implemented.** No production code, content, skill map, ledger
+**Status: approved by the owner on 2026-10-21 (direction and policy option P1) and
+implemented as method v1.2 / policy v1.4; see docs/decisions.md ADR-027 and
+docs/evaluation/adr027-2026-10-21. The text below is the proposal as approved.**
+Original status line: proposed, not implemented. No production code, content, skill map, ledger
 policy, BKT parameter or recommendation rule changes until the owner approves this
 document. Production stays on `fingerprint_consistency` v1.1, ledger policy 1.2, learner
 model LM1 (`bkt-params-assumed-1`) and policy v1.3. Written 2026-10-21 after the VAL1-A

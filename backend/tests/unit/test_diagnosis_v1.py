@@ -12,6 +12,9 @@ from codeadapt.diagnosis import (
 from codeadapt.evidence import OutcomeKind, Signature
 
 METHOD = FingerprintConsistencyV1()
+# v1.1 is kept to reproduce every result recorded before ADR-027; tests of a time-limit model
+# being named (beta) run against it.
+V11 = METHODS["v1.1"]
 TESTS = ["t1", "t2", "t3", "t4", "t5", "t6"]
 
 
@@ -86,8 +89,13 @@ def test_rule5_unmodelled_behaviour_is_not_forced_into_a_category() -> None:
 
 
 def test_rule5_double_bug_abstains() -> None:
-    d = METHOD.diagnose(observe(behaviour(t1=out("a"), t2=out("a"), t3=TLE, t4=TLE, t5=TLE)))
-    assert d.outcome is Outcome.UNMODELLED_BEHAVIOUR
+    double = observe(behaviour(t1=out("a"), t2=out("a"), t3=out("b")))
+    assert METHOD.diagnose(double).outcome is Outcome.UNMODELLED_BEHAVIOUR
+    # alpha's bug plus beta's time limits: v1.1 abstained as unmodelled; v1.2 reports the
+    # time limit as a symptom (rule 4b runs before rule 5).
+    with_stall = observe(behaviour(t1=out("a"), t2=out("a"), t3=TLE, t4=TLE, t5=TLE))
+    assert V11.diagnose(with_stall).outcome is Outcome.UNMODELLED_BEHAVIOUR
+    assert METHOD.diagnose(with_stall).outcome is Outcome.NON_TERMINATION_OBSERVED
 
 
 def test_rule6_indistinguishable_models_are_ambiguous() -> None:
@@ -116,9 +124,13 @@ def test_rule7_single_weak_test_is_insufficient() -> None:
     assert d.selected_model is None
 
 
-@pytest.mark.parametrize(("model", "support"), [("alpha", 2), ("beta", 3)])
-def test_rule8_supported_hypothesis(model: str, support: int) -> None:
-    d = METHOD.diagnose(observe(MODELS[model]))
+@pytest.mark.parametrize(
+    ("method", "model", "support"), [(METHOD, "alpha", 2), (V11, "alpha", 2), (V11, "beta", 3)]
+)
+def test_rule8_supported_hypothesis(
+    method: FingerprintConsistencyV1, model: str, support: int
+) -> None:
+    d = method.diagnose(observe(MODELS[model]))
     assert d.outcome is Outcome.HYPOTHESIS_SUPPORTED
     assert d.selected_model == model
     assert d.support == support
@@ -127,7 +139,7 @@ def test_rule8_supported_hypothesis(model: str, support: int) -> None:
 
 
 def test_exclusion_below_threshold_still_diagnoses_on_reliable_tests() -> None:
-    d = METHOD.diagnose(observe(MODELS["beta"], {"t1": "nondet"}))
+    d = V11.diagnose(observe(MODELS["beta"], {"t1": "nondet"}))
     assert d.outcome is Outcome.HYPOTHESIS_SUPPORTED
     assert d.rationale["excluded"] == {"t1": "nondet"}
 
@@ -142,7 +154,7 @@ def test_rationale_records_every_observation() -> None:
 
 
 def test_parameters_are_recorded_and_adjustable() -> None:
-    strict = FingerprintConsistencyV1(min_support=4)
+    strict = FingerprintConsistencyV1(min_support=4, time_limit_is_symptom=False)
     d = strict.diagnose(observe(MODELS["beta"]))
     assert d.outcome is Outcome.INSUFFICIENT_EVIDENCE
     assert d.rationale["parameters"]["min_support"] == 4
@@ -213,3 +225,92 @@ def test_one_stalled_test_does_not_change_a_supported_diagnosis() -> None:
     d = METHOD.diagnose(observe(sigs, {"t6": STALL_REASON}))
     assert d.outcome is Outcome.HYPOTHESIS_SUPPORTED
     assert d.selected_model == "alpha"
+
+
+# ------------------------------------------- time limits are a symptom (ADR-027, rule 4b)
+def test_rule4b_time_limit_is_reported_as_a_symptom_not_a_model() -> None:
+    d = METHOD.diagnose(observe(MODELS["beta"]))
+    assert d.outcome is Outcome.NON_TERMINATION_OBSERVED
+    assert not d.outcome.is_diagnosis
+    assert d.selected_model is None
+    assert d.candidates == ()
+    assert d.rationale["rule"] == "4b"
+    assert d.rationale["timed_out_tests"] == ["t3", "t4", "t5"]
+    assert d.rationale["other_failing_tests"] == []
+    # The models it is consistent with are kept for research, under their own key only.
+    assert d.rationale["consistent_models"] == ["beta"]
+    assert "candidates" not in d.rationale
+    assert "no error model is named" in d.rationale["note"]
+
+
+def test_rule4b_v1_1_still_names_the_time_limit_model() -> None:
+    d = V11.diagnose(observe(MODELS["beta"]))
+    assert (d.method_version, d.outcome, d.selected_model) == (
+        "1.1",
+        Outcome.HYPOTHESIS_SUPPORTED,
+        "beta",
+    )
+    assert METHOD.version == "1.2"
+    assert METHODS["v1"] == METHOD
+
+
+def test_rule4b_applies_with_other_failures_and_without_candidates() -> None:
+    # A time limit plus a wrong output that no model predicts: still a symptom, not
+    # unmodelled, and the other failing test is listed.
+    d = METHOD.diagnose(observe(behaviour(t3=TLE, t1=out("zzz"))))
+    assert d.outcome is Outcome.NON_TERMINATION_OBSERVED
+    assert d.rationale["timed_out_tests"] == ["t3"]
+    assert d.rationale["other_failing_tests"] == ["t1"]
+    assert d.rationale["consistent_models"] == []
+
+
+def test_rule4b_a_time_limit_on_every_test_is_a_symptom() -> None:
+    d = METHOD.diagnose(observe(dict.fromkeys(TESTS, TLE)))
+    assert d.outcome is Outcome.NON_TERMINATION_OBSERVED
+    assert d.rationale["timed_out_tests"] == TESTS
+
+
+def test_rule4b_ignores_time_limits_on_excluded_tests() -> None:
+    # A sanitizer stack-overflow on the test that timed out excludes it (VAL1-A C_AOR_018):
+    # the remaining reliable failure decides, as in v1.1.
+    sigs = {**MODELS["alpha"], "t3": TLE}
+    d = METHOD.diagnose(observe(sigs, {"t3": "sanitizer: stack-overflow"}))
+    assert (d.outcome, d.selected_model) == (Outcome.HYPOTHESIS_SUPPORTED, "alpha")
+
+
+@pytest.mark.parametrize(
+    ("sigs", "excluded", "outcome"),
+    [
+        # Infrastructure error anywhere wins (rule 2).
+        (behaviour(t3=TLE, t1=INFRA), {}, Outcome.EXECUTION_ERROR),
+        # Too many exclusions wins (rule 3), even with a reliable time limit.
+        (
+            behaviour(t3=TLE, t4=out("x"), t5=out("x"), t6=out("x")),
+            {"t4": "ub", "t5": "ub", "t6": "nondet"},
+            Outcome.UNRELIABLE_EVIDENCE,
+        ),
+        # A time limit only on an excluded test, with no other failure: unreliable.
+        (behaviour(t3=TLE), {"t3": "sanitizer: stack-overflow"}, Outcome.UNRELIABLE_EVIDENCE),
+        # Wall-clock stops are inconclusive, never a time limit (ADR-023).
+        (
+            behaviour(t3=STALL, t4=STALL, t5=STALL),
+            dict.fromkeys(("t3", "t4", "t5"), STALL_REASON),
+            Outcome.UNRELIABLE_EVIDENCE,
+        ),
+        # A crash is a runtime error, not a time limit: ordinary evidence, unmodelled here.
+        (
+            behaviour(t3=Signature(kind=OutcomeKind.RUNTIME_ERROR, detail="signal:11")),
+            {},
+            Outcome.UNMODELLED_BEHAVIOUR,
+        ),
+    ],
+)
+def test_rule4b_precedence(
+    sigs: dict[str, Signature], excluded: dict[str, str], outcome: Outcome
+) -> None:
+    assert METHOD.diagnose(observe(sigs, excluded)).outcome is outcome
+
+
+def test_rule4b_parameter_is_recorded() -> None:
+    d = METHOD.diagnose(observe(MODELS["alpha"]))
+    assert d.rationale["parameters"]["time_limit_is_symptom"] is True

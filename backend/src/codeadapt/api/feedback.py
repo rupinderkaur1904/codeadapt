@@ -160,6 +160,17 @@ def _feedback(
                 hint=model.student_hint,
                 related_cases=related,
             )
+        case Outcome.NON_TERMINATION_OBSERVED:
+            # A symptom (ADR-027): no hint, no error model, no skill.
+            return FeedbackView(
+                kind=FeedbackKind.FAILING_CASES,
+                message="Your program did not finish within the time limit on some cases "
+                '(marked "time limit" below). This usually means a loop or a recursive call '
+                "stops making progress for some inputs, or the approach is far too slow. Look "
+                "at how your search range changes on those cases. Other failing cases are "
+                "listed too.",
+                related_cases=failing,
+            )
         case Outcome.AMBIGUOUS | Outcome.UNMODELLED_BEHAVIOUR | Outcome.INSUFFICIENT_EVIDENCE:
             return FeedbackView(
                 kind=FeedbackKind.FAILING_CASES,

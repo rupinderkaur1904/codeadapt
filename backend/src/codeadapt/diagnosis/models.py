@@ -23,6 +23,9 @@ class Outcome(StrEnum):
     AMBIGUOUS = "ambiguous"
     INSUFFICIENT_EVIDENCE = "insufficient_evidence"
     HYPOTHESIS_SUPPORTED = "hypothesis_supported"
+    # v1.2 (ADR-027): a reliable failing test hit the CPU-time limit. A symptom, not a
+    # diagnosis: no error model is named and no skill is inferred from it.
+    NON_TERMINATION_OBSERVED = "non_termination_observed"
 
     @property
     def is_diagnosis(self) -> bool:

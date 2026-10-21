@@ -97,6 +97,7 @@ Decision procedure (evaluated in order; first match wins):
 | 2 | any infrastructure error, or no tests ran | `EXECUTION_ERROR` |
 | 3 | excluded tests > `max_excluded_fraction` (default 0.34) of the suite, or every failing test is excluded | `UNRELIABLE_EVIDENCE` |
 | 4 | observation agrees with *R* on every reliable test | `NO_FAILURE_OBSERVED` |
+| 4b | (v1.2, ADR-027) any reliable failing test ended at the CPU-time limit | `NON_TERMINATION_OBSERVED`: a symptom, no model selected; the models consistent with the observations are recorded as `consistent_models` for research only |
 | 5 | *C* = {Mᵢ : agree on **every** reliable test}; if *C* = ∅ | `UNMODELLED_BEHAVIOUR` (nearest models reported with their mismatch counts, not as a diagnosis) |
 | 6 | \|C\| ≥ 2 | `AMBIGUOUS` (candidates listed; the tests that would distinguish them are named if the content has any) |
 | 7 | \|C\| = 1 but *support* < `min_support` (default 2), where support = number of reliable tests on which *M* differs from *R* (i.e. failures it explains) | `INSUFFICIENT_EVIDENCE` |
@@ -113,6 +114,17 @@ Properties this gives us, each covered by a unit test:
 * Two models that the suite cannot separate always yield `AMBIGUOUS`, never a pick (rule 6).
 * A failing submission never gets forced into a category (rule 5).
 * Unreliable evidence is never diagnosed (rule 3).
+* A time limit is never named as an error model (rule 4b, v1.2).
+
+**Time limits are a symptom (v1.2, ADR-027).** A CPU-time-limit stop is one bit per test,
+and many different edits stop progress on the same inputs: in the VAL1-A mutation audit 17
+of 22 termination diagnoses named the wrong edit despite 6–9 behaviour groups. Rule 4b runs
+after rules 1–4, so infrastructure errors, unreliable evidence, sanitizer findings
+(including stack overflow) and wall-clock-only stops (`inconclusive`) keep their meaning;
+a time limit on an excluded test never triggers it. `v1.1` stays registered in `METHODS`
+to reproduce earlier results. The outcome adds no `incorrect` skill observation (only an
+unqualified `HYPOTHESIS_SUPPORTED` does), so `loop_termination` can now receive failure
+evidence only from models that terminate with a wrong output.
 
 **Behaviour groups and qualified hypotheses (v1.1, ADR-019).** Tests that every modelled
 program passes together or fails together form one *behaviour group*; they carry one
@@ -150,6 +162,7 @@ observations (test, problem, passed/failed, reliable?). No latent "mastery" vari
 | `AMBIGUOUS(C)` | exercise whose test suite *discriminates* between the skills of the candidates | follow-up diagnosis resolves to one candidate's skill or to `NO_FAILURE_OBSERVED` on those probes |
 | `NO_FAILURE_OBSERVED` | next exercise in the family whose probes have the least evidence in the ledger | follow-up passes its probes |
 | `UNMODELLED` / `INSUFFICIENT` / `UNRELIABLE` | retry the same problem with the generic feedback; flagged for researcher review | none claimed (`not_comparable`) |
+| `NON_TERMINATION_OBSERVED` (policy 1.4, ADR-027) | retry the same problem with the time-limit feedback; flagged for researcher review; no target skill | none claimed (`not_comparable`) |
 | `COMPILE_ERROR` / `EXECUTION_ERROR` | retry the same problem | none |
 
 **Follow-up evaluation** compares, per probe of the targeted skill, the index attempt and
@@ -197,6 +210,8 @@ append-only `recommendations` and `followup_evaluations` tables.
   neither consume nor replace an open recommendation for the same problem; an attempt on
   a different problem supersedes it without a verdict; an attempt created before the
   recommendation existed is not its follow-up.
+* Since policy 1.4 (ADR-027) every outcome has an explicit rule; an outcome without one
+  raises an error instead of reaching the no-failure branch.
 * Verdicts: `not_comparable` when no criterion was recorded, when the follow-up's outcome
   is `UNRELIABLE_EVIDENCE` (or a compile/execution error), or when no reliable follow-up
   test probes the targeted skills; `criterion_not_met` when any such test failed or the

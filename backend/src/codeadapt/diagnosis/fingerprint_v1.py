@@ -21,17 +21,26 @@ SINGLE_BEHAVIOUR = (
     "behaviour group), so the evidence is one observation repeated. Other errors that "
     "produce the same behaviour cannot be ruled out."
 )
+NON_TERMINATION = (
+    "The program did not finish within the CPU-time limit on these tests. That is "
+    "consistent with a loop or recursion that stops making progress and with a program that "
+    "is far too slow. Many different errors stop progress on the same inputs, so no error "
+    "model is named (ADR-027)."
+)
 
 
 @dataclass(frozen=True)
 class FingerprintConsistencyV1:
     name: str = "fingerprint_consistency"
-    version: str = "1.1"
+    version: str = "1.2"
     min_support: int = 2
     # Distinct behaviour groups the supporting tests must span (diagnosis/groups.py).
     # 1 keeps v1's decisions and only reports the count; 2 is the C6 candidate rule.
     min_behaviours: int = 1
     max_excluded_fraction: float = 0.34
+    # Rule 4b (v1.2, ADR-027): a reliable CPU-time-limit failure is reported as a symptom
+    # and never named as an error model. False reproduces v1.1.
+    time_limit_is_symptom: bool = True
 
     def diagnose(self, data: DiagnosticInput) -> Diagnosis:
         rationale: dict[str, Any] = {
@@ -39,10 +48,11 @@ class FingerprintConsistencyV1:
                 "min_support": self.min_support,
                 "min_behaviours": self.min_behaviours,
                 "max_excluded_fraction": self.max_excluded_fraction,
+                "time_limit_is_symptom": self.time_limit_is_symptom,
             }
         }
 
-        def result(outcome: Outcome, rule: int, **kw: Any) -> Diagnosis:
+        def result(outcome: Outcome, rule: int | str, **kw: Any) -> Diagnosis:
             rationale["rule"] = rule
             return Diagnosis(
                 method=self.name,
@@ -89,6 +99,10 @@ class FingerprintConsistencyV1:
             )
             return result(Outcome.NO_FAILURE_OBSERVED, 4)
 
+        timed_out = [
+            o.test_key for o in reliable_failing if o.signature.kind is OutcomeKind.TIME_LIMIT
+        ]
+
         contradictions = {
             key: [o.test_key for o in reliable if pred.get(o.test_key) != o.signature]
             for key, pred in data.models.items()
@@ -97,6 +111,17 @@ class FingerprintConsistencyV1:
         rationale["contradicting_tests"] = {k: v for k, v in contradictions.items() if v}
         rationale["candidates"] = list(candidates)
 
+        # Rule 4b (ADR-027). Every candidate predicts the time limit it is consistent with, so
+        # naming one would rest on a one-bit observation many errors share. The candidates
+        # are kept for research only; no consumer reads them.
+        if self.time_limit_is_symptom and timed_out:
+            rationale["timed_out_tests"] = timed_out
+            rationale["other_failing_tests"] = [
+                o.test_key for o in reliable_failing if o.test_key not in timed_out
+            ]
+            rationale["consistent_models"] = rationale.pop("candidates")
+            rationale["note"] = NON_TERMINATION
+            return result(Outcome.NON_TERMINATION_OBSERVED, "4b")
         # Rule 5
         if not candidates:
             rationale["nearest_models"] = sorted(
@@ -157,9 +182,13 @@ class FingerprintConsistencyV1:
         return [k for k in keys if len({str(data.models[c].get(k)) for c in candidates}) > 1]
 
 
-# Named parameter sets. "v1" is the deployed method; "v2-candidate" is change C6, kept
-# for evaluation until a decision adopts or rejects it (docs/decisions.md ADR-019).
+# Named parameter sets. "v1" is the deployed method (1.2 since ADR-027); "v1.1" reproduces
+# every result recorded before it; "v2-candidate" is change C6 on top of v1.1, kept for
+# evaluation until a decision adopts or rejects it (docs/decisions.md ADR-019).
 METHODS: dict[str, FingerprintConsistencyV1] = {
     "v1": FingerprintConsistencyV1(),
-    "v2-candidate": FingerprintConsistencyV1(version="2-candidate", min_behaviours=2),
+    "v1.1": FingerprintConsistencyV1(version="1.1", time_limit_is_symptom=False),
+    "v2-candidate": FingerprintConsistencyV1(
+        version="2-candidate", min_behaviours=2, time_limit_is_symptom=False
+    ),
 }

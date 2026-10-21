@@ -68,7 +68,15 @@ export function TracePage() {
           />
           <Fields
             row={rationale}
-            keys={["rule", "excluded", "supporting_tests", "contradicting_tests", "caveat"]}
+            keys={[
+              "rule",
+              "excluded",
+              "supporting_tests",
+              "timed_out_tests",
+              "contradicting_tests",
+              "caveat",
+              "note",
+            ]}
           />
           <Raw label="Full rationale" value={rationale} />
         </>
