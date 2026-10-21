@@ -1,0 +1,884 @@
+{
+ "A_AOR_017": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_AOR_020": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_AOR_035": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_DEL_038": {
+  "debatable": false,
+  "lenient": "no_progress_update",
+  "reason": "lo = mid",
+  "strict": "no_progress_update"
+ },
+ "A_ICR_001": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ICR_002": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ICR_023": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ICR_024": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ICR_036": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ICR_037": {
+  "debatable": false,
+  "lenient": "no_progress_update",
+  "reason": "lo = mid + 0 is lo = mid",
+  "strict": "no_progress_update"
+ },
+ "A_NEG_014": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_NEG_032": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ROR_007": {
+  "debatable": false,
+  "lenient": "closed_loop_hi_mid",
+  "reason": "lo <= hi with hi = mid",
+  "strict": "closed_loop_hi_mid"
+ },
+ "A_ROR_008": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ROR_009": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ROR_010": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ROR_011": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ROR_027": {
+  "debatable": false,
+  "lenient": "upper_bound_confusion",
+  "reason": "a[mid] <= target sends equal elements right",
+  "strict": "upper_bound_confusion"
+ },
+ "A_ROR_028": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ROR_029": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ROR_030": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_ROR_031": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_SDL_039": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_SDL_042": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_003": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_004": {
+  "debatable": false,
+  "lenient": "hi_init_last_index",
+  "reason": "hi = n - 1 with a half-open loop",
+  "strict": "hi_init_last_index"
+ },
+ "A_UOI_005": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_006": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_012": {
+  "debatable": false,
+  "lenient": "closed_loop_hi_mid",
+  "reason": "lo < hi + 1 is lo <= hi, with hi = mid",
+  "strict": "closed_loop_hi_mid"
+ },
+ "A_UOI_013": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_015": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_016": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_018": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_019": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_021": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_022": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_025": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_026": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_033": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_034": {
+  "debatable": false,
+  "lenient": "no_progress_update",
+  "reason": "lo = (mid - 1) + 1 is lo = mid",
+  "strict": "no_progress_update"
+ },
+ "A_UOI_040": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_041": {
+  "debatable": false,
+  "lenient": "hi_skips_candidate",
+  "reason": "hi = mid - 1 in a half-open loop",
+  "strict": "hi_skips_candidate"
+ },
+ "A_UOI_043": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "A_UOI_044": {
+  "debatable": false,
+  "lenient": "returns_wrong_pointer",
+  "reason": "returns lower_bound - 1",
+  "strict": "returns_wrong_pointer"
+ },
+ "B_AOR_005": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_AOR_023": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_AOR_026": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_AOR_044": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_AOR_051": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_DEL_008": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_DEL_047": {
+  "debatable": true,
+  "lenient": "closed_loop_hi_mid",
+  "reason": "closed loop with hi = mid: E7's described code shape",
+  "strict": "none"
+ },
+ "B_DEL_054": {
+  "debatable": true,
+  "lenient": "no_progress_update",
+  "reason": "lo = mid instead of mid + 1 (closed loop)",
+  "strict": "none"
+ },
+ "B_ICR_001": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ICR_002": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ICR_006": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ICR_007": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ICR_029": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ICR_030": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ICR_045": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ICR_046": {
+  "debatable": true,
+  "lenient": "closed_loop_hi_mid",
+  "reason": "hi = mid - 0 is hi = mid in a closed loop",
+  "strict": "none"
+ },
+ "B_ICR_052": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ICR_053": {
+  "debatable": true,
+  "lenient": "no_progress_update",
+  "reason": "lo = mid + 0 (closed loop)",
+  "strict": "none"
+ },
+ "B_NEG_020": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_NEG_038": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_013": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_014": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_015": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_016": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_017": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_033": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_034": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_035": {
+  "debatable": false,
+  "lenient": "upper_bound_confusion",
+  "reason": "a[mid] > target sends equal elements right",
+  "strict": "upper_bound_confusion"
+ },
+ "B_ROR_036": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_ROR_037": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_SDL_041": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_SDL_048": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_SDL_055": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_003": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_004": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_009": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_010": {
+  "debatable": true,
+  "lenient": "hi_init_last_index",
+  "reason": "answer starts at n - 1, so n is unreachable (E2's behaviour, not its code)",
+  "strict": "none"
+ },
+ "B_UOI_011": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_012": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_018": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_019": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_021": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_022": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_024": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_025": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_027": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_028": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_031": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_032": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_039": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_040": {
+  "debatable": true,
+  "lenient": "returns_wrong_pointer",
+  "reason": "records mid - 1 as the answer (returns n when absent above)",
+  "strict": "none"
+ },
+ "B_UOI_042": {
+  "debatable": true,
+  "lenient": "closed_loop_hi_mid",
+  "reason": "hi = (mid + 1) - 1 is hi = mid in a closed loop",
+  "strict": "none"
+ },
+ "B_UOI_043": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_049": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_050": {
+  "debatable": true,
+  "lenient": "no_progress_update",
+  "reason": "lo = (mid - 1) + 1 (closed loop)",
+  "strict": "none"
+ },
+ "B_UOI_056": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "B_UOI_057": {
+  "debatable": false,
+  "lenient": "returns_wrong_pointer",
+  "reason": "returns ans - 1",
+  "strict": "returns_wrong_pointer"
+ },
+ "C_AOR_015": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_AOR_018": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_AOR_033": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_DEL_038": {
+  "debatable": false,
+  "lenient": "no_progress_update",
+  "reason": "recurse with lo = mid",
+  "strict": "no_progress_update"
+ },
+ "C_ICR_021": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ICR_022": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ICR_034": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ICR_035": {
+  "debatable": false,
+  "lenient": "no_progress_update",
+  "reason": "mid + 0 is mid",
+  "strict": "no_progress_update"
+ },
+ "C_ICR_043": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ICR_044": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_NEG_010": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_NEG_030": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ROR_003": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ROR_004": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ROR_005": {
+  "debatable": false,
+  "lenient": "closed_loop_hi_mid",
+  "reason": "base case lo > hi with hi = mid",
+  "strict": "closed_loop_hi_mid"
+ },
+ "C_ROR_006": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ROR_007": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ROR_025": {
+  "debatable": false,
+  "lenient": "upper_bound_confusion",
+  "reason": "a[mid] <= target sends equal elements right",
+  "strict": "upper_bound_confusion"
+ },
+ "C_ROR_026": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ROR_027": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ROR_028": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_ROR_029": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_001": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_002": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_008": {
+  "debatable": false,
+  "lenient": "closed_loop_hi_mid",
+  "reason": "lo >= hi + 1 is lo > hi, with hi = mid",
+  "strict": "closed_loop_hi_mid"
+ },
+ "C_UOI_009": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_011": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_012": {
+  "debatable": false,
+  "lenient": "returns_wrong_pointer",
+  "reason": "base case returns lo - 1",
+  "strict": "returns_wrong_pointer"
+ },
+ "C_UOI_013": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_014": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_016": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_017": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_019": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_020": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_023": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_024": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_031": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_032": {
+  "debatable": false,
+  "lenient": "no_progress_update",
+  "reason": "(mid - 1) + 1 is mid",
+  "strict": "no_progress_update"
+ },
+ "C_UOI_036": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_037": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_039": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_040": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_041": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_042": {
+  "debatable": false,
+  "lenient": "hi_skips_candidate",
+  "reason": "recurse with hi = mid - 1 in a half-open range",
+  "strict": "hi_skips_candidate"
+ },
+ "C_UOI_045": {
+  "debatable": false,
+  "lenient": "none",
+  "reason": "",
+  "strict": "none"
+ },
+ "C_UOI_046": {
+  "debatable": false,
+  "lenient": "hi_init_last_index",
+  "reason": "initial call with hi = n - 1",
+  "strict": "hi_init_last_index"
+ }
+}
