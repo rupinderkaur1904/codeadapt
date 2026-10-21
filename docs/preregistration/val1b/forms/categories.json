@@ -1,0 +1,88 @@
+{
+ "skills": {
+  "S1": "search_space_boundaries",
+  "S2": "loop_termination",
+  "S3": "equality_handling",
+  "S4": "problem_specification"
+ },
+ "lower-bound": {
+  "problem_toml_sha256": "8a3ed00c01d581eb970b6c9dc006de8617f650d67c29f06991493b49839150f0",
+  "categories": {
+   "C1": "upper_bound_confusion",
+   "C2": "returns_wrong_pointer",
+   "C3": "hi_init_last_index",
+   "C4": "no_progress_update",
+   "C5": "closed_loop_hi_mid",
+   "C6": "stops_at_first_match",
+   "C7": "hi_skips_candidate",
+   "C8": "exact_match_sentinel"
+  },
+  "category_skills": {
+   "C1": "S3",
+   "C2": "S4",
+   "C3": "S1",
+   "C4": "S2",
+   "C5": "S2",
+   "C6": "S3",
+   "C7": "S1",
+   "C8": "S4"
+  }
+ },
+ "count-occurrences": {
+  "problem_toml_sha256": "7c597562ece0abf73b9f18aec8f84381a1dd73bf319aaa29a8a9218431de6d9a",
+  "categories": {
+   "C1": "hi_init_last_index",
+   "C2": "inclusive_count",
+   "C3": "no_progress_update",
+   "C4": "upper_uses_strict"
+  },
+  "category_skills": {
+   "C1": "S1",
+   "C2": "S4",
+   "C3": "S2",
+   "C4": "S3"
+  }
+ },
+ "last-less-than": {
+  "problem_toml_sha256": "7b0435eee3ca1417db1102493958c8a7e9222cbc2553ac96c3a8f93a764c3356",
+  "categories": {
+   "C1": "clamps_to_zero",
+   "C2": "returns_insertion_point",
+   "C3": "hi_init_last_index",
+   "C4": "no_progress_update",
+   "C5": "uses_le"
+  },
+  "category_skills": {
+   "C1": "S4",
+   "C2": "S4",
+   "C3": "S1",
+   "C4": "S2",
+   "C5": "S3"
+  }
+ },
+ "first-true": {
+  "problem_toml_sha256": "618b0c3507e154eb3c85823ec214890efbbd5da7f9be21dd7107b5005bf86d82",
+  "categories": {
+   "C1": "stops_one_early",
+   "C2": "returns_last_false",
+   "C3": "hi_init_last_index",
+   "C4": "no_progress_update",
+   "C5": "closed_loop_hi_mid",
+   "C6": "none_sentinel",
+   "C7": "lo_init_one",
+   "C8": "returns_any_true",
+   "C9": "hi_skips_candidate"
+  },
+  "category_skills": {
+   "C1": "S2",
+   "C2": "S4",
+   "C3": "S1",
+   "C4": "S2",
+   "C5": "S2",
+   "C6": "S4",
+   "C7": "S1",
+   "C8": "S4",
+   "C9": "S1"
+  }
+ }
+}
