@@ -54,3 +54,46 @@ Cases whose outcome or consequences changed: 30 of 150.
 | B_UOI_042 | none | named (closed_loop_hi_mid) | non_termination_observed | 1 obs, incorrect loop_termination → 0 obs | hypothesis_supported new_problem count-occurrences (loop_termination) → abstained retry lower-bound (no skill) | yes → no |
 | B_UOI_050 | none | named (no_progress_update) | non_termination_observed | 1 obs, incorrect loop_termination → 0 obs | hypothesis_supported new_problem count-occurrences (loop_termination) → abstained retry lower-bound (no skill) | yes → no |
 
+## Held-out
+
+| Metric | v1.1 | v1.2 |
+| --- | --- | --- |
+| Buggy cases | 26 | 26 |
+| Named diagnoses (coverage) | 19/26 (73%, CI 54-86%) | 15/26 (58%, CI 39-74%) |
+| Wrong name | 0/19 (0%, CI 0-17%) | 0/15 (0%, CI 0-20%) |
+| Unqualified named | 16 | 12 |
+| non_termination_observed | 0 | 4 |
+| Abstentions by outcome | unmodelled_behaviour: 7 | non_termination_observed: 4, unmodelled_behaviour: 7 |
+| `incorrect` skill observations | equality_handling: 4, loop_termination: 4, problem_specification: 5, search_space_boundaries: 3 | equality_handling: 4, problem_specification: 5, search_space_boundaries: 3 |
+| Hints shown on buggy cases | 19 | 15 |
+| Recommendations targeting a diagnosed skill | 19 | 15 |
+| Correct code with no failure observed | 6/6 (100%, CI 61-100%) | 6/6 (100%, CI 61-100%) |
+
+Cases whose outcome or consequences changed: 4 of 32.
+
+| Case | Truth | v1.1 outcome (model) | v1.2 outcome (model) | v1.1 → v1.2 skill obs | v1.1 → v1.2 recommendation | hint |
+| --- | --- | --- | --- | --- | --- | --- |
+| count-occurrences/two_searches_stalled_left.cpp | no_progress_update | named (no_progress_update) | non_termination_observed | 1 obs, incorrect loop_termination → 0 obs | hypothesis_supported new_problem lower-bound (loop_termination) → abstained retry count-occurrences (no skill) | yes → no |
+| last-less-than/while_true_stalls.cpp | no_progress_update | named (no_progress_update) | non_termination_observed | 1 obs, incorrect loop_termination → 0 obs | hypothesis_supported new_problem lower-bound (loop_termination) → abstained retry last-less-than (no skill) | yes → no |
+| lower-bound/negated_closed_loop.cpp | closed_loop_hi_mid | named (closed_loop_hi_mid) | non_termination_observed | 1 obs, incorrect loop_termination → 0 obs | hypothesis_supported new_problem count-occurrences (loop_termination) → abstained retry lower-bound (no skill) | yes → no |
+| lower-bound/size_t_stuck_left.cpp | no_progress_update | named (no_progress_update) | non_termination_observed | 1 obs, incorrect loop_termination → 0 obs | hypothesis_supported new_problem count-occurrences (loop_termination) → abstained retry lower-bound (no skill) | yes → no |
+
+## Calibration
+
+| Metric | v1.1 | v1.2 |
+| --- | --- | --- |
+| Buggy cases | 5 | 5 |
+| Named diagnoses (coverage) | 2/5 (40%, CI 12-77%) | 2/5 (40%, CI 12-77%) |
+| Wrong name | 1/2 (50%, CI 9-91%) | 1/2 (50%, CI 9-91%) |
+| Unqualified named | 1 | 1 |
+| non_termination_observed | 0 | 0 |
+| Abstentions by outcome | unmodelled_behaviour: 3 | unmodelled_behaviour: 3 |
+| `incorrect` skill observations | equality_handling: 1 | equality_handling: 1 |
+| Hints shown on buggy cases | 2 | 2 |
+| Recommendations targeting a diagnosed skill | 2 | 2 |
+| Correct code with no failure observed | 0/0 | 0/0 |
+
+Cases whose outcome or consequences changed: 0 of 5.
+
+No case changed.
+
