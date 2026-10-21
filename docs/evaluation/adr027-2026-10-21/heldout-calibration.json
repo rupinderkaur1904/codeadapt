@@ -1,0 +1,7383 @@
+[
+ {
+  "set": "heldout",
+  "case": "count-occurrences/bounded_by_last_index.cpp",
+  "truth": "hi_init_last_index",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_init_last_index",
+   "evidence_strength": "single_behaviour",
+   "known_limitation": true,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_init_last_index",
+   "evidence_strength": "single_behaviour",
+   "known_limitation": true,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_run": [
+     "output:3",
+     null
+    ],
+    "sample_absent": [
+     "output:0",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:0",
+     null
+    ],
+    "unique_middle": [
+     "output:1",
+     null
+    ],
+    "run_at_start": [
+     "output:3",
+     null
+    ],
+    "run_at_end": [
+     "output:2",
+     null
+    ],
+    "all_equal": [
+     "output:6",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_other": [
+     "output:0",
+     null
+    ],
+    "two_equal": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:0",
+     null
+    ],
+    "large_unique": [
+     "output:1",
+     null
+    ],
+    "large_all_equal": [
+     "output:199999",
+     null
+    ]
+   },
+   {
+    "sample_run": [
+     "output:3",
+     null
+    ],
+    "sample_absent": [
+     "output:0",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:0",
+     null
+    ],
+    "unique_middle": [
+     "output:1",
+     null
+    ],
+    "run_at_start": [
+     "output:3",
+     null
+    ],
+    "run_at_end": [
+     "output:2",
+     null
+    ],
+    "all_equal": [
+     "output:6",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_other": [
+     "output:0",
+     null
+    ],
+    "two_equal": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:0",
+     null
+    ],
+    "large_unique": [
+     "output:1",
+     null
+    ],
+    "large_all_equal": [
+     "output:199999",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "count-occurrences/closed_interval_correct.cpp",
+  "truth": "correct",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "last-less-than",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "last-less-than",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_run": [
+     "output:3",
+     null
+    ],
+    "sample_absent": [
+     "output:0",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:0",
+     null
+    ],
+    "unique_middle": [
+     "output:1",
+     null
+    ],
+    "run_at_start": [
+     "output:3",
+     null
+    ],
+    "run_at_end": [
+     "output:3",
+     null
+    ],
+    "all_equal": [
+     "output:7",
+     null
+    ],
+    "single_equal": [
+     "output:1",
+     null
+    ],
+    "single_other": [
+     "output:0",
+     null
+    ],
+    "two_equal": [
+     "output:2",
+     null
+    ],
+    "large_absent": [
+     "output:0",
+     null
+    ],
+    "large_unique": [
+     "output:1",
+     null
+    ],
+    "large_all_equal": [
+     "output:200000",
+     null
+    ]
+   },
+   {
+    "sample_run": [
+     "output:3",
+     null
+    ],
+    "sample_absent": [
+     "output:0",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:0",
+     null
+    ],
+    "unique_middle": [
+     "output:1",
+     null
+    ],
+    "run_at_start": [
+     "output:3",
+     null
+    ],
+    "run_at_end": [
+     "output:3",
+     null
+    ],
+    "all_equal": [
+     "output:7",
+     null
+    ],
+    "single_equal": [
+     "output:1",
+     null
+    ],
+    "single_other": [
+     "output:0",
+     null
+    ],
+    "two_equal": [
+     "output:2",
+     null
+    ],
+    "large_absent": [
+     "output:0",
+     null
+    ],
+    "large_unique": [
+     "output:1",
+     null
+    ],
+    "large_all_equal": [
+     "output:200000",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "count-occurrences/inclusive_end_formula.cpp",
+  "truth": "inclusive_count",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "inclusive_count",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "last-less-than",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "inclusive_count",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "last-less-than",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_run": [
+     "output:4",
+     null
+    ],
+    "sample_absent": [
+     "output:1",
+     null
+    ],
+    "empty": [
+     "output:1",
+     null
+    ],
+    "below_all": [
+     "output:1",
+     null
+    ],
+    "above_all": [
+     "output:1",
+     null
+    ],
+    "unique_middle": [
+     "output:2",
+     null
+    ],
+    "run_at_start": [
+     "output:4",
+     null
+    ],
+    "run_at_end": [
+     "output:4",
+     null
+    ],
+    "all_equal": [
+     "output:8",
+     null
+    ],
+    "single_equal": [
+     "output:2",
+     null
+    ],
+    "single_other": [
+     "output:1",
+     null
+    ],
+    "two_equal": [
+     "output:3",
+     null
+    ],
+    "large_absent": [
+     "output:1",
+     null
+    ],
+    "large_unique": [
+     "output:2",
+     null
+    ],
+    "large_all_equal": [
+     "output:200001",
+     null
+    ]
+   },
+   {
+    "sample_run": [
+     "output:4",
+     null
+    ],
+    "sample_absent": [
+     "output:1",
+     null
+    ],
+    "empty": [
+     "output:1",
+     null
+    ],
+    "below_all": [
+     "output:1",
+     null
+    ],
+    "above_all": [
+     "output:1",
+     null
+    ],
+    "unique_middle": [
+     "output:2",
+     null
+    ],
+    "run_at_start": [
+     "output:4",
+     null
+    ],
+    "run_at_end": [
+     "output:4",
+     null
+    ],
+    "all_equal": [
+     "output:8",
+     null
+    ],
+    "single_equal": [
+     "output:2",
+     null
+    ],
+    "single_other": [
+     "output:1",
+     null
+    ],
+    "two_equal": [
+     "output:3",
+     null
+    ],
+    "large_absent": [
+     "output:1",
+     null
+    ],
+    "large_unique": [
+     "output:2",
+     null
+    ],
+    "large_all_equal": [
+     "output:200001",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "count-occurrences/presence_only.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "count-occurrences",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "count-occurrences",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_run": [
+     "output:1",
+     null
+    ],
+    "sample_absent": [
+     "output:0",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:0",
+     null
+    ],
+    "unique_middle": [
+     "output:1",
+     null
+    ],
+    "run_at_start": [
+     "output:1",
+     null
+    ],
+    "run_at_end": [
+     "output:1",
+     null
+    ],
+    "all_equal": [
+     "output:1",
+     null
+    ],
+    "single_equal": [
+     "output:1",
+     null
+    ],
+    "single_other": [
+     "output:0",
+     null
+    ],
+    "two_equal": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:0",
+     null
+    ],
+    "large_unique": [
+     "output:1",
+     null
+    ],
+    "large_all_equal": [
+     "output:1",
+     null
+    ]
+   },
+   {
+    "sample_run": [
+     "output:1",
+     null
+    ],
+    "sample_absent": [
+     "output:0",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:0",
+     null
+    ],
+    "unique_middle": [
+     "output:1",
+     null
+    ],
+    "run_at_start": [
+     "output:1",
+     null
+    ],
+    "run_at_end": [
+     "output:1",
+     null
+    ],
+    "all_equal": [
+     "output:1",
+     null
+    ],
+    "single_equal": [
+     "output:1",
+     null
+    ],
+    "single_other": [
+     "output:0",
+     null
+    ],
+    "two_equal": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:0",
+     null
+    ],
+    "large_unique": [
+     "output:1",
+     null
+    ],
+    "large_all_equal": [
+     "output:1",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "count-occurrences/same_comparison_twice.cpp",
+  "truth": "upper_uses_strict",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "upper_uses_strict",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "upper_uses_strict",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_run": [
+     "output:0",
+     null
+    ],
+    "sample_absent": [
+     "output:0",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:0",
+     null
+    ],
+    "unique_middle": [
+     "output:0",
+     null
+    ],
+    "run_at_start": [
+     "output:0",
+     null
+    ],
+    "run_at_end": [
+     "output:0",
+     null
+    ],
+    "all_equal": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_other": [
+     "output:0",
+     null
+    ],
+    "two_equal": [
+     "output:0",
+     null
+    ],
+    "large_absent": [
+     "output:0",
+     null
+    ],
+    "large_unique": [
+     "output:0",
+     null
+    ],
+    "large_all_equal": [
+     "output:0",
+     null
+    ]
+   },
+   {
+    "sample_run": [
+     "output:0",
+     null
+    ],
+    "sample_absent": [
+     "output:0",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:0",
+     null
+    ],
+    "unique_middle": [
+     "output:0",
+     null
+    ],
+    "run_at_start": [
+     "output:0",
+     null
+    ],
+    "run_at_end": [
+     "output:0",
+     null
+    ],
+    "all_equal": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_other": [
+     "output:0",
+     null
+    ],
+    "two_equal": [
+     "output:0",
+     null
+    ],
+    "large_absent": [
+     "output:0",
+     null
+    ],
+    "large_unique": [
+     "output:0",
+     null
+    ],
+    "large_all_equal": [
+     "output:0",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "count-occurrences/two_searches_stalled_left.cpp",
+  "truth": "no_progress_update",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "no_progress_update",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "loop_termination"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "non_termination_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [
+    "sample_run",
+    "sample_absent",
+    "above_all",
+    "unique_middle",
+    "run_at_start",
+    "run_at_end",
+    "all_equal",
+    "single_equal",
+    "single_other",
+    "two_equal",
+    "large_absent",
+    "large_unique",
+    "large_all_equal"
+   ],
+   "consistent_models": [
+    "no_progress_update"
+   ],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "count-occurrences",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_run": [
+     "time_limit",
+     null
+    ],
+    "sample_absent": [
+     "time_limit",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "time_limit",
+     null
+    ],
+    "unique_middle": [
+     "time_limit",
+     null
+    ],
+    "run_at_start": [
+     "time_limit",
+     null
+    ],
+    "run_at_end": [
+     "time_limit",
+     null
+    ],
+    "all_equal": [
+     "time_limit",
+     null
+    ],
+    "single_equal": [
+     "time_limit",
+     null
+    ],
+    "single_other": [
+     "time_limit",
+     null
+    ],
+    "two_equal": [
+     "time_limit",
+     null
+    ],
+    "large_absent": [
+     "time_limit",
+     null
+    ],
+    "large_unique": [
+     "time_limit",
+     null
+    ],
+    "large_all_equal": [
+     "time_limit",
+     null
+    ]
+   },
+   {
+    "sample_run": [
+     "time_limit",
+     null
+    ],
+    "sample_absent": [
+     "time_limit",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "time_limit",
+     null
+    ],
+    "unique_middle": [
+     "time_limit",
+     null
+    ],
+    "run_at_start": [
+     "time_limit",
+     null
+    ],
+    "run_at_end": [
+     "time_limit",
+     null
+    ],
+    "all_equal": [
+     "time_limit",
+     null
+    ],
+    "single_equal": [
+     "time_limit",
+     null
+    ],
+    "single_other": [
+     "time_limit",
+     null
+    ],
+    "two_equal": [
+     "time_limit",
+     null
+    ],
+    "large_absent": [
+     "time_limit",
+     null
+    ],
+    "large_unique": [
+     "time_limit",
+     null
+    ],
+    "large_all_equal": [
+     "time_limit",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "first-true/classic_found_return.cpp",
+  "truth": "returns_any_true",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "first-true",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "first-true",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "all_true": [
+     "output:1",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:2",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:4",
+     null
+    ],
+    "large_interior": [
+     "output:149999",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:99999",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   },
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "all_true": [
+     "output:1",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:2",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:4",
+     null
+    ],
+    "large_interior": [
+     "output:149999",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:99999",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "first-true/closed_interval_answer_var.cpp",
+  "truth": "correct",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:1",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   },
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:1",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "first-true/empty_minus_one.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:correct",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "first-true",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:correct",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "first-true",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:1",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   },
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:1",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "first-true/power_of_two_steps.cpp",
+  "truth": "correct",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:1",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   },
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:1",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "first-true/recursive_from_one.cpp",
+  "truth": "lo_init_one",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "lo_init_one",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:correct",
+    "search_space_boundaries:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "lo_init_one",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:correct",
+    "search_space_boundaries:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:1",
+     null
+    ],
+    "all_true": [
+     "output:1",
+     null
+    ],
+    "single_true": [
+     "output:1",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:1",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:1",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:1",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   },
+   {
+    "sample_interior": [
+     "output:2",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:1",
+     null
+    ],
+    "all_true": [
+     "output:1",
+     null
+    ],
+    "single_true": [
+     "output:1",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:1",
+     null
+    ],
+    "two_true": [
+     "output:1",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:1",
+     null
+    ],
+    "second_index": [
+     "output:1",
+     null
+    ],
+    "last_index": [
+     "output:4",
+     null
+    ],
+    "interior_odd": [
+     "output:3",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:1",
+     null
+    ],
+    "large_last": [
+     "output:199999",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "first-true/right_drops_mid.cpp",
+  "truth": "hi_skips_candidate",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_skips_candidate",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "search_space_boundaries:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_skips_candidate",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "search_space_boundaries:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_interior": [
+     "output:1",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:0",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:0",
+     null
+    ],
+    "second_index": [
+     "output:0",
+     null
+    ],
+    "last_index": [
+     "output:3",
+     null
+    ],
+    "interior_odd": [
+     "output:2",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199998",
+     null
+    ]
+   },
+   {
+    "sample_interior": [
+     "output:1",
+     null
+    ],
+    "sample_none": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:1",
+     null
+    ],
+    "two_false_true": [
+     "output:0",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:2",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:0",
+     null
+    ],
+    "second_index": [
+     "output:0",
+     null
+    ],
+    "last_index": [
+     "output:3",
+     null
+    ],
+    "interior_odd": [
+     "output:2",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:200000",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199998",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "first-true/skips_and_sentinel.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "first-true",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "first-true",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_interior": [
+     "output:1",
+     null
+    ],
+    "sample_none": [
+     "output:-1",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:-1",
+     null
+    ],
+    "two_false_true": [
+     "output:0",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:-1",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:0",
+     null
+    ],
+    "second_index": [
+     "output:0",
+     null
+    ],
+    "last_index": [
+     "output:3",
+     null
+    ],
+    "interior_odd": [
+     "output:2",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:-1",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199998",
+     null
+    ]
+   },
+   {
+    "sample_interior": [
+     "output:1",
+     null
+    ],
+    "sample_none": [
+     "output:-1",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "all_true": [
+     "output:0",
+     null
+    ],
+    "single_true": [
+     "output:0",
+     null
+    ],
+    "single_false": [
+     "output:-1",
+     null
+    ],
+    "two_false_true": [
+     "output:0",
+     null
+    ],
+    "two_true": [
+     "output:0",
+     null
+    ],
+    "two_false": [
+     "output:-1",
+     null
+    ],
+    "three_last": [
+     "output:2",
+     null
+    ],
+    "three_middle": [
+     "output:0",
+     null
+    ],
+    "second_index": [
+     "output:0",
+     null
+    ],
+    "last_index": [
+     "output:3",
+     null
+    ],
+    "interior_odd": [
+     "output:2",
+     null
+    ],
+    "ten_answer_three": [
+     "output:3",
+     null
+    ],
+    "large_interior": [
+     "output:123457",
+     null
+    ],
+    "large_none": [
+     "output:-1",
+     null
+    ],
+    "large_all_true": [
+     "output:0",
+     null
+    ],
+    "large_last": [
+     "output:199998",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "last-less-than/closed_from_last_index.cpp",
+  "truth": "hi_init_last_index",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_init_last_index",
+   "evidence_strength": "single_behaviour",
+   "known_limitation": true,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_init_last_index",
+   "evidence_strength": "single_behaviour",
+   "known_limitation": true,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:0",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:1",
+     null
+    ],
+    "equal_last": [
+     "output:1",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:-1",
+     null
+    ],
+    "single_below": [
+     "output:-1",
+     null
+    ],
+    "single_equal": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199998",
+     null
+    ],
+    "large_duplicates": [
+     "output:-1",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:0",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:1",
+     null
+    ],
+    "equal_last": [
+     "output:1",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:-1",
+     null
+    ],
+    "single_below": [
+     "output:-1",
+     null
+    ],
+    "single_equal": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199998",
+     null
+    ],
+    "large_duplicates": [
+     "output:-1",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "last-less-than/closed_interval_correct.cpp",
+  "truth": "correct",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:0",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_last": [
+     "output:1",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:-1",
+     null
+    ],
+    "single_below": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:-1",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:0",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_last": [
+     "output:1",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:-1",
+     null
+    ],
+    "single_below": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:-1",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "last-less-than/closed_interval_le.cpp",
+  "truth": "uses_le",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "uses_le",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "uses_le",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:4",
+     null
+    ],
+    "duplicates_all": [
+     "output:6",
+     null
+    ],
+    "single_below": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:199999",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:4",
+     null
+    ],
+    "duplicates_all": [
+     "output:6",
+     null
+    ],
+    "single_below": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:199999",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "last-less-than/le_and_clamped.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "last-less-than",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "last-less-than",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:4",
+     null
+    ],
+    "duplicates_all": [
+     "output:6",
+     null
+    ],
+    "single_below": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:199999",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:4",
+     null
+    ],
+    "duplicates_all": [
+     "output:6",
+     null
+    ],
+    "single_below": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:199999",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "last-less-than/never_negative.cpp",
+  "truth": "clamps_to_zero",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "clamps_to_zero",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "clamps_to_zero",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:0",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_last": [
+     "output:1",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_below": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:0",
+     null
+    ],
+    "sample_between": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_last": [
+     "output:1",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_below": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_between": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "last-less-than/returns_count_below.cpp",
+  "truth": "returns_insertion_point",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "returns_insertion_point",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "returns_insertion_point",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:1",
+     null
+    ],
+    "sample_between": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_below": [
+     "output:1",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_between": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:1",
+     null
+    ],
+    "sample_between": [
+     "output:3",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_below": [
+     "output:1",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_between": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "last-less-than/while_true_stalls.cpp",
+  "truth": "no_progress_update",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "no_progress_update",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "lower-bound",
+    "target_skills": [
+     "loop_termination"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "non_termination_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [
+    "sample_present",
+    "sample_between",
+    "above_all",
+    "equal_last",
+    "duplicates_middle",
+    "single_below",
+    "two_between",
+    "large_between",
+    "large_above_all"
+   ],
+   "consistent_models": [
+    "no_progress_update"
+   ],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "last-less-than",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "time_limit",
+     null
+    ],
+    "sample_between": [
+     "time_limit",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "time_limit",
+     null
+    ],
+    "equal_last": [
+     "time_limit",
+     null
+    ],
+    "duplicates_middle": [
+     "time_limit",
+     null
+    ],
+    "duplicates_all": [
+     "output:-1",
+     null
+    ],
+    "single_below": [
+     "time_limit",
+     null
+    ],
+    "single_equal": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "time_limit",
+     null
+    ],
+    "large_between": [
+     "time_limit",
+     null
+    ],
+    "large_above_all": [
+     "time_limit",
+     null
+    ],
+    "large_duplicates": [
+     "output:-1",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "time_limit",
+     null
+    ],
+    "sample_between": [
+     "time_limit",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "time_limit",
+     null
+    ],
+    "equal_last": [
+     "time_limit",
+     null
+    ],
+    "duplicates_middle": [
+     "time_limit",
+     null
+    ],
+    "duplicates_all": [
+     "output:-1",
+     null
+    ],
+    "single_below": [
+     "time_limit",
+     null
+    ],
+    "single_equal": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "time_limit",
+     null
+    ],
+    "large_between": [
+     "time_limit",
+     null
+    ],
+    "large_above_all": [
+     "time_limit",
+     null
+    ],
+    "large_duplicates": [
+     "output:-1",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/answer_var_returns_right.cpp",
+  "truth": "returns_wrong_pointer",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "returns_wrong_pointer",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "last-less-than",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "returns_wrong_pointer",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "last-less-than",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:1",
+     null
+    ],
+    "sample_absent": [
+     "output:1",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:-1",
+     null
+    ],
+    "equal_last": [
+     "output:1",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:-1",
+     null
+    ],
+    "single_equal": [
+     "output:-1",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_absent": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:-1",
+     null
+    ],
+    "pair_equal_target": [
+     "output:-1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:2",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:1",
+     null
+    ],
+    "sample_absent": [
+     "output:1",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:-1",
+     null
+    ],
+    "equal_last": [
+     "output:1",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:-1",
+     null
+    ],
+    "single_equal": [
+     "output:-1",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_absent": [
+     "output:49999",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:-1",
+     null
+    ],
+    "pair_equal_target": [
+     "output:-1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:2",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/classic_exact_search.cpp",
+  "truth": "exact_match_sentinel",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "exact_match_sentinel",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "last-less-than",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "exact_match_sentinel",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "last-less-than",
+    "target_skills": [
+     "problem_specification"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:-1",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:2",
+     null
+    ],
+    "duplicates_all": [
+     "output:3",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "output:-1",
+     null
+    ],
+    "large_absent": [
+     "output:-1",
+     null
+    ],
+    "large_above_all": [
+     "output:-1",
+     null
+    ],
+    "large_duplicates": [
+     "output:99999",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:-1",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:-1",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:2",
+     null
+    ],
+    "duplicates_all": [
+     "output:3",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "output:-1",
+     null
+    ],
+    "large_absent": [
+     "output:-1",
+     null
+    ],
+    "large_above_all": [
+     "output:-1",
+     null
+    ],
+    "large_duplicates": [
+     "output:99999",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:-1",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/closed_interval_correct.cpp",
+  "truth": "correct",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/correct_iterative.cpp",
+  "truth": "correct",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "no_failure_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "no_failure_observed",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling",
+     "loop_termination",
+     "problem_specification",
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "all_tests_passed",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/double_bug.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:3",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:1",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:5",
+     null
+    ],
+    "duplicates_all": [
+     "output:6",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:199999",
+     null
+    ],
+    "pair_equal_target": [
+     "output:1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:3",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:1",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:5",
+     null
+    ],
+    "duplicates_all": [
+     "output:6",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:199999",
+     null
+    ],
+    "pair_equal_target": [
+     "output:1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/empty_returns_minus_one.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct",
+    "loop_termination:correct",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/negated_closed_loop.cpp",
+  "truth": "closed_loop_hi_mid",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "closed_loop_hi_mid",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "loop_termination"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "non_termination_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [
+    "sample_present",
+    "sample_absent",
+    "below_all",
+    "equal_first",
+    "equal_last",
+    "duplicates_middle",
+    "duplicates_all",
+    "single_equal",
+    "two_between",
+    "large_absent",
+    "large_duplicates",
+    "pair_equal_target",
+    "absent_after_duplicates"
+   ],
+   "consistent_models": [
+    "closed_loop_hi_mid"
+   ],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "time_limit",
+     null
+    ],
+    "sample_absent": [
+     "time_limit",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "time_limit",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "time_limit",
+     null
+    ],
+    "equal_last": [
+     "time_limit",
+     null
+    ],
+    "duplicates_middle": [
+     "time_limit",
+     null
+    ],
+    "duplicates_all": [
+     "time_limit",
+     null
+    ],
+    "single_equal": [
+     "time_limit",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "time_limit",
+     null
+    ],
+    "large_absent": [
+     "time_limit",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "time_limit",
+     null
+    ],
+    "pair_equal_target": [
+     "time_limit",
+     null
+    ],
+    "absent_after_duplicates": [
+     "time_limit",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "time_limit",
+     null
+    ],
+    "sample_absent": [
+     "time_limit",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "time_limit",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "time_limit",
+     null
+    ],
+    "equal_last": [
+     "time_limit",
+     null
+    ],
+    "duplicates_middle": [
+     "time_limit",
+     null
+    ],
+    "duplicates_all": [
+     "time_limit",
+     null
+    ],
+    "single_equal": [
+     "time_limit",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "time_limit",
+     null
+    ],
+    "large_absent": [
+     "time_limit",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "time_limit",
+     null
+    ],
+    "pair_equal_target": [
+     "time_limit",
+     null
+    ],
+    "absent_after_duplicates": [
+     "time_limit",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/recursive_early_equal.cpp",
+  "truth": "stops_at_first_match",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "stops_at_first_match",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "stops_at_first_match",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:3",
+     null
+    ],
+    "duplicates_all": [
+     "output:3",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:100000",
+     null
+    ],
+    "pair_equal_target": [
+     "output:1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:3",
+     null
+    ],
+    "duplicates_all": [
+     "output:3",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:100000",
+     null
+    ],
+    "pair_equal_target": [
+     "output:1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/recursive_last_index.cpp",
+  "truth": "hi_init_last_index",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_init_last_index",
+   "evidence_strength": "single_behaviour",
+   "known_limitation": true,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_init_last_index",
+   "evidence_strength": "single_behaviour",
+   "known_limitation": true,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/reversed_test_drops_mid.cpp",
+  "truth": "hi_skips_candidate",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_skips_candidate",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "search_space_boundaries:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_skips_candidate",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "search_space_boundaries:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:1",
+     null
+    ],
+    "sample_absent": [
+     "output:1",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:2",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:1",
+     null
+    ],
+    "sample_absent": [
+     "output:1",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:0",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:0",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:2",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/size_t_stuck_left.cpp",
+  "truth": "no_progress_update",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "no_progress_update",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "loop_termination:incorrect"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "loop_termination"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "non_termination_observed",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [
+    "sample_present",
+    "sample_absent",
+    "above_all",
+    "equal_last",
+    "duplicates_middle",
+    "single_above",
+    "two_between",
+    "large_absent",
+    "large_above_all",
+    "absent_after_duplicates"
+   ],
+   "consistent_models": [
+    "no_progress_update"
+   ],
+   "skill_observations": [],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "time_limit",
+     null
+    ],
+    "sample_absent": [
+     "time_limit",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "time_limit",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "time_limit",
+     null
+    ],
+    "duplicates_middle": [
+     "time_limit",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "time_limit",
+     null
+    ],
+    "two_between": [
+     "time_limit",
+     null
+    ],
+    "large_absent": [
+     "time_limit",
+     null
+    ],
+    "large_above_all": [
+     "time_limit",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "time_limit",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "time_limit",
+     null
+    ],
+    "sample_absent": [
+     "time_limit",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "time_limit",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "time_limit",
+     null
+    ],
+    "duplicates_middle": [
+     "time_limit",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "time_limit",
+     null
+    ],
+    "two_between": [
+     "time_limit",
+     null
+    ],
+    "large_absent": [
+     "time_limit",
+     null
+    ],
+    "large_above_all": [
+     "time_limit",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "time_limit",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "heldout",
+  "case": "lower-bound/upper_bound_closed.cpp",
+  "truth": "upper_bound_confusion",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "upper_bound_confusion",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "upper_bound_confusion",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect",
+    "problem_specification:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:3",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:1",
+     null
+    ],
+    "equal_last": [
+     "output:3",
+     null
+    ],
+    "duplicates_middle": [
+     "output:5",
+     null
+    ],
+    "duplicates_all": [
+     "output:7",
+     null
+    ],
+    "single_equal": [
+     "output:1",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:200000",
+     null
+    ],
+    "pair_equal_target": [
+     "output:2",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:3",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:1",
+     null
+    ],
+    "equal_last": [
+     "output:3",
+     null
+    ],
+    "duplicates_middle": [
+     "output:5",
+     null
+    ],
+    "duplicates_all": [
+     "output:7",
+     null
+    ],
+    "single_equal": [
+     "output:1",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:200000",
+     null
+    ],
+    "pair_equal_target": [
+     "output:2",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "calibration",
+  "case": "lower-bound/clamp_to_last_index.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "calibration",
+  "case": "lower-bound/clamp_with_empty_guard.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_init_last_index",
+   "evidence_strength": "single_behaviour",
+   "known_limitation": true,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "hi_init_last_index",
+   "evidence_strength": "single_behaviour",
+   "known_limitation": true,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "search_space_boundaries"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:2",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:0",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:199999",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "calibration",
+  "case": "lower-bound/exact_search_walk_back.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:-1",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "output:-1",
+     null
+    ],
+    "large_absent": [
+     "output:-1",
+     null
+    ],
+    "large_above_all": [
+     "output:-1",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:-1",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:-1",
+     null
+    ],
+    "empty": [
+     "output:-1",
+     null
+    ],
+    "below_all": [
+     "output:-1",
+     null
+    ],
+    "above_all": [
+     "output:-1",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:1",
+     null
+    ],
+    "duplicates_all": [
+     "output:0",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:-1",
+     null
+    ],
+    "two_between": [
+     "output:-1",
+     null
+    ],
+    "large_absent": [
+     "output:-1",
+     null
+    ],
+    "large_above_all": [
+     "output:-1",
+     null
+    ],
+    "large_duplicates": [
+     "output:0",
+     null
+    ],
+    "pair_equal_target": [
+     "output:0",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:-1",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "calibration",
+  "case": "lower-bound/last_of_run.cpp",
+  "truth": "unmodelled",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "v1.2": {
+   "outcome": "unmodelled_behaviour",
+   "selected_model": null,
+   "evidence_strength": null,
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "abstained",
+    "action": "retry",
+    "problem": "lower-bound",
+    "target_skills": [],
+    "criterion": false,
+    "review_flag": true
+   },
+   "feedback": {
+    "kind": "failing_cases",
+    "hint_shown": false
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:4",
+     null
+    ],
+    "duplicates_all": [
+     "output:6",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:199999",
+     null
+    ],
+    "pair_equal_target": [
+     "output:1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:4",
+     null
+    ],
+    "duplicates_all": [
+     "output:6",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:199999",
+     null
+    ],
+    "pair_equal_target": [
+     "output:1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ },
+ {
+  "set": "calibration",
+  "case": "lower-bound/stop_on_match_upper_mid.cpp",
+  "truth": "stops_at_first_match",
+  "reproducible": true,
+  "v1.1": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "stops_at_first_match",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.3",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "v1.2": {
+   "outcome": "hypothesis_supported",
+   "selected_model": "stops_at_first_match",
+   "evidence_strength": "multiple",
+   "known_limitation": false,
+   "timed_out_tests": [],
+   "consistent_models": [],
+   "skill_observations": [
+    "equality_handling:incorrect",
+    "problem_specification:correct",
+    "search_space_boundaries:correct"
+   ],
+   "recommendation": {
+    "policy_version": "1.4",
+    "rule": "hypothesis_supported",
+    "action": "new_problem",
+    "problem": "count-occurrences",
+    "target_skills": [
+     "equality_handling"
+    ],
+    "criterion": true,
+    "review_flag": false
+   },
+   "feedback": {
+    "kind": "recognised_pattern",
+    "hint_shown": true
+   }
+  },
+  "observations": [
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:3",
+     null
+    ],
+    "duplicates_all": [
+     "output:3",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:100000",
+     null
+    ],
+    "pair_equal_target": [
+     "output:1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   },
+   {
+    "sample_present": [
+     "output:2",
+     null
+    ],
+    "sample_absent": [
+     "output:2",
+     null
+    ],
+    "empty": [
+     "output:0",
+     null
+    ],
+    "below_all": [
+     "output:0",
+     null
+    ],
+    "above_all": [
+     "output:3",
+     null
+    ],
+    "equal_first": [
+     "output:0",
+     null
+    ],
+    "equal_last": [
+     "output:2",
+     null
+    ],
+    "duplicates_middle": [
+     "output:3",
+     null
+    ],
+    "duplicates_all": [
+     "output:3",
+     null
+    ],
+    "single_equal": [
+     "output:0",
+     null
+    ],
+    "single_above": [
+     "output:1",
+     null
+    ],
+    "two_between": [
+     "output:1",
+     null
+    ],
+    "large_absent": [
+     "output:50000",
+     null
+    ],
+    "large_above_all": [
+     "output:200000",
+     null
+    ],
+    "large_duplicates": [
+     "output:100000",
+     null
+    ],
+    "pair_equal_target": [
+     "output:1",
+     null
+    ],
+    "absent_after_duplicates": [
+     "output:3",
+     null
+    ]
+   }
+  ]
+ }
+]
