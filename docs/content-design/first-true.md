@@ -255,12 +255,13 @@ written, they go in `eval/calibration/first-true/` and are reported separately.
 **Measured limitation: F9's midpoint dependence.** The held-out case
 `classic_found_return.cpp` is a closed-interval search that returns the first 1 it lands
 on. It abstained because "some 1" depends on the midpoint convention, and the model covers
-only the half-open one. Two options, neither applied:
-- C7: add a closed-interval variant of F9. This needs a fresh held-out case written before
-  evaluating it, because the existing one has been seen.
-- Accept it as a documented limitation.
+only the half-open one.
 
-Either way, abstaining here is safe: no wrong diagnosis is shown.
+**Owner decision (2026-10-21): accepted as a documented limitation.** C7, a
+closed-interval variant of F9, is not authorised. `returns_any_true` therefore covers one
+midpoint convention only. Variants with other midpoints abstain, which is safe: no wrong
+diagnosis is shown. Nothing in this record claims that other midpoint conventions are
+covered.
 
 **Known limitations, before measurement.**
 - F1 collides by design.
