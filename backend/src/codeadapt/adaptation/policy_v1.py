@@ -37,7 +37,10 @@ class PolicyV1:
     # with their own content version's skill map.
     # 1.3 (CE1 decision E2): only problems marked `recommendable` are candidates. The rules
     # are unchanged; a non-recommendable index problem can still be the retry fallback.
-    version: str = "1.3"
+    # 1.4 (ADR-027, option P1): `non_termination_observed` is a symptom; it gets a retry of
+    # the same problem with a review flag, no target skill and no criterion. Every outcome
+    # now has an explicit rule; none falls through to the no-failure branch.
+    version: str = "1.4"
     # A problem is "recently attempted" if it appears among the learner's last N attempts.
     recent_window: int = 3
 
@@ -101,6 +104,19 @@ class PolicyV1:
                 },
             )
 
+        if index.outcome is Outcome.NON_TERMINATION_OBSERVED:
+            return make(
+                Rule.ABSTAINED,
+                Action.RETRY,
+                spec.slug,
+                review_flag=True,
+                rationale={
+                    "note": "The program did not finish within the time limit on some tests. "
+                    "That is a symptom many errors share, so no skill is targeted and no "
+                    "improvement criterion is claimed (ADR-027). Flagged for researcher review."
+                },
+            )
+
         model_skill = {m.key: m.skill for m in spec.error_models}
         if index.outcome is Outcome.HYPOTHESIS_SUPPORTED:
             assert index.selected_model is not None  # noqa: S101 - invariant of the outcome
@@ -147,7 +163,11 @@ class PolicyV1:
                 rationale={"candidates": list(index.candidates), "ranking": ranking},
             )
 
-        # NO_FAILURE_OBSERVED: move to the least-evidenced problem not yet passed.
+        # NO_FAILURE_OBSERVED: move to the least-evidenced problem not yet passed. No other
+        # outcome may reach this branch: an outcome added without a rule is an error here,
+        # never a pass.
+        if index.outcome is not Outcome.NO_FAILURE_OBSERVED:
+            raise ValueError(f"policy {self.version} has no rule for outcome {index.outcome}")
         passed = {a.problem_slug for a in attempts if a.outcome is Outcome.NO_FAILURE_OBSERVED}
         remaining = [p for p in family if p.slug not in passed]
         if not remaining:

@@ -14,6 +14,7 @@ const OUTCOMES = [
   "ambiguous",
   "insufficient_evidence",
   "hypothesis_supported",
+  "non_termination_observed",
 ];
 const DATA_CLASSES = ["real", "synthetic", "dev"];
 

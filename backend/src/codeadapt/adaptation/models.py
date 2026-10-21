@@ -81,7 +81,7 @@ class Rule(StrEnum):
     HYPOTHESIS_SUPPORTED = "hypothesis_supported"
     AMBIGUOUS = "ambiguous"
     NO_FAILURE_OBSERVED = "no_failure_observed"
-    ABSTAINED = "abstained"  # unmodelled, insufficient or unreliable evidence
+    ABSTAINED = "abstained"  # unmodelled, insufficient, unreliable or non-termination
     NOT_EVALUATED = "not_evaluated"  # compile or execution error
 
 

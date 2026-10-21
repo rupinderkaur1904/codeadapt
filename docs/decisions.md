@@ -373,3 +373,18 @@ candidate set until a separate policy decision on prerequisite step-back and tra
 `89a7803` over the three original problems, must be reproduced exactly with first-true in
 the catalogue (`tests/unit/test_adaptation.py`). These histories are synthetic and exercise
 the rules; they are not learner data.
+
+## ADR-027 — Time-limit evidence is a symptom, not a named error (2026-10-21)
+**Context:** the VAL1-A lower-bound mutation audit (docs/evaluation/val1a-2026-10-21)
+found 17 of 32 named diagnoses naming the wrong edit, all unqualified termination
+diagnoses resting on CPU-time-limit fingerprints with 6–9 behaviour groups.
+**Decision (owner, 2026-10-21, with policy option P1):** method `fingerprint_consistency`
+v1.2 adds rule 4b: any reliable failing time limit gives `non_termination_observed`, with
+no model selected. Policy 1.4 retries the same problem with a review flag, no target skill
+and no criterion, and refuses any outcome without an explicit rule. No `incorrect` skill
+observation results (ledger policy 1.2 unchanged); under LM1 the attempt consumes its
+counted opportunity without failure evidence; BKT, skill maps and content are unchanged.
+v1.1 stays registered as `v1.1`; earlier results are not rewritten. Proposal, conditions
+for ever naming a termination error again, and the re-run plan:
+docs/proposals/adr-027-non-termination-evidence.md. Re-run comparison:
+docs/evaluation/adr027-2026-10-21.

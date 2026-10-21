@@ -79,6 +79,9 @@ class CaseResult(BaseModel):
             return "correct_pass" if self.outcome is Outcome.NO_FAILURE_OBSERVED else "false_alarm"
         if self.diagnosed:
             return "true_diagnosis" if self.selected_model == self.truth else "false_diagnosis"
+        # A symptom (ADR-027) names no model, so it is neither a true nor a false diagnosis.
+        if self.outcome is Outcome.NON_TERMINATION_OBSERVED:
+            return "symptom_reported"
         return "abstained"
 
 
