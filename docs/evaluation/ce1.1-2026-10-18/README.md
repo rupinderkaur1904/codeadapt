@@ -48,9 +48,9 @@ the product's execution path, gave these outputs (reference / model / case):
 The method abstained rather than forcing a diagnosis, which is the intended behaviour for
 an inconsistent fingerprint. But the model as written covers only one midpoint convention
 of this error.
-- Adding a second variant now would be fitted to a case that has already been seen.
-- It would need a new held-out case written before the variant is evaluated.
-- It is not applied; see the design record §7.
+- **Owner decision (2026-10-21):** this is accepted as a documented limitation, and
+  C7 (a second variant) is not authorised.
+- Other midpoint conventions of this error are not covered; see the design record §7.
 
 ## All held-out cases
 
