@@ -1,0 +1,868 @@
+{
+ "A_AOR_017": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "A_AOR_020": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "15",
+  "native": "non_equivalent"
+ },
+ "A_AOR_035": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_DEL_038": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_ICR_001": {
+  "expected": "0",
+  "first_diff_input": 4,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "A_ICR_002": {
+  "expected": "0",
+  "first_diff_input": 5,
+  "got": "-1",
+  "native": "non_equivalent"
+ },
+ "A_ICR_023": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "A_ICR_024": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_ICR_036": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "A_ICR_037": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_NEG_014": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_NEG_032": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_ROR_007": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_ROR_008": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_ROR_009": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_ROR_010": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_ROR_011": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "A_ROR_027": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "A_ROR_028": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_ROR_029": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_ROR_030": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_ROR_031": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "A_SDL_039": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_SDL_042": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_003": {
+  "expected": "0",
+  "first_diff_input": 8,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "A_UOI_004": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "A_UOI_005": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "A_UOI_006": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_012": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_013": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "A_UOI_015": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_016": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_018": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_019": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "A_UOI_021": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "A_UOI_022": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_025": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "A_UOI_026": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "A_UOI_033": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "A_UOI_034": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_040": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "A_UOI_041": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "A_UOI_043": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "11",
+  "native": "non_equivalent"
+ },
+ "A_UOI_044": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "B_AOR_005": {
+  "expected": "0",
+  "first_diff_input": 8,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "B_AOR_023": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "B_AOR_026": {
+  "expected": "7",
+  "first_diff_input": 2,
+  "got": "16",
+  "native": "non_equivalent"
+ },
+ "B_AOR_044": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_AOR_051": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_DEL_008": {
+  "expected": "0",
+  "first_diff_input": 25,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "B_DEL_047": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_DEL_054": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_ICR_001": {
+  "expected": "0",
+  "first_diff_input": 4,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "B_ICR_002": {
+  "expected": "0",
+  "first_diff_input": 5,
+  "got": "-1",
+  "native": "non_equivalent"
+ },
+ "B_ICR_006": {
+  "expected": "0",
+  "first_diff_input": 8,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "B_ICR_007": {
+  "expected": "0",
+  "first_diff_input": 25,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "B_ICR_029": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "B_ICR_030": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "B_ICR_045": {
+  "expected": "4",
+  "first_diff_input": 7,
+  "got": "5",
+  "native": "non_equivalent"
+ },
+ "B_ICR_046": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_ICR_052": {
+  "expected": "7",
+  "first_diff_input": 2,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "B_ICR_053": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_NEG_020": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "B_NEG_038": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "B_ROR_013": {
+  "expected": "0",
+  "first_diff_input": 5,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "B_ROR_014": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "B_ROR_015": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "B_ROR_016": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "B_ROR_017": {
+  "expected": "7",
+  "first_diff_input": 2,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_ROR_033": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "B_ROR_034": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "B_ROR_035": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "B_ROR_036": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "B_ROR_037": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "B_SDL_041": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "B_SDL_048": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_SDL_055": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_UOI_003": {
+  "expected": "0",
+  "first_diff_input": 25,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "B_UOI_004": {
+  "expected": "0",
+  "first_diff_input": 8,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "B_UOI_009": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "11",
+  "native": "non_equivalent"
+ },
+ "B_UOI_010": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "B_UOI_011": {
+  "expected": "0",
+  "first_diff_input": 5,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "B_UOI_012": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_UOI_018": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_UOI_019": {
+  "expected": "0",
+  "first_diff_input": 5,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "B_UOI_021": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_UOI_022": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_UOI_024": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "B_UOI_025": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "B_UOI_027": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "B_UOI_028": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "B_UOI_031": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "B_UOI_032": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "B_UOI_039": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "B_UOI_040": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "B_UOI_042": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_UOI_043": {
+  "expected": "4",
+  "first_diff_input": 7,
+  "got": "5",
+  "native": "non_equivalent"
+ },
+ "B_UOI_049": {
+  "expected": "7",
+  "first_diff_input": 2,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "B_UOI_050": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "TLE",
+  "native": "non_equivalent"
+ },
+ "B_UOI_056": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "11",
+  "native": "non_equivalent"
+ },
+ "B_UOI_057": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "C_AOR_015": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_AOR_018": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "15",
+  "native": "non_equivalent"
+ },
+ "C_AOR_033": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_DEL_038": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_ICR_021": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "C_ICR_022": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_ICR_034": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "C_ICR_035": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_ICR_043": {
+  "expected": "0",
+  "first_diff_input": 4,
+  "got": "1",
+  "native": "non_equivalent"
+ },
+ "C_ICR_044": {
+  "expected": "0",
+  "first_diff_input": 5,
+  "got": "-1",
+  "native": "non_equivalent"
+ },
+ "C_NEG_010": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_NEG_030": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_ROR_003": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_ROR_004": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_ROR_005": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_ROR_006": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "C_ROR_007": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_ROR_025": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "C_ROR_026": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_ROR_027": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_ROR_028": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_ROR_029": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "C_UOI_001": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "C_UOI_002": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_UOI_008": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_UOI_009": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "C_UOI_011": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "11",
+  "native": "non_equivalent"
+ },
+ "C_UOI_012": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "C_UOI_013": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_UOI_014": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_UOI_016": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_UOI_017": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "C_UOI_019": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "C_UOI_020": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_UOI_023": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "C_UOI_024": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "C_UOI_031": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "C_UOI_032": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_UOI_036": {
+  "expected": "1",
+  "first_diff_input": 16,
+  "got": "6",
+  "native": "non_equivalent"
+ },
+ "C_UOI_037": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "8",
+  "native": "non_equivalent"
+ },
+ "C_UOI_039": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "C_UOI_040": {
+  "expected": "0",
+  "first_diff_input": 4,
+  "got": "-2",
+  "native": "non_equivalent"
+ },
+ "C_UOI_041": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "CRASH",
+  "native": "non_equivalent"
+ },
+ "C_UOI_042": {
+  "expected": "1",
+  "first_diff_input": 1,
+  "got": "0",
+  "native": "non_equivalent"
+ },
+ "C_UOI_045": {
+  "expected": "0",
+  "first_diff_input": 8,
+  "got": "2",
+  "native": "non_equivalent"
+ },
+ "C_UOI_046": {
+  "expected": "10",
+  "first_diff_input": 0,
+  "got": "9",
+  "native": "non_equivalent"
+ },
+ "original:closed_answer": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "original:half_open": {
+  "inputs": 3040,
+  "native": "equivalent"
+ },
+ "original:recursive": {
+  "inputs": 3040,
+  "native": "equivalent"
+ }
+}
