@@ -87,9 +87,22 @@ async def test_every_outcome_class_end_to_end(harness: Harness) -> None:
     assert [r["profile"] for r in ref_trace["execution_runs"]] == ["standard", "sanitize"]
 
     problem = harness.catalogue.by_slug["lower-bound"]
+    # Models that stall end at the CPU-time limit: since ADR-027 that is a symptom, never a
+    # named diagnosis, and the student sees no hint.
+    stalling = {"no_progress_update", "closed_loop_hi_mid"}
     for model in problem.spec.error_models:
         view, trace = await harness.submit((PROBLEM_DIR / model.file).read_text())
         diagnosis = trace["diagnosis"]
+        if model.key in stalling:
+            assert diagnosis["outcome"] == "non_termination_observed", (model.key, diagnosis)
+            assert diagnosis["selected_model"] is None
+            assert diagnosis["rationale"]["timed_out_tests"]
+            assert model.key in diagnosis["rationale"]["consistent_models"]
+            assert view["feedback"]["kind"] == "failing_cases"
+            assert view["feedback"]["hint"] is None
+            assert "did not finish within the time limit" in view["feedback"]["message"]
+            assert_student_view_is_safe(view)
+            continue
         assert diagnosis["outcome"] == "hypothesis_supported", (model.key, diagnosis)
         assert diagnosis["selected_model"] == model.key
         assert diagnosis["support"] >= 2
