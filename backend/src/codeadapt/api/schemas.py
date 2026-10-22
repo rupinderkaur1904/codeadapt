@@ -221,3 +221,18 @@ class LearnerModelView(_Out):
     data_class: str
     attempts: int
     estimate: LearnerEstimate
+
+
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    username: str = Field(min_length=1, max_length=64)
+    password: str = Field(min_length=1, max_length=1024)
+
+
+class AuthUser(_Out):
+    username: str
+    role: str
+    # Echo in the X-CSRF-Token header on every state-changing request. None for the
+    # development stub, which has no session.
+    csrf_token: str | None

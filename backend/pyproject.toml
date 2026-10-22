@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 license = { text = "Proprietary" }
 dependencies = [
     "alembic>=1.14",
+    "argon2-cffi>=23.1",
     "fastapi>=0.115",
     "pydantic>=2.9,<3",
     "sqlalchemy>=2.0.36",
@@ -18,6 +19,7 @@ codeadapt-content = "codeadapt.content.cli:main"
 codeadapt-worker = "codeadapt.worker.main:main"
 codeadapt-openapi = "codeadapt.api.openapi_export:main"
 codeadapt-eval = "codeadapt.evaluation.cli:main"
+codeadapt-admin = "codeadapt.auth.cli:main"
 
 [dependency-groups]
 dev = [

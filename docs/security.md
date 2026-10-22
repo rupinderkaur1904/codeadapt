@@ -79,6 +79,18 @@ The runtime is configuration (`CODEADAPT_SANDBOX_RUNTIME`), so moving tiers requ
 code change. A future option is Firecracker microVMs behind the same `SandboxBackend`
 interface.
 
+## 3a. Accounts, sessions and audit (ADR-029)
+
+Accounts are created by an operator (`codeadapt-admin`); there is no self-registration.
+Passwords: Argon2id, at least 12 characters. Sessions: a random token in an HttpOnly,
+SameSite=Strict, Path=/api cookie (Secure in production); only its SHA-256 is stored; 12 h
+lifetime; revoked on logout, password change and disable. State-changing requests must
+echo the session's CSRF token in `X-CSRF-Token`. Failed logins are throttled per username
+and per client (5 per 15 min); submissions are limited per user (10 per minute in
+production). Logins, account changes, researcher-endpoint requests and staff views of other
+users' submissions go to the append-only `audit_events` table. The dev `X-Dev-Role` stub
+is ignored outside dev/test.
+
 ## 4. Limits (defaults, configurable)
 
 | Limit | Compile | Run (per test) |

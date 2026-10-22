@@ -99,8 +99,9 @@ def test_students_cannot_see_others_submissions_or_traces(client: TestClient) ->
 def test_dev_auth_is_disabled_in_production(settings: Settings) -> None:
     client = TestClient(create_app(replace(settings, env=Environment.PRODUCTION)))
     r = client.get("/api/v1/problems", headers=RESEARCHER)
-    assert r.status_code == 503
-    assert r.json()["type"].endswith("/auth-not-configured")
+    # The dev header is ignored: without a login session the request is unauthenticated.
+    assert r.status_code == 401
+    assert r.json()["type"].endswith("/not-authenticated")
     assert client.get("/api/v1/health").status_code == 200
 
 
