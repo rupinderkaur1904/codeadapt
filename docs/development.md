@@ -37,6 +37,13 @@ On Windows, run the same commands in PowerShell (or WSL2). Use `copy` instead of
 Sandbox tests are **skipped with a stated reason** if Docker or the image is missing. Set
 `CODEADAPT_REQUIRE_SANDBOX=1` to make them fail instead; CI always does.
 
+In CI the `backend` job runs everything except `tests/sandbox`. The sandbox tests run in a
+`sandbox` matrix with one shard per long pipeline test (`demo-content`,
+`heldout-evaluation`, `end-to-end`, `adaptation`) and a `core` shard for every other sandbox
+file. Locally (4 cores) those four tests take about 1000 s of the 1080 s full suite, run
+one after another; on CI the backend job alone took about 41 min on e94ec81. A new sandbox
+test file lands in `core` automatically; give it its own shard only if it is long.
+
 To test the production tier: `CODEADAPT_SANDBOX_RUNTIME=runsc uv run pytest -m sandbox`.
 
 ## Running the API and worker locally
