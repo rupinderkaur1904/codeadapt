@@ -408,3 +408,41 @@ the `core` shard under `runsc`. **Not validated:** the deployment host; whether 
 give identical observations for every content test (methodology §6.1 cross-environment
 reproducibility is still unmeasured); the headroom under heavily multi-threaded programs.
 No content, evidence rule, diagnosis or feedback change.
+
+## ADR-029 — Real authentication, request limits and an audit log (M8, 2026-10-22)
+**Context:** ADR-007 chose server-side sessions, Argon2id and three roles, and left the
+implementation to M8. Until now only the dev stub existed, and production answered 503.
+**Decision:**
+- *Accounts:* there is no self-registration. An operator runs `codeadapt-admin create-user`
+  with an explicit role and data class. Passwords are read without echo or from stdin,
+  never from arguments, and must have at least 12 characters. They are hashed with
+  Argon2id (argon2-cffi defaults, RFC 9106 low-memory profile) and rehashed on login when
+  those parameters change. `set-password` and `disable` end all of the account's sessions.
+- *Sessions:* `POST /api/v1/auth/login` sets a random 256-bit token in the
+  `codeadapt_session` cookie: HttpOnly, SameSite=Strict, Path=/api, Secure in production,
+  12 h by default (`CODEADAPT_SESSION_HOURS`). Only its SHA-256 is stored. Logout revokes
+  the session server-side. A wrong password, an unknown user, an account without a
+  password and a disabled account all give the same 401, and unknown users are checked
+  against a dummy hash so the timing matches.
+- *CSRF:* each session has its own CSRF token, returned by login and `GET /auth/me`. Every
+  request other than GET, HEAD or OPTIONS made with the cookie must send it in
+  `X-CSRF-Token`. This comes on top of SameSite=Strict.
+- *Limits:* after 5 failed logins for a username or from a client address within 15 min,
+  login answers 429, even with the right password. Each user may create
+  `CODEADAPT_SUBMISSIONS_PER_MINUTE` submissions per minute (10 in production, unlimited in
+  dev and test).
+- *Audit log:* the append-only `audit_events` table records logins, failed and throttled
+  logins, logouts, account changes, every researcher-endpoint request (path and query),
+  and every time staff opens another user's submission. It never stores passwords, tokens
+  or source code.
+- *Dev stub:* the `X-Dev-Role` header still works in dev and test, but only when there is
+  no session cookie. In production it is ignored and requests without a session get 401.
+
+**Validated:** `tests/unit/test_auth.py` covers the hash format, the cookie attributes, the
+digest-only storage, identical failures, CSRF (missing, wrong, right), logout replay,
+expiry, disabled accounts, login throttling, the submission limit, both audit kinds and the
+admin CLI. Migration 0005 matches the models.
+**Not done:** the web login page (next step); the client address behind a reverse proxy
+(needs the deployment's trusted-proxy setting); password reset by email (none planned);
+data retention for `audit_events` (needs an owner decision with M9). No change to
+diagnosis, feedback, recommendations or the learner model.

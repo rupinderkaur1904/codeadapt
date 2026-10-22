@@ -7,19 +7,23 @@ import hashlib
 import uuid
 from collections import Counter
 from collections.abc import Iterator
+from datetime import timedelta
 from typing import Annotated, Any
 
-from fastapi import Depends, FastAPI, Header, Request
+from fastapi import Depends, FastAPI, Header, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from codeadapt import auth
 from codeadapt.api import feedback, recommendation
 from codeadapt.api.schemas import (
+    AuthUser,
     LearnerModelView,
     LearnerNext,
+    LoginRequest,
     ProblemDetail,
     ProblemSummary,
     ResearchMetrics,
@@ -49,6 +53,7 @@ from codeadapt.db.models import (
     Submission,
     TestObservation,
     User,
+    utcnow,
 )
 from codeadapt.db.session import as_utc, make_engine, make_session_factory
 from codeadapt.diagnosis import Outcome
@@ -57,6 +62,9 @@ from codeadapt.worker.adapt import learner_attempts, skill_maps_for
 
 ERROR_BASE = "https://codeadapt.dev/errors/"
 PROBLEM_JSON = "application/problem+json"
+SESSION_COOKIE = "codeadapt_session"
+CSRF_HEADER = "X-CSRF-Token"
+_SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
 
 
 class ApiError(Exception):
@@ -129,32 +137,126 @@ def create_app(
 
     DB = Annotated[Session, Depends(db)]  # noqa: N806 - type alias
 
-    def current_user(session: DB, x_dev_role: Annotated[str | None, Header()] = None) -> User:
-        """ADR-007 stub: in dev/test the X-Dev-Role header selects a fixed dev account."""
+    def client_of(request: Request) -> str:
+        return request.client.host if request.client else "unknown"
+
+    def current_user(
+        request: Request, session: DB, x_dev_role: Annotated[str | None, Header()] = None
+    ) -> User:
+        """A login session from the cookie (ADR-029); in dev/test only, without a cookie,
+        the X-Dev-Role header selects a fixed dev account (ADR-007 stub)."""
+        token = request.cookies.get(SESSION_COOKIE)
+        if token:
+            found = auth.resolve_session(session, token)
+            if found is None:
+                raise ApiError(401, "not-authenticated", "Session expired or invalid")
+            row, user = found
+            if request.method not in _SAFE_METHODS and not auth.csrf_matches(
+                row, request.headers.get(CSRF_HEADER)
+            ):
+                raise ApiError(403, "csrf-failed", "Missing or wrong CSRF token")
+            request.state.auth_session = row
+            return user
         if not settings.dev_auth_enabled:
-            raise ApiError(503, "auth-not-configured", "Authentication is not configured")
+            raise ApiError(401, "not-authenticated", "Login required")
         role = Role(x_dev_role) if x_dev_role in {r.value for r in Role} else Role.STUDENT
         username = f"dev-{role.value}"
-        user = session.scalar(select(User).where(User.username == username))
-        if user is None:
-            user = User(username=username, role=role.value, data_class=DataClass.DEV.value)
-            session.add(user)
+        dev = session.scalar(select(User).where(User.username == username))
+        if dev is None:
+            dev = User(username=username, role=role.value, data_class=DataClass.DEV.value)
+            session.add(dev)
             session.commit()
-        return user
+        return dev
 
     CurrentUser = Annotated[User, Depends(current_user)]  # noqa: N806 - type alias
 
-    def researcher(user: CurrentUser) -> User:
+    def researcher(request: Request, session: DB, user: CurrentUser) -> User:
         if user.role not in (Role.RESEARCHER.value, Role.ADMIN.value):
             raise ApiError(403, "forbidden", "Researcher role required")
+        auth.audit(
+            session,
+            auth.AuditKind.RESEARCH_ACCESS,
+            username=user.username,
+            user=user,
+            client=client_of(request),
+            target=request.url.path + (f"?{request.url.query}" if request.url.query else ""),
+        )
+        session.commit()
         return user
 
-    def owned_submission(session: Session, user: User, submission_id: str) -> Submission:
+    def owned_submission(
+        request: Request, session: Session, user: User, submission_id: str
+    ) -> Submission:
         sub = session.get(Submission, submission_id)
         is_staff = user.role in (Role.RESEARCHER.value, Role.ADMIN.value)
         if sub is None or (sub.user_id != user.id and not is_staff):
             raise ApiError(404, "not-found", "Submission not found")
+        if sub.user_id != user.id:
+            auth.audit(
+                session,
+                auth.AuditKind.STAFF_VIEW_SUBMISSION,
+                username=user.username,
+                user=user,
+                client=client_of(request),
+                target=submission_id,
+            )
+            session.commit()
         return sub
+
+    # ------------------------------------------------------------------ auth
+    @app.post("/api/v1/auth/login", response_model=AuthUser)
+    def login(body: LoginRequest, request: Request, response: Response, session: DB) -> AuthUser:
+        client = client_of(request)
+        window = timedelta(minutes=settings.login_failure_window_minutes)
+        failures = auth.recent_failures(session, body.username, client, utcnow() - window)
+        if failures >= settings.login_max_failures:
+            auth.audit(
+                session, auth.AuditKind.LOGIN_THROTTLED, username=body.username, client=client
+            )
+            session.commit()
+            raise ApiError(429, "too-many-attempts", "Too many failed logins; try again later")
+        user = auth.authenticate(session, body.username, body.password)
+        if user is None:
+            auth.audit(session, auth.AuditKind.LOGIN_FAILED, username=body.username, client=client)
+            session.commit()
+            raise ApiError(401, "login-failed", "Wrong username or password")
+        token, row = auth.start_session(session, user, timedelta(hours=settings.session_hours))
+        auth.audit(session, auth.AuditKind.LOGIN, username=user.username, user=user, client=client)
+        session.commit()
+        response.set_cookie(
+            SESSION_COOKIE,
+            token,
+            max_age=int(settings.session_hours * 3600),
+            path="/api",
+            httponly=True,
+            secure=settings.secure_cookies,
+            samesite="strict",
+        )
+        return AuthUser(username=user.username, role=user.role, csrf_token=row.csrf_token)
+
+    @app.post("/api/v1/auth/logout", status_code=204)
+    def logout(request: Request, response: Response, session: DB, user: CurrentUser) -> None:
+        row = getattr(request.state, "auth_session", None)
+        if row is not None:
+            auth.revoke_session(row)
+            auth.audit(
+                session,
+                auth.AuditKind.LOGOUT,
+                username=user.username,
+                user=user,
+                client=client_of(request),
+            )
+            session.commit()
+        response.delete_cookie(SESSION_COOKIE, path="/api")
+
+    @app.get("/api/v1/auth/me", response_model=AuthUser)
+    def me(request: Request, user: CurrentUser) -> AuthUser:
+        row = getattr(request.state, "auth_session", None)
+        return AuthUser(
+            username=user.username,
+            role=user.role,
+            csrf_token=row.csrf_token if row is not None else None,
+        )
 
     # ------------------------------------------------------------------ problems
     @app.get("/api/v1/problems", response_model=list[ProblemSummary])
@@ -209,6 +311,18 @@ def create_app(
         p = catalogue.by_slug.get(body.problem_slug)
         if p is None:
             raise ApiError(404, "not-found", "Problem not found")
+        limit = settings.submissions_per_minute
+        if limit is not None:
+            recent = session.scalar(
+                select(func.count())
+                .select_from(Submission)
+                .where(
+                    Submission.user_id == user.id,
+                    Submission.created_at >= utcnow() - timedelta(minutes=1),
+                )
+            )
+            if (recent or 0) >= limit:
+                raise ApiError(429, "too-many-submissions", "Too many submissions; wait a minute")
         sub = Submission(
             user_id=user.id,
             problem_version=p.version,
@@ -256,8 +370,10 @@ def create_app(
         return [submission_view(session, sub) for sub in session.scalars(query)]
 
     @app.get("/api/v1/submissions/{submission_id}", response_model=SubmissionView)
-    def get_submission(submission_id: str, session: DB, user: CurrentUser) -> SubmissionView:
-        return submission_view(session, owned_submission(session, user, submission_id))
+    def get_submission(
+        submission_id: str, request: Request, session: DB, user: CurrentUser
+    ) -> SubmissionView:
+        return submission_view(session, owned_submission(request, session, user, submission_id))
 
     # ------------------------------------------------------------------ adaptation
     @app.get("/api/v1/me/recommendation", response_model=LearnerNext)

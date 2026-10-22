@@ -81,6 +81,37 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(16))
     data_class: Mapped[str] = mapped_column(String(16))
     created_at: Mapped[datetime] = _ts()
+    # Argon2id hash (ADR-029). None = cannot log in (dev and synthetic accounts).
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    disabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+
+class AuthSession(Base):
+    """A server-side login session (ADR-029). Only a SHA-256 of the cookie token is stored."""
+
+    __tablename__ = "auth_sessions"
+
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    csrf_token: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = _ts()
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class AuditEvent(Base):
+    """Append-only security and researcher-access log (ADR-029). Never holds passwords,
+    tokens or submission source."""
+
+    __tablename__ = "audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    at: Mapped[datetime] = _ts()
+    kind: Mapped[str] = mapped_column(String(32), index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    username: Mapped[str] = mapped_column(String(64), index=True)
+    client: Mapped[str] = mapped_column(String(64))
+    target: Mapped[str] = mapped_column(String(255), default="")
 
 
 class ProblemVersion(Base):
