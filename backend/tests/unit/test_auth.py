@@ -1,8 +1,10 @@
 """Login sessions, CSRF, rate limits, audit log and the admin CLI (ADR-029)."""
 
 import io
+import sqlite3
 from dataclasses import replace
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -222,3 +224,16 @@ def test_admin_cli_creates_resets_and_disables_accounts(
     assert "hal\tresearcher\treal\tdisabled" in capsys.readouterr().out
     kinds = [e.kind for e in _events(sessions, auth.AuditKind.ACCOUNT_CREATED)]
     assert kinds == ["account_created"]
+
+
+def test_admin_backup_copies_a_consistent_sqlite_database(
+    db_url: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("CODEADAPT_DATABASE_URL", db_url)
+    destination = tmp_path / "backup.sqlite3"
+    assert admin(["backup", str(destination)]) == 0
+    copy = sqlite3.connect(destination)
+    assert copy.execute("SELECT version_num FROM alembic_version").fetchone() == ("0005",)
+    copy.close()
+    with pytest.raises(SystemExit, match="refusing"):
+        admin(["backup", str(destination)])
