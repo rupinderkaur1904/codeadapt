@@ -71,6 +71,7 @@ def audit_cases(slug: str) -> list[dict]:
     labels = json.loads((ROOT / f"eval/mutation/{slug}/behaviour_labels.json").read_text())
     symptoms = RES / "native-symptoms.json"
     native = json.loads(symptoms.read_text())[slug] if symptoms.exists() else {}
+    env = json.loads((RES / f"{slug}-environment.json").read_text())
     rows = [json.loads(x) for x in (RES / f"{slug}.jsonl").read_text().splitlines() if x]
     run2 = RES / f"{slug}.run2.jsonl"
     if run2.exists():
@@ -100,9 +101,24 @@ def audit_cases(slug: str) -> list[dict]:
         obs = first["observations"]
         reliable = {k: v[0] for k, v in obs.items() if v[1] is None}
         entry = manifest.get(name, {})
+        # Does the pipeline's reliable evidence agree with the native behavioural label? Labels
+        # were computed at -O1 (PLAN.md §5); the pipeline builds at -O2, so programs whose
+        # behaviour depends on undefined behaviour can differ.
+        expected = [env["reference"]] if lab["label"] == "reference" else []
+        expected += [env["models"][m.split(":", 1)[1]] for m in lab["matches"] if m.startswith("model:")]
+        label_consistent = (
+            None
+            if cat in ("compile_error", "unreliable") or lab["label"] in ("none", "compile_error")
+            else any(all(fp.get(k) == v for k, v in reliable.items()) for fp in expected)
+        )
+        named = d["selected_model"]
+        fp = env["models"].get(named or "", {})
         cases.append(
             {
                 "problem": slug,
+                "named_fingerprint_constant": bool(fp) and len(set(fp.values())) == 1,
+                "evidence_equals_named_fingerprint": bool(fp)
+                and all(fp.get(k) == v for k, v in reliable.items()),
                 "id": name,
                 "original": name.startswith("original:"),
                 "style": entry.get("style") or {"half_open": "A", "closed_answer": "B", "recursive": "C"}[
@@ -113,6 +129,7 @@ def audit_cases(slug: str) -> list[dict]:
                 "mutated": entry.get("mutated_line"),
                 "category": cat,
                 "reproducible": reproducible,
+                "label_consistent": label_consistent,
                 "runs": len(runs),
                 "label": lab["label"],
                 "matches": lab["matches"],
@@ -315,6 +332,19 @@ def main() -> None:
         "coarse": cp,
         "coarse_per_problem": {s: coarse(mutants[s]) for s in PROBLEMS},
         "readings": readings(pool, by_style, cp),
+        "exploratory_wrong_names": [
+            {"case": c["problem"] + "/" + c["id"], "named": c["v1.2"]["selected_model"],
+             "named_fingerprint_constant": c["named_fingerprint_constant"],
+             "evidence_equals_named_fingerprint": c["evidence_equals_named_fingerprint"]}
+            for c in pooled
+            if c["category"] == "incorrect_failing" and c["v1.2"].get("correct") is False
+        ],
+        "label_pipeline_disagreements": [
+            {"case": c["problem"] + "/" + c["id"], "label": c["label"], "category": c["category"],
+             "v1.2": c["v1.2"]["outcome"], "model": c["v1.2"]["selected_model"]}
+            for c in pooled
+            if c["label_consistent"] is False
+        ],
         "lower_bound_replay": {
             "v1.2": block(lb),
             "v1.1": block(lb, "v1.1"),
@@ -411,6 +441,19 @@ def tables(s: dict, pooled: list[dict]) -> str:
     P(f"- Named diagnoses supported only by runtime_error/memory_limit: {fmt(c['named_supported_only_by_coarse'])}")
     P(f"- Wrong among those: {fmt(c['wrong_among_coarse_only'])} {c['coarse_only_cases']}")
     P(f"- Native symptom vs pipeline signature (native / pipeline): {c['native_vs_pipeline']}")
+    ex = s["exploratory_wrong_names"]
+    P("\n## Exploratory (not pre-registered): why the wrong names happen\n")
+    P(f"- Wrong names whose reliable evidence equals the named model's fingerprint on every test: "
+      f"{sum(e['evidence_equals_named_fingerprint'] for e in ex)}/{len(ex)}")
+    P(f"- Wrong names whose named model has a constant fingerprint (same signature on every test): "
+      f"{sum(e['named_fingerprint_constant'] for e in ex)}/{len(ex)}")
+    dis = s["label_pipeline_disagreements"]
+    P("\n## Native label vs pipeline evidence\n")
+    P("Labels were computed at -O1 (PLAN.md §5); the pipeline builds at -O2. A labelled-reference or")
+    P("labelled-model mutant whose reliable pipeline evidence differs from that program's fingerprint")
+    P(f"is listed here ({len(dis)}):\n")
+    for d in dis:
+        P(f"- {d['case']}: label {d['label']}, {d['category']}, v1.2 {d['v1.2']} {d['model'] or ''}")
     P("\n## Secondary: method 1.1 on the same evidence\n")
     P("| Set | Named coverage | Wrong name |")
     P("| --- | --- | --- |")
