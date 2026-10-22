@@ -1,4 +1,5 @@
-"""`codeadapt-admin`: create accounts, set passwords, disable accounts (ADR-029).
+"""`codeadapt-admin`: create accounts, set passwords, disable accounts (ADR-029); back up
+a SQLite database.
 
 Passwords are read from the terminal without echo, or from stdin when it is not a
 terminal (one line). They are never accepted as command-line arguments, which other local
@@ -9,7 +10,9 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import sqlite3
 import sys
+from pathlib import Path
 
 from sqlalchemy import select
 
@@ -30,6 +33,29 @@ def _read_password() -> str:
     return sys.stdin.readline().rstrip("\n")
 
 
+def _backup(database_url: str, destination: Path) -> int:
+    """SQLite's online backup API: safe while the API and worker are running. Other
+    databases are backed up with their own tools (docs/deployment.md)."""
+    prefix = "sqlite:///"
+    if not database_url.startswith(prefix):
+        raise SystemExit("backup supports SQLite only; use the database's own tool (pg_dump)")
+    if destination.exists():
+        raise SystemExit(f"{destination} exists; refusing to overwrite")
+    source = sqlite3.connect(f"file:{database_url[len(prefix) :]}?mode=ro", uri=True)
+    target = sqlite3.connect(destination)
+    try:
+        source.backup(target)
+        (check,) = target.execute("PRAGMA integrity_check").fetchone()
+        (revision,) = target.execute("SELECT version_num FROM alembic_version").fetchone()
+    finally:
+        target.close()
+        source.close()
+    if check != "ok":
+        raise SystemExit(f"backup failed its integrity check: {check}")
+    print(f"backup: {destination} (schema revision {revision}, integrity ok)")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="codeadapt-admin", description=__doc__.split("\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -41,9 +67,13 @@ def main(argv: list[str] | None = None) -> int:
         p = sub.add_parser(name, help=f"{text}; ends the account's sessions")
         p.add_argument("username")
     sub.add_parser("list", help="list accounts")
+    backup = sub.add_parser("backup", help="consistent online copy of a SQLite database")
+    backup.add_argument("destination", type=Path)
     args = parser.parse_args(argv)
 
     settings = Settings.from_env()
+    if args.command == "backup":
+        return _backup(settings.database_url, args.destination)
     sessions = make_session_factory(make_engine(settings.database_url))
     with sessions() as session:
         if args.command == "list":

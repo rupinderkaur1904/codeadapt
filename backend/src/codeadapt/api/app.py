@@ -4,6 +4,8 @@ Run in development:  uvicorn codeadapt.api.app:create_app --factory
 """
 
 import hashlib
+import logging
+import time
 import uuid
 from collections import Counter
 from collections.abc import Iterator
@@ -18,7 +20,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from codeadapt import auth
+from codeadapt import auth, logs
 from codeadapt.api import feedback, recommendation
 from codeadapt.api.schemas import (
     AuthUser,
@@ -36,6 +38,7 @@ from codeadapt.api.schemas import (
     SubmissionView,
     TraceView,
 )
+from codeadapt.config import Environment as Env
 from codeadapt.config import Settings
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.content.models import Visibility
@@ -66,6 +69,7 @@ PROBLEM_JSON = "application/problem+json"
 SESSION_COOKIE = "codeadapt_session"
 CSRF_HEADER = "X-CSRF-Token"
 _SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+log = logging.getLogger("codeadapt.api")
 
 
 class ApiError(Exception):
@@ -94,6 +98,8 @@ def create_app(
     catalogue: Catalogue | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
+    if settings.env is not Env.TEST:
+        logs.configure(production=settings.env is Env.PRODUCTION)
     sessions = sessions or make_session_factory(make_engine(settings.database_url))
     catalogue = catalogue or Catalogue.load(settings.content_dir)
     with sessions() as s:
@@ -110,8 +116,23 @@ def create_app(
     @app.middleware("http")
     async def request_id(request: Request, call_next: Any) -> Any:
         request.state.request_id = uuid.uuid4().hex
+        start = time.monotonic()
         response = await call_next(request)
         response.headers["X-Request-ID"] = request.state.request_id
+        # Path only: query strings can carry usernames and filters.
+        log.info(
+            "%s %s %d",
+            request.method,
+            request.url.path,
+            response.status_code,
+            extra={
+                "request_id": request.state.request_id,
+                "method": request.method,
+                "path": request.url.path,
+                "status": response.status_code,
+                "duration_ms": round((time.monotonic() - start) * 1000, 1),
+            },
+        )
         return response
 
     @app.exception_handler(ApiError)
@@ -129,6 +150,11 @@ def create_app(
 
     @app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
+        log.error(
+            "unhandled error",
+            exc_info=exc,
+            extra={"request_id": getattr(request.state, "request_id", None)},
+        )
         return _problem(request, 500, "internal-error", "Internal server error")
 
     # ------------------------------------------------------------------ dependencies
