@@ -15,6 +15,7 @@ from codeadapt import auth
 from codeadapt.api.app import CSRF_HEADER, SESSION_COOKIE, create_app
 from codeadapt.auth.cli import main as admin
 from codeadapt.config import Environment, Settings
+from codeadapt.db.migrate import upgrade
 from codeadapt.db.models import AuditEvent, AuthSession, User
 
 PASSWORD = "correct horse battery"  # noqa: S105 - test fixture
@@ -227,8 +228,10 @@ def test_admin_cli_creates_resets_and_disables_accounts(
 
 
 def test_admin_backup_copies_a_consistent_sqlite_database(
-    db_url: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    db_url = f"sqlite:///{tmp_path / 'live.sqlite3'}"
+    upgrade(db_url)
     monkeypatch.setenv("CODEADAPT_DATABASE_URL", db_url)
     destination = tmp_path / "backup.sqlite3"
     assert admin(["backup", str(destination)]) == 0
