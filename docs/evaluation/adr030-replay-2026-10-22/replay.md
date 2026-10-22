@@ -55,4 +55,17 @@ Cases whose diagnosis is unchanged but whose consequences differ: 0.
 
 Changed cases by set and rule: heldout 8a: 1, val1a2 8a: 18, val1a2 8a+8b: 1, val1a2 8b: 1
 
-Programs whose candidate result differs between runs: 1 ['val1a2/first-true/C_AOR_018']
+## Checks
+
+- Recorded runs reproduced exactly: v1.1 1366, v1.2 1066 (VAL1-A records v1.1 only).
+- Programs whose v1.1 result differs between their 2 runs: 1
+    - val1a2/first-true/C_AOR_018 (unreliable): unreliable_evidence / unmodelled_behaviour
+- Programs whose v1.2 result differs between their 2 runs: 1
+    - val1a2/first-true/C_AOR_018 (unreliable): unreliable_evidence / non_termination_observed
+- Programs whose candidate result differs between their 2 runs: 1
+    - val1a2/first-true/C_AOR_018 (unreliable): unreliable_evidence / non_termination_observed
+
+A program whose runs differ is execution non-reproducibility in the recorded evidence, not
+a property of a method: VAL1-A/A2 classify it `unreliable` and leave it out of every scored
+count above. The candidate agrees with v1.2 on every run of every such program.
+- Candidate identical to v1.2 on every run of every unchanged program: True
