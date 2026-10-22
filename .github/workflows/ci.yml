@@ -78,6 +78,49 @@ jobs:
           test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"
           test -z "$(docker volume ls -q --filter label=org.codeadapt.sandbox=1)"
 
+  sandbox-gvisor:
+    # The production runtime (ADR-003, ADR-028): the core sandbox tests under gVisor.
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      GVISOR_RELEASE: "20261005"
+      GVISOR_SHA512: 79869ae9a589355a46d46fdac068d9a954e741741ffe77c64e38c56ea955498c1cb04e9bce44e1cce5155333e6b76bee72347c6661bb7c78fd2fe3aad198c8fe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install (locked)
+        run: uv sync --locked
+      - name: Install gVisor (pinned release, checksum verified)
+        working-directory: /tmp
+        run: |
+          curl -fsSLO "https://storage.googleapis.com/gvisor/releases/release/${GVISOR_RELEASE}/x86_64/gvisor.tar.bz2"
+          echo "${GVISOR_SHA512}  gvisor.tar.bz2" | sha512sum -c -
+          mkdir gvisor && tar -xjf gvisor.tar.bz2 -C gvisor
+          sudo install -m 755 gvisor/runsc gvisor/containerd-shim-runsc-v1 /usr/local/bin/
+          sudo mkdir -p /usr/local/bin/gvisor-bin && sudo install -m 755 gvisor/gvisor-bin/* /usr/local/bin/gvisor-bin/
+          sudo /usr/local/bin/runsc install
+          sudo systemctl restart docker
+          docker info --format '{{json .Runtimes}}' | grep -q runsc
+      - name: Build sandbox image
+        working-directory: .
+        run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
+      - name: Core sandbox tests under runsc
+        env:
+          CODEADAPT_REQUIRE_SANDBOX: "1"
+          CODEADAPT_SANDBOX_RUNTIME: runsc
+        run: >-
+          uv run pytest tests/sandbox
+          --ignore=tests/sandbox/test_demo_content.py
+          --ignore=tests/sandbox/test_evaluation_harness.py
+          --ignore=tests/sandbox/test_end_to_end.py
+          --ignore=tests/sandbox/test_adaptation_end_to_end.py
+      - name: No sandbox leftovers
+        run: |
+          test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"
+          test -z "$(docker volume ls -q --filter label=org.codeadapt.sandbox=1)"
+
   web:
     runs-on: ubuntu-24.04
     defaults:
