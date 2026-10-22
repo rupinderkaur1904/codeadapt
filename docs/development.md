@@ -99,7 +99,7 @@ Local results are evidence about *this* environment only.
 | Sandbox image | `codeadapt-sandbox:gcc14.2-1` on `gcc:14.2.0@sha256:b99b86a2…f5d24c`; g++ 14.2.0 |
 | Python / uv | CPython 3.13.16 / uv 0.11.32 |
 | Results | `pytest`: **70 passed, 0 skipped, 0 failed** (42 unit, 28 sandbox; ≈ 49 s). `ruff check`, `ruff format --check`, `mypy --strict`: clean. `pip-audit`: no known vulnerabilities. No labelled containers or volumes left afterwards. |
-| Not tested | gVisor (`runsc`) runtime; cgroup v2 hosts; macOS/Windows Docker Desktop; arm64. GitHub Actions (ubuntu-24.04 runner) is the second reference environment: the M1 commit passed all CI steps there, including the sandbox tests. |
+| Not tested | gVisor (`runsc`) runtime (tested 2026-10-22, see ADR-028); cgroup v2 hosts; macOS/Windows Docker Desktop; arm64. GitHub Actions (ubuntu-24.04 runner) is the second reference environment: the M1 commit passed all CI steps there, including the sandbox tests. |
 
 ### M2 (2026-10-15)
 
@@ -227,3 +227,13 @@ Same environment.
   OpenAPI is unchanged.
 - Content: `codeadapt-content validate ../content/demo` is valid for all four problems, and
   the first-true report regenerates identically.
+
+### gVisor runtime (2026-10-22, ADR-028)
+Development container (4 cores, cgroup v1, kernel 6.18, Docker 29.9.1) with `runsc`
+release-20261005.0 (systrap) registered by `runsc install`.
+- Before ADR-028: `CODEADAPT_SANDBOX_RUNTIME=runsc pytest tests/sandbox`: 26 failed, 7 passed
+  (run containers could not start under `--pids-limit 16`).
+- After: **33 passed** in 1224 s (runc: 33 passed, about 1000 s of the 1078 s full suite).
+- Unit: `tests/unit/test_sandbox_flags.py` (runc flags unchanged, runsc flags as decided).
+- CI: the `sandbox-gvisor` job installs the same pinned release (sha512 checked) and runs the
+  `core` sandbox shard under `runsc`.

@@ -127,7 +127,15 @@ SIGXCPU had no effect and only the wall deadline stopped CPU-bound loops (`abort
 affected similarly). Containers now run with `--init`; the CPU-loop test asserts that the
 rlimit, not the deadline, ends the program.
 
-**Not verified:** anything under gVisor; cgroup v2 hosts; resistance to kernel exploits
+**gVisor (2026-10-22, ADR-028):** the whole sandbox suite (33 tests, including the fork bomb,
+memory limit, CPU-limit/SIGXCPU, read-only filesystem, network denial and held-out
+reproducibility tests) passes under `runsc` release-20261005.0 (systrap platform) on the
+development container (cgroup v1, kernel 6.18), after two runsc-only flag changes: the guest
+process limit is `RLIMIT_NPROC` with the pids cgroup kept as a host backstop, and runs get a
+read-only `/tmp`. CI runs the `core` sandbox shard under `runsc` on every push. This is not
+yet the deployment host the M8 gate names.
+
+**Not verified:** gVisor on the deployment host; cgroup v2 hosts; resistance to kernel exploits
 (out of reach of the runc tier by design); behaviour under Docker Desktop.
 
 ## 6. Known limitations and gates

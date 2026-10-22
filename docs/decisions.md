@@ -388,3 +388,23 @@ v1.1 stays registered as `v1.1`; earlier results are not rewritten. Proposal, co
 for ever naming a termination error again, and the re-run plan:
 docs/proposals/adr-027-non-termination-evidence.md. Re-run comparison:
 docs/evaluation/adr027-2026-10-21.
+
+## ADR-028 — Sandbox flags under gVisor (2026-10-22)
+**Context:** the production tier requires `runsc` (ADR-003), but it had never been run. Under
+`runsc` release-20261005.0 (systrap) with the unchanged flags, 26 of 33 sandbox tests failed:
+(1) the container's pids cgroup also holds gVisor's own host threads (about 30 at start-up),
+so `--pids-limit 16` stopped every run container from starting, and with a larger limit a
+fork bomb exhausted it and crashed the sandbox, which the runner reported as an
+infrastructure error (no markers) instead of failed `fork()` calls; (2) gVisor mounts a
+writable tmpfs at `/tmp` when the container has none, so a run could write `/tmp`.
+**Decision:** only when the runtime is `runsc`: the guest process limit is
+`--ulimit nproc=<pids>` (gVisor enforces it per sandbox; the fork-bomb test still sees at most
+15 children), the pids cgroup becomes `<pids> + 256` as a host-side backstop, and run
+containers get `--tmpfs /tmp:ro`. runc flags are byte-for-byte unchanged (unit test), because
+under runc the sandbox uid is shared by every container, so `RLIMIT_NPROC` would not be per run.
+**Validated:** all 33 sandbox tests pass under `runsc` locally (about 20 min against 18 min
+under runc); `tests/unit/test_sandbox_flags.py` pins the flags for both runtimes; a CI job runs
+the `core` shard under `runsc`. **Not validated:** the deployment host; whether runc and runsc
+give identical observations for every content test (methodology §6.1 cross-environment
+reproducibility is still unmeasured); the headroom under heavily multi-threaded programs.
+No content, evidence rule, diagnosis or feedback change.
