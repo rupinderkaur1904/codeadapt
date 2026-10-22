@@ -44,8 +44,10 @@ Method version: 1.3. v1.1 and v1.2 stay selectable.
 ## 3. Replay (case by case, recorded evidence, nothing re-executed)
 
 The full per-case table is `docs/evaluation/adr030-replay-2026-10-22/replay.md`, with the data in
-`cases.json`. Before any number was computed, the replay reproduced every recorded v1.2 and v1.1
-outcome and model.
+`cases.json`. Before any number was computed, the replay reproduced every recorded run's v1.2 and v1.1
+outcome and model (1,066 and 1,366 runs). One program, first-true `C_AOR_018`, differs between
+its two recorded executions under every method. It is an unreliable stack-overflow mutant that
+no scored count includes; see `DECISION-REPORT.md`.
 
 | Set (incorrect programs) | v1.2 named / right / wrong | Candidate named / right / wrong |
 | --- | --- | --- |

@@ -174,6 +174,7 @@ def main() -> None:
             )
 
     rows = []
+    checked = {"v1.1": 0, "v1.2": 0}
     for set_name, slug, name, record, exp in sources:
         version, reference, models = fps[slug]
         problem = catalogue.by_slug[slug]
@@ -194,9 +195,21 @@ def main() -> None:
             if exp["kind"] == "val1a2" and not record["runs"][i]["compiled"]:
                 data = data.model_copy(update={"compiled": False})
             old, new, cand = METHODS["v1.1"].diagnose(data), METHODS["v1"].diagnose(data), candidate(data)
+            # Every recorded run is checked against its own record where one exists: VAL1-A2
+            # records v1.1 and v1.2 per run, VAL1-A records v1.1 per run, and the held-out
+            # file records one summary per case (checked on every run).
             for m, d in (("v1.1", old), ("v1.2", new)):
-                if m in exp and i == 0 and (d.outcome.value, d.selected_model) != tuple(exp[m]):
-                    sys.exit(f"{set_name} {slug}/{name}: {m} replay differs from the record")
+                if exp["kind"] == "val1a2":
+                    want = (record["runs"][i][m]["outcome"], record["runs"][i][m]["selected_model"])
+                elif exp["kind"] == "val1a":
+                    if m != "v1.1":
+                        continue
+                    want = (record["runs"][i]["outcome"], record["runs"][i]["selected_model"])
+                else:
+                    want = tuple(exp[m])
+                if (d.outcome.value, d.selected_model) != want:
+                    sys.exit(f"{set_name} {slug}/{name} run {i + 1}: {m} replay differs from the record")
+                checked[m] += 1
             per["v1.1"].append(summary(old, problem, problems))
             per["v1.2"].append(summary(new, problem, problems))
             per["candidate"].append(summary(cand, problem, problems))
@@ -208,12 +221,13 @@ def main() -> None:
                 "truth": exp["truth"],
                 "matches": exp.get("matches"),
                 "category": exp.get("category"),
-                "reproducible": all(r == per["candidate"][0] for r in per["candidate"]),
+                "reproducible": {m: all(r == v[0] for r in v) for m, v in per.items()},
+                "runs": per,
                 **{m: v[0] for m, v in per.items()},
             }
         )
     (HERE / "cases.json").write_text(json.dumps(rows, indent=1) + "\n")
-    (HERE / "replay.md").write_text(report(rows) + "\n")
+    (HERE / "replay.md").write_text(report(rows, checked) + "\n")
 
 
 def correct(row: dict, model: str | None) -> bool | None:
@@ -224,7 +238,7 @@ def correct(row: dict, model: str | None) -> bool | None:
     return f"model:{model}" in (row["matches"] or [])
 
 
-def report(rows: list[dict]) -> str:
+def report(rows: list[dict], checked: dict[str, int]) -> str:
     md = ["# ADR-030 replay: v1.1, v1.2 and the candidate rule, case by case", ""]
     md += [
         "Recorded evidence only; nothing re-executed. Every recorded v1.2 (and v1.1) outcome and",
@@ -265,8 +279,30 @@ def report(rows: list[dict]) -> str:
     md += ["", f"Cases whose diagnosis is unchanged but whose consequences differ: {len(other)}.", ""]
     counts = Counter((r["set"], tuple(r["candidate"]["uninformative"])) for r in changed)
     md += ["Changed cases by set and rule: " + ", ".join(f"{s} {'+'.join(k)}: {n}" for (s, k), n in sorted(counts.items())), ""]
-    nonrep = [f"{r['set']}/{r['problem']}/{r['case']}" for r in rows if not r["reproducible"]]
-    md += [f"Programs whose candidate result differs between runs: {len(nonrep)} {nonrep}"]
+    md += [
+        "## Checks",
+        "",
+        f"- Recorded runs reproduced exactly: v1.1 {checked['v1.1']}, v1.2 {checked['v1.2']} (VAL1-A records v1.1 only).",
+    ]
+    for m in ("v1.1", "v1.2", "candidate"):
+        nonrep = [r for r in rows if not r["reproducible"][m]]
+        md.append(f"- Programs whose {m} result differs between their 2 runs: {len(nonrep)}")
+        for r in nonrep:
+            outs = " / ".join(f"{x['outcome']} {x['selected_model'] or ''}".strip() for x in r["runs"][m])
+            md.append(f"    - {r['set']}/{r['problem']}/{r['case']} ({r['category']}): {outs}")
+    md += [
+        "",
+        "A program whose runs differ is execution non-reproducibility in the recorded evidence, not",
+        "a property of a method: VAL1-A/A2 classify it `unreliable` and leave it out of every scored",
+        "count above. The candidate agrees with v1.2 on every run of every such program.",
+    ]
+    agree = all(
+        (x["outcome"], x["selected_model"]) == (y["outcome"], y["selected_model"])
+        for r in rows
+        if r not in changed
+        for x, y in zip(r["runs"]["v1.2"], r["runs"]["candidate"], strict=True)
+    )
+    md.append(f"- Candidate identical to v1.2 on every run of every unchanged program: {agree}")
     return "\n".join(md)
 
 
