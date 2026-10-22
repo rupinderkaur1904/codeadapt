@@ -442,7 +442,13 @@ implementation to M8. Until now only the dev stub existed, and production answer
 digest-only storage, identical failures, CSRF (missing, wrong, right), logout replay,
 expiry, disabled accounts, login throttling, the submission limit, both audit kinds and the
 admin CLI. Migration 0005 matches the models.
-**Not done:** the web login page (next step); the client address behind a reverse proxy
+**Web (same day):** a login page shown when the API answers 401, the CSRF header on every
+non-GET request, the signed-in username with a logout button, and the dev role switch only
+under the stub. Vitest covers wrong and right passwords, logout and the stub; a Playwright
+test logs in with a real account through the browser and checks the cookie attributes.
+The dev stub also no longer fails with a 500 when two first requests race to create the
+dev account (seen in the browser test).
+**Not done:** the client address behind a reverse proxy
 (needs the deployment's trusted-proxy setting); password reset by email (none planned);
 data retention for `audit_events` (needs an owner decision with M9). No change to
 diagnosis, feedback, recommendations or the learner model.

@@ -14,6 +14,7 @@ from fastapi import Depends, FastAPI, Header, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -163,9 +164,12 @@ def create_app(
         username = f"dev-{role.value}"
         dev = session.scalar(select(User).where(User.username == username))
         if dev is None:
-            dev = User(username=username, role=role.value, data_class=DataClass.DEV.value)
-            session.add(dev)
-            session.commit()
+            session.add(User(username=username, role=role.value, data_class=DataClass.DEV.value))
+            try:
+                session.commit()
+            except IntegrityError:  # a concurrent first request created it
+                session.rollback()
+            dev = session.scalars(select(User).where(User.username == username)).one()
         return dev
 
     CurrentUser = Annotated[User, Depends(current_user)]  # noqa: N806 - type alias
