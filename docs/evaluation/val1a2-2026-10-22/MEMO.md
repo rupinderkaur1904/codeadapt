@@ -52,7 +52,7 @@ Nothing here authorises a production change, content change, CE1.2/CE1.3 or bank
 nothing has been changed.
 
 1. **Treat G1 and G2 as confirmed across all four problems.** Keep diagnoses researcher-facing.
-2. **Consider an ADR-028 proposal for candidate (a).** It would be a narrow, testable rule: no
+2. **Consider an ADR-030 proposal for candidate (a).** It would be a narrow, testable rule: no
    unqualified name from a constant fingerprint or from exclusion-thinned evidence. It would need its
    own approval, regression tests, and a replay on held-out, calibration, VAL1-A and VAL1-A2, as
    ADR-027 had.

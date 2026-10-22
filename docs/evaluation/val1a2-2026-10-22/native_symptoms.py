@@ -7,13 +7,15 @@ it decides no label. Run after run_audit.py has finished, never alongside the sa
 (it competes for CPU).
 
 Run from the repository root:  python3 docs/evaluation/val1a2-2026-10-22/native_symptoms.py
-Writes docs/evaluation/val1a2-2026-10-22/results/native-symptoms.json.
+Writes docs/evaluation/val1a2-2026-10-22/results/native-symptoms.json. Progress is kept in
+results/native-symptoms.partial.jsonl, so a restart skips programs already measured.
 """
 
 from __future__ import annotations
 
 import json
 import subprocess
+import threading
 import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -25,6 +27,13 @@ PROBLEMS = ("count-occurrences", "last-less-than", "first-true")
 
 
 def main() -> None:
+    partial = HERE / "results/native-symptoms.partial.jsonl"
+    done: dict[str, dict[str, dict]] = {p: {} for p in PROBLEMS}
+    if partial.exists():
+        for line in partial.read_text().splitlines():
+            r = json.loads(line)
+            done[r["problem"]][r["program"]] = r["result"]
+    lock = threading.Lock()
     result: dict[str, dict[str, dict]] = {}
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)
@@ -34,6 +43,14 @@ def main() -> None:
 
             def one(src: Path, problem: str = problem) -> tuple[str, dict]:
                 key = src.stem if src.parent.name == "mutants" else f"original:{src.stem}"
+                if key in done[problem]:
+                    return key, done[problem][key]
+                key, value = measure(src, key, problem)
+                with lock, partial.open("a") as f:
+                    f.write(json.dumps({"problem": problem, "program": key, "result": value}) + "\n")
+                return key, value
+
+            def measure(src: Path, key: str, problem: str) -> tuple[str, dict]:
                 exe = tmp / f"{problem}-{key.replace(':', '_')}"
                 if not build(src, DEFINES[problem], exe):
                     return key, {"compiled": False}

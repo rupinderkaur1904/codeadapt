@@ -21,7 +21,6 @@ cd backend
 uv run python ../docs/evaluation/val1a2-2026-10-22/run_audit.py 1   # pipeline, run 1 (Docker)
 uv run python ../docs/evaluation/val1a2-2026-10-22/run_audit.py 2   # pipeline, run 2
 cd ..
-python3 docs/evaluation/val1a2-2026-10-22/native_symptoms.py  # native crash/TLE cross-check
 cd backend && uv run python ../docs/evaluation/val1a2-2026-10-22/analyse.py
 ```
 
@@ -44,8 +43,11 @@ Pipeline time was 75 minutes per pass, against a planned estimate of 9–10 hour
    evidence (added after the plan). One differs: count-occurrences `A_SDL_046`. At `-O2` the
    compiler removes its side-effect-free endless loop, and the program prints 0 everywhere; at `-O1`
    it stalls like `no_progress_update`. It is counted as a wrong name, as the rule in §7 says.
-3. **The native crash/TLE cross-check** (`native_symptoms.py`) **was run after the pipeline**, so
-   that it did not compete with the sandbox for CPU.
+3. **The native crash/TLE cross-check was not completed.** `native_symptoms.py` (§7, last bullet)
+   runs every program on all 3,040 inputs at 50 ms per stalling input. It projected at about 6 hours
+   and was stopped twice by container restarts, so it was dropped. It decides no label or reading,
+   and the pipeline's own signatures, reported above, answer Q3. The script is kept for anyone who
+   wants to run it.
 4. **Two analyses were added after seeing the data** and are labelled exploratory:
    - whether each wrong name's evidence equals the named model's fingerprint;
    - whether the named model's fingerprint is constant.
@@ -57,6 +59,8 @@ No stop condition (X1–X5) was triggered:
 - **X3:** 0 `execution_error`.
 - **X4:** v1.1 had already reproduced every lower-bound record (`../adr027-2026-10-21/`).
 - **X5:** the run took 2.5 hours.
+
+`MANIFEST.sha256` lists the SHA-256 of the plan, scripts, mutants, labels and raw results.
 
 ## Results (pooled over the three problems, method 1.2)
 
