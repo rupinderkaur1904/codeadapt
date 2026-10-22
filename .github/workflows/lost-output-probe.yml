@@ -7,8 +7,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - eval/infra/lost-output/**
-      - .github/workflows/lost-output-probe.yml
+      - eval/infra/lost-output/probe.py
 
 permissions:
   contents: read
