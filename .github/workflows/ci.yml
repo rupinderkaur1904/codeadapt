@@ -32,6 +32,31 @@ jobs:
           uv export --no-hashes --no-emit-project --format requirements-txt > /tmp/requirements.txt
           uvx pip-audit -r /tmp/requirements.txt
 
+  backend-postgres:
+    # The same non-sandbox tests against PostgreSQL 16, the deployment database (ADR-004):
+    # every test gets a fresh database, migrated from scratch.
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 2s --health-timeout 5s --health-retries 30
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install (locked)
+        run: uv sync --locked
+      - name: Tests without the sandbox, on PostgreSQL
+        env:
+          CODEADAPT_TEST_POSTGRES_URL: postgresql+psycopg://postgres:postgres@127.0.0.1:5432/postgres
+        run: uv run pytest --ignore=tests/sandbox
+
   sandbox:
     # The sandbox tests, split across runners so the four long pipeline tests run side by
     # side instead of one after another. Each shard is a separate VM, so shards do not load

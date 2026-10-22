@@ -91,7 +91,8 @@ audit rows are kept is an owner decision (M9).
 
 ## 8. Not yet verified
 
-- PostgreSQL: the code targets it (ADR-004), but tests run on SQLite only, and the
-  Postgres driver is not a dependency yet. A CI job against PostgreSQL is the next M8 step.
+- PostgreSQL: the driver (psycopg 3) is a dependency and the `backend-postgres` CI job runs
+  every non-sandbox test against PostgreSQL 16, each on a freshly migrated database
+  (`CODEADAPT_TEST_POSTGRES_URL`). The sandbox pipeline tests still run on SQLite.
 - The production container image (the current `backend/Dockerfile` is the dev image).
 - gVisor on the real runner VM (CI and the development container only, ADR-028).

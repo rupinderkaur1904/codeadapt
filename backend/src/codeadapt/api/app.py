@@ -97,8 +97,8 @@ def create_app(
     sessions: sessionmaker[Session] | None = None,
     catalogue: Catalogue | None = None,
 ) -> FastAPI:
-    settings = settings or Settings.from_env()
-    if settings.env is not Env.TEST:
+    if settings is None:  # started by uvicorn's factory: this process owns its logging
+        settings = Settings.from_env()
         logs.configure(production=settings.env is Env.PRODUCTION)
     sessions = sessions or make_session_factory(make_engine(settings.database_url))
     catalogue = catalogue or Catalogue.load(settings.content_dir)
