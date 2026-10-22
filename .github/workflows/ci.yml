@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   backend:
+    # Lint, types, unit tests and the dependency audit: everything that needs no sandbox.
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -24,17 +25,54 @@ jobs:
         run: uv run ruff format --check src tests
       - name: Type check
         run: uv run mypy
+      - name: Tests without the sandbox
+        run: uv run pytest --ignore=tests/sandbox
+      - name: Dependency audit
+        run: |
+          uv export --no-hashes --no-emit-project --format requirements-txt > /tmp/requirements.txt
+          uvx pip-audit -r /tmp/requirements.txt
+
+  sandbox:
+    # The sandbox tests, split across runners so the four long pipeline tests run side by
+    # side instead of one after another. Each shard is a separate VM, so shards do not load
+    # each other. "core" takes every sandbox test file not named by another shard, so a new
+    # file is never left out.
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: demo-content
+            tests: tests/sandbox/test_demo_content.py
+          - shard: heldout-evaluation
+            tests: tests/sandbox/test_evaluation_harness.py
+          - shard: end-to-end
+            tests: tests/sandbox/test_end_to_end.py
+          - shard: adaptation
+            tests: tests/sandbox/test_adaptation_end_to_end.py
+          - shard: core
+            tests: >-
+              tests/sandbox
+              --ignore=tests/sandbox/test_demo_content.py
+              --ignore=tests/sandbox/test_evaluation_harness.py
+              --ignore=tests/sandbox/test_end_to_end.py
+              --ignore=tests/sandbox/test_adaptation_end_to_end.py
+    name: sandbox (${{ matrix.shard }})
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install (locked)
+        run: uv sync --locked
       - name: Build sandbox image
         working-directory: .
         run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
       - name: Tests (sandbox tests required, never skipped in CI)
         env:
           CODEADAPT_REQUIRE_SANDBOX: "1"
-        run: uv run pytest
-      - name: Dependency audit
-        run: |
-          uv export --no-hashes --no-emit-project --format requirements-txt > /tmp/requirements.txt
-          uvx pip-audit -r /tmp/requirements.txt
+        run: uv run pytest ${{ matrix.tests }}
       - name: No sandbox leftovers
         run: |
           test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"
