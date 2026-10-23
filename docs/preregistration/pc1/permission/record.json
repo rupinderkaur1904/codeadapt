@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "status": "granted",
+  "dataset": "IBM Project CodeNet 1.0.0",
+  "granted_by_role": "supervisor",
+  "basis": "explicit approval",
+  "decision_date": "2026-10-23",
+  "recorded_on": "2026-10-23",
+  "recorded_by": "owner",
+  "evidence_reference": "Written approval kept in the owner's records; confirmed in the project thread on 2026-10-23",
+  "conditions_verbatim": "none",
+  "scope": {
+    "download_full_archive": true,
+    "store_outside_repository": true,
+    "metadata_analysis": true,
+    "source_code_analysis": false,
+    "publish_derived_statistics": false,
+    "publish_submission_ids": false,
+    "redistribute_code": false
+  }
+}
