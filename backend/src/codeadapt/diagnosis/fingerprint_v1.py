@@ -27,12 +27,23 @@ NON_TERMINATION = (
     "is far too slow. Many different errors stop progress on the same inputs, so no error "
     "model is named (ADR-027)."
 )
+UNINFORMATIVE = {
+    "8a": (
+        "The only consistent error model predicts the same result on every test, so any "
+        "program that always gives that result matches it. No error model is named (ADR-030)."
+    ),
+    "8b": (
+        "Tests on which the consistent error model differs from the reference were excluded "
+        "as unreliable, so the remaining evidence cannot separate it from other errors. No "
+        "error model is named (ADR-030)."
+    ),
+}
 
 
 @dataclass(frozen=True)
 class FingerprintConsistencyV1:
     name: str = "fingerprint_consistency"
-    version: str = "1.2"
+    version: str = "1.3"
     min_support: int = 2
     # Distinct behaviour groups the supporting tests must span (diagnosis/groups.py).
     # 1 keeps v1's decisions and only reports the count; 2 is the C6 candidate rule.
@@ -41,6 +52,10 @@ class FingerprintConsistencyV1:
     # Rule 4b (v1.2, ADR-027): a reliable CPU-time-limit failure is reported as a symptom
     # and never named as an error model. False reproduces v1.1.
     time_limit_is_symptom: bool = True
+    # Rules 8a/8b (v1.3, ADR-030): a name resting on a constant fingerprint, or on evidence
+    # from which the model's distinguishing tests were excluded, becomes insufficient
+    # evidence. False reproduces v1.2.
+    uninformative_is_insufficient: bool = True
 
     def diagnose(self, data: DiagnosticInput) -> Diagnosis:
         rationale: dict[str, Any] = {
@@ -49,6 +64,7 @@ class FingerprintConsistencyV1:
                 "min_behaviours": self.min_behaviours,
                 "max_excluded_fraction": self.max_excluded_fraction,
                 "time_limit_is_symptom": self.time_limit_is_symptom,
+                "uninformative_is_insufficient": self.uninformative_is_insufficient,
             }
         }
 
@@ -145,6 +161,31 @@ class FingerprintConsistencyV1:
         rationale["support_behaviours"] = behaviours
         if support < self.min_support or behaviours < self.min_behaviours:
             return result(Outcome.INSUFFICIENT_EVIDENCE, 7, candidates=candidates, support=support)
+        # Rules 8a and 8b (ADR-030): the match is real but carries too little information
+        # to name the model. The consistent model is kept for research only.
+        if self.uninformative_is_insufficient:
+            uninformative = []
+            if len(set(prediction.values())) == 1:
+                uninformative.append("8a")
+            thinned = sorted(
+                o.test_key
+                for o in observations
+                if o.excluded_reason is not None
+                and prediction[o.test_key] != data.reference[o.test_key]
+            )
+            if thinned:
+                uninformative.append("8b")
+            if uninformative:
+                rationale["uninformative"] = uninformative
+                rationale["consistent_model"] = model
+                rationale["informative_tests_excluded"] = thinned
+                rationale["note"] = " ".join(UNINFORMATIVE[r] for r in uninformative)
+                return result(
+                    Outcome.INSUFFICIENT_EVIDENCE,
+                    uninformative[0],
+                    candidates=candidates,
+                    support=support,
+                )
         rationale["caveat"] = CAVEAT
         # A supported diagnosis resting on one behaviour is reported as qualified, never as
         # established: consumers (feedback, policy, research views) read this field.
@@ -182,13 +223,19 @@ class FingerprintConsistencyV1:
         return [k for k in keys if len({str(data.models[c].get(k)) for c in candidates}) > 1]
 
 
-# Named parameter sets. "v1" is the deployed method (1.2 since ADR-027); "v1.1" reproduces
-# every result recorded before it; "v2-candidate" is change C6 on top of v1.1, kept for
-# evaluation until a decision adopts or rejects it (docs/decisions.md ADR-019).
+# Named parameter sets. "v1" is the deployed method (1.3 since ADR-030); "v1.2" and "v1.1"
+# reproduce every result recorded before ADR-030 and ADR-027; "v2-candidate" is change C6
+# on top of v1.1, kept for evaluation until a decision adopts or rejects it (ADR-019).
 METHODS: dict[str, FingerprintConsistencyV1] = {
     "v1": FingerprintConsistencyV1(),
-    "v1.1": FingerprintConsistencyV1(version="1.1", time_limit_is_symptom=False),
+    "v1.2": FingerprintConsistencyV1(version="1.2", uninformative_is_insufficient=False),
+    "v1.1": FingerprintConsistencyV1(
+        version="1.1", time_limit_is_symptom=False, uninformative_is_insufficient=False
+    ),
     "v2-candidate": FingerprintConsistencyV1(
-        version="2-candidate", min_behaviours=2, time_limit_is_symptom=False
+        version="2-candidate",
+        min_behaviours=2,
+        time_limit_is_symptom=False,
+        uninformative_is_insufficient=False,
     ),
 }

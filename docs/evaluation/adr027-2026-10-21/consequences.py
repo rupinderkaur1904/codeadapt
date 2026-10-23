@@ -54,7 +54,8 @@ def policy_for(version: str) -> PolicyV1:
     # Policy 1.3 and 1.4 differ only in the rule for the new outcome, which v1.1 never
     # produces, so 1.4 gives 1.3's recommendation for every v1.1 diagnosis
     # (tests/unit/test_adaptation.py golden-file test).
-    return POLICY_V1_4 if version == "1.2" else PolicyV1(version="1.3")
+    # Methods after 1.2 (1.3, ADR-030) add no outcome, so policy 1.4 applies to them too.
+    return PolicyV1(version="1.3") if version == "1.1" else POLICY_V1_4
 
 
 def consequences(
