@@ -1,6 +1,8 @@
 # Proposed ADR-030: no named error from uninformative evidence (for owner approval)
 
-**Status: proposed, not implemented.** The owner approved the proposal-and-replay stage on
+**Status: approved by the owner on 2026-10-23 (option A) and implemented as method v1.3; see
+docs/decisions.md ADR-030 and docs/evaluation/adr030-2026-10-23. The text below is the proposal
+as approved.** Original status line: proposed, not implemented. The owner approved the proposal-and-replay stage on
 2026-10-22. Production stays on `fingerprint_consistency` v1.2, ledger policy 1.2, policy v1.4
 and LM1, and v1.1 stays selectable. The candidate rule exists only in
 `docs/evaluation/adr030-replay-2026-10-22/replay.py`. It goes into production only after the

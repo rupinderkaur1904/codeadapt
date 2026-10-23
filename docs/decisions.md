@@ -388,3 +388,18 @@ v1.1 stays registered as `v1.1`; earlier results are not rewritten. Proposal, co
 for ever naming a termination error again, and the re-run plan:
 docs/proposals/adr-027-non-termination-evidence.md. Re-run comparison:
 docs/evaluation/adr027-2026-10-21.
+
+## ADR-030 — No named error from uninformative evidence (2026-10-23)
+**Context:** the VAL1-A2 mutation audit (docs/evaluation/val1a2-2026-10-22) found 11 of 50
+v1.2 names wrong. In every one, the evidence was identical to the named model's fingerprint:
+10 rested on a constant fingerprint (count-occurrences `upper_uses_strict` prints 0 on every
+test), and 1 on evidence from which the sanitizer had excluded the distinguishing tests.
+**Decision (owner, 2026-10-23, option A of the proposal):** method `fingerprint_consistency`
+v1.3 adds rules 8a (constant fingerprint) and 8b (an excluded test on which the model differs
+from the reference). Either gives `insufficient_evidence`, with the model recorded as
+`consistent_model` for research only. Policy, ledger, feedback wording, BKT, skill maps and
+content are unchanged. Under LM1 the attempt counts like any other `insufficient_evidence`
+attempt. v1.2 and v1.1 stay registered as `v1.2` and `v1.1`; earlier results are not
+rewritten. ADR-028 and ADR-029 are used on another branch. Proposal and replay:
+docs/proposals/adr-030-uninformative-evidence.md, docs/evaluation/adr030-replay-2026-10-22.
+Re-run comparison: docs/evaluation/adr030-2026-10-23.
