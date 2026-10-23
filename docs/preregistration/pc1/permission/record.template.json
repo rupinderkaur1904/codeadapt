@@ -1,0 +1,21 @@
+{
+  "record_version": 1,
+  "status": "TEMPLATE",
+  "dataset": "IBM Project CodeNet 1.0.0",
+  "granted_by_role": "one of: supervisor | institutional research-data office | institutional ethics office | dataset owner (IBM)",
+  "basis": "explicit approval",
+  "decision_date": "YYYY-MM-DD",
+  "recorded_on": "YYYY-MM-DD",
+  "recorded_by": "owner",
+  "evidence_reference": "Where the written approval is kept, e.g. 'supervisor email of 2026-11-01, owner's records'. No names or email addresses.",
+  "conditions_verbatim": "Quote every condition of the approval exactly; write 'none' if there are none.",
+  "scope": {
+    "download_full_archive": false,
+    "store_outside_repository": false,
+    "metadata_analysis": false,
+    "source_code_analysis": false,
+    "publish_derived_statistics": false,
+    "publish_submission_ids": false,
+    "redistribute_code": false
+  }
+}
