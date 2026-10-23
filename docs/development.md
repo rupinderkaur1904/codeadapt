@@ -57,8 +57,9 @@ uv run codeadapt-worker            # second terminal; --once drains the queue an
 
 Interactive API docs are at `http://localhost:8000/api/docs`. In `dev` and `test`
 environments the stub authentication uses the `X-Dev-Role: student|researcher` header
-(ADR-013). With `CODEADAPT_ENV=production`, every authenticated endpoint returns 503 until
-real authentication arrives in M8. The first submission for a problem takes about 45
+(ADR-013). With `CODEADAPT_ENV=production` the stub is off: endpoints return 401 until
+the user logs in with an account created by `uv run codeadapt-admin create-user` and
+`set-password` (ADR-029, docs/deployment.md §4). The first submission for a problem takes about 45
 seconds locally, because the worker measures and caches that problem's fingerprints for
 the current environment. Later submissions take a few seconds.
 
