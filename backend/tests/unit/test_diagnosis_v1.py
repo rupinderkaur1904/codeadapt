@@ -250,7 +250,7 @@ def test_rule4b_v1_1_still_names_the_time_limit_model() -> None:
         Outcome.HYPOTHESIS_SUPPORTED,
         "beta",
     )
-    assert METHOD.version == "1.2"
+    assert METHOD.version == "1.3"
     assert METHODS["v1"] == METHOD
 
 

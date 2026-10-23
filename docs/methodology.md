@@ -101,6 +101,8 @@ Decision procedure (evaluated in order; first match wins):
 | 5 | *C* = {Mᵢ : agree on **every** reliable test}; if *C* = ∅ | `UNMODELLED_BEHAVIOUR` (nearest models reported with their mismatch counts, not as a diagnosis) |
 | 6 | \|C\| ≥ 2 | `AMBIGUOUS` (candidates listed; the tests that would distinguish them are named if the content has any) |
 | 7 | \|C\| = 1 but *support* < `min_support` (default 2), where support = number of reliable tests on which *M* differs from *R* (i.e. failures it explains) | `INSUFFICIENT_EVIDENCE` |
+| 8a | (v1.3, ADR-030) *M*'s fingerprint is constant: the same signature on every test | `INSUFFICIENT_EVIDENCE`; *M* recorded as `consistent_model` for research only |
+| 8b | (v1.3, ADR-030) an excluded test is one on which *M* differs from *R* | `INSUFFICIENT_EVIDENCE`; the excluded tests listed as `informative_tests_excluded` |
 | 8 | otherwise | `HYPOTHESIS_SUPPORTED` (M) |
 
 The rationale record for every outcome contains: per-test observation vs. reference vs.
@@ -115,6 +117,17 @@ Properties this gives us, each covered by a unit test:
 * A failing submission never gets forced into a category (rule 5).
 * Unreliable evidence is never diagnosed (rule 3).
 * A time limit is never named as an error model (rule 4b, v1.2).
+* A constant fingerprint, or a match left only after the model's distinguishing tests were
+  excluded, is never named (rules 8a/8b, v1.3).
+
+**Uninformative evidence is not named (v1.3, ADR-030).** In the VAL1-A2 mutation audit all
+11 wrong names under v1.2 rested on evidence identical to the named model's fingerprint. 10
+named count-occurrences `upper_uses_strict`, which prints 0 on every test, so any program
+printing 0 everywhere matches it. One matched only after the sanitizer excluded exactly the
+tests that separated the model from the reference. Rules 8a and 8b turn such a match into
+`INSUFFICIENT_EVIDENCE`. Their consequences are those of that outcome: failing cases without a
+hint, no `incorrect` skill observation, and the abstained retry. The cost is that count-occurrences can no
+longer name its only equality model. `v1.2` and `v1.1` stay registered in `METHODS`.
 
 **Time limits are a symptom (v1.2, ADR-027).** A CPU-time-limit stop is one bit per test,
 and many different edits stop progress on the same inputs: in the VAL1-A mutation audit 17
