@@ -58,6 +58,7 @@ Changed cases by set and rule: heldout 8a: 1, val1a2 8a: 18, val1a2 8a+8b: 1, va
 ## Checks
 
 - Recorded runs reproduced exactly: v1.1 1366, v1.2 1066 (VAL1-A records v1.1 only).
+- Runs on which production method 1.3 (ADR-030, once implemented) equals the candidate: 1366.
 - Programs whose v1.1 result differs between their 2 runs: 1
     - val1a2/first-true/C_AOR_018 (unreliable): unreliable_evidence / unmodelled_behaviour
 - Programs whose v1.2 result differs between their 2 runs: 1

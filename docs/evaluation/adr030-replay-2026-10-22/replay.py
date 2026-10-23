@@ -1,7 +1,7 @@
 """ADR-030 proposal stage: case-by-case replay of the candidate rule on recorded evidence.
 
 The candidate rule lives in this script only; production code is unchanged and v1.1 and
-v1.2 stay selectable (`METHODS["v1.1"]`, `METHODS["v1"]`). For every recorded run of the
+v1.2 stay selectable (`METHODS["v1.1"]`, `METHODS["v1.2"]`). For every recorded run of the
 held-out, calibration, VAL1-A and VAL1-A2 sets, the recorded observations are diagnosed
 with v1.1, v1.2 and the candidate, and the downstream consequences (skill observations,
 recommendation, feedback) are computed with the production code. Nothing is re-executed.
@@ -40,7 +40,7 @@ def candidate(data: DiagnosticInput) -> Diagnosis:
     """v1.2, then ADR-030: a name resting on uninformative evidence becomes
     `insufficient_evidence` (rule 8a: the named model's fingerprint is constant; rule 8b: a
     test where the named model differs from the reference was excluded)."""
-    d = METHODS["v1"].diagnose(data)
+    d = METHODS["v1.2"].diagnose(data)
     if d.outcome is not Outcome.HYPOTHESIS_SUPPORTED:
         return d
     model = d.selected_model
@@ -174,7 +174,7 @@ def main() -> None:
             )
 
     rows = []
-    checked = {"v1.1": 0, "v1.2": 0}
+    checked = {"v1.1": 0, "v1.2": 0, "production": 0}
     for set_name, slug, name, record, exp in sources:
         version, reference, models = fps[slug]
         problem = catalogue.by_slug[slug]
@@ -194,7 +194,15 @@ def main() -> None:
                 data = data.model_copy(update={"compiled": False})
             if exp["kind"] == "val1a2" and not record["runs"][i]["compiled"]:
                 data = data.model_copy(update={"compiled": False})
-            old, new, cand = METHODS["v1.1"].diagnose(data), METHODS["v1"].diagnose(data), candidate(data)
+            old, new, cand = METHODS["v1.1"].diagnose(data), METHODS["v1.2"].diagnose(data), candidate(data)
+            # Since ADR-030 was implemented (method 1.3), the production method must reproduce
+            # the candidate exactly on every run.
+            prod = METHODS["v1"].diagnose(data)
+            if prod.method_version != "1.2" and (
+                prod.outcome, prod.selected_model, prod.candidates, prod.rationale.get("rule")
+            ) != (cand.outcome, cand.selected_model, cand.candidates, cand.rationale.get("rule")):
+                sys.exit(f"{set_name} {slug}/{name} run {i + 1}: production 1.3 differs from the candidate")
+            checked["production"] += prod.method_version != "1.2"
             # Every recorded run is checked against its own record where one exists: VAL1-A2
             # records v1.1 and v1.2 per run, VAL1-A records v1.1 per run, and the held-out
             # file records one summary per case (checked on every run).
@@ -283,6 +291,7 @@ def report(rows: list[dict], checked: dict[str, int]) -> str:
         "## Checks",
         "",
         f"- Recorded runs reproduced exactly: v1.1 {checked['v1.1']}, v1.2 {checked['v1.2']} (VAL1-A records v1.1 only).",
+        f"- Runs on which production method 1.3 (ADR-030, once implemented) equals the candidate: {checked['production']}.",
     ]
     for m in ("v1.1", "v1.2", "candidate"):
         nonrep = [r for r in rows if not r["reproducible"][m]]
