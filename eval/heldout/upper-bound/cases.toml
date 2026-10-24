@@ -1,0 +1,42 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE2 (2026-10-24) by the models' author, in styles different from the models,
+# and committed before the method was run on them. See docs/methodology.md §6.1 for what that
+# does and does not allow us to claim.
+
+problem = "upper-bound"
+
+[[cases]]
+file = "closed_interval_answer_var.cpp"
+truth = "correct"
+note = "Closed interval with a running answer."
+
+[[cases]]
+file = "power_of_two_steps.cpp"
+truth = "correct"
+note = "Decreasing power-of-two jumps (no lo/hi pair)."
+
+[[cases]]
+file = "closed_answer_ge.cpp"
+truth = "lower_bound_confusion"
+note = "Closed interval with a running answer that accepts a[mid] >= target."
+
+[[cases]]
+file = "for_loop_right_drops_mid.cpp"
+truth = "hi_skips_candidate"
+note = "For-loop form; a greater element at mid moves the right edge to mid - 1."
+
+[[cases]]
+file = "answer_starts_minus_one.cpp"
+truth = "none_sentinel"
+note = "Closed interval whose running answer starts at -1."
+
+[[cases]]
+file = "lower_bound_with_sentinel.cpp"
+truth = "unmodelled"
+note = "Two modelled errors at once: >= and -1 when nothing qualifies."
+
+[[cases]]
+file = "returns_any_greater.cpp"
+truth = "unmodelled"
+note = "Early return on a greater element whose left neighbour is also greater."
