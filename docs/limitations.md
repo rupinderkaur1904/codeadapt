@@ -1,0 +1,50 @@
+# Limitations and future work (as of 2026-10-24)
+
+Each item says what is limited, the evidence for it, and what would address it. Numbers come
+from [evaluation/summary.md](evaluation/summary.md).
+
+## Evidence about the diagnostic method
+
+| # | Limitation | Evidence | What would address it |
+| --- | --- | --- | --- |
+| L1 | No independent test data. Held-out programs were written by the error-model author; mutants were generated and labelled by the same AI system that works on the project. | critical review 2026-10-21; VAL1-A/A2 reports | Programs by other people: VAL1-B (pre-registered, deferred) or real rejected submissions (PC1, blocked) |
+| L2 | Near-circularity. Every correctly diagnosed held-out case produced exactly its bug model's output on 500 random inputs (it was effectively that model), and the unmodelled cases were far from every model. | critical review §3 | Cases chosen by someone else; mutation audits (done) |
+| L3 | Low coverage. Under v1.3, about 9% of incorrect mutants (30/323) and 14/26 held-out cases get a named error. | adr030-2026-10-23 | Better failing-case feedback (proposal); more discriminating tests per problem |
+| L4 | "0 wrong" rests on small denominators (30 named mutants, 14 held-out). | same | Larger, independent samples |
+| L5 | One algorithm family (binary search, 4 problems) with shared bug models, so evidence across problems is not independent. | content/demo | New families designed for diagnosis (CE1.2/1.3 paused) |
+| L6 | Strict consistency: two bugs, or one bug plus noise, give `unmodelled_behaviour`. | methodology §4 | A noise-aware or compositional method, compared on stored evidence |
+| L7 | Complexity is not assessed: a linear scan passes. | methodology §4 | An instrumented harness counting comparisons |
+| L8 | count-occurrences can no longer name its only equality model (ADR-030 cost). | adr030-2026-10-23 | A test on which that model prints something other than 0 |
+
+## Learner model and recommendations
+
+| # | Limitation | Evidence | What would address it |
+| --- | --- | --- | --- |
+| L9 | BKT parameters are assumptions (`bkt-params-assumed-1`); estimates swing widely across plausible values (e.g. 0.52–0.99 after two corrects). | bkt-sensitivity-2026-10-17 | Fitting on real data; until then researcher-only |
+| L10 | Skill maps (problem → skill) are unvalidated modelling choices. | ADR-021/023 | Expert review; real-data checks |
+| L11 | The recommendation policy is a transparent rule set over a small bank, effectively a fixed sibling lookup; it ignores prerequisites and uncertainty. | critical review; policy 1.4 | More content; a policy evaluated on learner outcomes |
+| L12 | No learning effect has been measured; no claim of improved learning is possible. | — | A study with real learners and a suitable design |
+
+## Platform
+
+| # | Limitation | Evidence | What would address it |
+| --- | --- | --- | --- |
+| L13 | Not deployed; the production tier (gVisor on a separate runner VM) is set up and tested in CI only for one shard, and there is no host. | docs/deployment.md; roadmap M8 | Owner's hosting choice; full suite under runsc on the host |
+| L14 | Lost-output cause unknown; the end-of-output marker turns it into an infrastructure error. | ADR-024; 0 in about 37,700 probe runs | Root cause if it recurs |
+| L15 | No lease heartbeat: a job that exceeds its 600 s lease can run on two workers at once (both diagnoses kept). | ADR-031 | Heartbeat or fencing token through to the diagnosis insert |
+| L16 | The sandbox tests are slow (about 20–30 min locally), so they are sharded in CI. | CI config | Batch execution (changes per-test isolation, so it needs a decision) |
+
+## Data and permissions
+
+| # | Limitation | Evidence | What would address it |
+| --- | --- | --- | --- |
+| L17 | CodeNet: the licence is reported (CDLA-Permissive-2.0) but not shipped in the archive; IBM gives no warranty about upstream rights; ids are pseudonymous. The PC1 gate is closed. | pc1/STATUS.md; CORRECTIONS.md | Owner decision on amendment A1, first-hand evidence, optional maintainer reply |
+| L18 | Public-corpus authors are not CodeAdapt's target students; a rejected→accepted pair is not a misconception label. | PC1 protocol §9 | State this in any claim |
+
+## Future work, in order of value for the research question
+
+1. Independent programs (PC1 if unblocked, otherwise VAL1-B), evaluated with the pre-registered
+   protocols.
+2. Failing-case feedback as the main experience (proposal), since that is what most students see.
+3. A second, non-binary-search problem family, designed backwards from diagnostic purpose.
+4. Only after real data: fitting BKT parameters, and validating skill maps.
