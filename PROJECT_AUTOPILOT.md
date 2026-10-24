@@ -10,7 +10,9 @@ deliverables 1–12 from the owner's brief, without crossing approval gates.
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 9
+**Iteration:** 10
+
+**PC1 status:** Phase E proposed — blocked pending code-level permission and owner approval.
 
 ## Hard limits (owner rules, override everything below)
 
@@ -34,6 +36,7 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | C1 | Full test run, recorded | — | PROJECT_AUTOPILOT.md, docs/status-2026-10-24.md | Commands verified today with counts | **done**: unit 348, sandbox 33 + end-to-end re-run 2/2 on d78ee21, web 21 |
 | C2 | One documented command per evaluation to reproduce reported numbers | — | docs/evaluation/*, docs/development.md | Re-run reproduces held-out/calibration tables | **done**: fresh held-out and calibration re-runs identical to the adr030 records |
 | D1 | CodeNet PC1 Phase F counts | A2 + owner | — | Only after a truthful, accepted record | **done** 2026-10-24 on dc4c0e1 (feasible; counts in owner's project files only) |
+| D2 | PC1 Phase E: permission assessment, maintainer enquiry draft, preregistration draft, suitability review | D1 + owner | owner's project files `codeadapt/pc1/phase-e-proposal/` | Drafts only; no code read; nothing activated | **proposed — blocked pending code-level permission and owner approval** |
 | E1 | Consolidated, labelled results table across all evaluations | — | docs/evaluation/summary.md | Every number traceable to a report; labels on every row | **done** fca1432 |
 | F1 | Architecture document matches the code | — | docs/architecture.md | Known mismatch fixed (queue uses an optimistic conditional UPDATE, not SKIP LOCKED); every component checked | **done** 987cc50 |
 | F2 | Research report draft with evidence-supported claims only | E1 | docs/research-report-draft.md | Each claim cites a result; limitations section | **done** (draft) 91cb35a |
@@ -81,12 +84,13 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Blockers needing the owner
 
-1. PC1 Phase E (source code): needs a code-level permission basis and an approved plan.
+1. PC1 Phase E: proposed — blocked pending code-level permission and owner approval
+   (decisions P and D1–D12 in the owner's project files `phase-e-proposal/04-…`).
 2. Hosting/deployment (M8): not needed for the research deliverables.
 
 ## Next three tasks
 
-1. Owner decision on Phase E.
+1. Owner decisions on Phase E (permission basis P, then D1–D12).
 2. Otherwise idle safely: every remaining workstream needs an owner decision (Phase E, hosting,
    failing-case feedback proposal, CE1.2/1.3).
 
@@ -110,3 +114,11 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
   CI green on all three (runs 69–71).
 - PC1 Phase F run with the frozen script: identification identical, confirm by owner,
   feasibility exit 0, band feasible. Counts kept out of the repository (not publishable).
+
+### Iteration 10 (local commit; owner said not to push)
+
+- Phase E prepared, not approved. Permission assessment: no first-hand evidence covers the full
+  archive's source code (IBM's own download page `readme.html` has no licence statement; the
+  CODAIT statement covers samples only; AIZU rights unknown). Enquiry drafted, not sent.
+  Preregistration draft 0.1 and suitability review written to project files.
+- Code gate re-checked: `pc1.py gate --level code` exit 3. No code extracted or read.

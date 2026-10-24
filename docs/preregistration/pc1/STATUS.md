@@ -14,7 +14,7 @@ they were frozen and are no longer true. This file records the current state.
 | Confirmation | ALDS1_4_B ↔ p02268, confirmed by the owner (`--role owner`) | — |
 | Counting, pairing (Phase F) | **Run on 2026-10-24.** No stop condition fired. Counts are **not** in this repository because `publish_derived_statistics` is false. | owner's project files |
 | Source code | Never read | — |
-| Phase E | **Not started.** Needs a code-level permission basis (A1 cannot give one) and an owner-approved plan. | — |
+| Phase E | **Proposed — blocked pending code-level permission and owner approval.** Draft plan and permission assessment exist outside the repository; nothing approved, no code read. | owner's project files |
 | README "no CodeNet data has been downloaded", protocol section 12 "no permission record exists" | Out of date (frozen text); superseded by this file | — |
 
 ## History: why PC1 was blocked
