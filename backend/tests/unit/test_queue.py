@@ -99,3 +99,28 @@ def test_live_lease_is_not_reclaimed(sessions: sessionmaker[Session]) -> None:
     assert claim(sessions, lease=timedelta(hours=1).total_seconds()) is not None
     assert claim(sessions) is None
     assert utcnow().tzinfo is not None
+
+
+def test_lost_claim_cannot_overwrite_the_newer_attempt(sessions: sessionmaker[Session]) -> None:
+    """A worker whose lease expired must not finish or requeue the job another worker holds."""
+    (job_id,) = enqueue(sessions)
+    stale = claim(sessions, "w1", lease=-1)  # w1's lease is already over
+    current = claim(sessions, "w2")
+    assert stale is not None and current is not None and current.attempts == 2
+    with sessions() as s:
+        assert queue.finish(s, stale, state=JobState.FAILED, error="late") is False
+        assert queue.requeue(s, stale, "late") is False
+        row = s.get_one(Job, job_id)
+        assert (row.state, row.claimed_by, row.last_error) == (JobState.RUNNING.value, "w2", None)
+        assert queue.finish(s, current, state=JobState.DONE) is True
+        assert s.get_one(Job, job_id).state == JobState.DONE.value
+
+
+def test_finish_is_not_repeated(sessions: sessionmaker[Session]) -> None:
+    enqueue(sessions)
+    job = claim(sessions)
+    assert job is not None
+    with sessions() as s:
+        assert queue.finish(s, job, state=JobState.DONE) is True
+        assert queue.finish(s, job, state=JobState.FAILED, error="again") is False
+        assert s.get_one(Job, job.id).state == JobState.DONE.value

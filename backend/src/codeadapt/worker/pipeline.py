@@ -71,20 +71,42 @@ class Pipeline:
         """Process one claimed job and record its final state. Never raises for job errors."""
         with self.sessions() as session:
             try:
-                await self.process(session, job.submission_id)
+                existing = self._existing_diagnosis(session, job.submission_id)
+                if existing is not None:
+                    # A redelivered job (a worker died after committing): do not run the
+                    # submission again, which would add a second, possibly different diagnosis
+                    # and a second recommendation.
+                    log.info("job %s already has diagnosis %s", job.id, existing.id)
+                else:
+                    await self.process(session, job.submission_id)
             except SandboxUnavailableError as exc:
                 log.warning("sandbox unavailable; requeueing job %s: %s", job.id, exc)
                 session.rollback()
-                queue.requeue(session, job, f"sandbox unavailable: {exc}")
+                if not queue.requeue(session, job, f"sandbox unavailable: {exc}"):
+                    log.warning("job %s was reclaimed by another worker", job.id)
                 return
             except Exception as exc:
                 log.exception("job %s failed", job.id)
                 session.rollback()
-                queue.finish(
+                if not queue.finish(
                     session, job, state=JobState.FAILED, error=f"{type(exc).__name__}: {exc}"
-                )
+                ):
+                    log.warning("job %s was reclaimed by another worker", job.id)
                 return
-            queue.finish(session, job, state=JobState.DONE)
+            if not queue.finish(session, job, state=JobState.DONE):
+                log.warning("job %s was reclaimed by another worker", job.id)
+
+    def _existing_diagnosis(self, session: Session, submission_id: str) -> DiagnosisRow | None:
+        """A diagnosis this worker's method version already recorded for the submission."""
+        return session.scalars(
+            select(DiagnosisRow)
+            .where(
+                DiagnosisRow.submission_id == submission_id,
+                DiagnosisRow.method == self.method.name,
+                DiagnosisRow.method_version == self.method.version,
+            )
+            .limit(1)
+        ).first()
 
     async def process(self, session: Session, submission_id: str) -> DiagnosisRow:
         submission = session.get_one(Submission, submission_id)

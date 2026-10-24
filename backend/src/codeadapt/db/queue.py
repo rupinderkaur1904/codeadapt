@@ -4,13 +4,17 @@ Claiming uses an optimistic conditional UPDATE, which is safe for concurrent wor
 both PostgreSQL and SQLite: exactly one worker's UPDATE matches the expected prior state.
 Expired leases (a worker died mid-job) are reclaimed; a job that keeps failing for
 infrastructure reasons is marked FAILED after `max_attempts`.
+
+`finish` and `requeue` are fenced: they change the job only while it is still this claim
+(same worker, same attempt, still running). A worker whose lease expired and whose job was
+reclaimed by another worker therefore cannot overwrite the newer attempt's state.
 """
 
 from __future__ import annotations
 
 from datetime import timedelta
 
-from sqlalchemy import and_, or_, select, update
+from sqlalchemy import ColumnElement, and_, or_, select, update
 from sqlalchemy.orm import Session
 
 from codeadapt.db.models import Job, JobState, utcnow
@@ -55,22 +59,37 @@ def claim_next(
     return None
 
 
-def finish(session: Session, job: Job, *, state: JobState, error: str | None = None) -> None:
-    session.execute(
+def _this_claim(job: Job) -> ColumnElement[bool]:
+    return and_(
+        Job.id == job.id,
+        Job.state == JobState.RUNNING.value,
+        Job.claimed_by == job.claimed_by,
+        Job.attempts == job.attempts,
+    )
+
+
+def finish(session: Session, job: Job, *, state: JobState, error: str | None = None) -> bool:
+    """Record the final state; False if the claim was lost (the job was reclaimed)."""
+    result = session.execute(
         update(Job)
-        .where(Job.id == job.id)
+        .where(_this_claim(job))
         .values(state=state.value, last_error=error, lease_until=None, updated_at=utcnow())
     )
     session.commit()
+    return bool(result.rowcount == 1)  # type: ignore[attr-defined]
 
 
-def requeue(session: Session, job: Job, error: str) -> None:
-    """Infrastructure failure: let another attempt (or worker) try again."""
-    session.execute(
+def requeue(session: Session, job: Job, error: str) -> bool:
+    """Infrastructure failure: let another attempt (or worker) try again.
+
+    False if the claim was lost (the job was reclaimed).
+    """
+    result = session.execute(
         update(Job)
-        .where(Job.id == job.id)
+        .where(_this_claim(job))
         .values(
             state=JobState.QUEUED.value, last_error=error, lease_until=None, updated_at=utcnow()
         )
     )
     session.commit()
+    return bool(result.rowcount == 1)  # type: ignore[attr-defined]
