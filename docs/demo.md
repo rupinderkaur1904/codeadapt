@@ -58,4 +58,4 @@ verdict of `not_comparable`.
 2. Paste a program and submit. The feedback panel and the "Recommended next" card appear.
 3. Switch the dev role to researcher, open Research, and open the submission's trace.
 
-The Playwright test `web/e2e/practice.spec.ts` automates the student part in CI. The researcher part is covered by API tests, not by a browser test.
+The Playwright tests automate both parts in CI: `web/e2e/practice.spec.ts` (student) and `web/e2e/research.spec.ts` (trace and learner model).
