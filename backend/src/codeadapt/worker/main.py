@@ -8,7 +8,8 @@ import logging
 import os
 import socket
 
-from codeadapt.config import Settings
+from codeadapt import logs
+from codeadapt.config import Environment, Settings
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.db import queue
 from codeadapt.db.session import make_engine, make_session_factory
@@ -54,8 +55,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="codeadapt-worker")
     parser.add_argument("--once", action="store_true", help="drain the queue, then exit")
     args = parser.parse_args(argv)
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
-    processed = asyncio.run(run(Settings.from_env(), once=args.once))
+    settings = Settings.from_env()
+    logs.configure(production=settings.env is Environment.PRODUCTION)
+    processed = asyncio.run(run(settings, once=args.once))
     log.info("processed %d job(s)", processed)
     return 0
 

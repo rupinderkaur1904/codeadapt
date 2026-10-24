@@ -1,0 +1,47 @@
+name: lost-output-probe
+
+# Diagnostic only (ADR-024): measures how often sandbox output is lost on GitHub-hosted
+# runners, under the production command line and three single-change variants. Runs only
+# when the probe changes or by hand; it is not a test gate.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - eval/infra/lost-output/probe.py
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        replica: [1, 2, 3]
+        load: [idle, cpu-loaded]
+    name: probe (${{ matrix.load }} ${{ matrix.replica }})
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --locked
+      - name: Build sandbox image
+        working-directory: .
+        run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
+      - name: Host CPU load (one busy loop per core)
+        if: matrix.load == 'cpu-loaded'
+        run: for i in $(seq "$(nproc)"); do (timeout 3000 sh -c 'while :; do :; done' &) ; done
+      - name: Probe
+        run: >-
+          uv run python ../eval/infra/lost-output/probe.py --runs 1500 --concurrency 4
+          --variants production,json-log,no-init,create-start
+          --json probe-${{ matrix.load }}-${{ matrix.replica }}.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: probe-${{ matrix.load }}-${{ matrix.replica }}
+          path: backend/probe-*.json

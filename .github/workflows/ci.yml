@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   backend:
+    # Lint, types, unit tests and the dependency audit: everything that needs no sandbox.
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -24,17 +25,122 @@ jobs:
         run: uv run ruff format --check src tests
       - name: Type check
         run: uv run mypy
+      - name: Tests without the sandbox
+        run: uv run pytest --ignore=tests/sandbox
+      - name: Dependency audit
+        run: |
+          uv export --no-hashes --no-emit-project --format requirements-txt > /tmp/requirements.txt
+          uvx pip-audit -r /tmp/requirements.txt
+
+  backend-postgres:
+    # The same non-sandbox tests against PostgreSQL 16, the deployment database (ADR-004):
+    # every test gets a fresh database, migrated from scratch.
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 2s --health-timeout 5s --health-retries 30
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install (locked)
+        run: uv sync --locked
+      - name: Tests without the sandbox, on PostgreSQL
+        env:
+          CODEADAPT_TEST_POSTGRES_URL: postgresql+psycopg://postgres:postgres@127.0.0.1:5432/postgres
+        run: uv run pytest --ignore=tests/sandbox
+
+  sandbox:
+    # The sandbox tests, split across runners so the four long pipeline tests run side by
+    # side instead of one after another. Each shard is a separate VM, so shards do not load
+    # each other. "core" takes every sandbox test file not named by another shard, so a new
+    # file is never left out.
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: demo-content
+            tests: tests/sandbox/test_demo_content.py
+          - shard: heldout-evaluation
+            tests: tests/sandbox/test_evaluation_harness.py
+          - shard: end-to-end
+            tests: tests/sandbox/test_end_to_end.py
+          - shard: adaptation
+            tests: tests/sandbox/test_adaptation_end_to_end.py
+          - shard: core
+            tests: >-
+              tests/sandbox
+              --ignore=tests/sandbox/test_demo_content.py
+              --ignore=tests/sandbox/test_evaluation_harness.py
+              --ignore=tests/sandbox/test_end_to_end.py
+              --ignore=tests/sandbox/test_adaptation_end_to_end.py
+    name: sandbox (${{ matrix.shard }})
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install (locked)
+        run: uv sync --locked
       - name: Build sandbox image
         working-directory: .
         run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
       - name: Tests (sandbox tests required, never skipped in CI)
         env:
           CODEADAPT_REQUIRE_SANDBOX: "1"
-        run: uv run pytest
-      - name: Dependency audit
+        run: uv run pytest ${{ matrix.tests }}
+      - name: No sandbox leftovers
         run: |
-          uv export --no-hashes --no-emit-project --format requirements-txt > /tmp/requirements.txt
-          uvx pip-audit -r /tmp/requirements.txt
+          test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"
+          test -z "$(docker volume ls -q --filter label=org.codeadapt.sandbox=1)"
+
+  sandbox-gvisor:
+    # The production runtime (ADR-003, ADR-028): the core sandbox tests under gVisor.
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      GVISOR_RELEASE: "20261005"
+      GVISOR_SHA512: 79869ae9a589355a46d46fdac068d9a954e741741ffe77c64e38c56ea955498c1cb04e9bce44e1cce5155333e6b76bee72347c6661bb7c78fd2fe3aad198c8fe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install (locked)
+        run: uv sync --locked
+      - name: Install gVisor (pinned release, checksum verified)
+        working-directory: /tmp
+        run: |
+          curl -fsSLO "https://storage.googleapis.com/gvisor/releases/release/${GVISOR_RELEASE}/x86_64/gvisor.tar.bz2"
+          echo "${GVISOR_SHA512}  gvisor.tar.bz2" | sha512sum -c -
+          mkdir gvisor && tar -xjf gvisor.tar.bz2 -C gvisor
+          sudo install -m 755 gvisor/runsc gvisor/containerd-shim-runsc-v1 /usr/local/bin/
+          sudo mkdir -p /usr/local/bin/gvisor-bin && sudo install -m 755 gvisor/gvisor-bin/* /usr/local/bin/gvisor-bin/
+          sudo /usr/local/bin/runsc install
+          sudo systemctl restart docker
+          docker info --format '{{json .Runtimes}}' | grep -q runsc
+      - name: Build sandbox image
+        working-directory: .
+        run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
+      - name: Core sandbox tests under runsc
+        env:
+          CODEADAPT_REQUIRE_SANDBOX: "1"
+          CODEADAPT_SANDBOX_RUNTIME: runsc
+        run: >-
+          uv run pytest tests/sandbox
+          --ignore=tests/sandbox/test_demo_content.py
+          --ignore=tests/sandbox/test_evaluation_harness.py
+          --ignore=tests/sandbox/test_end_to_end.py
+          --ignore=tests/sandbox/test_adaptation_end_to_end.py
       - name: No sandbox leftovers
         run: |
           test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"

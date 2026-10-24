@@ -13,6 +13,15 @@ export type ResearchSubmissionRow = components["schemas"]["ResearchSubmissionRow
 export type ResearchMetrics = components["schemas"]["ResearchMetrics"];
 export type TraceView = components["schemas"]["TraceView"];
 export type LearnerModelView = components["schemas"]["LearnerModelView"];
+export type AuthUser = components["schemas"]["AuthUser"];
+
+// The session's CSRF token (ADR-029), echoed on every state-changing request. The session
+// cookie itself is HttpOnly and never visible here. Null under the dev stub.
+let csrfToken: string | null = null;
+
+export function setCsrfToken(token: string | null): void {
+  csrfToken = token;
+}
 
 export interface ResearchFilters {
   problem_slug?: string;
@@ -42,11 +51,15 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const method = (init?.method ?? "GET").toUpperCase();
   const response = await fetch(`/api/v1${path}`, {
     ...init,
+    credentials: "same-origin",
     headers: {
       Accept: "application/json",
+      // Ignored by the API whenever a session cookie is present, and outside development.
       "X-Dev-Role": getDevRole(),
+      ...(csrfToken && method !== "GET" ? { "X-CSRF-Token": csrfToken } : {}),
       ...(init?.headers ?? {}),
     },
   });
@@ -64,10 +77,19 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       body.detail,
     );
   }
+  if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
 
 export const api = {
+  me: () => request<AuthUser>("/auth/me"),
+  login: (username: string, password: string) =>
+    request<AuthUser>("/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    }),
+  logout: () => request<undefined>("/auth/logout", { method: "POST" }),
   listProblems: () => request<ProblemSummary[]>("/problems"),
   getProblem: (slug: string) => request<ProblemDetail>(`/problems/${encodeURIComponent(slug)}`),
   submit: (problemSlug: string, source: string) =>

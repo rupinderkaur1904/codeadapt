@@ -37,6 +37,13 @@ On Windows, run the same commands in PowerShell (or WSL2). Use `copy` instead of
 Sandbox tests are **skipped with a stated reason** if Docker or the image is missing. Set
 `CODEADAPT_REQUIRE_SANDBOX=1` to make them fail instead; CI always does.
 
+In CI the `backend` job runs everything except `tests/sandbox`. The sandbox tests run in a
+`sandbox` matrix with one shard per long pipeline test (`demo-content`,
+`heldout-evaluation`, `end-to-end`, `adaptation`) and a `core` shard for every other sandbox
+file. Locally (4 cores) those four tests take about 1000 s of the 1080 s full suite, run
+one after another; on CI the backend job alone took about 41 min on e94ec81. A new sandbox
+test file lands in `core` automatically; give it its own shard only if it is long.
+
 To test the production tier: `CODEADAPT_SANDBOX_RUNTIME=runsc uv run pytest -m sandbox`.
 
 ## Running the API and worker locally
@@ -50,8 +57,9 @@ uv run codeadapt-worker            # second terminal; --once drains the queue an
 
 Interactive API docs are at `http://localhost:8000/api/docs`. In `dev` and `test`
 environments the stub authentication uses the `X-Dev-Role: student|researcher` header
-(ADR-013). With `CODEADAPT_ENV=production`, every authenticated endpoint returns 503 until
-real authentication arrives in M8. The first submission for a problem takes about 45
+(ADR-013). With `CODEADAPT_ENV=production` the stub is off: endpoints return 401 until
+the user logs in with an account created by `uv run codeadapt-admin create-user` and
+`set-password` (ADR-029, docs/deployment.md §4). The first submission for a problem takes about 45
 seconds locally, because the worker measures and caches that problem's fingerprints for
 the current environment. Later submissions take a few seconds.
 
@@ -92,7 +100,7 @@ Local results are evidence about *this* environment only.
 | Sandbox image | `codeadapt-sandbox:gcc14.2-1` on `gcc:14.2.0@sha256:b99b86a2…f5d24c`; g++ 14.2.0 |
 | Python / uv | CPython 3.13.16 / uv 0.11.32 |
 | Results | `pytest`: **70 passed, 0 skipped, 0 failed** (42 unit, 28 sandbox; ≈ 49 s). `ruff check`, `ruff format --check`, `mypy --strict`: clean. `pip-audit`: no known vulnerabilities. No labelled containers or volumes left afterwards. |
-| Not tested | gVisor (`runsc`) runtime; cgroup v2 hosts; macOS/Windows Docker Desktop; arm64. GitHub Actions (ubuntu-24.04 runner) is the second reference environment: the M1 commit passed all CI steps there, including the sandbox tests. |
+| Not tested | gVisor (`runsc`) runtime (tested 2026-10-22, see ADR-028); cgroup v2 hosts; macOS/Windows Docker Desktop; arm64. GitHub Actions (ubuntu-24.04 runner) is the second reference environment: the M1 commit passed all CI steps there, including the sandbox tests. |
 
 ### M2 (2026-10-15)
 
@@ -220,3 +228,13 @@ Same environment.
   OpenAPI is unchanged.
 - Content: `codeadapt-content validate ../content/demo` is valid for all four problems, and
   the first-true report regenerates identically.
+
+### gVisor runtime (2026-10-22, ADR-028)
+Development container (4 cores, cgroup v1, kernel 6.18, Docker 29.9.1) with `runsc`
+release-20261005.0 (systrap) registered by `runsc install`.
+- Before ADR-028: `CODEADAPT_SANDBOX_RUNTIME=runsc pytest tests/sandbox`: 26 failed, 7 passed
+  (run containers could not start under `--pids-limit 16`).
+- After: **33 passed** in 1224 s (runc: 33 passed, about 1000 s of the 1078 s full suite).
+- Unit: `tests/unit/test_sandbox_flags.py` (runc flags unchanged, runsc flags as decided).
+- CI: the `sandbox-gvisor` job installs the same pinned release (sha512 checked) and runs the
+  `core` sandbox shard under `runsc`.

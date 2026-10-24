@@ -389,6 +389,70 @@ for ever naming a termination error again, and the re-run plan:
 docs/proposals/adr-027-non-termination-evidence.md. Re-run comparison:
 docs/evaluation/adr027-2026-10-21.
 
+## ADR-028 — Sandbox flags under gVisor (2026-10-22)
+**Context:** the production tier requires `runsc` (ADR-003), but it had never been run. Under
+`runsc` release-20261005.0 (systrap) with the unchanged flags, 26 of 33 sandbox tests failed:
+(1) the container's pids cgroup also holds gVisor's own host threads (about 30 at start-up),
+so `--pids-limit 16` stopped every run container from starting, and with a larger limit a
+fork bomb exhausted it and crashed the sandbox, which the runner reported as an
+infrastructure error (no markers) instead of failed `fork()` calls; (2) gVisor mounts a
+writable tmpfs at `/tmp` when the container has none, so a run could write `/tmp`.
+**Decision:** only when the runtime is `runsc`: the guest process limit is
+`--ulimit nproc=<pids>` (gVisor enforces it per sandbox; the fork-bomb test still sees at most
+15 children), the pids cgroup becomes `<pids> + 256` as a host-side backstop, and run
+containers get `--tmpfs /tmp:ro`. runc flags are byte-for-byte unchanged (unit test), because
+under runc the sandbox uid is shared by every container, so `RLIMIT_NPROC` would not be per run.
+**Validated:** all 33 sandbox tests pass under `runsc` locally (about 20 min against 18 min
+under runc); `tests/unit/test_sandbox_flags.py` pins the flags for both runtimes; a CI job runs
+the `core` shard under `runsc`. **Not validated:** the deployment host; whether runc and runsc
+give identical observations for every content test (methodology §6.1 cross-environment
+reproducibility is still unmeasured); the headroom under heavily multi-threaded programs.
+No content, evidence rule, diagnosis or feedback change.
+
+## ADR-029 — Real authentication, request limits and an audit log (M8, 2026-10-22)
+**Context:** ADR-007 chose server-side sessions, Argon2id and three roles, and left the
+implementation to M8. Until now only the dev stub existed, and production answered 503.
+**Decision:**
+- *Accounts:* there is no self-registration. An operator runs `codeadapt-admin create-user`
+  with an explicit role and data class. Passwords are read without echo or from stdin,
+  never from arguments, and must have at least 12 characters. They are hashed with
+  Argon2id (argon2-cffi defaults, RFC 9106 low-memory profile) and rehashed on login when
+  those parameters change. `set-password` and `disable` end all of the account's sessions.
+- *Sessions:* `POST /api/v1/auth/login` sets a random 256-bit token in the
+  `codeadapt_session` cookie: HttpOnly, SameSite=Strict, Path=/api, Secure in production,
+  12 h by default (`CODEADAPT_SESSION_HOURS`). Only its SHA-256 is stored. Logout revokes
+  the session server-side. A wrong password, an unknown user, an account without a
+  password and a disabled account all give the same 401, and unknown users are checked
+  against a dummy hash so the timing matches.
+- *CSRF:* each session has its own CSRF token, returned by login and `GET /auth/me`. Every
+  request other than GET, HEAD or OPTIONS made with the cookie must send it in
+  `X-CSRF-Token`. This comes on top of SameSite=Strict.
+- *Limits:* after 5 failed logins for a username or from a client address within 15 min,
+  login answers 429, even with the right password. Each user may create
+  `CODEADAPT_SUBMISSIONS_PER_MINUTE` submissions per minute (10 in production, unlimited in
+  dev and test).
+- *Audit log:* the append-only `audit_events` table records logins, failed and throttled
+  logins, logouts, account changes, every researcher-endpoint request (path and query),
+  and every time staff opens another user's submission. It never stores passwords, tokens
+  or source code.
+- *Dev stub:* the `X-Dev-Role` header still works in dev and test, but only when there is
+  no session cookie. In production it is ignored and requests without a session get 401.
+
+**Validated:** `tests/unit/test_auth.py` covers the hash format, the cookie attributes, the
+digest-only storage, identical failures, CSRF (missing, wrong, right), logout replay,
+expiry, disabled accounts, login throttling, the submission limit, both audit kinds and the
+admin CLI. Migration 0005 matches the models.
+**Web (same day):** a login page shown when the API answers 401, the CSRF header on every
+non-GET request, the signed-in username with a logout button, and the dev role switch only
+under the stub. Vitest covers wrong and right passwords, logout and the stub; a Playwright
+test logs in with a real account through the browser and checks the cookie attributes.
+The dev stub also no longer fails with a 500 when two first requests race to create the
+dev account (seen in the browser test).
+**Not done:** the client address behind a reverse proxy
+(needs the deployment's trusted-proxy setting); password reset by email (none planned);
+data retention for `audit_events` (needs an owner decision with M9). No change to
+diagnosis, feedback, recommendations or the learner model.
+
 ## ADR-030 — No named error from uninformative evidence (2026-10-23)
 **Context:** the VAL1-A2 mutation audit (docs/evaluation/val1a2-2026-10-22) found 11 of 50
 v1.2 names wrong. In every one, the evidence was identical to the named model's fingerprint:
