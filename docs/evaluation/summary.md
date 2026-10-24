@@ -11,6 +11,7 @@ was written by the error models' author (held-out, calibration) or generated mec
 | Set | What it is | Labels | Size |
 | --- | --- | --- | --- |
 | Held-out | Programs written by the error-model author, committed before the method was run on them | the author's intended bug | 32 cases (26 incorrect, 6 correct), 4 problems |
+| Held-out, bank expansion (2026-10-24) | Same kind, for the 8 new problems; each problem's cases were committed after its content and before its evaluation | the author's intended bug | 62 cases (46 incorrect, 16 correct), 8 problems |
 | Calibration | Author-written cases used while designing content; never pooled with held-out | the author's intended bug | 5 incorrect |
 | VAL1-A | Single-edit mutants of 3 independently structured correct lower-bound programs | behavioural (output-equivalence to a model); earlier report also used Claude's edit labels | 147 mutants, 98 incorrect and failing |
 | VAL1-A2 | Same method on count-occurrences, last-less-than, first-true | behavioural | 487 mutants (496 programs), 323 incorrect and failing |
@@ -45,6 +46,49 @@ fresh sandbox runs, `uv run codeadapt-eval --content ../content/demo --heldout .
 - The calibration wrong name (`clamp_with_empty_guard` → `hi_init_last_index`) is a known
   collision, kept visible.
 
+## Bank expansion, 2026-10-24 (synthetic, author-written, per problem)
+
+Sources:
+
+- [ce1.2-2026-10-24](ce1.2-2026-10-24/README.md): integer-sqrt;
+- [ce2-2026-10-24](ce2-2026-10-24/README.md): the other seven problems. Despite the folder
+  name, these are a binary-search extension, not the planned CE2 stage.
+
+Method v1.3. Columns:
+
+- **modelled named right / wrong / abstained**: incorrect cases whose truth is one of the
+  problem's models;
+- **unmodelled abstained**: incorrect cases whose truth is unmodelled;
+- **false alarms**: correct cases that received a named diagnosis.
+
+| Problem | Cases | Modelled: right / wrong / abstained | Unmodelled abstained | False alarms |
+| --- | --- | --- | --- | --- |
+| integer-sqrt (G2) | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| upper-bound | 7 | 3 / 0 / 0 | 2 / 2 | 0 / 2 |
+| exact-search | 7 | 3 / 0 / 0 | 2 / 2 | 0 / 2 |
+| last-occurrence | 8 | 3 / 0 / 1 | 2 / 2 | 0 / 2 |
+| min-capacity (G3) | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| rotated-min | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| rotated-search | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| peak-index | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+
+**Across all eight problems:**
+
+- v1.1, v1.2 and v1.3 give identical outcomes on every case.
+- Every case is reproducible across 2 runs.
+- The one abstention (last-occurrence, midpoint rounded up) was predicted in the design record
+  before the run.
+
+**How to read this.**
+
+- **Weak evidence by construction.** The author wrote each modelled case to contain exactly one
+  modelled error. So naming it is close to circular, as the 2026-10-21 critical review found
+  for the original held-out set.
+- **Not a sample.** The cases do not sample how real programs fail. In particular, no case
+  exercises the time-limit-only models, and v1.3 would not name those.
+- **Coverage is not precision.** A 29/30 naming rate here says nothing about coverage on real
+  code. The mutation audits measured about 9% named coverage (VAL1-A2, v1.3).
+
 ## Earlier milestones
 
 | Report | Result | Method |
@@ -57,6 +101,7 @@ fresh sandbox runs, `uv run codeadapt-eval --content ../content/demo --heldout .
 | [adr027-2026-10-21](adr027-2026-10-21/) | v1.1 vs v1.2 case by case | v1.1, v1.2 |
 | [val1a2-2026-10-22](val1a2-2026-10-22/) | coverage 15% pooled (v1.2), wrong 11/50 | v1.2 |
 | [adr030-replay-2026-10-22](adr030-replay-2026-10-22/) | replay of every recorded run, run-to-run differences | v1.1–v1.3 |
+| [ce1.4-2026-10-24](ce1.4-2026-10-24/README.md) | observation capacity per skill on the 12-problem bank (8–12 per skill), and BKT sensitivity | technical only |
 
 ## Infrastructure and learner-model measurements
 

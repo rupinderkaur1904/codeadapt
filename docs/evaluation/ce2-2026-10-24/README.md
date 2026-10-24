@@ -18,6 +18,7 @@ and were pushed before the evaluation ran.
 | `min-capacity` (G3) | 6bb088e | 939baf0 |
 | `rotated-min` | 1fee3a4 | 4f73f95 |
 | `rotated-search` | a1d10e6 | c94e5a1 |
+| `peak-index` | 3297062 | f6ce7c5 |
 
 **Command** (from `backend/`; repeat for each problem):
 
@@ -106,6 +107,19 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
 | `one_based.cpp` | unmodelled | unmodelled_behaviour | — |
 | `plain_lt_loop.cpp` | unmodelled | unmodelled_behaviour | — |
 
+## peak-index
+
+| Case | Truth | v1.3 outcome | Named |
+| --- | --- | --- | --- |
+| `closed_answer_variable.cpp` | correct | no_failure_observed | — |
+| `upper_mid_previous.cpp` | correct | no_failure_observed | — |
+| `next_smaller_goes_right.cpp` | `swapped_direction` | hypothesis_supported | `swapped_direction` |
+| `falling_drops_mid.cpp` | `hi_skips_candidate` | hypothesis_supported | `hi_skips_candidate` |
+| `gap_loop_returns_lo.cpp` | `stops_one_early` | hypothesis_supported | `stops_one_early` |
+| `returns_peak_value.cpp` | `returns_value` | hypothesis_supported | `returns_value` |
+| `gap_loop_returns_hi.cpp` | unmodelled | unmodelled_behaviour | — |
+| `one_based.cpp` | unmodelled | unmodelled_behaviour | — |
+
 ## Results, per problem (kept separate)
 
 - **upper-bound.** All 3 modelled cases were named correctly, both unmodelled cases were
@@ -135,7 +149,9 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
     error that shows as a wrong output, not a time limit.
   - Both unmodelled cases were abstained on, and there were 0 false alarms on 2 correct
     programs.
-- **All six problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
+- **peak-index.** All 4 modelled cases were named correctly, both unmodelled cases were
+  abstained on, and there were 0 false alarms on 2 correct programs.
+- **All seven problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
   identical outcomes on every case.
 
 **Not covered.** No time-limit-only termination model (`no_progress_update`,
