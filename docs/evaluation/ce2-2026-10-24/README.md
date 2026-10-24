@@ -12,6 +12,7 @@ and were pushed before the evaluation ran.
 | --- | --- | --- |
 | `upper-bound` | a92ce36 | d35dcaf |
 | `exact-search` | 701d15d | 052daf6 |
+| `last-occurrence` | 41345d9 | 2070c41 |
 
 **Command** (from `backend/`; repeat for each problem):
 
@@ -48,13 +49,34 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
 | `from_one_insertion_point.cpp` | unmodelled | unmodelled_behaviour | — |
 | `one_based_index.cpp` | unmodelled | unmodelled_behaviour | — |
 
+## last-occurrence
+
+| Case | Truth | v1.3 outcome | Named |
+| --- | --- | --- | --- |
+| `closed_answer_variable.cpp` | correct | no_failure_observed | — |
+| `power_of_two_jumps.cpp` | correct | no_failure_observed | — |
+| `closed_goes_left_on_match.cpp` | `returns_first_occurrence` | hypothesis_supported | `returns_first_occurrence` |
+| `for_loop_returns_on_match.cpp` | `stops_at_any_match` | hypothesis_supported | `stops_at_any_match` |
+| `count_not_greater.cpp` | `returns_one_past` | hypothesis_supported | `returns_one_past` |
+| `upper_midpoint_any_match.cpp` | `stops_at_any_match` | unmodelled_behaviour | — |
+| `one_based_position.cpp` | unmodelled | unmodelled_behaviour | — |
+| `unchecked_count.cpp` | unmodelled | unmodelled_behaviour | — |
+
 ## Results, per problem (kept separate)
 
 - **upper-bound.** All 3 modelled cases were named correctly, both unmodelled cases were
   abstained on, and there were 0 false alarms on 2 correct programs.
 - **exact-search.** The results were the same: 3 of 3 modelled cases named correctly, 2 of 2
   unmodelled cases abstained on, and 0 false alarms on 2 correct programs.
-- **Both problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
+- **last-occurrence.**
+  - 3 of 4 modelled cases were named correctly.
+  - The fourth, `stops_at_any_match` with the midpoint rounded up, was abstained on. The design
+    record (§4) predicted this before the run.
+  - Both unmodelled cases were abstained on, and there were 0 false alarms on 2 correct
+    programs.
+  - The miss is the known midpoint-convention limitation, also seen in first-true. It is a safe
+    miss: no wrong name and no negative skill evidence.
+- **All three problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
   identical outcomes on every case.
 
 **Not covered.** No termination model (`no_progress_update`, `closed_loop_hi_mid`) appears as a
