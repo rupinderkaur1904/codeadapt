@@ -126,3 +126,17 @@ def test_starter_code_and_own_submission_history(client: TestClient) -> None:
     history = client.get("/api/v1/submissions?problem_slug=lower-bound", headers=STUDENT).json()
     assert {h["id"] for h in history} == set(ids)
     assert client.get("/api/v1/submissions?problem_slug=nope", headers=STUDENT).json() == []
+
+
+# Raw JSON text: a NUL character, and a lone surrogate (valid JSON, not encodable as UTF-8).
+@pytest.mark.parametrize("escaped", ["int main() {}\\u0000", "\\ud800"])
+def test_unstorable_source_is_rejected_before_storage(client: TestClient, escaped: str) -> None:
+    body = '{"problem_slug": "lower-bound", "source": "' + escaped + '"}'
+    r = client.post(
+        "/api/v1/submissions",
+        content=body.encode(),
+        headers={**STUDENT, "Content-Type": "application/json"},
+    )
+    assert r.status_code == 422, r.text
+    assert r.headers["content-type"].startswith("application/problem+json")
+    assert client.get("/api/v1/submissions", headers=STUDENT).json() == []

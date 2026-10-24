@@ -53,6 +53,9 @@ class SubmissionCreate(BaseModel):
     def _size(cls, value: str) -> str:
         if len(value.encode("utf-8")) > MAX_SOURCE_BYTES:
             raise ValueError(f"source exceeds {MAX_SOURCE_BYTES} bytes")
+        # PostgreSQL text cannot store NUL, and no C++ source needs one.
+        if "\x00" in value:
+            raise ValueError("source contains a NUL character")
         return value
 
 
