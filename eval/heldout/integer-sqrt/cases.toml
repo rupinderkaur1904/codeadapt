@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE1.2 (2026-10-24) by the models' author, in styles different from the
+# models, and committed before the method was run on them. See docs/methodology.md §6.1
+# for what that does and does not allow us to claim.
+
+problem = "integer-sqrt"
+
+[[cases]]
+file = "division_test.cpp"
+truth = "correct"
+note = "Compares mid with x / mid; no 64-bit product."
+
+[[cases]]
+file = "newton_integer.cpp"
+truth = "correct"
+note = "Integer Newton iteration from above."
+
+[[cases]]
+file = "for_loop_last_unchecked.cpp"
+truth = "closed_loop_lt"
+note = "For-loop form with a best-so-far variable, looping while left < right."
+
+[[cases]]
+file = "too_big_branch_first.cpp"
+truth = "strict_square_test"
+note = "Too-big branch tested first with >=, so equality is rejected."
+
+[[cases]]
+file = "smallest_square_at_least.cpp"
+truth = "returns_ceiling"
+note = "Closed interval recording the smallest mid with mid * mid >= x."
+
+[[cases]]
+file = "capped_closed_range.cpp"
+truth = "hi_cap_46340"
+note = "Closed interval capped at 46339 instead of a half-open cap at 46340."
+
+[[cases]]
+file = "unsigned_wrap.cpp"
+truth = "unmodelled"
+note = "U2 in the design record: 32-bit unsigned product wraps for large mid."
+
+[[cases]]
+file = "strict_and_capped.cpp"
+truth = "unmodelled"
+note = "Two modelled errors at once: strict acceptance and the capped range."
