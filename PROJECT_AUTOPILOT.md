@@ -31,7 +31,7 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | B2 | Review sandbox limits and status classification against ADR-020/023/024/028 | — | execution/* | Each limit and status has a test; gaps fixed or documented | **done** f570b5b (compile output limit and stream-mismatch edge cases pinned; SIGKILL-without-deadline is a runtime error, documented) |
 | B3 | API validation and error-handling review | — | api/app.py, schemas.py | Malformed input gets 4xx, not 500; tests | **done** f570b5b (18 malformed requests probed; NUL in source was accepted and would fail on PostgreSQL, now 422) |
 | C1 | Full test run, recorded | — | PROJECT_AUTOPILOT.md, docs/status-2026-10-24.md | Commands verified today with counts | **done**: unit 348, sandbox 33 + end-to-end re-run 2/2 on d78ee21, web 21 |
-| C2 | One documented command per evaluation to reproduce reported numbers | — | docs/evaluation/*, docs/development.md | Re-run reproduces held-out/calibration tables | **done** for held-out: fresh re-run identical to adr030 heldout.md |
+| C2 | One documented command per evaluation to reproduce reported numbers | — | docs/evaluation/*, docs/development.md | Re-run reproduces held-out/calibration tables | **done**: fresh held-out and calibration re-runs identical to the adr030 records |
 | D1 | CodeNet PC1 Phase F counts | A2 + owner | — | Only after a truthful, accepted record | **blocked (owner)** |
 | E1 | Consolidated, labelled results table across all evaluations | — | docs/evaluation/summary.md | Every number traceable to a report; labels on every row | **done** fca1432 |
 | F1 | Architecture document matches the code | — | docs/architecture.md | Known mismatch fixed (queue uses an optimistic conditional UPDATE, not SKIP LOCKED); every component checked | **done** 987cc50 |
@@ -86,9 +86,9 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Next three tasks
 
-1. Check CI on the pushed branch; fix anything red.
-2. Calibration re-run (same command with `--cases ../eval/calibration --case-set calibration`).
-3. Then idle safely: every remaining workstream needs an owner decision (A1/A1b, hosting,
+1. Owner decision on A1/A1b (see Blockers).
+2. If approved: apply a1-v2.patch, CI, then the owner writes a truthful v2 record.
+3. Otherwise idle safely: every remaining workstream needs an owner decision (A1/A1b, hosting,
    failing-case feedback proposal, CE1.2/1.3).
 
 ## Resume instruction
@@ -102,3 +102,5 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - A1 + A1b rebased as `a1-v2.patch` (project files); applied only in a scratch worktree, where
   54 PC1 tests pass. **Not applied to the branch.**
 - Held-out evaluation re-run from scratch: identical to docs/evaluation/adr030-2026-10-23/heldout.md.
+- Calibration re-run: identical to the adr030 record. CI green on every pushed commit
+  (runs 63–66, including the lost-output probe).
