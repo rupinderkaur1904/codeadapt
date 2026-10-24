@@ -15,6 +15,7 @@ and were pushed before the evaluation ran.
 | `last-occurrence` | 41345d9 | 2070c41 |
 | `min-capacity` (G3) | 6bb088e | 939baf0 |
 | `rotated-min` | 1fee3a4 | 4f73f95 |
+| `rotated-search` | a1d10e6 | c94e5a1 |
 
 **Command** (from `backend/`; repeat for each problem):
 
@@ -90,6 +91,19 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
 | `one_based.cpp` | unmodelled | unmodelled_behaviour | — |
 | `first_vs_mid_value.cpp` | unmodelled | unmodelled_behaviour | — |
 
+## rotated-search
+
+| Case | Truth | v1.3 outcome | Named |
+| --- | --- | --- | --- |
+| `min_then_search.cpp` | correct | no_failure_observed | — |
+| `right_half_first.cpp` | correct | no_failure_observed | — |
+| `left_sorted_strict_start.cpp` | `left_range_excludes_lo` | hypothesis_supported | `left_range_excludes_lo` |
+| `for_loop_lt.cpp` | `closed_loop_lt` | hypothesis_supported | `closed_loop_lt` |
+| `recursive_plain.cpp` | `ignores_rotation` | hypothesis_supported | `ignores_rotation` |
+| `virtual_index.cpp` | `returns_sorted_position` | hypothesis_supported | `returns_sorted_position` |
+| `one_based.cpp` | unmodelled | unmodelled_behaviour | — |
+| `plain_lt_loop.cpp` | unmodelled | unmodelled_behaviour | — |
+
 ## Results, per problem (kept separate)
 
 - **upper-bound.** All 3 modelled cases were named correctly, both unmodelled cases were
@@ -114,8 +128,13 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
     adds no negative skill evidence.
   - The evaluation output does not record the rationale, so qualification of this case is
     implied by the measured fingerprints, not observed here.
-- **All five problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
+- **rotated-search.**
+  - All 4 modelled cases were named correctly. One of them is `closed_loop_lt`, a termination
+    error that shows as a wrong output, not a time limit.
+  - Both unmodelled cases were abstained on, and there were 0 false alarms on 2 correct
+    programs.
+- **All six problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
   identical outcomes on every case.
 
-**Not covered.** No termination model (`no_progress_update`, `closed_loop_hi_mid`) appears as a
-held-out truth. The measured behaviour of those models is in each problem's content report.
+**Not covered.** No time-limit-only termination model (`no_progress_update`,
+`closed_loop_hi_mid`) appears as a held-out truth; under v1.3 they would never be named. The measured behaviour of those models is in each problem's content report.
