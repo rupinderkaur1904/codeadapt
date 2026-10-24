@@ -1,0 +1,259 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/upper-bound.md (CE2).
+
+slug = "upper-bound"
+title = "Upper bound"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int upper_bound_index(const std::vector<int>& a, int target);"
+# CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
+# problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
+recommendable = false
+
+[skills]
+search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+equality_handling = "Choosing the comparison so equal elements land on the correct side of the boundary."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# A probe is a property of an input that a test exercises. Each probe names the skills
+# whose errors it can expose; this mapping is a modelling assumption, not a fact.
+[probes]
+empty_input = ["search_space_boundaries"]
+target_below_all = ["search_space_boundaries"]
+target_above_all = ["search_space_boundaries", "problem_specification"]
+target_present_unique = ["equality_handling"]
+target_present_duplicates = ["equality_handling"]
+target_absent_between = ["problem_specification"]
+single_element = ["search_space_boundaries", "loop_termination"]
+two_elements = ["loop_termination"]
+large_input = ["loop_termination"]
+
+[curriculum]
+assumes = ["indexing a sorted std::vector", "a loop invariant over a half-open range [lo, hi)"]
+prerequisites = ["lower-bound"]
+
+[[tests]]
+key = "sample_duplicates"
+visibility = "sample"
+input = "L 4 1 3 3 5 3"
+expected = "3"
+probes = ["target_present_duplicates"]
+student_description = "The target appears twice."
+purpose = "Visible duplicate case: the answer is just past the run of equal elements."
+distinguishes = ["closed_loop_hi_mid", "lower_bound_confusion", "no_progress_update", "returns_last_not_greater"]
+
+[[tests]]
+key = "sample_absent"
+visibility = "sample"
+input = "L 4 1 3 3 5 4"
+expected = "3"
+probes = ["target_absent_between"]
+student_description = "The target is absent and falls between two elements."
+purpose = "Visible absent-target case."
+distinguishes = ["closed_loop_hi_mid", "no_progress_update", "returns_last_not_greater"]
+
+[[tests]]
+key = "empty"
+input = "L 0 3"
+expected = "0"
+probes = ["empty_input"]
+student_description = "The array is empty."
+purpose = "Minimal input (n = 0)."
+distinguishes = ["none_sentinel", "returns_last_not_greater"]
+
+[[tests]]
+key = "below_all"
+input = "L 3 2 4 6 1"
+expected = "0"
+probes = ["target_below_all"]
+student_description = "The target is smaller than every element."
+purpose = "Answer 0 with the target absent."
+distinguishes = ["closed_loop_hi_mid", "returns_last_not_greater"]
+
+[[tests]]
+key = "above_all"
+input = "L 3 2 4 6 9"
+expected = "3"
+probes = ["target_above_all"]
+student_description = "The target is larger than every element."
+purpose = "Answer n: no element is greater."
+distinguishes = ["hi_init_last_index", "no_progress_update", "none_sentinel", "returns_last_not_greater"]
+
+[[tests]]
+key = "equal_last"
+input = "L 3 2 4 6 6"
+expected = "3"
+probes = ["target_present_unique", "target_above_all"]
+student_description = "The target equals the last element."
+purpose = "Answer n reached through an equal element."
+distinguishes = ["hi_init_last_index", "lower_bound_confusion", "no_progress_update", "none_sentinel", "returns_last_not_greater"]
+
+[[tests]]
+key = "equal_first"
+input = "L 3 2 4 6 2"
+expected = "1"
+probes = ["target_present_unique"]
+student_description = "The target equals the first element."
+purpose = "Equal element at index 0."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "lower_bound_confusion", "no_progress_update", "returns_last_not_greater"]
+
+[[tests]]
+key = "unique_middle"
+input = "L 5 1 3 5 7 9 5"
+expected = "3"
+probes = ["target_present_unique"]
+student_description = "The target appears once, in the middle."
+purpose = "Unique interior target."
+distinguishes = ["closed_loop_hi_mid", "lower_bound_confusion", "no_progress_update", "returns_last_not_greater"]
+
+[[tests]]
+key = "duplicates_middle"
+input = "L 6 1 2 2 2 2 3 2"
+expected = "5"
+probes = ["target_present_duplicates"]
+student_description = "The target appears several times in the middle."
+purpose = "A run of equal elements in the interior."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "lower_bound_confusion", "no_progress_update", "returns_last_not_greater"]
+
+[[tests]]
+key = "duplicates_all"
+input = "D 7 5 5"
+expected = "7"
+probes = ["target_present_duplicates", "target_above_all"]
+student_description = "Every element equals the target."
+purpose = "Answer n with every element equal."
+distinguishes = ["hi_init_last_index", "lower_bound_confusion", "no_progress_update", "none_sentinel", "returns_last_not_greater"]
+
+[[tests]]
+key = "duplicates_all_below"
+input = "D 7 5 4"
+expected = "0"
+probes = ["target_below_all"]
+student_description = "Every element is equal and greater than the target."
+purpose = "Answer 0 with every element equal."
+distinguishes = ["closed_loop_hi_mid", "returns_last_not_greater"]
+
+[[tests]]
+key = "single_equal"
+input = "L 1 4 4"
+expected = "1"
+probes = ["single_element", "target_present_unique", "target_above_all"]
+student_description = "A single element equal to the target."
+purpose = "Smallest range; answer 1."
+distinguishes = ["hi_init_last_index", "lower_bound_confusion", "no_progress_update", "none_sentinel", "returns_last_not_greater"]
+
+[[tests]]
+key = "single_greater"
+input = "L 1 4 2"
+expected = "0"
+probes = ["single_element", "target_below_all"]
+student_description = "A single element greater than the target."
+purpose = "Smallest range; answer 0."
+distinguishes = ["closed_loop_hi_mid", "returns_last_not_greater"]
+
+[[tests]]
+key = "two_between"
+input = "L 2 1 9 5"
+expected = "1"
+probes = ["two_elements", "target_absent_between"]
+student_description = "Two elements with the target between them."
+purpose = "Answer 1 in a two-element range."
+distinguishes = ["closed_loop_hi_mid", "hi_skips_candidate", "no_progress_update", "returns_last_not_greater"]
+
+[[tests]]
+key = "pair_equal_target"
+input = "L 2 5 5 5"
+expected = "2"
+probes = ["two_elements", "target_present_duplicates", "target_above_all"]
+student_description = "Two elements, both equal to the target."
+purpose = "Answer n in a two-element range."
+distinguishes = ["hi_init_last_index", "lower_bound_confusion", "no_progress_update", "none_sentinel", "returns_last_not_greater"]
+
+[[tests]]
+key = "large_absent"
+input = "A 200000 0 2 99999"
+expected = "50000"
+probes = ["large_input", "target_absent_between"]
+student_description = "A large array; the target is absent."
+purpose = "Interior answer at scale."
+distinguishes = ["closed_loop_hi_mid", "no_progress_update", "returns_last_not_greater"]
+
+[[tests]]
+key = "large_present"
+input = "A 200000 0 2 100000"
+expected = "50001"
+probes = ["large_input", "target_present_unique"]
+student_description = "A large array containing the target once."
+purpose = "Equal element at scale."
+distinguishes = ["closed_loop_hi_mid", "lower_bound_confusion", "no_progress_update", "returns_last_not_greater"]
+
+[[tests]]
+key = "large_above_all"
+input = "A 200000 0 2 1000000000"
+expected = "200000"
+probes = ["large_input", "target_above_all"]
+student_description = "A large array; the target is larger than every element."
+purpose = "Answer n at scale."
+distinguishes = ["hi_init_last_index", "no_progress_update", "none_sentinel", "returns_last_not_greater"]
+
+[[tests]]
+key = "large_duplicates"
+input = "D 200000 7 7"
+expected = "200000"
+probes = ["large_input", "target_present_duplicates"]
+student_description = "A large array where every element equals the target."
+purpose = "Answer n at scale with every element equal."
+distinguishes = ["hi_init_last_index", "lower_bound_confusion", "no_progress_update", "none_sentinel", "returns_last_not_greater"]
+
+[[error_models]]
+key = "lower_bound_confusion"
+file = "error_models/lower_bound_confusion.cpp"
+skill = "equality_handling"
+description = "Moves right only while a[mid] < target, so it returns the first element >= target (lower bound) instead of > target."
+student_hint = "Check which side of the boundary elements equal to the target end up on."
+
+[[error_models]]
+key = "hi_init_last_index"
+file = "error_models/hi_init_last_index.cpp"
+skill = "search_space_boundaries"
+description = "Initialises hi = n - 1 with a half-open loop, so the answer n (no greater element) is unreachable."
+student_hint = "Can your search ever return a.size()? Check the initial bounds of the search space."
+
+[[error_models]]
+key = "hi_skips_candidate"
+file = "error_models/hi_skips_candidate.cpp"
+skill = "search_space_boundaries"
+description = "In a half-open loop, an element greater than the target at mid sets hi = mid - 1, discarding mid, which may be the answer."
+student_hint = "When a[mid] is greater than the target, could mid itself be the answer? Check that your update keeps it."
+
+[[error_models]]
+key = "no_progress_update"
+file = "error_models/no_progress_update.cpp"
+skill = "loop_termination"
+description = "Sets lo = mid instead of mid + 1, so the range stops shrinking once hi == lo + 1."
+student_hint = "When only two candidates remain, does every iteration still shrink the range?"
+
+[[error_models]]
+key = "closed_loop_hi_mid"
+file = "error_models/closed_loop_hi_mid.cpp"
+skill = "loop_termination"
+description = "Uses a closed loop condition lo <= hi with the half-open update hi = mid, so the loop never ends once lo == hi on a greater element."
+student_hint = "Check that your loop condition and your updates use the same kind of range, so the loop can end."
+
+[[error_models]]
+key = "returns_last_not_greater"
+file = "error_models/returns_last_not_greater.cpp"
+skill = "problem_specification"
+description = "Finds the boundary but returns the index before it: the last element <= target."
+student_hint = "Re-read which index to return: the first element greater than the target, not the last one that is not."
+
+[[error_models]]
+key = "none_sentinel"
+file = "error_models/none_sentinel.cpp"
+skill = "problem_specification"
+description = "Returns -1 instead of a.size() when no element is greater than the target."
+student_hint = "Re-read what the function must return when no element is greater than the target."
