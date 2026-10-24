@@ -13,6 +13,7 @@ and were pushed before the evaluation ran.
 | `upper-bound` | a92ce36 | d35dcaf |
 | `exact-search` | 701d15d | 052daf6 |
 | `last-occurrence` | 41345d9 | 2070c41 |
+| `min-capacity` (G3) | 6bb088e | 939baf0 |
 
 **Command** (from `backend/`; repeat for each problem):
 
@@ -62,6 +63,19 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
 | `one_based_position.cpp` | unmodelled | unmodelled_behaviour | — |
 | `unchecked_count.cpp` | unmodelled | unmodelled_behaviour | — |
 
+## min-capacity (G3)
+
+| Case | Truth | v1.3 outcome | Named |
+| --- | --- | --- | --- |
+| `closed_answer_variable.cpp` | correct | no_failure_observed | — |
+| `count_style_search.cpp` | correct | no_failure_observed | — |
+| `closed_from_one.cpp` | `lo_init_one` | hypothesis_supported | `lo_init_one` |
+| `bool_check_strict.cpp` | `strict_day_limit` | hypothesis_supported | `strict_day_limit` |
+| `segment_cut_at_full.cpp` | `full_day_overflows` | hypothesis_supported | `full_day_overflows` |
+| `sorted_copy.cpp` | `sorts_weights` | hypothesis_supported | `sorts_weights` |
+| `allows_one_over.cpp` | unmodelled | unmodelled_behaviour | — |
+| `from_one_strict.cpp` | unmodelled | unmodelled_behaviour | — |
+
 ## Results, per problem (kept separate)
 
 - **upper-bound.** All 3 modelled cases were named correctly, both unmodelled cases were
@@ -76,7 +90,9 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
     programs.
   - The miss is the known midpoint-convention limitation, also seen in first-true. It is a safe
     miss: no wrong name and no negative skill evidence.
-- **All three problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
+- **min-capacity (G3).** All 4 modelled cases were named correctly, both unmodelled cases
+  were abstained on, and there were 0 false alarms on 2 correct programs.
+- **All four problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
   identical outcomes on every case.
 
 **Not covered.** No termination model (`no_progress_update`, `closed_loop_hi_mid`) appears as a
