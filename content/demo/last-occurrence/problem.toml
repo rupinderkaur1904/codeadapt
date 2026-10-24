@@ -1,0 +1,252 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/last-occurrence.md (CE2).
+
+slug = "last-occurrence"
+title = "Last occurrence"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int last_occurrence(const std::vector<int>& a, int target);"
+# CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
+# problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
+recommendable = false
+
+[skills]
+search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+equality_handling = "Choosing the comparison so equal elements land on the correct side of the boundary."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# A probe is a property of an input that a test exercises. Each probe names the skills
+# whose errors it can expose; this mapping is a modelling assumption, not a fact.
+[probes]
+empty_input = ["search_space_boundaries"]
+target_absent = ["problem_specification"]
+target_present_unique = ["equality_handling"]
+target_present_duplicates = ["equality_handling"]
+run_at_end = ["search_space_boundaries"]
+single_element = ["search_space_boundaries", "loop_termination"]
+two_elements = ["loop_termination"]
+large_input = ["loop_termination"]
+
+[curriculum]
+assumes = ["indexing a sorted std::vector", "a loop invariant over a half-open range [lo, hi)"]
+prerequisites = ["lower-bound", "count-occurrences"]
+
+[[tests]]
+key = "sample_run"
+visibility = "sample"
+input = "L 5 1 3 3 3 5 3"
+expected = "3"
+probes = ["target_present_duplicates"]
+student_description = "The target appears several times."
+purpose = "Visible duplicate case: the answer is the end of the run."
+distinguishes = ["no_progress_update", "returns_first_occurrence", "returns_one_past", "stops_at_any_match"]
+
+[[tests]]
+key = "sample_absent"
+visibility = "sample"
+input = "L 5 1 3 3 3 5 4"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "The target does not occur."
+purpose = "Visible absent case."
+distinguishes = ["missing_equality_check", "no_progress_update"]
+
+[[tests]]
+key = "empty"
+input = "L 0 3"
+expected = "-1"
+probes = ["empty_input", "target_absent"]
+student_description = "The array is empty."
+purpose = "Minimal input (n = 0)."
+distinguishes = []
+
+[[tests]]
+key = "below_all"
+input = "L 3 2 4 6 1"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "The target is smaller than every element."
+purpose = "Absent on the left."
+distinguishes = []
+
+[[tests]]
+key = "above_all"
+input = "L 3 2 4 6 9"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "The target is larger than every element."
+purpose = "Absent on the right."
+distinguishes = ["missing_equality_check", "no_progress_update"]
+
+[[tests]]
+key = "absent_after_run"
+input = "L 6 1 2 2 2 4 5 3"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "The target is absent, just after a run of equal elements."
+purpose = "The last smaller element is the end of a run."
+distinguishes = ["missing_equality_check", "no_progress_update"]
+
+[[tests]]
+key = "unique_middle"
+input = "L 5 1 3 5 7 9 5"
+expected = "2"
+probes = ["target_present_unique"]
+student_description = "The target appears once, in the middle."
+purpose = "Unique interior target."
+distinguishes = ["no_progress_update", "returns_one_past"]
+
+[[tests]]
+key = "unique_last"
+input = "L 4 1 3 5 7 7"
+expected = "3"
+probes = ["target_present_unique", "run_at_end"]
+student_description = "The target is the last element and appears once."
+purpose = "Answer n - 1."
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_one_past"]
+
+[[tests]]
+key = "run_at_start"
+input = "L 6 2 2 2 5 6 7 2"
+expected = "2"
+probes = ["target_present_duplicates"]
+student_description = "A run of the target at the start."
+purpose = "Run ending inside the array."
+distinguishes = ["no_progress_update", "returns_first_occurrence", "returns_one_past"]
+
+[[tests]]
+key = "run_at_end"
+input = "L 6 1 2 3 9 9 9 9"
+expected = "5"
+probes = ["target_present_duplicates", "run_at_end"]
+student_description = "A run of the target at the end."
+purpose = "Answer n - 1 through a run."
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_first_occurrence", "returns_one_past", "stops_at_any_match"]
+
+[[tests]]
+key = "run_middle_long"
+input = "L 9 1 4 4 4 4 4 4 4 8 4"
+expected = "7"
+probes = ["target_present_duplicates"]
+student_description = "A long run of the target in the middle."
+purpose = "The midpoint lands inside the run."
+distinguishes = ["no_progress_update", "returns_first_occurrence", "returns_one_past", "stops_at_any_match"]
+
+[[tests]]
+key = "all_equal"
+input = "D 7 5 5"
+expected = "6"
+probes = ["target_present_duplicates", "run_at_end"]
+student_description = "Every element equals the target."
+purpose = "Answer n - 1 with every element equal."
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_first_occurrence", "returns_one_past", "stops_at_any_match"]
+
+[[tests]]
+key = "single_equal"
+input = "L 1 4 4"
+expected = "0"
+probes = ["single_element", "target_present_unique", "run_at_end"]
+student_description = "A single element equal to the target."
+purpose = "Smallest range with an answer."
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_one_past"]
+
+[[tests]]
+key = "single_other"
+input = "L 1 4 7"
+expected = "-1"
+probes = ["single_element", "target_absent"]
+student_description = "A single element different from the target."
+purpose = "Smallest range without an answer."
+distinguishes = ["missing_equality_check", "no_progress_update"]
+
+[[tests]]
+key = "two_equal"
+input = "L 2 5 5 5"
+expected = "1"
+probes = ["two_elements", "target_present_duplicates", "run_at_end"]
+student_description = "Two elements, both equal to the target."
+purpose = "Answer 1 in a two-element range."
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_first_occurrence", "returns_one_past", "stops_at_any_match"]
+
+[[tests]]
+key = "two_first"
+input = "L 2 5 8 5"
+expected = "0"
+probes = ["two_elements", "target_present_unique"]
+student_description = "Two elements; the target is the first."
+purpose = "Answer 0 in a two-element range."
+distinguishes = ["no_progress_update", "returns_one_past"]
+
+[[tests]]
+key = "large_all_equal"
+input = "D 200000 7 7"
+expected = "199999"
+probes = ["large_input", "target_present_duplicates", "run_at_end"]
+student_description = "A large array where every element equals the target."
+purpose = "Answer n - 1 at scale."
+distinguishes = ["hi_init_last_index", "no_progress_update", "returns_first_occurrence", "returns_one_past", "stops_at_any_match"]
+
+[[tests]]
+key = "large_unique"
+input = "A 200000 0 2 100000"
+expected = "50000"
+probes = ["large_input", "target_present_unique"]
+student_description = "A large array containing the target once."
+purpose = "Unique target at scale."
+distinguishes = ["no_progress_update", "returns_one_past"]
+
+[[tests]]
+key = "large_absent"
+input = "A 200000 0 2 99999"
+expected = "-1"
+probes = ["large_input", "target_absent"]
+student_description = "A large array; the target is absent."
+purpose = "Absent at scale."
+distinguishes = ["missing_equality_check", "no_progress_update"]
+
+[[error_models]]
+key = "returns_first_occurrence"
+file = "error_models/returns_first_occurrence.cpp"
+skill = "equality_handling"
+description = "Searches for the first element >= target and checks it, so it returns the first occurrence, not the last."
+student_hint = "Check which side of the boundary elements equal to the target end up on: you need the last one."
+
+[[error_models]]
+key = "stops_at_any_match"
+file = "error_models/stops_at_any_match.cpp"
+skill = "equality_handling"
+description = "Returns as soon as a[mid] == target: some occurrence, not necessarily the last."
+student_hint = "Finding the target is not the end: could there be a later occurrence?"
+
+[[error_models]]
+key = "hi_init_last_index"
+file = "error_models/hi_init_last_index.cpp"
+skill = "search_space_boundaries"
+description = "Initialises hi = n - 1 with a half-open loop, so an occurrence at the last index is missed."
+student_hint = "Can your search ever reach the last element? Check the initial bounds of the search space."
+
+[[error_models]]
+key = "no_progress_update"
+file = "error_models/no_progress_update.cpp"
+skill = "loop_termination"
+description = "Sets lo = mid instead of mid + 1, so the range stops shrinking once hi == lo + 1."
+student_hint = "When only two candidates remain, does every iteration still shrink the range?"
+
+[[error_models]]
+key = "missing_equality_check"
+file = "error_models/missing_equality_check.cpp"
+skill = "problem_specification"
+description = "Returns the last element <= target without checking that it equals the target, so an absent target gives a smaller element's index."
+student_hint = "Re-read what the function must return when the target does not occur."
+known_limitation = "Detected only by tests whose target is absent (one behaviour group). Any error that returns something other than -1 for an absent target fails the same tests, so diagnoses are reported as qualified."
+
+[[error_models]]
+key = "returns_one_past"
+file = "error_models/returns_one_past.cpp"
+skill = "problem_specification"
+description = "Returns the index one past the last occurrence (the upper bound) when the target occurs."
+student_hint = "Re-read which index to return: the last occurrence itself, not the position after it."
