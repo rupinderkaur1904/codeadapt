@@ -8,6 +8,8 @@ infrastructure reasons is marked FAILED after `max_attempts`.
 `finish` and `requeue` are fenced: they change the job only while it is still this claim
 (same worker, same attempt, still running). A worker whose lease expired and whose job was
 reclaimed by another worker therefore cannot overwrite the newer attempt's state.
+`renew` (the worker's lease heartbeat) is fenced the same way, so a job that runs longer
+than one lease period is not reclaimed while its worker is alive.
 """
 
 from __future__ import annotations
@@ -90,6 +92,18 @@ def requeue(session: Session, job: Job, error: str) -> bool:
         .values(
             state=JobState.QUEUED.value, last_error=error, lease_until=None, updated_at=utcnow()
         )
+    )
+    session.commit()
+    return bool(result.rowcount == 1)  # type: ignore[attr-defined]
+
+
+def renew(session: Session, job: Job, *, lease_seconds: float) -> bool:
+    """Extend the lease of a running job; False if the claim was lost (the job was reclaimed)."""
+    now = utcnow()
+    result = session.execute(
+        update(Job)
+        .where(_this_claim(job))
+        .values(lease_until=now + timedelta(seconds=lease_seconds), updated_at=now)
     )
     session.commit()
     return bool(result.rowcount == 1)  # type: ignore[attr-defined]

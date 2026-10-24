@@ -480,6 +480,10 @@ silently.
 looks for a diagnosis by its own method and version for the submission. If one exists, it
 finishes the job without executing anything. Diagnosis rules, evidence rules, policy, ledger,
 BKT and feedback are unchanged.
-**Not solved:** two workers can still run the same job at once if one exceeds its lease
-(there is no lease heartbeat). Each then commits a diagnosis, and only the claim holder
-finishes the job. Tests: `tests/unit/test_queue.py`, `tests/unit/test_pipeline_redelivery.py`.
+**Lease heartbeat (added 2026-10-24):** while a job runs, the worker renews its lease every
+third of a lease period (`queue.renew`, fenced like `finish`). A long job (for example the
+first submission, which measures fingerprints) is therefore not reclaimed while its worker is
+alive. **Still not solved:** a worker that is alive but stalled (event loop blocked for a whole
+lease) can lose its claim mid-run. Both runs then commit a diagnosis, and only the claim holder
+finishes the job. Tests: `tests/unit/test_queue.py` (including a job that outlives two lease
+periods), `tests/unit/test_pipeline_redelivery.py`.

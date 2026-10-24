@@ -4,20 +4,51 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import logging
 import os
 import socket
+
+from sqlalchemy.orm import Session, sessionmaker
 
 from codeadapt import logs
 from codeadapt.config import Environment, Settings
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.db import queue
+from codeadapt.db.models import Job
 from codeadapt.db.session import make_engine, make_session_factory
 from codeadapt.diagnosis import FingerprintConsistencyV1
 from codeadapt.execution.docker import DockerSandbox, DockerSandboxConfig
 from codeadapt.worker.pipeline import Pipeline
 
 log = logging.getLogger("codeadapt.worker")
+
+
+async def heartbeat(
+    sessions: sessionmaker[Session], job: Job, *, lease_seconds: float, interval: float
+) -> None:
+    """Renew the job's lease every `interval` seconds until cancelled or the claim is lost."""
+    while True:
+        await asyncio.sleep(interval)
+        with sessions() as session:
+            if not queue.renew(session, job, lease_seconds=lease_seconds):
+                log.warning("lease renewal for job %s failed: the claim was lost", job.id)
+                return
+
+
+async def handle_with_heartbeat(
+    pipeline: Pipeline, sessions: sessionmaker[Session], job: Job, *, lease_seconds: float
+) -> None:
+    """Run one job while keeping its lease alive (ADR-031)."""
+    beat = asyncio.create_task(
+        heartbeat(sessions, job, lease_seconds=lease_seconds, interval=lease_seconds / 3)
+    )
+    try:
+        await pipeline.handle(job)
+    finally:
+        beat.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await beat
 
 
 async def run(settings: Settings, *, once: bool = False) -> int:
@@ -43,7 +74,9 @@ async def run(settings: Settings, *, once: bool = False) -> int:
             )
         if job is not None:
             log.info("processing job %s (submission %s)", job.id, job.submission_id)
-            await pipeline.handle(job)
+            await handle_with_heartbeat(
+                pipeline, sessions, job, lease_seconds=settings.job_lease_seconds
+            )
             processed += 1
         elif once:
             return processed
