@@ -14,6 +14,7 @@ and were pushed before the evaluation ran.
 | `exact-search` | 701d15d | 052daf6 |
 | `last-occurrence` | 41345d9 | 2070c41 |
 | `min-capacity` (G3) | 6bb088e | 939baf0 |
+| `rotated-min` | 1fee3a4 | 4f73f95 |
 
 **Command** (from `backend/`; repeat for each problem):
 
@@ -76,6 +77,19 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
 | `allows_one_over.cpp` | unmodelled | unmodelled_behaviour | — |
 | `from_one_strict.cpp` | unmodelled | unmodelled_behaviour | — |
 
+## rotated-min
+
+| Case | Truth | v1.3 outcome | Named |
+| --- | --- | --- | --- |
+| `predicate_vs_last.cpp` | correct | no_failure_observed | — |
+| `recursive_halves.cpp` | correct | no_failure_observed | — |
+| `first_vs_mid.cpp` | `compares_with_lo` | hypothesis_supported | `compares_with_lo` |
+| `smaller_than_end_skips.cpp` | `hi_skips_candidate` | hypothesis_supported | `hi_skips_candidate` |
+| `returns_smallest_value.cpp` | `returns_value` | hypothesis_supported | `returns_value` |
+| `returns_rotation_end.cpp` | `returns_pivot` | hypothesis_supported | `returns_pivot` |
+| `one_based.cpp` | unmodelled | unmodelled_behaviour | — |
+| `first_vs_mid_value.cpp` | unmodelled | unmodelled_behaviour | — |
+
 ## Results, per problem (kept separate)
 
 - **upper-bound.** All 3 modelled cases were named correctly, both unmodelled cases were
@@ -92,7 +106,12 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
     miss: no wrong name and no negative skill evidence.
 - **min-capacity (G3).** All 4 modelled cases were named correctly, both unmodelled cases
   were abstained on, and there were 0 false alarms on 2 correct programs.
-- **All four problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
+- **rotated-min.**
+  - All 4 modelled cases were named correctly, both unmodelled cases were abstained on, and
+    there were 0 false alarms on 2 correct programs.
+  - `hi_skips_candidate` is a documented single-group model, so its name is a qualified
+    diagnosis and adds no negative skill evidence.
+- **All five problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
   identical outcomes on every case.
 
 **Not covered.** No termination model (`no_progress_update`, `closed_loop_hi_mid`) appears as a
