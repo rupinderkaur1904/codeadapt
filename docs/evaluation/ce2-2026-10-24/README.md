@@ -109,8 +109,11 @@ uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout \
 - **rotated-min.**
   - All 4 modelled cases were named correctly, both unmodelled cases were abstained on, and
     there were 0 false alarms on 2 correct programs.
-  - `hi_skips_candidate` is a documented single-group model, so its name is a qualified
-    diagnosis and adds no negative skill evidence.
+  - `hi_skips_candidate` is a documented single-group model. v1.3 qualifies any diagnosis that
+    rests on one behaviour (`evidence_strength = single_behaviour`), and a qualified diagnosis
+    adds no negative skill evidence.
+  - The evaluation output does not record the rationale, so qualification of this case is
+    implied by the measured fingerprints, not observed here.
 - **All five problems.** All cases were reproducible across 2 runs, and v1.1, v1.2 and v1.3 gave
   identical outcomes on every case.
 
