@@ -1,0 +1,214 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/peak-index.md (CE2).
+
+slug = "peak-index"
+title = "Peak of a mountain array"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int peak_index(const std::vector<int>& a);"
+# CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
+# problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
+recommendable = false
+
+[skills]
+search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# A probe is a property of an input that a test exercises. Each probe names the skills
+# whose errors it can expose; this mapping is a modelling assumption, not a fact.
+[probes]
+peak_inside = ["search_space_boundaries", "problem_specification"]
+peak_first = ["search_space_boundaries"]
+peak_last = ["search_space_boundaries", "loop_termination"]
+single_element = ["search_space_boundaries", "loop_termination"]
+two_elements = ["loop_termination"]
+large_input = ["loop_termination"]
+
+[curriculum]
+assumes = ["indexing a std::vector", "a loop invariant over a closed range [lo, hi]"]
+prerequisites = ["first-true", "rotated-min"]
+
+[[tests]]
+key = "sample_middle"
+visibility = "sample"
+input = "L 5 11 14 19 17 12"
+expected = "2"
+probes = ["peak_inside"]
+student_description = "The peak is in the middle."
+purpose = "Visible typical case."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "sample_increasing"
+visibility = "sample"
+input = "L 3 13 15 18"
+expected = "2"
+probes = ["peak_last"]
+student_description = "The array only increases."
+purpose = "Visible case: the peak is last."
+distinguishes = ["no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "single"
+input = "L 1 7"
+expected = "0"
+probes = ["single_element"]
+student_description = "A single element."
+purpose = "Smallest input."
+distinguishes = ["returns_value"]
+
+[[tests]]
+key = "two_up"
+input = "L 2 3 9"
+expected = "1"
+probes = ["two_elements", "peak_last"]
+student_description = "Two elements, increasing."
+purpose = "Answer 1 with two elements."
+distinguishes = ["no_progress_update", "returns_value", "stops_one_early", "swapped_direction"]
+
+[[tests]]
+key = "two_down"
+input = "L 2 9 3"
+expected = "0"
+probes = ["two_elements", "peak_first"]
+student_description = "Two elements, decreasing."
+purpose = "Answer 0 with two elements."
+distinguishes = ["returns_value", "swapped_direction"]
+
+[[tests]]
+key = "decreasing"
+input = "L 5 30 25 20 15 11"
+expected = "0"
+probes = ["peak_first"]
+student_description = "The array only decreases."
+purpose = "Answer 0."
+distinguishes = ["returns_value", "swapped_direction"]
+
+[[tests]]
+key = "peak_second"
+input = "L 6 12 40 35 30 25 20"
+expected = "1"
+probes = ["peak_inside"]
+student_description = "The peak is the second element."
+purpose = "Peak just after the start."
+distinguishes = ["no_progress_update", "returns_value", "stops_one_early", "swapped_direction"]
+
+[[tests]]
+key = "peak_second_last"
+input = "L 6 12 14 16 18 40 20"
+expected = "4"
+probes = ["peak_inside"]
+student_description = "The peak is the second-to-last element."
+purpose = "Peak just before the end."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_value", "stops_one_early", "swapped_direction"]
+
+[[tests]]
+key = "three_peak_middle"
+input = "L 3 15 19 12"
+expected = "1"
+probes = ["peak_inside"]
+student_description = "Three elements, peak in the middle."
+purpose = "Smallest inside peak."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_value", "stops_one_early", "swapped_direction"]
+
+[[tests]]
+key = "four_peak_third"
+input = "L 4 11 13 19 12"
+expected = "2"
+probes = ["peak_inside"]
+student_description = "Four elements, peak third."
+purpose = "Peak right of the first midpoint."
+distinguishes = ["no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "long_peak_left"
+input = "L 9 15 31 29 27 25 23 21 19 17"
+expected = "1"
+probes = ["peak_inside"]
+student_description = "A long descent after an early peak."
+purpose = "Peak far left of the midpoint."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_value", "stops_one_early", "swapped_direction"]
+
+[[tests]]
+key = "negatives"
+input = "L 6 -9 -4 -1 -3 -8 -20"
+expected = "2"
+probes = ["peak_inside"]
+student_description = "Negative values."
+purpose = "Values are not indices."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "large_peak_first"
+input = "M 200000 0"
+expected = "0"
+probes = ["large_input", "peak_first"]
+student_description = "A large decreasing array."
+purpose = "Answer 0 at scale."
+distinguishes = ["swapped_direction"]
+
+[[tests]]
+key = "large_peak_last"
+input = "M 200000 199999"
+expected = "199999"
+probes = ["large_input", "peak_last"]
+student_description = "A large increasing array."
+purpose = "Answer n - 1 at scale."
+distinguishes = ["no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "large_peak_middle"
+input = "M 200000 123456"
+expected = "123456"
+probes = ["large_input", "peak_inside"]
+student_description = "A large array with an inside peak."
+purpose = "Typical answer at scale."
+distinguishes = ["no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "large_peak_near_end"
+input = "M 200000 199998"
+expected = "199998"
+probes = ["large_input", "peak_inside"]
+student_description = "A large array whose peak is second-to-last."
+purpose = "Peak just before the end at scale."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_value", "stops_one_early", "swapped_direction"]
+
+[[error_models]]
+key = "swapped_direction"
+file = "error_models/swapped_direction.cpp"
+skill = "search_space_boundaries"
+description = "Moves the wrong way: a rising step at mid discards the right half, which holds the peak."
+student_hint = "If the next element is larger, which side of mid must the peak be on?"
+
+[[error_models]]
+key = "hi_skips_candidate"
+file = "error_models/hi_skips_candidate.cpp"
+skill = "search_space_boundaries"
+description = "Sets hi = mid - 1 when the next element is smaller, which discards mid even though it may be the peak."
+student_hint = "When the next element is smaller, could mid itself be the peak? Keep it in the search space."
+
+[[error_models]]
+key = "no_progress_update"
+file = "error_models/no_progress_update.cpp"
+skill = "loop_termination"
+description = "Sets lo = mid instead of mid + 1, so the range stops shrinking once hi == lo + 1."
+student_hint = "When only two candidates remain, does every iteration still shrink the range?"
+
+[[error_models]]
+key = "stops_one_early"
+file = "error_models/stops_one_early.cpp"
+skill = "loop_termination"
+description = "Loops while hi - lo > 1 and returns lo, so when two candidates remain the right one is never considered."
+student_hint = "When your loop stops, how many candidates are left, and have you compared them?"
+
+[[error_models]]
+key = "returns_value"
+file = "error_models/returns_value.cpp"
+skill = "problem_specification"
+description = "Returns the peak value instead of its index."
+student_hint = "Re-read what the function must return: a position or a value?"
