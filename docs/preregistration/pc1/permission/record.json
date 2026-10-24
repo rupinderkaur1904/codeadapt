@@ -1,6 +1,6 @@
 {
   "record_version": 1,
-  "status": "granted",
+  "status": "withdrawn",
   "dataset": "IBM Project CodeNet 1.0.0",
   "granted_by_role": "supervisor",
   "basis": "explicit approval",
@@ -9,6 +9,11 @@
   "recorded_by": "owner",
   "evidence_reference": "Written approval kept in the owner's records; confirmed in the project thread on 2026-10-23",
   "conditions_verbatim": "none",
+  "withdrawal": {
+    "withdrawn_on": "2026-10-23",
+    "withdrawn_by": "owner",
+    "reason": "Entered in error. I am an independent student researcher with no supervisor; no supervisor or institution approved this work. The fields above are kept unchanged only as the historical record of commit 447757a and are not true."
+  },
   "scope": {
     "download_full_archive": true,
     "store_outside_repository": true,
@@ -19,3 +24,4 @@
     "redistribute_code": false
   }
 }
+
