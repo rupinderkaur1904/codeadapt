@@ -19,6 +19,12 @@ const ResearchPage = lazy(() =>
   import("./pages/ResearchPage").then((m) => ({ default: m.ResearchPage })),
 );
 const TracePage = lazy(() => import("./pages/TracePage").then((m) => ({ default: m.TracePage })));
+const LearnersPage = lazy(() =>
+  import("./pages/LearnersPage").then((m) => ({ default: m.LearnersPage })),
+);
+const AttemptsPage = lazy(() =>
+  import("./pages/AttemptsPage").then((m) => ({ default: m.AttemptsPage })),
+);
 const LearnerModelPage = lazy(() =>
   import("./pages/LearnerModelPage").then((m) => ({ default: m.LearnerModelPage })),
 );
@@ -104,7 +110,15 @@ export function App() {
         <Brand />
         <nav>
           <NavLink to="/problems">Problems</NavLink>
-          {role !== "student" && <NavLink to="/research">Research</NavLink>}
+          <NavLink to="/attempts">My attempts</NavLink>
+          {role !== "student" && (
+            <>
+              <NavLink to="/research" end>
+                Research
+              </NavLink>
+              <NavLink to="/research/learners">Learners</NavLink>
+            </>
+          )}
         </nav>
         {!devStub && (
           <span className="account">
@@ -147,7 +161,9 @@ export function App() {
             <Route path="/" element={<LandingPage loggedIn />} />
             <Route path="/problems" element={<ProblemListPage />} />
             <Route path="/practice/:slug" element={<PracticePage />} />
+            <Route path="/attempts" element={<AttemptsPage />} />
             <Route path="/research" element={<ResearchPage />} />
+            <Route path="/research/learners" element={<LearnersPage />} />
             <Route path="/research/submissions/:id" element={<TracePage />} />
             <Route path="/research/learners/:username" element={<LearnerModelPage />} />
             <Route path="*" element={<p>Page not found.</p>} />

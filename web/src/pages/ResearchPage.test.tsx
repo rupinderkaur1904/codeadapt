@@ -11,7 +11,10 @@ import type {
   TraceView,
 } from "../api/client";
 import { setDevRole } from "../devRole";
+import { supported } from "../test/fixtures";
+import { AttemptsPage } from "./AttemptsPage";
 import { LearnerModelPage } from "./LearnerModelPage";
+import { LearnersPage } from "./LearnersPage";
 import { ProblemListPage } from "./ProblemListPage";
 import { ResearchPage } from "./ResearchPage";
 import { TracePage } from "./TracePage";
@@ -154,6 +157,8 @@ describe("researcher pages", () => {
       requests.push({ url, role: new Headers(init?.headers).get("X-Dev-Role") });
       if (url.includes("/research/submissions/s1/trace")) return json(trace);
       if (url.includes("/research/submissions")) return json([row]);
+      if (url.endsWith("/submissions?limit=50"))
+        return json([supported, { ...supported, id: "s9", problem_slug: "lower-bound" }]);
       if (url.includes("/research/metrics")) return json(metrics);
       if (url.includes("/research/learner-model?username=synthetic-a")) return json(learnerModel);
       if (url.endsWith("/problems"))
@@ -225,5 +230,39 @@ describe("researcher pages", () => {
     renderAt("/", <ProblemListPage />, "/");
     expect(await screen.findByText(/all tests passed/)).toBeInTheDocument();
     expect(screen.getAllByText(/all tests passed/)).toHaveLength(1);
+  });
+
+  it("shows outcomes per problem on the overview", async () => {
+    renderAt("/research", <ResearchPage />, "/research");
+    expect(await screen.findByRole("heading", { name: "Outcomes by problem" })).toBeInTheDocument();
+  });
+
+  it("starts the submission filters from the URL", async () => {
+    renderAt("/research?outcome=ambiguous", <ResearchPage />, "/research");
+    expect(await screen.findByText("synthetic-a")).toBeInTheDocument();
+    expect(requests.some((r) => r.url.includes("outcome=ambiguous"))).toBe(true);
+  });
+
+  it("lists learners seen in submissions, linked to their learner model", async () => {
+    renderAt("/research/learners", <LearnersPage />, "/research/learners");
+    const link = await screen.findByRole("link", { name: "synthetic-a" });
+    expect(link).toHaveAttribute("href", "/research/learners/synthetic-a");
+    expect(requests.some((r) => r.url.includes("/research/submissions?limit=200"))).toBe(true);
+    expect(screen.getByText(/activity, not learning/)).toBeInTheDocument();
+  });
+
+  it("shows a student's attempts across problems with links back to each attempt", async () => {
+    setDevRole("student");
+    renderAt("/attempts", <AttemptsPage />, "/attempts");
+    const links = await screen.findAllByRole("link", { name: /\d/ });
+    expect(links[0]).toHaveAttribute("href", "/practice/lower-bound?attempt=s1");
+    expect(screen.getAllByText("1/2 tests passed")).toHaveLength(2);
+  });
+
+  it("shows each problem's status and attempt count", async () => {
+    setDevRole("student");
+    renderAt("/problems", <ProblemListPage />, "/problems");
+    expect(await screen.findByText(/2 attempts/)).toBeInTheDocument();
+    expect(screen.getByText("Not started")).toBeInTheDocument();
   });
 });

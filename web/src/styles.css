@@ -584,3 +584,40 @@ table.research {
 .statement pre {
   overflow-x: auto;
 }
+.problem-list .eyebrow {
+  margin-bottom: 4px;
+}
+.problem-meta {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+}
+.status {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--panel-sunk);
+  color: var(--muted);
+}
+.status-pass {
+  color: var(--pass);
+}
+.status-tried {
+  background: var(--flag);
+  color: var(--fg);
+}
+.how-feedback {
+  margin: 12px 0;
+  color: var(--muted);
+}
+.how-feedback summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+.table-scroll {
+  overflow-x: auto;
+}
+table.research-matrix td:not(:first-child),
+table.research-matrix th:not(:first-child) {
+  text-align: right;
+}
