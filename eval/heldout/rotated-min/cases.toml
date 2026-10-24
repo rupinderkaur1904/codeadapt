@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE2 (2026-10-24) by the models' author, in styles different from the models,
+# and committed before the method was run on them. See docs/methodology.md §6.1 for what that
+# does and does not allow us to claim.
+
+problem = "rotated-min"
+
+[[cases]]
+file = "predicate_vs_last.cpp"
+truth = "correct"
+note = "Search for the first element <= the array's last element."
+
+[[cases]]
+file = "recursive_halves.cpp"
+truth = "correct"
+note = "Recursive search that stops early on a sorted range."
+
+[[cases]]
+file = "first_vs_mid.cpp"
+truth = "compares_with_lo"
+note = "Checks whether [lo, mid] is in order and moves right if so."
+
+[[cases]]
+file = "smaller_than_end_skips.cpp"
+truth = "hi_skips_candidate"
+note = "hi = mid - 1 when a[mid] < a[hi]."
+
+[[cases]]
+file = "returns_smallest_value.cpp"
+truth = "returns_value"
+note = "Correct predicate search returning the element instead of the index."
+
+[[cases]]
+file = "returns_rotation_end.cpp"
+truth = "returns_pivot"
+note = "Reports the position before the minimum, wrapping to the end."
+
+[[cases]]
+file = "one_based.cpp"
+truth = "unmodelled"
+note = "Correct search reporting a 1-based position."
+
+[[cases]]
+file = "first_vs_mid_value.cpp"
+truth = "unmodelled"
+note = "Two modelled errors at once: compares with the first element and returns the value."
