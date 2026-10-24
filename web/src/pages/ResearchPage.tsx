@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
-import { api, type ResearchFilters, type ResearchMetrics } from "../api/client";
+import { api, RESEARCH_PAGE_SIZE, type ResearchFilters, type ResearchMetrics } from "../api/client";
 import { ErrorMessage } from "../components/ErrorMessage";
 
 const OUTCOMES = [
@@ -17,6 +17,37 @@ const OUTCOMES = [
   "non_termination_observed",
 ];
 const DATA_CLASSES = ["real", "synthetic", "dev"];
+
+function OutcomesByProblem({ table }: { table: ResearchMetrics["outcomes_by_problem"] }) {
+  const problems = Object.keys(table);
+  if (problems.length === 0) return null;
+  const outcomes = OUTCOMES.filter((o) => problems.some((p) => table[p]?.[o]));
+  return (
+    <div className="table-scroll">
+      <h3>Outcomes by problem</h3>
+      <table className="tests research-matrix">
+        <thead>
+          <tr>
+            <th>Problem</th>
+            {outcomes.map((o) => (
+              <th key={o}>{o}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {problems.map((p) => (
+            <tr key={p}>
+              <td>{p}</td>
+              {outcomes.map((o) => (
+                <td key={o}>{table[p]?.[o] ?? 0}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 function Counts({ title, counts }: { title: string; counts: Record<string, number> }) {
   const entries = Object.entries(counts);
@@ -52,17 +83,31 @@ export function MetricsPanel({ metrics }: { metrics: ResearchMetrics }) {
         <Counts title="Recommendations by rule" counts={metrics.recommendations_by_rule} />
         <Counts title="Follow-up verdicts" counts={metrics.followup_verdicts} />
       </div>
+      <OutcomesByProblem table={metrics.outcomes_by_problem} />
     </section>
   );
 }
 
 export function ResearchPage() {
-  const [filters, setFilters] = useState<ResearchFilters>({});
+  // Filters start from the URL, so other pages can link to a filtered list.
+  const [params] = useSearchParams();
+  const [filters, setFiltersState] = useState<ResearchFilters>(() => ({
+    problem_slug: params.get("problem_slug") ?? undefined,
+    outcome: params.get("outcome") ?? undefined,
+    data_class: params.get("data_class") ?? undefined,
+  }));
+  const [offset, setOffset] = useState(0);
+  const [reviewOnly, setReviewOnly] = useState(false);
+  const setFilters = (next: ResearchFilters) => {
+    setFiltersState(next);
+    setOffset(0);
+  };
   const problems = useQuery({ queryKey: ["problems"], queryFn: api.listProblems });
   const rows = useQuery({
-    queryKey: ["research", "submissions", filters],
-    queryFn: () => api.researchSubmissions(filters),
+    queryKey: ["research", "submissions", filters, offset],
+    queryFn: () => api.researchSubmissions(filters, offset),
   });
+  const shown = rows.data?.filter((r) => !reviewOnly || r.review_flag);
   const metrics = useQuery({
     queryKey: ["research", "metrics", filters.data_class],
     queryFn: () => api.researchMetrics(filters.data_class),
@@ -96,13 +141,22 @@ export function ResearchPage() {
         )}
         {select("outcome", "Outcome", OUTCOMES)}
         {select("data_class", "Data class", DATA_CLASSES)}
+        <label>
+          <input
+            type="checkbox"
+            checked={reviewOnly}
+            onChange={(e) => setReviewOnly(e.target.checked)}
+          />{" "}
+          Flagged for review only (this page)
+        </label>
       </div>
       {metrics.isError && <ErrorMessage error={metrics.error} />}
       {metrics.data && <MetricsPanel metrics={metrics.data} />}
+      <h2>Submissions</h2>
       {rows.isError && <ErrorMessage error={rows.error} />}
       {rows.isPending && <p>Loading submissions…</p>}
-      {rows.data && rows.data.length === 0 && <p className="muted">No submissions match.</p>}
-      {rows.data && rows.data.length > 0 && (
+      {shown && shown.length === 0 && <p className="muted">No submissions match.</p>}
+      {shown && shown.length > 0 && (
         <table className="tests research">
           <thead>
             <tr>
@@ -117,7 +171,7 @@ export function ResearchPage() {
             </tr>
           </thead>
           <tbody>
-            {rows.data.map((r) => (
+            {shown.map((r) => (
               <tr key={r.id}>
                 <td>
                   <Link to={`/research/submissions/${r.id}`}>
@@ -142,6 +196,29 @@ export function ResearchPage() {
             ))}
           </tbody>
         </table>
+      )}
+      {rows.data && (offset > 0 || rows.data.length === RESEARCH_PAGE_SIZE) && (
+        <div className="actions">
+          <button
+            type="button"
+            className="secondary"
+            disabled={offset === 0}
+            onClick={() => setOffset(Math.max(0, offset - RESEARCH_PAGE_SIZE))}
+          >
+            Newer
+          </button>
+          <span className="muted">
+            Rows {offset + 1}–{offset + rows.data.length}
+          </span>
+          <button
+            type="button"
+            className="secondary"
+            disabled={rows.data.length < RESEARCH_PAGE_SIZE}
+            onClick={() => setOffset(offset + RESEARCH_PAGE_SIZE)}
+          >
+            Older
+          </button>
+        </div>
       )}
     </section>
   );

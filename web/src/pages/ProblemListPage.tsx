@@ -1,31 +1,65 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
-import { api } from "../api/client";
+import { api, type ProblemSummary, type SubmissionView } from "../api/client";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { RecommendationCard } from "../components/RecommendationCard";
 
+const RECENT_LIMIT = 50;
+
+function status(p: ProblemSummary, attempts: number | undefined) {
+  if (p.no_failure_observed) {
+    return (
+      <span className="status status-pass" title="You have an attempt with no failing tests">
+        ✓ all tests passed
+      </span>
+    );
+  }
+  if (attempts === undefined) return null;
+  if (attempts === 0) return <span className="status">Not started</span>;
+  return <span className="status status-tried">In progress</span>;
+}
+
+function countAttempts(recent: SubmissionView[] | undefined): Map<string, number> | undefined {
+  if (!recent) return undefined;
+  const counts = new Map<string, number>();
+  for (const s of recent) counts.set(s.problem_slug, (counts.get(s.problem_slug) ?? 0) + 1);
+  return counts;
+}
+
 export function ProblemListPage() {
   const problems = useQuery({ queryKey: ["problems"], queryFn: api.listProblems });
+  // Attempt counts come from the most recent submissions; with more than the API's cap,
+  // older attempts are not counted and the count reads "50+".
+  const recent = useQuery({ queryKey: ["submissions", "all"], queryFn: api.listAllSubmissions });
   if (problems.isPending) return <p>Loading problems…</p>;
   if (problems.isError) return <ErrorMessage error={problems.error} />;
+  const counts = countAttempts(recent.data);
+  const capped = (recent.data?.length ?? 0) >= RECENT_LIMIT;
   return (
     <section>
       <h1>Problems</h1>
       <RecommendationCard />
       <ul className="problem-list">
-        {problems.data.map((p) => (
-          <li key={p.slug}>
-            <Link to={`/practice/${p.slug}`}>{p.title}</Link>
-            <span className="muted"> · {p.family}</span>
-            {p.no_failure_observed && (
-              <span className="badge-pass" title="You have an attempt with no failing tests">
-                {" "}
-                ✓ all tests passed
-              </span>
-            )}
-          </li>
-        ))}
+        {problems.data.map((p) => {
+          const attempts = counts ? (counts.get(p.slug) ?? 0) : undefined;
+          return (
+            <li key={p.slug}>
+              <p className="eyebrow">{p.family}</p>
+              <Link to={`/practice/${p.slug}`}>{p.title}</Link>
+              <p className="problem-meta">
+                {status(p, attempts)}
+                {attempts !== undefined && attempts > 0 && (
+                  <span className="muted">
+                    {" "}
+                    · {attempts}
+                    {capped ? "+" : ""} attempt{attempts === 1 && !capped ? "" : "s"}
+                  </span>
+                )}
+              </p>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

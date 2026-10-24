@@ -95,7 +95,7 @@ export function LandingPage({ loggedIn }: { loggedIn: boolean }) {
               </li>
               <li>
                 <strong>Gives a hint only when the tests point to one known mistake.</strong>{" "}
-                Otherwise it says it can&apos;t tell, rather than guess.
+                Otherwise it shows the failing cases without guessing.
               </li>
             </ol>
           </div>

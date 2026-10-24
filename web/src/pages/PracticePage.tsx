@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 import { api, isFinished } from "../api/client";
 import { AttemptHistory } from "../components/AttemptHistory";
@@ -33,7 +33,9 @@ function Workspace(props: { slug: string; title: string; statement: string; star
   const { slug } = props;
   const queryClient = useQueryClient();
   const [source, setSource] = useState(() => loadDraft(slug) ?? props.starter);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // "My attempts" links here with ?attempt=<id> to open that attempt's result.
+  const [params] = useSearchParams();
+  const [selectedId, setSelectedId] = useState<string | null>(() => params.get("attempt"));
 
   const history = useQuery({
     queryKey: ["submissions", slug],
@@ -100,6 +102,14 @@ function Workspace(props: { slug: string; title: string; statement: string; star
         {selected.isError && <ErrorMessage error={selected.error} />}
         {selected.data && <SubmissionResult submission={selected.data} />}
         {finished && <RecommendationCard currentSlug={slug} />}
+        <details className="how-feedback">
+          <summary>How feedback works</summary>
+          <p>
+            Your code runs on tests designed to separate common mistakes. When tests fail, you see
+            which cases failed. A hint about the likely mistake appears only when the failing cases
+            match one known mistake; otherwise you get the cases to compare, without a guess.
+          </p>
+        </details>
         <h2>Your attempts</h2>
         {history.isError ? (
           <ErrorMessage error={history.error} />
