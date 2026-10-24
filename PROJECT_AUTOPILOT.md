@@ -60,10 +60,10 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | F3 | Limitations and future work list | E1 | docs/limitations.md | Complete, consistent with status report | **done** 91cb35a |
 | G1 | Demo workflow with expected results, verified locally | C1 | docs/demo.md | Steps run today; outputs match | **done** (run 2026-10-24, output recorded) |
 | G2 | Interview-preparation document | F1, E1 | docs/interview-prep.md | Architecture, algorithms, trade-offs, evaluation, limitations | **done** 91cb35a |
-| H1 | Bank expansion: complete binary-search problems | — | content/demo/*, docs/content-design/*, docs/content-reports/*, eval/heldout/* | Per problem: sandbox validation ok, distinguishes = measured, design record, held-out committed before eval, eval recorded, E2 not recommendable | **VERIFIED locally** for 8 problems: integer-sqrt, upper-bound, exact-search, last-occurrence, min-capacity, rotated-min, rotated-search, peak-index. CI pending on the latest pushes |
+| H1 | Bank expansion: complete binary-search problems | — | content/demo/*, docs/content-design/*, docs/content-reports/*, eval/heldout/* | Per problem: sandbox validation ok, distinguishes = measured, design record, held-out committed before eval, eval recorded, E2 not recommendable | **VERIFIED** for 8 problems: integer-sqrt, upper-bound, exact-search, last-occurrence, min-capacity, rotated-min, rotated-search, peak-index. CI green (runs 90–92) |
 | H2 | Integration tests: infrastructure failure, redelivery, content versions | — | backend/tests/unit/test_pipeline_infrastructure.py, test_content_versions.py | Outage leaves no run, diagnosis, recommendation or learner attempt; redelivery adds no attempt; old version keeps its snapshot | **VERIFIED** (unit suite 373 pass) |
 | H3 | CE1.4 family report: observation capacity and BKT sensitivity on the 12-problem bank | H1 | docs/evaluation/ce1.4-2026-10-24/ | Technical measurements only | **VERIFIED** 8dbc328 |
-| H4 | Playwright specs no longer race for the single worker | — | web/playwright.config.ts | 3/3 pass locally serially | **VERIFIED locally** (2.1 min); CI pending |
+| H4 | Playwright specs no longer race for the single worker | — | web/playwright.config.ts | 3/3 pass locally serially | **VERIFIED**: CI run 92 green on eb05bf9 |
 
 ## Log
 
@@ -122,8 +122,7 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Next three tasks
 
-1. **Confirm CI is green on the latest push.** The demo-content shard now fingerprints 12
-   problems, about 13 minutes locally.
+1. **Keep CI green.** It is green on eb05bf9 (run 92, all jobs, about 23 min wall).
 2. **Frontend branch `9vflva`**: integrate after checking with that thread, so the two do not
    make conflicting edits.
 3. **Refresh the docs for the final state.** That means the status report, the research-report
