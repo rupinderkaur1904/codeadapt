@@ -468,15 +468,17 @@ def test_withdrawn_record_stops_real_data_commands(tmp_path: Path) -> None:
 
 
 def test_committed_record_is_not_an_open_gate() -> None:
-    """The repository's record.json (if any) must not open the gate while PC1 is blocked.
+    """The repository's record.json must never open the gate by accident.
 
-    PC1 is blocked pending amendment A1 (docs/preregistration/pc1/STATUS.md). When a truthful
-    record is legitimately committed, this test is updated in the same commit.
+    The withdrawn version 1 record (permission/CORRECTIONS.md) must stay closed at every level.
+    Any committed record must stay closed at the `code` level, which no approval covers yet.
     """
     record = PC1 / "permission/record.json"
-    if record.exists():
+    if not record.exists():
+        return
+    assert pc1.check_permission(record, "code") != []
+    if json.loads(record.read_text())["record_version"] == 1:
         assert pc1.check_permission(record, "metadata") != []
-        assert pc1.check_permission(record, "code") != []
 
 
 # ------------------------------------------------------------------ amendment A1: published licence

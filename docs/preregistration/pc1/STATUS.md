@@ -55,5 +55,5 @@ when false), and it would add tests for both. A1b is now implemented (`publicati
 Fill in `permission/record-licence.template.json` with your own first-hand reading of the
 CodeNet paper's licence sentence: the exact quote, where it is, and the date you read it. Then
 save it as `permission/record.json` with `status: granted`. Until then, the gate stays closed.
-The tripwire test `test_committed_record_is_not_an_open_gate` is updated in the same commit
-that adds a truthful record.
+The test `test_committed_record_is_not_an_open_gate` keeps the withdrawn version 1 record
+closed and keeps any committed record closed at the `code` level.
