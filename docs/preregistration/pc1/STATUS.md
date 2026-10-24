@@ -4,7 +4,7 @@ The frozen files (`protocol.md` 1.0, `README.md`, `permission.md`, the scripts a
 unchanged and still match `MANIFEST.sha256`. Some of their statements describe the state when
 they were frozen and are no longer true. This file records the current state.
 
-**As of 2026-10-24:**
+**As of 2026-10-24 (after A1 and A1b were approved and applied):**
 
 | Item | State | Evidence |
 | --- | --- | --- |
@@ -21,7 +21,7 @@ The owner is an independent researcher. The frozen gate accepts only an explicit
 a supervisor, an institutional research-data office, an institutional ethics office, or IBM.
 None exists, so under protocol 1.0 the gate cannot honestly open.
 
-## What is proposed (not applied, needs owner approval)
+## Amendment A1 + A1b: approved by the owner on 2026-10-24 and applied
 
 **Amendment A1:** a second basis, `published dataset licence` (record version 2), for the
 `metadata` level only. The dataset is reported to use CDLA-Permissive-2.0 (CodeNet paper
@@ -40,13 +40,20 @@ It never opens the `code` level.
 repository, but the reports carry no statement of whether they may be published. Only the
 README says "commit counts only if" the flag is true. A1b would have `feasibility` copy the
 flag into `feasibility.json` and print it at the top of `feasibility.md` ("NOT FOR PUBLICATION"
-when false), and it would add tests for both. A1b changes `scripts/pc1.py`, so it is an
-amendment and waits for the owner.
+when false), and it would add tests for both. A1b is now implemented (`publication_notice`).
 
 ## Evidence still needed to unblock
 
-1. Owner approval of A1 (and A1b), or a decision to stop PC1.
+1. ~~Owner approval of A1 (and A1b)~~: approved 2026-10-24.
 2. The owner's first-hand reading of the provider's licence statement (exact quote and date).
    Search excerpts seen by Claude do not count.
 3. Optional and recommended: a reply from the CodeNet maintainers confirming the dataset
    licence (draft question in the A1 proposal).
+
+## Next step (owner)
+
+Fill in `permission/record-licence.template.json` with your own first-hand reading of the
+CodeNet paper's licence sentence: the exact quote, where it is, and the date you read it. Then
+save it as `permission/record.json` with `status: granted`. Until then, the gate stays closed.
+The tripwire test `test_committed_record_is_not_an_open_gate` is updated in the same commit
+that adds a truthful record.

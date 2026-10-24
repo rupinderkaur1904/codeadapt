@@ -477,3 +477,103 @@ def test_committed_record_is_not_an_open_gate() -> None:
     if record.exists():
         assert pc1.check_permission(record, "metadata") != []
         assert pc1.check_permission(record, "code") != []
+
+
+# ------------------------------------------------------------------ amendment A1: published licence
+def licence_record(**changes: Any) -> dict[str, Any]:
+    record: dict[str, Any] = {
+        "record_version": 2,
+        "status": "granted",
+        "dataset": "IBM Project CodeNet 1.0.0",
+        "basis": "published dataset licence",
+        "licence_id": "CDLA-Permissive-2.0",
+        "licence_text_sha256": pc1.sha256_file(pc1.LICENCE_TEXT),
+        "licence_evidence": [
+            {
+                "source": "Synthetic paper datasheet",
+                "locator": "Section X, answer to 'license'",
+                "publisher": "dataset provider",
+                "seen": "first-hand",
+                "accessed_on": "2026-11-01",
+                "quote": "The license of the dataset is CDLA Permissive v2.0.",
+            }
+        ],
+        "unverified": "No current distribution page checked (synthetic test).",
+        "known_risks": "Upstream submission rights; pseudonymous ids (synthetic test).",
+        "recorded_on": "2026-11-02",
+        "recorded_by": "owner",
+        "self_imposed_conditions": dict.fromkeys(pc1.SELF_IMPOSED_CONDITIONS, True),
+        "scope": {
+            "download_full_archive": True,
+            "store_outside_repository": True,
+            "metadata_analysis": True,
+            "source_code_analysis": False,
+            "publish_derived_statistics": False,
+            "publish_submission_ids": False,
+            "redistribute_code": False,
+        },
+    }
+    record.update(changes)
+    return record
+
+
+def test_licence_record_opens_metadata_level_only(tmp_path: Path) -> None:
+    path = write_record(tmp_path, licence_record())
+    assert pc1.check_permission(path, "metadata") == []
+    code = pc1.check_permission(path, "code")
+    assert any("opens only the metadata level" in p for p in code), code
+
+
+def _evidence(**changes: Any) -> list[dict[str, Any]]:
+    return [{**licence_record()["licence_evidence"][0], **changes}]
+
+
+@pytest.mark.parametrize(
+    ("change", "reason"),
+    [
+        ({"record_version": 1}, "basis must be"),
+        ({"licence_id": "Apache-2.0"}, "licence_id"),
+        ({"licence_text_sha256": "0" * 64}, "licence_text_sha256"),
+        ({"licence_evidence": []}, "at least one source"),
+        ({"licence_evidence": _evidence(publisher="third party")}, "dataset provider"),
+        ({"licence_evidence": _evidence(seen="secondary")}, "dataset provider"),
+        ({"licence_evidence": _evidence(quote="Licensed under Apache 2.0")}, "dataset provider"),
+        ({"licence_evidence": _evidence(accessed_on="2026-11-03")}, "accessed_on"),
+        ({"licence_evidence": _evidence(locator="ask ibm@example.com")}, "email address"),
+        ({"unverified": ""}, "unverified"),
+        ({"known_risks": " "}, "known_risks"),
+        ({"self_imposed_conditions": {}}, "no_reidentification"),
+        ({"recorded_by": "Claude"}, "recorded_by"),
+        ({"status": "withdrawn"}, "status must be 'granted'"),
+    ],
+)
+def test_gate_refuses_weak_licence_records(
+    tmp_path: Path, change: dict[str, Any], reason: str
+) -> None:
+    problems = pc1.check_permission(write_record(tmp_path, licence_record(**change)))
+    assert any(reason in p for p in problems), problems
+
+
+@pytest.mark.parametrize("key", ["source_code_analysis", "publish_submission_ids"])
+def test_licence_record_keeps_code_and_ids_closed(tmp_path: Path, key: str) -> None:
+    scope = {**licence_record()["scope"], key: True}
+    problems = pc1.check_permission(write_record(tmp_path, licence_record(scope=scope)))
+    assert any(f"scope.{key} must be false" in p for p in problems), problems
+
+
+# ------------------------------------------------------------------ amendment A1b: publication flag
+def test_fixture_reports_say_they_are_not_data(tmp_path: Path) -> None:
+    assert run_fixture_pipeline(tmp_path) == pc1.EXIT_OK
+    report = json.loads((tmp_path / "feasibility.json").read_text())
+    assert report["publication"]["publish_derived_statistics"] is None
+    assert "SYNTHETIC FIXTURES - NOT DATA" in (tmp_path / "feasibility.md").read_text()
+
+
+@pytest.mark.parametrize(("allowed", "expected"), [(False, False), (True, True)])
+def test_publication_notice_follows_the_permission_record(
+    tmp_path: Path, allowed: bool, expected: bool
+) -> None:
+    scope = {**licence_record()["scope"], "publish_derived_statistics": allowed}
+    notice = pc1.publication_notice(write_record(tmp_path, licence_record(scope=scope)))
+    assert notice["publish_derived_statistics"] is expected
+    assert ("NOT FOR PUBLICATION" in notice["notice"]) is (not expected)
