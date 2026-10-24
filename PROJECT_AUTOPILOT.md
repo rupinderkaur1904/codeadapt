@@ -62,7 +62,8 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | G2 | Interview-preparation document | F1, E1 | docs/interview-prep.md | Architecture, algorithms, trade-offs, evaluation, limitations | **done** 91cb35a |
 | H1 | Bank expansion: complete binary-search problems | — | content/demo/*, docs/content-design/*, docs/content-reports/*, eval/heldout/* | Per problem: sandbox validation ok, distinguishes = measured, design record, held-out committed before eval, eval recorded, E2 not recommendable | **VERIFIED locally** for 8 problems: integer-sqrt, upper-bound, exact-search, last-occurrence, min-capacity, rotated-min, rotated-search, peak-index. CI pending on the latest pushes |
 | H2 | Integration tests: infrastructure failure, redelivery, content versions | — | backend/tests/unit/test_pipeline_infrastructure.py, test_content_versions.py | Outage leaves no run, diagnosis, recommendation or learner attempt; redelivery adds no attempt; old version keeps its snapshot | **VERIFIED** (unit suite 373 pass) |
-| H3 | CE1.4 family report: observation capacity and BKT sensitivity on the 12-problem bank | H1 | docs/evaluation/ | Technical measurements only | **PROPOSED** (not started) |
+| H3 | CE1.4 family report: observation capacity and BKT sensitivity on the 12-problem bank | H1 | docs/evaluation/ce1.4-2026-10-24/ | Technical measurements only | **VERIFIED** 8dbc328 |
+| H4 | Playwright specs no longer race for the single worker | — | web/playwright.config.ts | 3/3 pass locally serially | **VERIFIED locally** (2.1 min); CI pending |
 
 ## Log
 
@@ -123,8 +124,8 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 1. **Confirm CI is green on the latest push.** The demo-content shard now fingerprints 12
    problems, about 13 minutes locally.
-2. **CE1.4 family report** (H3): re-run the observation-capacity table and the BKT sensitivity
-   script on the 12-problem bank. Label both as technical measurements.
+2. **Frontend branch `9vflva`**: integrate after checking with that thread, so the two do not
+   make conflicting edits.
 3. **Refresh the docs for the final state.** That means the status report, the research-report
    draft and `docs/demo.md`. Then integrate the frontend branch `9vflva` without conflicting
    edits.
@@ -219,3 +220,10 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 these are a binary-search extension (BSX), not the planned CE2 stage (arrays). Content and
 held-out files were not edited, because editing them would change content versions and
 manifests.
+
+**Iteration 12, continued.**
+
+- CE1.4 report written (8dbc328).
+- Evaluation summary table for the bank expansion added (f88e9b8).
+- Playwright `research.spec` timed out in CI run 89. It was waiting behind other specs' jobs on
+  the single worker. The specs now run serially (`workers: 1`) and pass 3/3 locally.
