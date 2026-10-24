@@ -4,21 +4,25 @@ Persistent progress file for the self-directed loop requested by the owner on 20
 Reread it and check it against the repository before each task. Status report:
 [docs/status-2026-10-24.md](docs/status-2026-10-24.md).
 
-**Current objective:** bring CodeAdapt to a defensible, demonstrable completion state, with
-deliverables 1–12 from the owner's brief, without crossing approval gates.
+**Current objective (owner, 2026-10-24 17:04):** finish the full existing scope (sandbox,
+diagnosis, evidence, attribution, BKT, recommendations, problem bank, researcher UI,
+evaluation), integrated and verified, by Wednesday 2026-10-28. Functional completion by Tuesday
+night; Wednesday for regression, demo, report checks. No scope cuts, no unrelated features, no
+frozen rule/threshold/parameter changes. Phase E deferred (gate closed).
 
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 10
+**Iteration:** 11
 
 **PC1 status:** Phase E proposed — blocked pending code-level permission and owner approval.
 
 ## Hard limits (owner rules, override everything below)
 
-- PC1: gate open at `metadata` only (owner's version 2 record, A1). Phase F done; stop there.
-  Never read source code, start Phase E, edit `record.json` or commit counts. Never claim
-  supervisor approval.
+- PC1: gate open at `metadata` only (owner's version 2 record, A1). Phase F done; Phase E
+  deferred. Never read or run CodeNet source code, activate A2, send the maintainer enquiry,
+  edit `record.json` or commit counts. Never claim supervisor approval.
+- Pushing main-project work (never CodeNet data) to this branch: approved again 2026-10-24 17:05.
 - Do not change the diagnosis method, skill maps, BKT parameters, ledger, policy, feedback
   wording or frozen protocols without owner approval. Label synthetic results as synthetic.
 - No deployment, no real-student data, no publication of derived statistics.
@@ -84,15 +88,20 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Blockers needing the owner
 
-1. PC1 Phase E: proposed — blocked pending code-level permission and owner approval
-   (decisions P and D1–D12 in the owner's project files `phase-e-proposal/04-…`).
-2. Hosting/deployment (M8): not needed for the research deliverables.
+1. CE1.2/CE1.3 (problem bank): resume or keep paused (decision card, 2026-10-24). CE1.2 content
+   and 8 held-out cases are drafted in the scratchpad and validated (RESULT ok, matrix matches
+   the design record); nothing committed or evaluated.
+2. Rule C limitation L19 (positive evidence from an abstained, mostly failing attempt): policy
+   decision, not changed.
+3. PC1 Phase E: deferred (permission basis P, then D1–D12).
+4. Hosting/deployment (M8).
 
 ## Next three tasks
 
-1. Owner decisions on Phase E (permission basis P, then D1–D12).
-2. Otherwise idle safely: every remaining workstream needs an owner decision (Phase E, hosting,
-   failing-case feedback proposal, CE1.2/1.3).
+1. On the CE1.2 decision: commit design-record measured section, content, held-out cases (before
+   evaluating), then run the gates (policy golden unchanged, held-out, regression).
+2. Check CI for f583d98 (PostgreSQL pipeline job, gVisor on every shard) and fix any failure.
+3. Refresh docs/status report and evaluation summary for the final state.
 
 ## Resume instruction
 
@@ -122,3 +131,13 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
   CODAIT statement covers samples only; AIZU rights unknown). Enquiry drafted, not sent.
   Preregistration draft 0.1 and suitability review written to project files.
 - Code gate re-checked: `pc1.py gate --level code` exit 3. No code extracted or read.
+
+### Iteration 11 (owner's completion directive)
+
+- Audit: unit 368 → 370 pass; ruff/mypy clean; web 21 + Playwright 3 pass; CI green on fc4d427.
+- 91b41f0: adaptation end-to-end test extended through the LM1 learner model (compile error,
+  named, abstained, retry, follow-up); passes in the sandbox (207 s). Pinned limitation L19.
+- 91b41f0: worker lease heartbeat (`queue.renew`, fenced); heartbeat test fails without it.
+- fc4d427: Playwright test for researcher trace + learner model (3/3 pass locally).
+- f583d98: CI job running both end-to-end tests on PostgreSQL 16 (passed locally, 446 s);
+  gVisor job now runs every sandbox shard.
