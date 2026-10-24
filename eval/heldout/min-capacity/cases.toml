@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE2 (2026-10-24) by the models' author, in styles different from the models,
+# and committed before the method was run on them. See docs/methodology.md §6.1 for what that
+# does and does not allow us to claim.
+
+problem = "min-capacity"
+
+[[cases]]
+file = "closed_answer_variable.cpp"
+truth = "correct"
+note = "Closed interval over [1, total] with a running answer; the check rejects a package heavier than the capacity."
+
+[[cases]]
+file = "count_style_search.cpp"
+truth = "correct"
+note = "Counting-style search with a day-by-day segment loop."
+
+[[cases]]
+file = "closed_from_one.cpp"
+truth = "lo_init_one"
+note = "Closed interval with a running answer, starting at capacity 1 with no package check."
+
+[[cases]]
+file = "bool_check_strict.cpp"
+truth = "strict_day_limit"
+note = "Boolean feasibility check returning used < days."
+
+[[cases]]
+file = "segment_cut_at_full.cpp"
+truth = "full_day_overflows"
+note = "Closed-interval search whose inline check closes a day when the load would reach the capacity."
+
+[[cases]]
+file = "sorted_copy.cpp"
+truth = "sorts_weights"
+note = "Sorts a copy of the packages before the search."
+
+[[cases]]
+file = "allows_one_over.cpp"
+truth = "unmodelled"
+note = "The check lets a day exceed the capacity by one unit."
+
+[[cases]]
+file = "from_one_strict.cpp"
+truth = "unmodelled"
+note = "Two modelled errors at once: lo = 1 and strictly fewer days."
