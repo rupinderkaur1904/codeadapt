@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE2 (2026-10-24) by the models' author, in styles different from the models,
+# and committed before the method was run on them. See docs/methodology.md §6.1 for what that
+# does and does not allow us to claim.
+
+problem = "last-occurrence"
+
+[[cases]]
+file = "closed_answer_variable.cpp"
+truth = "correct"
+note = "Closed interval; records each match and keeps searching right."
+
+[[cases]]
+file = "power_of_two_jumps.cpp"
+truth = "correct"
+note = "Moves right by decreasing powers of two while the element is <= target."
+
+[[cases]]
+file = "closed_goes_left_on_match.cpp"
+truth = "returns_first_occurrence"
+note = "Closed interval that records a match and keeps searching left."
+
+[[cases]]
+file = "for_loop_returns_on_match.cpp"
+truth = "stops_at_any_match"
+note = "For-loop closed search returning the first match it meets (midpoint rounded down)."
+
+[[cases]]
+file = "count_not_greater.cpp"
+truth = "returns_one_past"
+note = "Counting-style search (size halving) that returns the count of elements <= target."
+
+[[cases]]
+file = "upper_midpoint_any_match.cpp"
+truth = "stops_at_any_match"
+note = "Same error as the model but with the midpoint rounded up, so it returns other occurrences. Predicted risk (design record §4): may be abstained on."
+
+[[cases]]
+file = "one_based_position.cpp"
+truth = "unmodelled"
+note = "Correct search reporting a 1-based position, and 0 when absent."
+
+[[cases]]
+file = "unchecked_count.cpp"
+truth = "unmodelled"
+note = "Two modelled errors at once: no equality check and one past the end."
