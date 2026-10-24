@@ -1,0 +1,261 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/rotated-search.md (CE2).
+
+slug = "rotated-search"
+title = "Search a rotated array"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int rotated_search(const std::vector<int>& a, int target);"
+# CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
+# problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
+recommendable = false
+
+[skills]
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+equality_handling = "Choosing the comparison so equal elements land on the correct side of the boundary."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# A probe is a property of an input that a test exercises. Each probe names the skills
+# whose errors it can expose; this mapping is a modelling assumption, not a fact.
+[probes]
+target_absent = ["problem_specification"]
+target_at_range_start = ["equality_handling"]
+two_candidates = ["equality_handling", "loop_termination"]
+last_candidate = ["loop_termination"]
+rotated = ["problem_specification"]
+not_rotated = ["problem_specification"]
+large_input = ["loop_termination"]
+
+[curriculum]
+assumes = ["indexing a std::vector", "a loop invariant over a closed range [lo, hi]"]
+prerequisites = ["exact-search", "rotated-min"]
+
+[[tests]]
+key = "sample_right"
+visibility = "sample"
+input = "L 6 14 15 16 11 12 13 12"
+expected = "4"
+probes = ["rotated"]
+student_description = "Rotated array; the target is in the right run."
+purpose = "Visible typical case."
+distinguishes = ["ignores_rotation", "returns_sorted_position"]
+
+[[tests]]
+key = "sample_absent"
+visibility = "sample"
+input = "L 6 14 15 16 11 12 13 17"
+expected = "-1"
+probes = ["rotated", "target_absent"]
+student_description = "Rotated array; the target is absent."
+purpose = "Visible absent case."
+distinguishes = []
+
+[[tests]]
+key = "left_run_first"
+input = "L 6 14 15 16 11 12 13 14"
+expected = "0"
+probes = ["rotated", "target_at_range_start"]
+student_description = "The target is the first element."
+purpose = "Target equal to a[lo] in the sorted left half."
+distinguishes = ["left_range_excludes_lo", "returns_sorted_position"]
+
+[[tests]]
+key = "left_run_middle"
+input = "L 6 14 15 16 11 12 13 15"
+expected = "1"
+probes = ["rotated"]
+student_description = "The target is in the left run."
+purpose = "Target inside the left run."
+distinguishes = ["closed_loop_lt", "returns_sorted_position"]
+
+[[tests]]
+key = "right_run_last"
+input = "L 6 14 15 16 11 12 13 13"
+expected = "5"
+probes = ["rotated", "last_candidate"]
+student_description = "The target is the last element."
+purpose = "Target at the end of the right run."
+distinguishes = ["closed_loop_lt", "ignores_rotation", "returns_sorted_position"]
+
+[[tests]]
+key = "right_run_first"
+input = "L 6 14 15 16 11 12 13 11"
+expected = "3"
+probes = ["rotated"]
+student_description = "The target is the smallest element."
+purpose = "Target at the rotation point."
+distinguishes = ["closed_loop_lt", "ignores_rotation", "left_range_excludes_lo", "returns_sorted_position"]
+
+[[tests]]
+key = "absent_in_gap"
+input = "L 6 14 15 16 11 12 13 10"
+expected = "-1"
+probes = ["rotated", "target_absent"]
+student_description = "The target is smaller than every element."
+purpose = "Absent below the minimum."
+distinguishes = []
+
+[[tests]]
+key = "sorted_first"
+input = "L 5 21 22 23 24 25 21"
+expected = "0"
+probes = ["not_rotated", "target_at_range_start"]
+student_description = "Not rotated; the target is first."
+purpose = "Answer 0 without rotation."
+distinguishes = ["left_range_excludes_lo"]
+
+[[tests]]
+key = "sorted_last"
+input = "L 5 21 22 23 24 25 25"
+expected = "4"
+probes = ["not_rotated", "last_candidate"]
+student_description = "Not rotated; the target is last."
+purpose = "Answer n - 1 without rotation."
+distinguishes = ["closed_loop_lt"]
+
+[[tests]]
+key = "single_hit"
+input = "L 1 7 7"
+expected = "0"
+probes = ["last_candidate"]
+student_description = "A single element equal to the target."
+purpose = "Smallest range with an answer."
+distinguishes = ["closed_loop_lt"]
+
+[[tests]]
+key = "single_miss"
+input = "L 1 7 8"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "A single element different from the target."
+purpose = "Smallest range without an answer."
+distinguishes = []
+
+[[tests]]
+key = "two_rotated_second"
+input = "L 2 9 3 3"
+expected = "1"
+probes = ["two_candidates", "rotated"]
+student_description = "Two elements, rotated; the target is second."
+purpose = "lo == mid on a rotated pair."
+distinguishes = ["closed_loop_lt", "ignores_rotation", "left_half_test_strict", "returns_sorted_position"]
+
+[[tests]]
+key = "two_rotated_first"
+input = "L 2 9 3 9"
+expected = "0"
+probes = ["two_candidates", "rotated", "target_at_range_start"]
+student_description = "Two elements, rotated; the target is first."
+purpose = "Target is the first midpoint."
+distinguishes = ["returns_sorted_position"]
+
+[[tests]]
+key = "two_sorted_second"
+input = "L 2 3 9 9"
+expected = "1"
+probes = ["two_candidates", "not_rotated"]
+student_description = "Two elements, not rotated; the target is second."
+purpose = "lo == mid on a sorted pair."
+distinguishes = ["closed_loop_lt"]
+
+[[tests]]
+key = "three_rotated_last"
+input = "L 3 8 9 2 2"
+expected = "2"
+probes = ["rotated", "last_candidate"]
+student_description = "Three elements; the target is last."
+purpose = "Small rotated range."
+distinguishes = ["closed_loop_lt", "ignores_rotation", "returns_sorted_position"]
+
+[[tests]]
+key = "seven_left_start"
+input = "L 7 15 16 17 11 12 13 14 15"
+expected = "0"
+probes = ["rotated", "target_at_range_start"]
+student_description = "The target starts the left run."
+purpose = "Target equal to a[lo] after the minimum is in the right half."
+distinguishes = ["closed_loop_lt", "ignores_rotation", "left_range_excludes_lo", "returns_sorted_position"]
+
+[[tests]]
+key = "four_min_last"
+input = "L 4 12 13 14 11 11"
+expected = "3"
+probes = ["rotated", "two_candidates", "last_candidate"]
+student_description = "Four elements; the target is the smallest, last."
+purpose = "The search ends on a rotated pair."
+distinguishes = ["closed_loop_lt", "ignores_rotation", "left_half_test_strict", "returns_sorted_position"]
+
+[[tests]]
+key = "large_min_last"
+input = "R 200000 199999 100 3 100"
+expected = "199999"
+probes = ["large_input", "rotated", "two_candidates"]
+student_description = "A large array whose smallest element is last; the target is that element."
+purpose = "Ends on a rotated pair at scale."
+distinguishes = ["closed_loop_lt", "ignores_rotation", "returns_sorted_position"]
+
+[[tests]]
+key = "large_rotated_hit"
+input = "R 200000 70000 100 3 400"
+expected = "70100"
+probes = ["large_input", "rotated"]
+student_description = "A large rotated array containing the target."
+purpose = "Typical answer at scale."
+distinguishes = ["ignores_rotation", "returns_sorted_position"]
+
+[[tests]]
+key = "large_rotated_miss"
+input = "R 200000 70000 100 3 401"
+expected = "-1"
+probes = ["large_input", "rotated", "target_absent"]
+student_description = "A large rotated array; the target is absent."
+purpose = "Absent at scale."
+distinguishes = []
+
+[[tests]]
+key = "large_sorted_hit"
+input = "R 200000 0 100 3 300097"
+expected = "99999"
+probes = ["large_input", "not_rotated"]
+student_description = "A large array that was not rotated."
+purpose = "Answer near the end at scale."
+distinguishes = []
+
+[[error_models]]
+key = "left_half_test_strict"
+file = "error_models/left_half_test_strict.cpp"
+skill = "equality_handling"
+description = "Tests a[lo] < a[mid] to decide that the left half is sorted, which is wrong when lo == mid."
+student_hint = "When the range has two elements, mid == lo. Does your test for a sorted left half still hold?"
+known_limitation = "Detected only when the search ends on a rotated pair whose second element is the target (one behaviour group, 2 tests). Any error that fails exactly those tests produces the same failures, so diagnoses are reported as qualified."
+
+[[error_models]]
+key = "left_range_excludes_lo"
+file = "error_models/left_range_excludes_lo.cpp"
+skill = "equality_handling"
+description = "Tests a[lo] < target for the sorted left half, so a target equal to a[lo] is searched for in the wrong half."
+student_hint = "Can the target be equal to the first element of the sorted half? Check the comparison."
+
+[[error_models]]
+key = "closed_loop_lt"
+file = "error_models/closed_loop_lt.cpp"
+skill = "loop_termination"
+description = "Closed interval but loops while lo < hi, so the last remaining candidate is never compared."
+student_hint = "When one candidate is left, does your loop still check it?"
+
+[[error_models]]
+key = "ignores_rotation"
+file = "error_models/ignores_rotation.cpp"
+skill = "problem_specification"
+description = "Ordinary binary search, as if the array were not rotated."
+student_hint = "Re-read the statement: the array is sorted, then rotated. Which parts of it are in order?"
+
+[[error_models]]
+key = "returns_sorted_position"
+file = "error_models/returns_sorted_position.cpp"
+skill = "problem_specification"
+description = "Searches the array as if unrotated and returns the position in sorted order, not the index in a."
+student_hint = "Re-read which index to return: the position in the given array."
