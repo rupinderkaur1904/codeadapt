@@ -467,3 +467,19 @@ attempt. v1.2 and v1.1 stay registered as `v1.2` and `v1.1`; earlier results are
 rewritten. ADR-028 and ADR-029 are used on another branch. Proposal and replay:
 docs/proposals/adr-030-uninformative-evidence.md, docs/evaluation/adr030-replay-2026-10-22.
 Re-run comparison: docs/evaluation/adr030-2026-10-23.
+
+## ADR-031 — Fenced job completion and no re-run of a diagnosed submission (2026-10-24)
+**Context:** `queue.finish` and `queue.requeue` updated a job by id alone. A worker whose lease
+expired (600 s) could overwrite the state of the attempt that another worker had reclaimed. A
+worker that died after committing its diagnosis but before finishing the job left it to be
+reclaimed and run again. That run added a second, possibly different diagnosis and a second
+recommendation. The learner model reads the latest diagnosis, so the evidence could change
+silently.
+**Decision:** `finish` and `requeue` change a job only while it is still the caller's claim
+(running, same worker, same attempt) and return whether they did. Before running, the worker
+looks for a diagnosis by its own method and version for the submission. If one exists, it
+finishes the job without executing anything. Diagnosis rules, evidence rules, policy, ledger,
+BKT and feedback are unchanged.
+**Not solved:** two workers can still run the same job at once if one exceeds its lease
+(there is no lease heartbeat). Each then commits a diagnosis, and only the claim holder
+finishes the job. Tests: `tests/unit/test_queue.py`, `tests/unit/test_pipeline_redelivery.py`.
