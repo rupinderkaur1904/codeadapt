@@ -43,7 +43,7 @@ The system never stores or displays "the student misunderstands X" or "has maste
 | --- | --- | --- |
 | Backend language | **Python 3.12+** | Research analysis, statistics and notebooks are native; strong typing via mypy strict; one language for API, worker and evaluation scripts. Go/Rust would give a faster runner but the runner's cost is dominated by container start-up, not by host code. (ADR-002) |
 | Web API | **FastAPI + Pydantic v2** | Typed request/response contracts, generated OpenAPI used to type the frontend client. Django was considered; its ORM/admin conveniences don't outweigh explicit contracts for a small API. |
-| Persistence | **PostgreSQL 16** (deploy) / **SQLite** (unit tests, local dev) via **SQLAlchemy 2 + Alembic** | Relational integrity for an evidence chain; JSONB for rationale payloads; `SELECT … FOR UPDATE SKIP LOCKED` gives a job queue without Redis. Portable SQL subset keeps SQLite usable for fast tests. (ADR-004) |
+| Persistence | **PostgreSQL 16** (deploy) / **SQLite** (unit tests, local dev) via **SQLAlchemy 2 + Alembic** | Relational integrity for an evidence chain; JSONB for rationale payloads; An optimistic conditional `UPDATE` (match on prior state and attempt count) gives a job queue without Redis on both databases; completion is fenced to the current claim (ADR-031). Portable SQL subset keeps SQLite usable for fast tests. (ADR-004) |
 | Job queue | **Database-backed queue + separate worker process** | One fewer moving part than Redis/Celery; jobs are durable evidence anyway. Revisit only if throughput demands it. (ADR-004) |
 | Sandboxed execution | **Docker/OCI container per compile and per test**, hardened flags, pinned toolchain image; **gVisor (`runsc`) runtime required for any public deployment** | Portable for developers on Linux/macOS/Windows; well-understood primitives (namespaces, cgroups, seccomp, capabilities). (ADR-003, security.md) |
 | C++ toolchain | **GCC 14.2** in image `gcc:14.2.0` pinned by digest, `-std=c++20` | Reproducibility: every run records the image digest, compiler version, flags and limits. |
@@ -60,7 +60,8 @@ API ↔ runner worker, because it *is* a trust boundary.
 **Modelling layers (ADR-021).** Diagnosis, skill evidence, learner model and recommendation
 are separate components: the deterministic fingerprint engine diagnoses one submission;
 the skill-evidence layer (the ledger) keeps only diagnosis-supported observations; a
-Bayesian learner model is planned but not implemented; the recommendation policy chooses
+researcher-only Bayesian knowledge-tracing model runs under labelled assumed parameters
+(LM1, ADR-025) and feeds nothing students see; the recommendation policy chooses
 the next activity. Their interface is documented for review before any learner model is
 built.
 
@@ -101,7 +102,7 @@ flowchart LR
   RW -- HTTPS JSON --> AUTH
   AUTH --> SUB & FB & RES & CAT
   SUB -- enqueue job --> DB
-  Q -- claim job SKIP LOCKED --> DB
+  Q -- claim job (conditional UPDATE) --> DB
   Q --> EXE --> CC & RC
   EXE --> EV --> DX --> AD
   EV & DX & AD -- append-only records --> DB
@@ -123,7 +124,9 @@ by network hops):
 | `db` | SQLAlchemy models, repositories, migrations. | all model types |
 | `worker` | Job loop: claim → execute → evidence → diagnose → recommend → persist. | everything except `api` |
 | `api` | HTTP routes, auth, role checks, student-safe projections. | `db`, model types; **never** `execution` |
-| `research` | Offline evaluation harness and metrics (CLI). | everything |
+| `learner` | LM1: researcher-only BKT over ledger skill observations, assumed parameters (ADR-025). | `adaptation`, `content` and `diagnosis` model types |
+| `auth` | Password hashing, server-side sessions, login throttling and audit events; `codeadapt-admin` CLI for accounts and backup (ADR-029). | `db`, `config` |
+| `evaluation` | Offline evaluation harness, held-out/calibration runs, method comparison and metrics (CLI `codeadapt-eval`). | everything except `api` |
 
 `diagnosis` and `adaptation` are pure (no I/O) so methods can be swapped and replayed
 over stored evidence — important for research: a new method is evaluated by re-running
@@ -144,7 +147,7 @@ sequenceDiagram
   A->>A: authN/Z, size limits, problem is open to student
   A->>D: insert submission (immutable, sha256) + job(queued)
   A-->>S: 202 {submission_id, status: queued}
-  W->>D: claim job (FOR UPDATE SKIP LOCKED)
+  W->>D: claim job (conditional UPDATE, lease)
   W->>X: compile (student source + private harness), no network
   X-->>W: CompileResult (diagnostics, binary in job volume)
   alt compile failed
@@ -218,13 +221,16 @@ with a stable machine `type` (e.g. `https://codeadapt.dev/errors/submission-too-
 | --- | --- | --- |
 | `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` | any | session cookie; CSRF token header for state-changing requests |
 | `GET /problems`, `GET /problems/{slug}` | student | statement, interface, sample tests only |
-| `POST /submissions` | student | `{problem_slug, source}` (current version resolved server-side); source ≤ 64 KiB; per-user rate limit (M8); returns 202 |
+| `POST /submissions` | student | `{problem_slug, source}` (current version resolved server-side); source ≤ 64 KiB; per-user rate limit (ADR-029); returns 202 |
 | `GET /submissions/{id}` | owner | status + **student feedback projection** |
 | `GET /me/recommendation` | student | latest recommended exercise, student-facing reason and focus, and the latest follow-up verdict (M6) |
 | `GET /research/submissions?…` | researcher | filters: problem_slug, outcome, data_class; latest diagnosis, recommendation and follow-up per row (M7) |
 | `GET /research/submissions/{id}/trace` | researcher | full evidence chain: observations, excluded tests, candidates, rationale, environment |
 | `GET /research/metrics?data_class=` | researcher | counts of outcomes, recommendation rules, review flags and follow-up verdicts (M7). Accuracy metrics need ground truth and come from `codeadapt-eval`, not from this endpoint |
-| `POST /research/replay` | researcher | planned: re-run a diagnostic method version over stored evidence (no re-execution) |
+| `GET /research/learner-model` | researcher | LM1 estimates, labelled "estimated under assumed parameters" (ADR-025) |
+| `GET /submissions` | owner | the learner's own attempts |
+| `GET /health` | any | liveness |
+| `POST /research/replay` | researcher | **not implemented**; replay over stored evidence is done offline (`docs/evaluation/adr030-replay-2026-10-22`) |
 
 The student projection is a separate Pydantic model built by an explicit allow-list
 function; hidden inputs, expected outputs, error-model keys, fingerprints and harness
