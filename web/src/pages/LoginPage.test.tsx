@@ -1,0 +1,102 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { App } from "../App";
+import type { ProblemSummary } from "../api/client";
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+const problems: ProblemSummary[] = [
+  {
+    slug: "lower-bound",
+    title: "Lower bound",
+    family: "binary-search",
+    no_failure_observed: false,
+  },
+];
+
+function renderApp() {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
+afterEach(() => vi.unstubAllGlobals());
+
+describe("login", () => {
+  it("shows the login form without a session, then the app after logging in", async () => {
+    let loggedIn = false;
+    const calls: { url: string; method: string; csrf: string | null }[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init?: RequestInit) => {
+        const method = init?.method ?? "GET";
+        calls.push({ url, method, csrf: new Headers(init?.headers).get("X-CSRF-Token") });
+        if (url.endsWith("/auth/login")) {
+          if (JSON.parse(String(init?.body)).password !== "right password") {
+            return json({ type: "x/login-failed", title: "Wrong", status: 401 }, 401);
+          }
+          loggedIn = true;
+          return json({ username: "ana", role: "student", csrf_token: "tok" });
+        }
+        if (!loggedIn)
+          return json({ type: "x/not-authenticated", title: "Login", status: 401 }, 401);
+        if (url.endsWith("/auth/me"))
+          return json({ username: "ana", role: "student", csrf_token: "tok" });
+        if (url.endsWith("/auth/logout")) {
+          loggedIn = false;
+          return new Response(null, { status: 204 });
+        }
+        return json(problems);
+      }),
+    );
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.type(await screen.findByLabelText("Username"), "ana");
+    await user.type(screen.getByLabelText("Password"), "wrong");
+    await user.click(screen.getByRole("button", { name: "Log in" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Wrong username or password.");
+
+    await user.type(screen.getByLabelText("Password"), "right password");
+    await user.click(screen.getByRole("button", { name: "Log in" }));
+    expect(await screen.findByText("ana")).toBeInTheDocument();
+    expect(screen.queryByText(/Development role/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Research" })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Log out" }));
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "Log in" })).toBeInTheDocument(),
+    );
+    const logout = calls.find((c) => c.url.endsWith("/auth/logout"));
+    expect(logout).toMatchObject({ method: "POST", csrf: "tok" });
+    expect(calls.filter((c) => c.method === "GET").every((c) => c.csrf === null)).toBe(true);
+  });
+
+  it("keeps the development role switch under the dev stub", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) =>
+        url.endsWith("/auth/me")
+          ? json({ username: "dev-student", role: "student", csrf_token: null })
+          : json(problems),
+      ),
+    );
+    renderApp();
+    expect(await screen.findByText(/Development role/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Log out" })).not.toBeInTheDocument();
+  });
+});

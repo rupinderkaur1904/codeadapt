@@ -14,7 +14,7 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 | M5 | Evidence reliability: sanitiser + repeat runs | M3 | done |
 | M6 | Adaptation policy v1 + follow-up evaluation | M3, M5 | done |
 | M7 | Researcher console + synthetic evaluation harness | M5, M6 | done |
-| M8 | Auth hardening, production isolation tier, deployment | M4, M7 | next |
+| M8 | Auth hardening, production isolation tier, deployment | M4, M7 | in progress (2026-10-22): gVisor flags (ADR-028), auth/CSRF/limits/audit (ADR-029), logs, backup, PostgreSQL CI, deployment guide; deploy host open |
 | M9 | Pilot readiness (real-data separation, consent, study protocol) | M8 + owner input | planned |
 | CE | Content expansion, designed for diagnosis (docs/content-design) | M7 | CE0 done; C1–C2 applied (ADR-022); C6 revision adopted for skill evidence (ADR-023); CE1.0–CE1.1 done |
 
@@ -183,6 +183,16 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
   access, gVisor runtime, runner VM separation, backups, structured logging, deployment docs.
 * **Gate:** sandbox suite passes under `runsc` on the deployment host; dependency audit
   clean (`pip-audit`, `npm audit`); no public exposure before this gate.
+* **Progress (2026-10-22), no deployment:**
+  - gVisor: all sandbox tests pass under `runsc` after ADR-028; CI runs the core shard
+    under `runsc`.
+  - ADR-029: Argon2id accounts created by `codeadapt-admin`, server-side sessions, CSRF,
+    login throttling, a per-user submission limit, an audit log and the web login page.
+  - JSON logs with request ids; `codeadapt-admin backup` for SQLite;
+    docs/deployment.md with the gate checklist.
+  - CI is sharded (about 10 min instead of 46).
+  - PostgreSQL 16: psycopg driver, all non-sandbox tests pass on it in CI.
+  - Open: production image, runner VM, hosting (owner).
 
 ### M9 — Pilot readiness
 * **Objective:** data-class separation verified, consent flow, export for analysis, study

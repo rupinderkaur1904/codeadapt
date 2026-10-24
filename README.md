@@ -27,7 +27,7 @@ to the evidence behind it.
 | M6 Adaptive follow-up exercises | done |
 | M7 Researcher console + synthetic evaluation harness | done |
 | CE0 Content-design method, tooling, review resolution | done |
-| M8 Auth, gVisor isolation, Postgres, deployment | next |
+| M8 Auth, gVisor isolation, Postgres, deployment | in progress: auth, gVisor (CI), PostgreSQL (CI) done; not deployed |
 
 There is a working student workspace in the browser, an HTTP API and a sandboxed worker. The full plan is in [docs/roadmap.md](docs/roadmap.md).
 **Do not deploy CodeAdapt where students can reach it** until milestone M8 (production

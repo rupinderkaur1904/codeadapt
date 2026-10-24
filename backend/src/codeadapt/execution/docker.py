@@ -43,6 +43,14 @@ _DOCKER_CLI_TIMEOUT = 60.0
 # this much start-up grace before it is reported as inconclusive (ADR-023, rule R2).
 STALL_RETRY_GRACE_SECONDS = 10.0
 _MIB = 1024 * 1024
+# Under gVisor the container's pids cgroup also holds the sandbox kernel's own host threads
+# (about 30 at start-up, more as the guest adds processes), so a 16-pid limit stops the
+# container from starting and a fork bomb crashes the sandbox instead of failing fork().
+# There the guest process limit is RLIMIT_NPROC, which gVisor enforces per sandbox, and the
+# pids cgroup stays as a host-side backstop with this much headroom. Under runc the uid is
+# shared with every other container, so RLIMIT_NPROC would not be per run; runc keeps the
+# pids cgroup as the limit.
+RUNSC_HOST_PIDS_HEADROOM = 256
 
 # Flags are part of the evidence provenance; change them only with a new profile name.
 PROFILE_FLAGS: dict[BuildProfile, tuple[str, ...]] = {
@@ -286,7 +294,15 @@ class DockerSandbox:
         ]
         if self.config.runtime:
             args += ["--runtime", self.config.runtime]
+        if self.is_gvisor:
+            i = args.index("--pids-limit")
+            args[i + 1] = str(pids + RUNSC_HOST_PIDS_HEADROOM)
+            args += ["--ulimit", f"nproc={pids}:{pids}"]
         return args
+
+    @property
+    def is_gvisor(self) -> bool:
+        return (self.config.runtime or "").startswith("runsc")
 
     async def _run_container(
         self,
@@ -491,6 +507,9 @@ class DockerSandboxJob:
             f"type=volume,src={self.volume},dst=/work,readonly",
             "--workdir",
             "/",
+            # gVisor mounts a writable tmpfs at /tmp unless one is given; runc has none, so
+            # a run's filesystem is read-only everywhere under both runtimes.
+            *(["--tmpfs", "/tmp:ro"] if self._sandbox.is_gvisor else []),  # noqa: S108
             self._sandbox.config.image,
             "perl",
             "-e",

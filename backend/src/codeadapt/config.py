@@ -24,6 +24,17 @@ class Settings:
     worker_poll_seconds: float = 1.0
     job_lease_seconds: float = 600.0
     job_max_attempts: int = 3
+    # ADR-029: login sessions and request limits.
+    session_hours: float = 12.0
+    login_max_failures: int = 5  # per username or per client, within the window below
+    login_failure_window_minutes: float = 15.0
+    # Submissions one user may create per minute; None = unlimited (dev and test default).
+    submissions_per_minute: int | None = None
+
+    @property
+    def secure_cookies(self) -> bool:
+        """Session cookies carry `Secure` everywhere except plain-HTTP dev and test."""
+        return self.env is Environment.PRODUCTION
 
     @property
     def dev_auth_enabled(self) -> bool:
@@ -44,4 +55,15 @@ class Settings:
                 os.environ.get("CODEADAPT_CONTENT_DIR") or str(_REPO_ROOT / "content" / "demo")
             ),
             worker_poll_seconds=float(os.environ.get("CODEADAPT_WORKER_POLL_SECONDS", "1.0")),
+            session_hours=float(os.environ.get("CODEADAPT_SESSION_HOURS", "12")),
+            submissions_per_minute=_optional_int(
+                os.environ.get("CODEADAPT_SUBMISSIONS_PER_MINUTE"),
+                default=10 if env is Environment.PRODUCTION else None,
+            ),
         )
+
+
+def _optional_int(value: str | None, *, default: int | None) -> int | None:
+    if value is None or value == "":
+        return default
+    return None if value.lower() == "none" else int(value)
