@@ -10,7 +10,7 @@ deliverables 1–12 from the owner's brief, without crossing approval gates.
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 2
+**Iteration:** 4
 
 ## Hard limits (owner rules, override everything below)
 
@@ -26,19 +26,19 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | --- | --- | --- | --- | --- | --- |
 | A1 | Record PC1 withdrawal, deviations, status truthfully | — | docs/preregistration/pc1/{STATUS,DEVIATIONS}.md, permission/CORRECTIONS.md | Frozen files unchanged; gate closed and pinned by tests | **done** a14fcde |
 | A2 | Keep amendment A1 + A1b ready as an inactive proposal on the current branch | owner | /mnt project files a1-proposal | Patch applies cleanly; tests pass in a scratch worktree; nothing activated | todo (proposal exists against 447757a) |
-| A3 | Claims audit: no doc states real-student accuracy, learning gains or calibrated mastery | — | README, docs/* | Every accuracy figure labelled synthetic or author-written | todo |
+| A3 | Claims audit: no doc states real-student accuracy, learning gains or calibrated mastery | — | README, docs/* | Every accuracy figure labelled synthetic or author-written | **done** (no change needed) |
 | B1 | Queue/worker idempotency | — | db/queue.py, worker/pipeline.py | Stale worker cannot overwrite; redelivery does not re-run | **done** d78ee21 (ADR-031) |
 | B2 | Review sandbox limits and status classification against ADR-020/023/024/028 | — | execution/* | Each limit and status has a test; gaps fixed or documented | todo |
 | B3 | API validation and error-handling review | — | api/app.py, schemas.py | Malformed input gets 4xx, not 500; tests | todo |
 | C1 | Full test run from a clean checkout, recorded in development.md | — | docs/development.md | Commands verified today with counts | in progress (sandbox suite running) |
 | C2 | One documented command per evaluation to reproduce reported numbers | — | docs/evaluation/*, docs/development.md | Re-run reproduces held-out/calibration tables | todo |
 | D1 | CodeNet PC1 Phase F counts | A2 + owner | — | Only after a truthful, accepted record | **blocked (owner)** |
-| E1 | Consolidated, labelled results table across all evaluations | — | docs/evaluation/summary.md | Every number traceable to a report; labels on every row | todo |
-| F1 | Architecture document matches the code | — | docs/architecture.md | Known mismatch fixed (queue uses an optimistic conditional UPDATE, not SKIP LOCKED); every component checked | todo |
-| F2 | Research report draft with evidence-supported claims only | E1 | docs/research-report-draft.md | Each claim cites a result; limitations section | todo |
-| F3 | Limitations and future work list | E1 | docs/limitations.md | Complete, consistent with status report | todo |
+| E1 | Consolidated, labelled results table across all evaluations | — | docs/evaluation/summary.md | Every number traceable to a report; labels on every row | **done** fca1432 |
+| F1 | Architecture document matches the code | — | docs/architecture.md | Known mismatch fixed (queue uses an optimistic conditional UPDATE, not SKIP LOCKED); every component checked | **done** 987cc50 |
+| F2 | Research report draft with evidence-supported claims only | E1 | docs/research-report-draft.md | Each claim cites a result; limitations section | **done** (draft) 91cb35a |
+| F3 | Limitations and future work list | E1 | docs/limitations.md | Complete, consistent with status report | **done** 91cb35a |
 | G1 | Demo workflow with expected results, verified locally | C1 | docs/demo.md | Steps run today; outputs match | todo |
-| G2 | Interview-preparation document | F1, E1 | docs/interview-prep.md | Architecture, algorithms, trade-offs, evaluation, limitations | todo |
+| G2 | Interview-preparation document | F1, E1 | docs/interview-prep.md | Architecture, algorithms, trade-offs, evaluation, limitations | **done** 91cb35a |
 
 ## Log
 
@@ -54,7 +54,22 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 ### Iteration 2
 
 - a14fcde (A1) and d78ee21 (B1) committed and pushed. Unit tests: 341 passed.
-- Sandbox suite: running (result to be recorded here).
+- Sandbox suite (Docker, runc, `CODEADAPT_REQUIRE_SANDBOX=1`, started before d78ee21 was
+  imported, so it tested 323f3a9 + zyjfh1 + a14fcde): **33 passed in 1570 s**. The two
+  end-to-end files were re-run on d78ee21 (see iteration 4).
+
+### Iteration 3
+
+- 987cc50: status report, this plan, architecture matches the code (F1 done).
+- fca1432: docs/evaluation/summary.md (E1 done).
+- A3 claims audit: grep over README and docs for accuracy, validation, mastery and
+  learning-gain wording found no unsupported claim; no change needed.
+
+### Iteration 4
+
+- 91cb35a: docs/limitations.md (F3), docs/interview-prep.md (G2),
+  docs/research-report-draft.md (F2). Pushed.
+- G1 demo: `docs/demo/run_demo.py` drafted; verification run pending.
 
 ## Blockers needing the owner
 
@@ -64,9 +79,9 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Next three tasks
 
-1. C1: record the sandbox suite result; re-run the end-to-end sandbox tests on d78ee21.
-2. F1: reconcile docs/architecture.md with the code.
-3. E1: consolidated, labelled results table.
+1. G1: run API + worker, run docs/demo/run_demo.py, write docs/demo.md with observed output.
+2. B2: review sandbox limits and status classification against their tests.
+3. B3: API validation and error-handling review.
 
 ## Resume instruction
 

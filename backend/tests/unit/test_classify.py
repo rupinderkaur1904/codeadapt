@@ -37,6 +37,17 @@ def raw(**kw: object) -> RawOutcome:
         (raw(output_incomplete=True), RunStatus.INFRASTRUCTURE_ERROR),
         # Memory beats a later timeout: OOM explains why the program stopped making progress.
         (raw(exit_code=137, oom_killed=True, timed_out=True), RunStatus.MEMORY_LIMIT),
+        # SIGKILL with no deadline, OOM or overflow: the hard CPU rlimit after a program
+        # caught SIGXCPU, or the program's own exit(137). Indistinguishable here, and
+        # documented as a runtime error (signal_of docstring); pinned so a change is deliberate.
+        (raw(exit_code=137), RunStatus.RUNTIME_ERROR),
+        # A finished run whose streams are untrustworthy is never a verdict about the program,
+        # even when it also looks like a resource stop.
+        (raw(exit_code=152, stream_mismatch=True), RunStatus.INFRASTRUCTURE_ERROR),
+        (
+            raw(exit_code=137, oom_killed=True, output_incomplete=True),
+            RunStatus.INFRASTRUCTURE_ERROR,
+        ),
     ],
 )
 def test_classify_run(outcome: RawOutcome, expected: RunStatus) -> None:
@@ -50,6 +61,8 @@ def test_classify_run(outcome: RawOutcome, expected: RunStatus) -> None:
         (raw(exit_code=1), CompileStatus.ERROR),
         (raw(exit_code=137), CompileStatus.TIME_LIMIT),  # CPU hard limit
         (raw(exit_code=137, oom_killed=True), CompileStatus.MEMORY_LIMIT),
+        (raw(exit_code=1, output_overflow=True), CompileStatus.OUTPUT_LIMIT),
+        (raw(exit_code=0, stream_mismatch=True), CompileStatus.INFRASTRUCTURE_ERROR),
         (raw(exit_code=1, timed_out=True), CompileStatus.TIME_LIMIT),
         (raw(started=False, exit_code=None), CompileStatus.INFRASTRUCTURE_ERROR),
         (raw(stream_mismatch=True), CompileStatus.INFRASTRUCTURE_ERROR),
