@@ -10,12 +10,13 @@ deliverables 1–12 from the owner's brief, without crossing approval gates.
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 8
+**Iteration:** 9
 
 ## Hard limits (owner rules, override everything below)
 
-- PC1: the gate is closed (withdrawn record). Do not count, pair, confirm, read source code,
-  apply A1 or write `record.json`. Never claim supervisor approval.
+- PC1: gate open at `metadata` only (owner's version 2 record, A1). Phase F done; stop there.
+  Never read source code, start Phase E, edit `record.json` or commit counts. Never claim
+  supervisor approval.
 - Do not change the diagnosis method, skill maps, BKT parameters, ledger, policy, feedback
   wording or frozen protocols without owner approval. Label synthetic results as synthetic.
 - No deployment, no real-student data, no publication of derived statistics.
@@ -32,7 +33,7 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | B3 | API validation and error-handling review | — | api/app.py, schemas.py | Malformed input gets 4xx, not 500; tests | **done** f570b5b (18 malformed requests probed; NUL in source was accepted and would fail on PostgreSQL, now 422) |
 | C1 | Full test run, recorded | — | PROJECT_AUTOPILOT.md, docs/status-2026-10-24.md | Commands verified today with counts | **done**: unit 348, sandbox 33 + end-to-end re-run 2/2 on d78ee21, web 21 |
 | C2 | One documented command per evaluation to reproduce reported numbers | — | docs/evaluation/*, docs/development.md | Re-run reproduces held-out/calibration tables | **done**: fresh held-out and calibration re-runs identical to the adr030 records |
-| D1 | CodeNet PC1 Phase F counts | A2 + owner | — | Only after a truthful, accepted record | **blocked (owner)** |
+| D1 | CodeNet PC1 Phase F counts | A2 + owner | — | Only after a truthful, accepted record | **done** 2026-10-24 on dc4c0e1 (feasible; counts in owner's project files only) |
 | E1 | Consolidated, labelled results table across all evaluations | — | docs/evaluation/summary.md | Every number traceable to a report; labels on every row | **done** fca1432 |
 | F1 | Architecture document matches the code | — | docs/architecture.md | Known mismatch fixed (queue uses an optimistic conditional UPDATE, not SKIP LOCKED); every component checked | **done** 987cc50 |
 | F2 | Research report draft with evidence-supported claims only | E1 | docs/research-report-draft.md | Each claim cites a result; limitations section | **done** (draft) 91cb35a |
@@ -80,15 +81,13 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Blockers needing the owner
 
-1. PC1: approve or decline amendment A1 (+A1b); if approved, read the CodeNet paper's
-   datasheet yourself and send the exact licence sentence and date.
+1. PC1 Phase E (source code): needs a code-level permission basis and an approved plan.
 2. Hosting/deployment (M8): not needed for the research deliverables.
 
 ## Next three tasks
 
-1. Owner decision on A1/A1b (see Blockers).
-2. If approved: apply a1-v2.patch, CI, then the owner writes a truthful v2 record.
-3. Otherwise idle safely: every remaining workstream needs an owner decision (A1/A1b, hosting,
+1. Owner decision on Phase E.
+2. Otherwise idle safely: every remaining workstream needs an owner decision (Phase E, hosting,
    failing-case feedback proposal, CE1.2/1.3).
 
 ## Resume instruction
@@ -104,3 +103,10 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - Held-out evaluation re-run from scratch: identical to docs/evaluation/adr030-2026-10-23/heldout.md.
 - Calibration re-run: identical to the adr030 record. CI green on every pushed commit
   (runs 63–66, including the lost-output probe).
+
+### Iteration 9
+
+- A1 + A1b applied (63e3773, b11e60d); the owner committed a truthful version 2 record (dc4c0e1).
+  CI green on all three (runs 69–71).
+- PC1 Phase F run with the frozen script: identification identical, confirm by owner,
+  feasibility exit 0, band feasible. Counts kept out of the repository (not publishable).

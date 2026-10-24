@@ -4,18 +4,20 @@ The frozen files (`protocol.md` 1.0, `README.md`, `permission.md`, the scripts a
 unchanged and still match `MANIFEST.sha256`. Some of their statements describe the state when
 they were frozen and are no longer true. This file records the current state.
 
-**As of 2026-10-24 (after A1 and A1b were approved and applied):**
+**As of 2026-10-24, after Phase F:**
 
 | Item | State | Evidence |
 | --- | --- | --- |
-| Permission gate | **Closed.** The only record is withdrawn. | `pc1.py gate` exit 3 at both levels; `permission/CORRECTIONS.md` |
+| Permission gate | **Open at `metadata` only** (record version 2, published-licence basis, A1). Closed at `code`. | `permission/record.json` (dc4c0e1); `pc1.py gate` |
 | Archive download | Done once, outside the repository (D1) | `DEVIATIONS.md` |
-| Extraction and identification | Done (D2); ALDS1_4_B ↔ p02268 identified from statement text, **not confirmed** | `DEVIATIONS.md` |
-| Counting, pairing (Phase F) | **Not run** | — |
+| Extraction and identification | Re-run under the version 2 record; output identical to the D2 run | — |
+| Confirmation | ALDS1_4_B ↔ p02268, confirmed by the owner (`--role owner`) | — |
+| Counting, pairing (Phase F) | **Run on 2026-10-24.** No stop condition fired. Counts are **not** in this repository because `publish_derived_statistics` is false. | owner's project files |
 | Source code | Never read | — |
+| Phase E | **Not started.** Needs a code-level permission basis (A1 cannot give one) and an owner-approved plan. | — |
 | README "no CodeNet data has been downloaded", protocol section 12 "no permission record exists" | Out of date (frozen text); superseded by this file | — |
 
-## Why PC1 is blocked
+## History: why PC1 was blocked
 
 The owner is an independent researcher. The frozen gate accepts only an explicit approval from
 a supervisor, an institutional research-data office, an institutional ethics office, or IBM.
@@ -52,8 +54,5 @@ when false), and it would add tests for both. A1b is now implemented (`publicati
 
 ## Next step (owner)
 
-Fill in `permission/record-licence.template.json` with your own first-hand reading of the
-CodeNet paper's licence sentence: the exact quote, where it is, and the date you read it. Then
-save it as `permission/record.json` with `status: granted`. Until then, the gate stays closed.
-The test `test_committed_record_is_not_an_open_gate` keeps the withdrawn version 1 record
-closed and keeps any committed record closed at the `code` level.
+Phase F is complete and stopped at its gate. The owner decides whether to pursue Phase E. That
+would need a code-level permission basis and a separate frozen plan. Nothing runs until then.
