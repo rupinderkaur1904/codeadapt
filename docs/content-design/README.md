@@ -45,6 +45,19 @@ Rules that apply throughout:
 
 ## 2. Milestone CE: content expansion
 
+**Status on 2026-10-24.**
+
+- **CE1.** G1 (`first-true`), G2 (`integer-sqrt`) and G3 (`min-capacity`) are built.
+- **BSX.** Six further binary-search problems were added in a binary-search extension:
+  `upper-bound`, `exact-search`, `last-occurrence`, `rotated-min`, `rotated-search` and
+  `peak-index`. The family now has 12 problems.
+- **Recommendation.** Every new problem is `recommendable = false` (decision E2).
+- **Labelling.** Their files and commits say "CE2". That was a working label; the CE2 stage
+  below (arrays and two pointers) has **not** started.
+- **Results.** See [../evaluation/ce2-2026-10-24/README.md](../evaluation/ce2-2026-10-24/README.md).
+- **CE1.4 not done.** The family report (observation capacity and BKT sensitivity on the
+  larger bank) has not been run.
+
 CE runs after M7 and alongside M8. M8 is the deployment gate; CE changes no isolation
 code. CE is delivered in stages, each ending with validation, evaluation and the full
 regression suite.

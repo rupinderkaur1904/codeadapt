@@ -4,6 +4,19 @@ Persistent progress file for the self-directed loop requested by the owner on 20
 Reread it and check it against the repository before each task. Status report:
 [docs/status-2026-10-24.md](docs/status-2026-10-24.md).
 
+**Overnight directive (owner, 2026-10-24 18:13):** autonomous loop, with these priorities:
+
+1. end-to-end correctness;
+2. bank expansion (6–10 complete binary-search problems);
+3. diagnosis tests (no rule changes);
+4. evidence and attribution;
+5. BKT and recommendation integrity;
+6. sandbox reliability;
+7. evaluation reproducibility;
+8. researcher UI and docs.
+
+Status labels: VERIFIED / PARTIALLY VERIFIED / UNVERIFIED / BLOCKED / PROPOSED.
+
 **Current objective (owner, 2026-10-24 17:04):** finish the full existing scope (sandbox,
 diagnosis, evidence, attribution, BKT, recommendations, problem bank, researcher UI,
 evaluation), integrated and verified, by Wednesday 2026-10-28. Functional completion by Tuesday
@@ -13,7 +26,7 @@ frozen rule/threshold/parameter changes. Phase E deferred (gate closed).
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 11
+**Iteration:** 12
 
 **PC1 status:** Phase E proposed — blocked pending code-level permission and owner approval.
 
@@ -47,6 +60,9 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | F3 | Limitations and future work list | E1 | docs/limitations.md | Complete, consistent with status report | **done** 91cb35a |
 | G1 | Demo workflow with expected results, verified locally | C1 | docs/demo.md | Steps run today; outputs match | **done** (run 2026-10-24, output recorded) |
 | G2 | Interview-preparation document | F1, E1 | docs/interview-prep.md | Architecture, algorithms, trade-offs, evaluation, limitations | **done** 91cb35a |
+| H1 | Bank expansion: complete binary-search problems | — | content/demo/*, docs/content-design/*, docs/content-reports/*, eval/heldout/* | Per problem: sandbox validation ok, distinguishes = measured, design record, held-out committed before eval, eval recorded, E2 not recommendable | **VERIFIED locally** for 8 problems: integer-sqrt, upper-bound, exact-search, last-occurrence, min-capacity, rotated-min, rotated-search, peak-index. CI pending on the latest pushes |
+| H2 | Integration tests: infrastructure failure, redelivery, content versions | — | backend/tests/unit/test_pipeline_infrastructure.py, test_content_versions.py | Outage leaves no run, diagnosis, recommendation or learner attempt; redelivery adds no attempt; old version keeps its snapshot | **VERIFIED** (unit suite 373 pass) |
+| H3 | CE1.4 family report: observation capacity and BKT sensitivity on the 12-problem bank | H1 | docs/evaluation/ | Technical measurements only | **PROPOSED** (not started) |
 
 ## Log
 
@@ -88,20 +104,30 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Blockers needing the owner
 
-1. CE1.2/CE1.3 (problem bank): resume or keep paused (decision card, 2026-10-24). CE1.2 content
-   and 8 held-out cases are drafted in the scratchpad and validated (RESULT ok, matrix matches
-   the design record); nothing committed or evaluated.
-2. Rule C limitation L19 (positive evidence from an abstained, mostly failing attempt): policy
+1. **CE1.2/CE1.3 resumed.**
+   - I closed the decision card on the owner's overnight instruction to expand the bank; the
+     owner did not tap it.
+   - The owner should confirm that reading.
+2. **Skill-mapping flags (no change made; owner review).**
+   - `min-capacity` maps two exact-boundary errors (`<` against `<=` on day count and load) to
+     `equality_handling`.
+   - `rotated-min` maps `compares_with_lo` (wrong reference element) to
+     `search_space_boundaries`.
+   - Each could argue for a new skill. None was added.
+3. Rule C limitation L19 (positive evidence from an abstained, mostly failing attempt): policy
    decision, not changed.
-3. PC1 Phase E: deferred (permission basis P, then D1–D12).
-4. Hosting/deployment (M8).
+4. PC1 Phase E: deferred (permission basis P, then D1–D12).
+5. Hosting/deployment (M8).
 
 ## Next three tasks
 
-1. On the CE1.2 decision: commit design-record measured section, content, held-out cases (before
-   evaluating), then run the gates (policy golden unchanged, held-out, regression).
-2. Check CI for f583d98 (PostgreSQL pipeline job, gVisor on every shard) and fix any failure.
-3. Refresh docs/status report and evaluation summary for the final state.
+1. **Confirm CI is green on the latest push.** The demo-content shard now fingerprints 12
+   problems, about 13 minutes locally.
+2. **CE1.4 family report** (H3): re-run the observation-capacity table and the BKT sensitivity
+   script on the 12-problem bank. Label both as technical measurements.
+3. **Refresh the docs for the final state.** That means the status report, the research-report
+   draft and `docs/demo.md`. Then integrate the frontend branch `9vflva` without conflicting
+   edits.
 
 ## Resume instruction
 
@@ -141,3 +167,55 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - fc4d427: Playwright test for researcher trace + learner model (3/3 pass locally).
 - f583d98: CI job running both end-to-end tests on PostgreSQL 16 (passed locally, 446 s);
   gVisor job now runs every sandbox shard.
+
+### Iteration 12 (overnight directive)
+
+**Bank expansion.**
+
+- 8 new binary-search problems:
+  - integer-sqrt (G2);
+  - upper-bound;
+  - exact-search;
+  - last-occurrence;
+  - min-capacity (G3);
+  - rotated-min;
+  - rotated-search;
+  - peak-index.
+- Each has:
+  - a design record;
+  - sandbox validation `ok` with measured `distinguishes`;
+  - a content report;
+  - 7–8 held-out cases, committed before evaluation;
+  - an evaluation under v1.1, v1.2 and v1.3.
+- **Results.** These are synthetic, author-written cases and are kept separate per problem
+  (`docs/evaluation/ce1.2-2026-10-24/`, `docs/evaluation/ce2-2026-10-24/`):
+  - every named diagnosis was correct;
+  - one predicted safe abstention (last-occurrence, upper midpoint);
+  - 0 false alarms;
+  - all cases reproducible;
+  - no method differences.
+- **Recommendations.** All new problems are `recommendable = false`. Policy 1.4 and its golden
+  test are unchanged.
+- **Single-group models.** These are documented as `known_limitation`:
+  - last-occurrence `missing_equality_check`;
+  - rotated-min `hi_skips_candidate`;
+  - rotated-search `left_half_test_strict`.
+
+**CI failure since run 83.** It was caught late.
+
+- `test_demo_content` asserted exactly one weak model (`hi_init_last_index`) per problem.
+- It now requires the weak set to equal the documented `known_limitation` set: stricter for new
+  problems, unchanged for the original four. It passed locally in 780 s.
+
+**New tests.**
+
+- Sandbox outage → requeue → failed after 3 attempts, with no run, diagnosis, recommendation or
+  learner attempt.
+- Redelivery adds no second learner attempt.
+- Content-version change keeps the old snapshot through the database.
+- Unit total: 373.
+
+**Label slip.** Commits and content comments call the new problems "CE2". The docs now say
+these are a binary-search extension (BSX), not the planned CE2 stage (arrays). Content and
+held-out files were not edited, because editing them would change content versions and
+manifests.

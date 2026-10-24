@@ -1,4 +1,6 @@
-# Content design record: `last-occurrence` (CE2)
+# Content design record: `last-occurrence` (BSX, binary-search extension)
+
+**Label.** Files and commits call this "CE2". That was a working label; this is a binary-search family extension, not the planned CE2 stage (arrays).
 
 **Status and order.**
 

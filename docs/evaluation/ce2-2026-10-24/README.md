@@ -1,4 +1,6 @@
-# CE2 held-out evaluations (2026-10-24)
+# Binary-search extension (BSX) held-out evaluations (2026-10-24)
+
+**Label note.** The 2026-10-24 binary-search additions carry the working label "CE2" in their commit messages, `problem.toml` comments, held-out manifests and this folder name. That label is a misnomer: they extend the **binary-search family** (call it BSX). They are not the planned CE2 stage (arrays and two pointers), which has not started. Content and held-out files are left unedited, because editing them would change content versions and held-out manifests after the fact.
 
 **Synthetic, author-written cases.** These are not accuracy estimates for real students. The
 error models and the held-out programs were written by the same author (Claude), so naming a
