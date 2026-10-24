@@ -103,9 +103,61 @@ jobs:
           test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"
           test -z "$(docker volume ls -q --filter label=org.codeadapt.sandbox=1)"
 
-  sandbox-gvisor:
-    # The production runtime (ADR-003, ADR-028): the core sandbox tests under gVisor.
+  sandbox-postgres:
+    # The two full pipeline tests (API -> queue -> worker -> sandbox -> diagnosis -> evidence
+    # -> learner model -> recommendation) on PostgreSQL 16, the deployment database.
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 2s --health-timeout 5s --health-retries 30
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install (locked)
+        run: uv sync --locked
+      - name: Build sandbox image
+        working-directory: .
+        run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
+      - name: End-to-end sandbox tests on PostgreSQL
+        env:
+          CODEADAPT_REQUIRE_SANDBOX: "1"
+          CODEADAPT_TEST_POSTGRES_URL: postgresql+psycopg://postgres:postgres@127.0.0.1:5432/postgres
+        run: >-
+          uv run pytest tests/sandbox/test_end_to_end.py
+          tests/sandbox/test_adaptation_end_to_end.py
+
+  sandbox-gvisor:
+    # The production runtime (ADR-003, ADR-028): every sandbox test under gVisor, in the same
+    # shards as the runc job.
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: demo-content
+            tests: tests/sandbox/test_demo_content.py
+          - shard: heldout-evaluation
+            tests: tests/sandbox/test_evaluation_harness.py
+          - shard: end-to-end
+            tests: tests/sandbox/test_end_to_end.py
+          - shard: adaptation
+            tests: tests/sandbox/test_adaptation_end_to_end.py
+          - shard: core
+            tests: >-
+              tests/sandbox
+              --ignore=tests/sandbox/test_demo_content.py
+              --ignore=tests/sandbox/test_evaluation_harness.py
+              --ignore=tests/sandbox/test_end_to_end.py
+              --ignore=tests/sandbox/test_adaptation_end_to_end.py
+    name: sandbox-gvisor (${{ matrix.shard }})
     defaults:
       run:
         working-directory: backend
@@ -131,16 +183,11 @@ jobs:
       - name: Build sandbox image
         working-directory: .
         run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
-      - name: Core sandbox tests under runsc
+      - name: Sandbox tests under runsc
         env:
           CODEADAPT_REQUIRE_SANDBOX: "1"
           CODEADAPT_SANDBOX_RUNTIME: runsc
-        run: >-
-          uv run pytest tests/sandbox
-          --ignore=tests/sandbox/test_demo_content.py
-          --ignore=tests/sandbox/test_evaluation_harness.py
-          --ignore=tests/sandbox/test_end_to_end.py
-          --ignore=tests/sandbox/test_adaptation_end_to_end.py
+        run: uv run pytest ${{ matrix.tests }}
       - name: No sandbox leftovers
         run: |
           test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"
