@@ -184,7 +184,7 @@ run, docs + decision log updated, and a pushed commit. Status is updated in plac
 * **Gate:** sandbox suite passes under `runsc` on the deployment host; dependency audit
   clean (`pip-audit`, `npm audit`); no public exposure before this gate.
 * **Progress (2026-10-22), no deployment:**
-  - gVisor: all sandbox tests pass under `runsc` after ADR-028; CI runs the core shard
+  - gVisor: all sandbox tests pass under `runsc` after ADR-028; since 2026-10-24 CI runs every sandbox shard
     under `runsc`.
   - ADR-029: Argon2id accounts created by `codeadapt-admin`, server-side sessions, CSRF,
     login throttling, a per-user submission limit, an audit log and the web login page.
