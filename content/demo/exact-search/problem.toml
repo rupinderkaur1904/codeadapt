@@ -1,0 +1,249 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/exact-search.md (CE2).
+
+slug = "exact-search"
+title = "Exact search"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int search_index(const std::vector<int>& a, int target);"
+# CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
+# problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
+recommendable = false
+
+[skills]
+search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# A probe is a property of an input that a test exercises. Each probe names the skills
+# whose errors it can expose; this mapping is a modelling assumption, not a fact.
+[probes]
+empty_input = ["search_space_boundaries"]
+target_at_start = ["search_space_boundaries"]
+target_at_end = ["search_space_boundaries"]
+target_interior = ["search_space_boundaries"]
+target_absent = ["problem_specification"]
+single_element = ["search_space_boundaries", "loop_termination"]
+two_elements = ["loop_termination"]
+large_input = ["loop_termination"]
+
+[curriculum]
+assumes = ["indexing a sorted std::vector", "while loops and integer division"]
+
+[[tests]]
+key = "sample_present"
+visibility = "sample"
+input = "L 4 2 4 6 8 6"
+expected = "2"
+probes = ["target_interior"]
+student_description = "The target is in the array."
+purpose = "Visible present case."
+distinguishes = ["returns_value", "swapped_direction"]
+
+[[tests]]
+key = "sample_absent"
+visibility = "sample"
+input = "L 4 2 4 6 8 5"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "The target is not in the array."
+purpose = "Visible absent case."
+distinguishes = ["no_progress_update", "returns_insertion_point"]
+
+[[tests]]
+key = "empty"
+input = "L 0 3"
+expected = "-1"
+probes = ["empty_input", "target_absent"]
+student_description = "The array is empty."
+purpose = "Minimal input (n = 0)."
+distinguishes = ["returns_insertion_point"]
+
+[[tests]]
+key = "first"
+input = "L 5 1 3 5 7 9 1"
+expected = "0"
+probes = ["target_at_start"]
+student_description = "The target is the first element."
+purpose = "Answer 0."
+distinguishes = ["lo_init_one", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "last"
+input = "L 5 1 3 5 7 9 9"
+expected = "4"
+probes = ["target_at_end"]
+student_description = "The target is the last element."
+purpose = "Answer n - 1."
+distinguishes = ["closed_loop_lt", "no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "second"
+input = "L 5 1 3 5 7 9 3"
+expected = "1"
+probes = ["target_interior"]
+student_description = "The target is the second element."
+purpose = "A candidate reached only near the end of the search."
+distinguishes = ["closed_loop_lt", "no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "fourth"
+input = "L 5 1 3 5 7 9 7"
+expected = "3"
+probes = ["target_interior"]
+student_description = "The target is the fourth element."
+purpose = "A candidate reached only near the end of the search."
+distinguishes = ["returns_value", "swapped_direction"]
+
+[[tests]]
+key = "below_all"
+input = "L 3 2 4 6 1"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "The target is smaller than every element."
+purpose = "Absent on the left."
+distinguishes = ["returns_insertion_point"]
+
+[[tests]]
+key = "above_all"
+input = "L 3 2 4 6 9"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "The target is larger than every element."
+purpose = "Absent on the right."
+distinguishes = ["no_progress_update", "returns_insertion_point"]
+
+[[tests]]
+key = "absent_between"
+input = "L 6 10 20 30 40 50 60 35"
+expected = "-1"
+probes = ["target_absent"]
+student_description = "The target falls between two elements."
+purpose = "Absent in the interior."
+distinguishes = ["no_progress_update", "returns_insertion_point"]
+
+[[tests]]
+key = "single_present"
+input = "L 1 4 4"
+expected = "0"
+probes = ["single_element", "target_at_start"]
+student_description = "A single element equal to the target."
+purpose = "Smallest range with an answer."
+distinguishes = ["closed_loop_lt", "lo_init_one", "returns_value"]
+
+[[tests]]
+key = "single_absent"
+input = "L 1 4 7"
+expected = "-1"
+probes = ["single_element", "target_absent"]
+student_description = "A single element different from the target."
+purpose = "Smallest range without an answer."
+distinguishes = ["no_progress_update", "returns_insertion_point"]
+
+[[tests]]
+key = "two_first"
+input = "L 2 1 9 1"
+expected = "0"
+probes = ["two_elements", "target_at_start"]
+student_description = "Two elements; the target is the first."
+purpose = "Answer 0 in a two-element range."
+distinguishes = ["lo_init_one", "returns_value"]
+
+[[tests]]
+key = "two_second"
+input = "L 2 1 9 9"
+expected = "1"
+probes = ["two_elements", "target_at_end"]
+student_description = "Two elements; the target is the second."
+purpose = "Answer 1 in a two-element range."
+distinguishes = ["closed_loop_lt", "no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "negative_values"
+input = "L 5 -9 -5 -1 0 4 -5"
+expected = "1"
+probes = ["target_interior"]
+student_description = "Negative values; the target is present."
+purpose = "The returned index differs from the value."
+distinguishes = ["closed_loop_lt", "no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "large_first"
+input = "A 200000 0 2 0"
+expected = "0"
+probes = ["large_input", "target_at_start"]
+student_description = "A large array; the target is the first element."
+purpose = "Answer 0 at scale."
+distinguishes = ["lo_init_one", "swapped_direction"]
+
+[[tests]]
+key = "large_last"
+input = "A 200000 0 2 399998"
+expected = "199999"
+probes = ["large_input", "target_at_end"]
+student_description = "A large array; the target is the last element."
+purpose = "Answer n - 1 at scale."
+distinguishes = ["closed_loop_lt", "no_progress_update", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "large_interior"
+input = "A 200000 0 2 123456"
+expected = "61728"
+probes = ["large_input", "target_interior"]
+student_description = "A large array; the target is in the interior."
+purpose = "Interior answer at scale."
+distinguishes = ["closed_loop_lt", "returns_value", "swapped_direction"]
+
+[[tests]]
+key = "large_absent"
+input = "A 200000 0 2 123457"
+expected = "-1"
+probes = ["large_input", "target_absent"]
+student_description = "A large array; the target is absent."
+purpose = "Absent at scale."
+distinguishes = ["no_progress_update", "returns_insertion_point"]
+
+[[error_models]]
+key = "closed_loop_lt"
+file = "error_models/closed_loop_lt.cpp"
+skill = "loop_termination"
+description = "Closed interval but loops while lo < hi, so the last remaining candidate is never compared and -1 is returned."
+student_hint = "Check when your loop stops: is there still a candidate left that you have not compared?"
+
+[[error_models]]
+key = "no_progress_update"
+file = "error_models/no_progress_update.cpp"
+skill = "loop_termination"
+description = "Sets lo = mid instead of mid + 1, so the range stops shrinking once hi == lo + 1."
+student_hint = "When only two candidates remain, does every iteration still shrink the range?"
+
+[[error_models]]
+key = "swapped_direction"
+file = "error_models/swapped_direction.cpp"
+skill = "search_space_boundaries"
+description = "Moves the wrong way: a smaller element at mid discards the right half, so the target is found only if a midpoint lands on it directly."
+student_hint = "If a[mid] is smaller than the target, which half can still contain it? Check which bound you move."
+
+[[error_models]]
+key = "lo_init_one"
+file = "error_models/lo_init_one.cpp"
+skill = "search_space_boundaries"
+description = "Initialises lo = 1, so index 0 is never a candidate."
+student_hint = "Can your search ever return 0? Check the initial bounds of the search space."
+
+[[error_models]]
+key = "returns_insertion_point"
+file = "error_models/returns_insertion_point.cpp"
+skill = "problem_specification"
+description = "Returns the insertion point lo instead of -1 when the target is absent."
+student_hint = "Re-read what the function must return when the target is not in the array."
+
+[[error_models]]
+key = "returns_value"
+file = "error_models/returns_value.cpp"
+skill = "problem_specification"
+description = "Returns the element a[mid] instead of its index when the target is found."
+student_hint = "Re-read what the function must return: the position of the target, not the target itself."
