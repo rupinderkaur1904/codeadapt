@@ -46,6 +46,13 @@ isolation tier) is complete. See [docs/security.md](docs/security.md).
 | [docs/content-design/](docs/content-design/README.md) | how problems are designed for diagnosis; worked example (lower-bound); content-expansion milestone |
 | [docs/evaluation/](docs/evaluation/synthetic-2026-10-15.md) | synthetic evaluation reports (not evidence about real students) |
 | [docs/development.md](docs/development.md) | setup, commands, tested environment |
+| [docs/status-2026-10-24.md](docs/status-2026-10-24.md) | verified project status: tested, untested, proposed, blocked |
+| [docs/evaluation/summary.md](docs/evaluation/summary.md) | one-page labelled results (synthetic and author-written only) |
+| [docs/demo.md](docs/demo.md) | demo workflow with observed output |
+| [docs/limitations.md](docs/limitations.md) | limitations and future work |
+| [docs/research-report-draft.md](docs/research-report-draft.md) | research report draft (evidence-supported claims only) |
+| [docs/interview-prep.md](docs/interview-prep.md) | how to explain the design, algorithms, trade-offs and evaluation |
+| [PROJECT_AUTOPILOT.md](PROJECT_AUTOPILOT.md) | completion plan and progress log |
 
 ## Quick start
 
