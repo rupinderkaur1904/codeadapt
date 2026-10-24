@@ -68,6 +68,30 @@ condition cannot be expressed here, such as a retention period, quote it in
 > IBM publishes no dataset licence. The repository's Apache-2.0 licence does not say it covers
 > the data.
 
+## Second basis: the published dataset licence (amendment A1)
+
+For an owner with no supervisor or institutional office, a version 2 record may use the licence
+that the dataset provider publishes. It opens the `metadata` level only. See
+`record-licence.template.json`.
+
+| Field | Required value |
+| --- | --- |
+| `record_version` | `2` |
+| `status` | `granted` |
+| `basis` | `published dataset licence` |
+| `licence_id` | `CDLA-Permissive-2.0` |
+| `licence_text_sha256` | SHA-256 of `permission/licences/CDLA-Permissive-2.0.txt` |
+| `licence_evidence` | A list. At least one entry must be by the `dataset provider` (IBM or the CodeNet authors), `seen: first-hand` by the owner, with a `quote` naming the licence. Each entry has `source`, `locator`, `publisher`, `seen`, `accessed_on`, `quote`. Third-party and secondary entries may be added, labelled as such. |
+| `unverified` | What the owner could not check, such as "no current IBM distribution page found" |
+| `known_risks` | Remaining uncertainty, such as upstream submission rights and pseudonymous ids |
+| `self_imposed_conditions` | All true: `aggregate_outputs_only`, `no_reidentification`, `no_linkage_with_other_sources`, `no_source_code_access`, `no_redistribution`, `data_outside_repository` |
+| `scope` | As for version 1, except `source_code_analysis` and `publish_submission_ids` must be `false` |
+
+**What this basis claims, and does not.** It records that the owner relies on a licence the
+provider reports. It is not an approval by anyone, and it is not legal advice. The licence says
+nothing about privacy law or about the rights of the people who wrote the submissions; the
+self-imposed conditions exist for those gaps.
+
 ## After it is recorded
 
 Run `python scripts/pc1.py gate`. If it prints `gate open`, the commands in `README.md`

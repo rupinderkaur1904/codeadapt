@@ -135,6 +135,20 @@ ALLOWED_ROLES = frozenset(
         "dataset owner (IBM)",
     }
 )
+# Amendment A1: a published dataset licence as a second, metadata-only basis.
+EXPLICIT_APPROVAL = "explicit approval"
+PUBLISHED_LICENCE = "published dataset licence"
+LICENCE_ID = "CDLA-Permissive-2.0"
+LICENCE_TEXT = PC1_DIR / "permission/licences/CDLA-Permissive-2.0.txt"
+LICENCE_LEVELS = frozenset({"metadata"})
+SELF_IMPOSED_CONDITIONS = (
+    "aggregate_outputs_only",
+    "no_reidentification",
+    "no_linkage_with_other_sources",
+    "no_source_code_access",
+    "no_redistribution",
+    "data_outside_repository",
+)
 REQUIRED_SCOPE = {
     "metadata": ("download_full_archive", "store_outside_repository", "metadata_analysis"),
     "code": (
@@ -182,21 +196,42 @@ def check_permission(path: Path, level: str = "metadata") -> list[str]:
     if not isinstance(record, dict):
         return ["permission record must be a JSON object"]
     problems: list[str] = []
-    if record.get("record_version") != 1:
-        problems.append("record_version must be 1")
     if record.get("status") != "granted":
         problems.append("status must be 'granted' (the template says 'TEMPLATE')")
     if record.get("dataset") != "IBM Project CodeNet 1.0.0":
         problems.append("dataset must be 'IBM Project CodeNet 1.0.0'")
-    if record.get("granted_by_role") not in ALLOWED_ROLES:
-        problems.append(f"granted_by_role must be one of {sorted(ALLOWED_ROLES)}")
-    if record.get("basis") != "explicit approval":
-        problems.append(
-            "basis must be 'explicit approval'; a repository licence or a third-party "
-            "description is not permission"
-        )
     if record.get("recorded_by") != "owner":
         problems.append("recorded_by must be 'owner' (Claude never writes this record)")
+    version, basis = record.get("record_version"), record.get("basis")
+    if version == 1 and basis == EXPLICIT_APPROVAL:
+        problems.extend(_check_approval(record))
+    elif version == 2 and basis == PUBLISHED_LICENCE:
+        problems.extend(_check_licence(record, level))
+    else:
+        problems.append(
+            f"basis must be {EXPLICIT_APPROVAL!r} (record_version 1) or {PUBLISHED_LICENCE!r} "
+            "(record_version 2, amendment A1); a repository licence or a third-party "
+            "description is not permission"
+        )
+    scope = record.get("scope")
+    if not isinstance(scope, dict):
+        problems.append("scope must be an object")
+    else:
+        problems.extend(
+            f"scope.{key} must be true for level {level!r}"
+            for key in REQUIRED_SCOPE[level]
+            if scope.get(key) is not True
+        )
+        if scope.get("redistribute_code") is not False:
+            problems.append("scope.redistribute_code must be false: PC1 never redistributes code")
+    return problems
+
+
+def _check_approval(record: dict[str, Any]) -> list[str]:
+    """Record version 1: an explicit approval from one of ALLOWED_ROLES (section 3)."""
+    problems: list[str] = []
+    if record.get("granted_by_role") not in ALLOWED_ROLES:
+        problems.append(f"granted_by_role must be one of {sorted(ALLOWED_ROLES)}")
     decided, recorded = _iso_date(record.get("decision_date")), _iso_date(record.get("recorded_on"))
     if decided is None or recorded is None:
         problems.append("decision_date and recorded_on must be ISO dates (YYYY-MM-DD)")
@@ -210,17 +245,82 @@ def check_permission(path: Path, level: str = "metadata") -> list[str]:
     conditions = record.get("conditions_verbatim")
     if not isinstance(conditions, str) or not conditions.strip():
         problems.append("conditions_verbatim must quote the approval's conditions ('none' if none)")
-    scope = record.get("scope")
-    if not isinstance(scope, dict):
-        problems.append("scope must be an object")
+    return problems
+
+
+def _check_licence(record: dict[str, Any], level: str) -> list[str]:
+    """Record version 2 (A1): the dataset provider's published licence, metadata level only."""
+    problems: list[str] = []
+    if level not in LICENCE_LEVELS:
+        problems.append(f"a {PUBLISHED_LICENCE!r} record opens only the metadata level (A1)")
+    if record.get("licence_id") != LICENCE_ID:
+        problems.append(f"licence_id must be {LICENCE_ID!r}")
+    if record.get("licence_text_sha256") != sha256_file(LICENCE_TEXT):
+        problems.append(
+            "licence_text_sha256 must match permission/licences/CDLA-Permissive-2.0.txt"
+        )
+    recorded = _iso_date(record.get("recorded_on"))
+    if recorded is None:
+        problems.append("recorded_on must be an ISO date (YYYY-MM-DD)")
+    evidence = record.get("licence_evidence")
+    if not isinstance(evidence, list) or not evidence:
+        problems.append("licence_evidence must list at least one source")
+        evidence = []
+    provider_first_hand = False
+    for i, item in enumerate(evidence):
+        if not isinstance(item, dict):
+            problems.append(f"licence_evidence[{i}] must be an object")
+            continue
+        for key in ("source", "locator", "quote"):
+            value = item.get(key)
+            if not isinstance(value, str) or len(value.strip()) < 8:
+                problems.append(f"licence_evidence[{i}].{key} must be filled in")
+        if item.get("publisher") not in ("dataset provider", "third party"):
+            problems.append(
+                f"licence_evidence[{i}].publisher must be 'dataset provider' or 'third party'"
+            )
+        if item.get("seen") not in ("first-hand", "secondary"):
+            problems.append(f"licence_evidence[{i}].seen must be 'first-hand' or 'secondary'")
+        accessed = _iso_date(item.get("accessed_on"))
+        if accessed is None or (recorded is not None and accessed > recorded):
+            problems.append(
+                f"licence_evidence[{i}].accessed_on must be an ISO date, not after recorded_on"
+            )
+        if "@" in json.dumps(item):
+            problems.append(f"licence_evidence[{i}] must not contain an email address")
+        quote = item.get("quote")
+        if (
+            item.get("publisher") == "dataset provider"
+            and item.get("seen") == "first-hand"
+            and isinstance(quote, str)
+            and ("CDLA" in quote or "Community Data License" in quote)
+        ):
+            provider_first_hand = True
+    if not provider_first_hand:
+        problems.append(
+            "licence_evidence needs a statement by the dataset provider, read first-hand by the "
+            "owner, quoting the licence; third-party or secondary sources alone are not enough"
+        )
+    for key in ("unverified", "known_risks"):
+        value = record.get(key)
+        if not isinstance(value, str) or len(value.strip()) < 8:
+            problems.append(f"{key} must say what was not verified or what remains uncertain")
+    conditions = record.get("self_imposed_conditions")
+    if not isinstance(conditions, dict):
+        problems.append("self_imposed_conditions must be an object")
     else:
         problems.extend(
-            f"scope.{key} must be true for level {level!r}"
-            for key in REQUIRED_SCOPE[level]
-            if scope.get(key) is not True
+            f"self_imposed_conditions.{key} must be true"
+            for key in SELF_IMPOSED_CONDITIONS
+            if conditions.get(key) is not True
         )
-        if scope.get("redistribute_code") is not False:
-            problems.append("scope.redistribute_code must be false: PC1 never redistributes code")
+    scope = record.get("scope")
+    if isinstance(scope, dict):
+        for key in ("source_code_analysis", "publish_submission_ids"):
+            if scope.get(key) is not False:
+                problems.append(
+                    f"scope.{key} must be false under a {PUBLISHED_LICENCE!r} record (A1)"
+                )
     return problems
 
 
@@ -749,9 +849,25 @@ def _recommend(report: dict[str, Any]) -> str:
     return "no candidate reached the minimum: report to the owner; no substitution"
 
 
+def publication_notice(permission: Path | None) -> dict[str, Any]:
+    """A1b: what the permission record says about publishing these counts."""
+    if permission is None:
+        return {"publish_derived_statistics": None, "notice": "SYNTHETIC FIXTURES - NOT DATA"}
+    record = json.loads(permission.read_text(encoding="utf-8"))
+    allowed = record.get("scope", {}).get("publish_derived_statistics") is True
+    return {
+        "publish_derived_statistics": allowed,
+        "notice": "may be published under the permission record"
+        if allowed
+        else "NOT FOR PUBLICATION: the permission record does not allow publishing these counts",
+    }
+
+
 def feasibility_markdown(report: dict[str, Any]) -> str:
     lines = [
         f"# PC1 feasibility counts (protocol {report['protocol']})",
+        "",
+        f"**{report['publication']['notice']}**",
         "",
         "Metadata only. No source code read, no diagnosis run. Counts of submissions, not of",
         "misconceptions.",
@@ -858,6 +974,9 @@ def main(argv: list[str] | None = None) -> int:
             return EXIT_OK
         identification = json.loads(Path(args.identification).read_text(encoding="utf-8"))
         report = feasibility(root, identification, synthetic=args.synthetic_fixtures)
+        report["publication"] = publication_notice(
+            None if args.synthetic_fixtures else Path(args.permission)
+        )
         write_atomic(out / "feasibility.json", dump(report))
         write_atomic(out / "feasibility.md", feasibility_markdown(report))
         print(report["recommendation"])

@@ -63,6 +63,13 @@ are specified in `permission.md`. In short:
   7.8 GB archive contains all source code. The scope must also cover storing it outside the
   repository and analysing metadata. Phase E also needs source-code analysis. Redistributing
   code must be false.
+- **Second basis (amendment A1), metadata level only.** The owner may instead record the
+  dataset provider's published licence (`basis: published dataset licence`, record version 2).
+  It needs a statement by the dataset provider, read first-hand by the owner, naming
+  CDLA-Permissive-2.0; the licence text committed in `permission/licences/` with its hash; what
+  was not verified; the known risks; and the self-imposed conditions in `permission.md`. It
+  never opens the `code` level, and it keeps source-code analysis and publishing submission ids
+  closed. Third-party descriptions are still not enough on their own.
 - Only the owner writes the record (`recorded_by: owner`). Claude never creates or edits it.
   It holds no names or email addresses. The written approval itself stays in the owner's
   records, referenced by `evidence_reference`.
@@ -357,6 +364,21 @@ is an amendment. Each amendment:
 
 A deviation discovered during a run, such as a CodeNet field that differs from its README, is
 reported and not silently fixed.
+
+### A1 and A1b (proposed 2026-10-23/24; approved by the owner 2026-10-24)
+
+- **A1:** section 3 and `permission.md` gain a second basis, `published dataset licence`
+  (record version 2), for the `metadata` level only. `scripts/pc1.py` checks it
+  (`_check_licence`), and version 1 records are checked exactly as before. The
+  CDLA-Permissive-2.0 text is committed at `permission/licences/` (from the SPDX licence list).
+- **A1b:** `feasibility` copies `scope.publish_derived_statistics` into `feasibility.json`
+  (`publication`) and prints a notice at the top of `feasibility.md`: "NOT FOR PUBLICATION"
+  when false, and "SYNTHETIC FIXTURES - NOT DATA" for fixtures.
+- **Why:** the owner is an independent researcher with no supervisor or institutional office,
+  so none of the four version 1 roles exists, and the only honest basis available is the
+  licence the dataset provider reports. Before A1b, nothing read the publication flag.
+- **Unchanged:** sections 4–8, all count and pairing rules, bands, stop conditions,
+  candidates and fixtures. Deviations D1–D3 are recorded in `DEVIATIONS.md`.
 
 ## 12. Done under this protocol so far
 
