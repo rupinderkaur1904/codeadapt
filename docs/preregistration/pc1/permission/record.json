@@ -1,18 +1,39 @@
 {
-  "record_version": 1,
-  "status": "withdrawn",
+  "record_version": 2,
+  "status": "granted",
   "dataset": "IBM Project CodeNet 1.0.0",
-  "granted_by_role": "supervisor",
-  "basis": "explicit approval",
-  "decision_date": "2026-10-23",
-  "recorded_on": "2026-10-23",
+  "basis": "published dataset licence",
+  "licence_id": "CDLA-Permissive-2.0",
+  "licence_text_sha256": "4531a67d443284d93ffed0803df5b10634aff21c3d77e381f2d48af01d875868",
+  "licence_evidence": [
+    {
+      "source": "IBM CODAIT (IBM Center for Open-Source Data & AI Technologies) GitHub repository MAX-CodeNet-Language-Classification, samples/README.md",
+      "locator": "https://github.com/CODAIT/MAX-CodeNet-Language-Classification/blob/master/samples/README.md",
+      "publisher": "dataset provider",
+      "seen": "first-hand",
+      "accessed_on": "2026-10-24",
+      "quote": "These test samples are part of the Project CodeNet dataset dataset and are licensed under the CDLA Permissive v2 license."
+    },
+    {
+      "source": "CodeNet paper (Puri et al., NeurIPS 2021 Datasets and Benchmarks) datasheet, and Linux Foundation press release of June 2021",
+      "locator": "arXiv 2105.12655; linuxfoundation.org press release on CDLA-Permissive-2.0",
+      "publisher": "third party",
+      "seen": "secondary",
+      "accessed_on": "2026-10-24",
+      "quote": "Reported in search results only: the datasheet states the dataset licence is CDLA Permissive v2.0; IBM CODAIT would re-license its datasets under CDLA-Permissive-2.0 starting with Project CodeNet. The owner could not find the sentence in the arXiv PDF."
+    }
+  ],
+  "unverified": "The IBM statement found first-hand covers CodeNet test samples ('part of the Project CodeNet dataset'), not the full archive explicitly. The owner could not find a licence sentence in the arXiv PDF; the paper datasheet and IBM's dataset page were not seen first-hand; the downloaded archive contains no licence file; no reply from the CodeNet maintainers.",
+  "known_risks": "IBM gives no warranty about the rights of the AIZU/AtCoder submitters (CDLA-Permissive-2.0 section 4); user ids are pseudonymous and could in principle be matched to public judge pages.",
+  "recorded_on": "2026-10-24",
   "recorded_by": "owner",
-  "evidence_reference": "Written approval kept in the owner's records; confirmed in the project thread on 2026-10-23",
-  "conditions_verbatim": "none",
-  "withdrawal": {
-    "withdrawn_on": "2026-10-23",
-    "withdrawn_by": "owner",
-    "reason": "Entered in error. I am an independent student researcher with no supervisor; no supervisor or institution approved this work. The fields above are kept unchanged only as the historical record of commit 447757a and are not true."
+  "self_imposed_conditions": {
+    "aggregate_outputs_only": true,
+    "no_reidentification": true,
+    "no_linkage_with_other_sources": true,
+    "no_source_code_access": true,
+    "no_redistribution": true,
+    "data_outside_repository": true
   },
   "scope": {
     "download_full_archive": true,
