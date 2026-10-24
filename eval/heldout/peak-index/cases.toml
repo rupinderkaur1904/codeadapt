@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE2 (2026-10-24) by the models' author, in styles different from the models,
+# and committed before the method was run on them. See docs/methodology.md §6.1 for what that
+# does and does not allow us to claim.
+
+problem = "peak-index"
+
+[[cases]]
+file = "closed_answer_variable.cpp"
+truth = "correct"
+note = "Closed interval with a running answer."
+
+[[cases]]
+file = "upper_mid_previous.cpp"
+truth = "correct"
+note = "Midpoint rounded up, compared with the previous element."
+
+[[cases]]
+file = "next_smaller_goes_right.cpp"
+truth = "swapped_direction"
+note = "Goes right when the next element is smaller."
+
+[[cases]]
+file = "falling_drops_mid.cpp"
+truth = "hi_skips_candidate"
+note = "hi = mid - 1 on a falling step, written with the comparison reversed."
+
+[[cases]]
+file = "gap_loop_returns_lo.cpp"
+truth = "stops_one_early"
+note = "For-loop running while lo + 1 < hi, returning lo."
+
+[[cases]]
+file = "returns_peak_value.cpp"
+truth = "returns_value"
+note = "Closed interval with a running answer, returning the element."
+
+[[cases]]
+file = "gap_loop_returns_hi.cpp"
+truth = "unmodelled"
+note = "Stops when lo and hi are adjacent but returns hi."
+
+[[cases]]
+file = "one_based.cpp"
+truth = "unmodelled"
+note = "Correct search reporting a 1-based position."
