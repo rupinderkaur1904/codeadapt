@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta
 
 from sqlalchemy.orm import Session, sessionmaker
@@ -5,6 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.db import queue
 from codeadapt.db.models import DataClass, Job, JobState, Submission, User, utcnow
+from codeadapt.worker.main import handle_with_heartbeat
 from tests.paths import DEMO_CONTENT
 
 
@@ -123,4 +125,43 @@ def test_finish_is_not_repeated(sessions: sessionmaker[Session]) -> None:
     with sessions() as s:
         assert queue.finish(s, job, state=JobState.DONE) is True
         assert queue.finish(s, job, state=JobState.FAILED, error="again") is False
+        assert s.get_one(Job, job.id).state == JobState.DONE.value
+
+
+def test_renew_extends_only_the_current_claim(sessions: sessionmaker[Session]) -> None:
+    (job_id,) = enqueue(sessions)
+    stale = claim(sessions, "w1", lease=-1)
+    current = claim(sessions, "w2", lease=1)
+    assert stale is not None and current is not None
+    with sessions() as s:
+        assert queue.renew(s, stale, lease_seconds=3600) is False
+        assert queue.renew(s, current, lease_seconds=3600) is True
+        lease_until = s.get_one(Job, job_id).lease_until
+        assert lease_until is not None
+    # The renewed lease is live, so nobody can reclaim the job.
+    assert claim(sessions, "w3") is None
+    with sessions() as s:
+        assert queue.finish(s, current, state=JobState.DONE) is True
+        assert queue.renew(s, current, lease_seconds=3600) is False  # finished: no claim left
+
+
+async def test_heartbeat_keeps_a_slow_job_claimed(sessions: sessionmaker[Session]) -> None:
+    """A job that outlives one lease period stays with its worker while the worker is alive."""
+    enqueue(sessions)
+    job = claim(sessions, "w1", lease=0.6)
+    assert job is not None
+
+    class SlowPipeline:
+        reclaimed: Job | None = None
+
+        async def handle(self, job: Job) -> None:
+            await asyncio.sleep(1.5)  # more than two lease periods
+            self.reclaimed = claim(sessions, "w2")
+            with sessions() as s:
+                queue.finish(s, job, state=JobState.DONE)
+
+    pipeline = SlowPipeline()
+    await handle_with_heartbeat(pipeline, sessions, job, lease_seconds=0.6)  # type: ignore[arg-type]
+    assert pipeline.reclaimed is None
+    with sessions() as s:
         assert s.get_one(Job, job.id).state == JobState.DONE.value

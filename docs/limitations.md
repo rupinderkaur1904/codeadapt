@@ -24,6 +24,7 @@ from [evaluation/summary.md](evaluation/summary.md).
 | L10 | Skill maps (problem → skill) are unvalidated modelling choices. | ADR-021/023 | Expert review; real-data checks |
 | L11 | The recommendation policy is a transparent rule set over a small bank, effectively a fixed sibling lookup; it ignores prerequisites and uncertainty. | critical review; policy 1.4 | More content; a policy evaluated on learner outcomes |
 | L12 | No learning effect has been measured; no claim of improved learning is possible. | — | A study with real learners and a suitable design |
+| L19 | Rule C gives a `correct` observation to any skill whose every probing test passed, whatever else the program did. A program that prints 0 on every count-occurrences test (abstained on, rule 8a) still earns `problem_specification` = correct from the absent-target tests. Evidence is per test property, not per program understanding. | pinned in `tests/sandbox/test_adaptation_end_to_end.py` (2026-10-24) | An owner decision on whether abstained or largely failing attempts should give positive evidence (an evidence-policy change, not made) |
 
 ## Platform
 
@@ -31,7 +32,7 @@ from [evaluation/summary.md](evaluation/summary.md).
 | --- | --- | --- | --- |
 | L13 | Not deployed; the production tier (gVisor on a separate runner VM) is set up and tested in CI only for one shard, and there is no host. | docs/deployment.md; roadmap M8 | Owner's hosting choice; full suite under runsc on the host |
 | L14 | Lost-output cause unknown; the end-of-output marker turns it into an infrastructure error. | ADR-024; 0 in about 37,700 probe runs | Root cause if it recurs |
-| L15 | No lease heartbeat: a job that exceeds its 600 s lease can run on two workers at once (both diagnoses kept). | ADR-031 | Heartbeat or fencing token through to the diagnosis insert |
+| L15 | The lease heartbeat (2026-10-24) keeps a live worker's claim, but a worker whose event loop stalls for a whole lease (600 s) can lose it mid-run; the job can then run on two workers (both diagnoses kept). | ADR-031 | A fencing token checked in the diagnosis insert |
 | L16 | The sandbox tests are slow (about 20–30 min locally), so they are sharded in CI. | CI config | Batch execution (changes per-test isolation, so it needs a decision) |
 
 ## Data and permissions
