@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE2 (2026-10-24) by the models' author, in styles different from the models,
+# and committed before the method was run on them. See docs/methodology.md §6.1 for what that
+# does and does not allow us to claim.
+
+problem = "rotated-search"
+
+[[cases]]
+file = "min_then_search.cpp"
+truth = "correct"
+note = "Finds the rotation point, then searches the one sorted run that can hold the target."
+
+[[cases]]
+file = "right_half_first.cpp"
+truth = "correct"
+note = "Tests whether the right half is sorted first."
+
+[[cases]]
+file = "left_sorted_strict_start.cpp"
+truth = "left_range_excludes_lo"
+note = "Named booleans; the left-half range test is target > a[lo]."
+
+[[cases]]
+file = "for_loop_lt.cpp"
+truth = "closed_loop_lt"
+note = "For-loop form running while lo < hi."
+
+[[cases]]
+file = "recursive_plain.cpp"
+truth = "ignores_rotation"
+note = "Recursive ordinary binary search."
+
+[[cases]]
+file = "virtual_index.cpp"
+truth = "returns_sorted_position"
+note = "Searches the unrotated order and returns the searched position."
+
+[[cases]]
+file = "one_based.cpp"
+truth = "unmodelled"
+note = "Correct search reporting a 1-based position."
+
+[[cases]]
+file = "plain_lt_loop.cpp"
+truth = "unmodelled"
+note = "Two modelled errors at once: ignores the rotation and loops while lo < hi."
