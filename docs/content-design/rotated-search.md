@@ -1,4 +1,6 @@
-# Content design record: `rotated-search` (CE2)
+# Content design record: `rotated-search` (BSX, binary-search extension)
+
+**Label.** Files and commits call this "CE2". That was a working label; this is a binary-search family extension, not the planned CE2 stage (arrays).
 
 **Status and order.** This record was written on 2026-10-24 together with the content, during
 the overnight bank expansion.
