@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from codeadapt.api.app import create_app
 from codeadapt.config import Environment, Settings
+from tests.paths import DEMO_SLUGS
 
 STUDENT = {"X-Dev-Role": "student"}
 RESEARCHER = {"X-Dev-Role": "researcher"}
@@ -18,12 +19,7 @@ def client(settings: Settings) -> TestClient:
 def test_list_and_get_problem_exposes_only_samples(client: TestClient) -> None:
     problems = client.get("/api/v1/problems", headers=STUDENT).json()
     # first-true is not recommendable by policy v1 (CE1 decision E2) but stays listed.
-    assert [p["slug"] for p in problems] == [
-        "count-occurrences",
-        "first-true",
-        "last-less-than",
-        "lower-bound",
-    ]
+    assert [p["slug"] for p in problems] == DEMO_SLUGS
     assert all("recommendable" not in p for p in problems)
     detail = client.get("/api/v1/problems/lower-bound", headers=STUDENT).json()
     assert "lower_bound_index" in detail["interface"]

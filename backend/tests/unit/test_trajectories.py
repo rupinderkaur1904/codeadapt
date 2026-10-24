@@ -35,7 +35,7 @@ from codeadapt.db.models import (
 )
 from codeadapt.diagnosis import Outcome
 from codeadapt.worker.adapt import adapt, open_recommendation
-from tests.paths import DEMO_CONTENT
+from tests.paths import DEMO_CONTENT, DEMO_SLUGS
 
 CATALOGUE = Catalogue.load(DEMO_CONTENT)
 
@@ -404,12 +404,7 @@ def test_problem_list_marks_problems_with_a_no_failure_attempt(
         p["slug"]: p["no_failure_observed"]
         for p in client.get("/api/v1/problems", headers=STUDENT).json()
     }
-    assert marked == {
-        "count-occurrences": True,
-        "first-true": False,
-        "last-less-than": False,
-        "lower-bound": False,
-    }
+    assert marked == {slug: slug == "count-occurrences" for slug in DEMO_SLUGS}
     # Another user's results do not mark this user's list.
     others = client.get("/api/v1/problems", headers=RESEARCHER).json()
     assert not any(p["no_failure_observed"] for p in others)
