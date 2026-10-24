@@ -28,7 +28,9 @@ are unchanged. Source: [adr030-2026-10-23/README.md](adr030-2026-10-23/README.md
 | VAL1-A2 (323, behavioural labels) | 94 / 75 / 19 | 50 / 39 / 11 | **30 / 30 / 0** |
 
 Other held-out facts under every version: 0 false alarms on the 6 correct programs; 32/32
-cases reproducible across 2 runs.
+cases reproducible across 2 runs. **Reproduced from scratch on 2026-10-24** (commit 43779b6,
+fresh sandbox runs, `uv run codeadapt-eval --content ../content/demo --heldout ../eval/heldout
+--compare v1.1 v1.2 v1`): the comparison table is identical to the recorded `heldout.md`.
 
 **How to read this.**
 

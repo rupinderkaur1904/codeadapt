@@ -10,7 +10,7 @@ deliverables 1–12 from the owner's brief, without crossing approval gates.
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 6
+**Iteration:** 8
 
 ## Hard limits (owner rules, override everything below)
 
@@ -25,13 +25,13 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | Id | Objective | Depends | Files | Acceptance | Status |
 | --- | --- | --- | --- | --- | --- |
 | A1 | Record PC1 withdrawal, deviations, status truthfully | — | docs/preregistration/pc1/{STATUS,DEVIATIONS}.md, permission/CORRECTIONS.md | Frozen files unchanged; gate closed and pinned by tests | **done** a14fcde |
-| A2 | Keep amendment A1 + A1b ready as an inactive proposal on the current branch | owner | /mnt project files a1-proposal | Patch applies cleanly; tests pass in a scratch worktree; nothing activated | todo (proposal exists against 447757a) |
+| A2 | Keep amendment A1 + A1b ready as an inactive proposal on the current branch | owner | project files codeadapt/pc1/a1-proposal/a1-v2.patch | Patch applies cleanly; tests pass in a scratch worktree; nothing activated | **done** (54 PC1 tests pass in scratch; not applied; waits for owner) |
 | A3 | Claims audit: no doc states real-student accuracy, learning gains or calibrated mastery | — | README, docs/* | Every accuracy figure labelled synthetic or author-written | **done** (no change needed) |
 | B1 | Queue/worker idempotency | — | db/queue.py, worker/pipeline.py | Stale worker cannot overwrite; redelivery does not re-run | **done** d78ee21 (ADR-031) |
 | B2 | Review sandbox limits and status classification against ADR-020/023/024/028 | — | execution/* | Each limit and status has a test; gaps fixed or documented | **done** f570b5b (compile output limit and stream-mismatch edge cases pinned; SIGKILL-without-deadline is a runtime error, documented) |
 | B3 | API validation and error-handling review | — | api/app.py, schemas.py | Malformed input gets 4xx, not 500; tests | **done** f570b5b (18 malformed requests probed; NUL in source was accepted and would fail on PostgreSQL, now 422) |
 | C1 | Full test run, recorded | — | PROJECT_AUTOPILOT.md, docs/status-2026-10-24.md | Commands verified today with counts | **done**: unit 348, sandbox 33 + end-to-end re-run 2/2 on d78ee21, web 21 |
-| C2 | One documented command per evaluation to reproduce reported numbers | — | docs/evaluation/*, docs/development.md | Re-run reproduces held-out/calibration tables | todo |
+| C2 | One documented command per evaluation to reproduce reported numbers | — | docs/evaluation/*, docs/development.md | Re-run reproduces held-out/calibration tables | **done** for held-out: fresh re-run identical to adr030 heldout.md |
 | D1 | CodeNet PC1 Phase F counts | A2 + owner | — | Only after a truthful, accepted record | **blocked (owner)** |
 | E1 | Consolidated, labelled results table across all evaluations | — | docs/evaluation/summary.md | Every number traceable to a report; labels on every row | **done** fca1432 |
 | F1 | Architecture document matches the code | — | docs/architecture.md | Known mismatch fixed (queue uses an optimistic conditional UPDATE, not SKIP LOCKED); every component checked | **done** 987cc50 |
@@ -86,12 +86,19 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Next three tasks
 
-1. A2: rebase the inactive A1 + A1b proposal onto this branch (scratch worktree), as a patch
-   for owner review. Never apply it.
-2. C2: check that the documented evaluation commands reproduce summary.md (held-out run).
-3. README: link the new deliverables (status, summary, demo, limitations, report, interview prep).
+1. Check CI on the pushed branch; fix anything red.
+2. Calibration re-run (same command with `--cases ../eval/calibration --case-set calibration`).
+3. Then idle safely: every remaining workstream needs an owner decision (A1/A1b, hosting,
+   failing-case feedback proposal, CE1.2/1.3).
 
 ## Resume instruction
 
 `git fetch origin && git checkout claude/project-thread-dyivyy`, reread this file, run
 `cd backend && uv sync && uv run pytest tests/unit -q`, then continue with "Next three tasks".
+
+### Iterations 7–8
+
+- 43779b6: README links to all deliverables.
+- A1 + A1b rebased as `a1-v2.patch` (project files); applied only in a scratch worktree, where
+  54 PC1 tests pass. **Not applied to the branch.**
+- Held-out evaluation re-run from scratch: identical to docs/evaluation/adr030-2026-10-23/heldout.md.
