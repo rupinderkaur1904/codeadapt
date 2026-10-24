@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from codeadapt.content import ContentError, Visibility, load_catalogue, load_problem
-from tests.paths import DEMO_CONTENT
+from tests.paths import DEMO_CONTENT, DEMO_SLUGS, ORIGINAL_SLUGS
 
 LOWER_BOUND = DEMO_CONTENT / "lower-bound"
 
@@ -41,12 +41,9 @@ def test_program_bundles_solution_with_harness() -> None:
 
 
 def test_catalogue_lists_problem_directories() -> None:
-    assert [p.spec.slug for p in load_catalogue(DEMO_CONTENT)] == [
-        "count-occurrences",
-        "first-true",
-        "last-less-than",
-        "lower-bound",
-    ]
+    slugs = [p.spec.slug for p in load_catalogue(DEMO_CONTENT)]
+    assert slugs == DEMO_SLUGS
+    assert set(ORIGINAL_SLUGS) <= set(slugs)
 
 
 def test_version_is_stable_and_content_addressed(problem_copy: Path) -> None:

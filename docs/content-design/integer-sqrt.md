@@ -168,10 +168,21 @@ reference. TLE is a predicted time limit.
 - Two termination models (T1, T2) are predicted to fail with **wrong outputs, not time
   limits**. This is the CE1.2 target for gap 4.
 
-### 4.2 Measured
+### 4.2 Measured (2026-10-24)
 
-To be filled from `codeadapt-content validate` and the generated report
-(`docs/content-reports/integer-sqrt.md`).
+Content written and measured on 2026-10-24, in the sandbox (`runc`, image
+`codeadapt-sandbox:gcc14.2-1`, 2 runs per test). Report:
+[`docs/content-reports/integer-sqrt.md`](../content-reports/integer-sqrt.md); validation result:
+valid, 0 errors, 0 warnings.
+
+- **The measured matrix is identical to the prediction in §4.1**, cell for cell, with
+  `time_limit` where §4.1 says TLE.
+- Detecting tests and behaviour groups per model match the predicted support table.
+- B1 (`hi_excludes_x`) and B2 (`hi_cap_46340`) each span 2 behaviour groups, so under the rule
+  in §4.3 neither gets a `known_limitation`. §4.3's caution still applies: each rests on 2
+  tests, and its second group exists only because another model splits the pair.
+- The 8 held-out cases (§7) were committed in a separate commit after this content and before
+  `codeadapt-eval` was run on them.
 
 ### 4.3 Ambiguity analysis (before measurement)
 
