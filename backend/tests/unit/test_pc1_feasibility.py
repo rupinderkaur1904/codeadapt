@@ -439,3 +439,41 @@ def test_extract_takes_metadata_and_descriptions_only(tmp_path: Path) -> None:
         "p00001.html",
         "problem_list.csv",
     ]
+
+
+# ------------------------------------------------------------------ withdrawn records (2026-10-24)
+def test_withdrawn_record_closes_the_gate(tmp_path: Path) -> None:
+    """A record the owner withdrew (permission/CORRECTIONS.md, C1) opens no level."""
+    record = valid_record(
+        status="withdrawn",
+        withdrawal={"withdrawn_on": "2026-11-03", "withdrawn_by": "owner", "reason": "error"},
+    )
+    path = write_record(tmp_path, record)
+    for level in ("metadata", "code"):
+        assert any("status must be 'granted'" in p for p in pc1.check_permission(path, level))
+        assert pc1.main(["gate", "--permission", str(path), "--level", level]) == pc1.EXIT_GATE
+
+
+def test_withdrawn_record_stops_real_data_commands(tmp_path: Path) -> None:
+    path = write_record(tmp_path, valid_record(status="withdrawn"))
+    data, out = tmp_path / "data", tmp_path / "out"
+    for argv in (
+        ["identify", "--data-dir", str(data), "--out", str(out)],
+        ["feasibility", "--data-dir", str(data), "--identification", "x.json", "--out", str(out)],
+        ["extract", "--archive", str(tmp_path / "missing.tar.gz"), "--data-dir", str(data)],
+    ):
+        assert pc1.main([*argv, "--permission", str(path)]) == pc1.EXIT_GATE
+    assert not out.exists()
+    assert not data.exists()
+
+
+def test_committed_record_is_not_an_open_gate() -> None:
+    """The repository's record.json (if any) must not open the gate while PC1 is blocked.
+
+    PC1 is blocked pending amendment A1 (docs/preregistration/pc1/STATUS.md). When a truthful
+    record is legitimately committed, this test is updated in the same commit.
+    """
+    record = PC1 / "permission/record.json"
+    if record.exists():
+        assert pc1.check_permission(record, "metadata") != []
+        assert pc1.check_permission(record, "code") != []
