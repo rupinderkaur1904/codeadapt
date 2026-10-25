@@ -266,6 +266,30 @@ describe("researcher pages", () => {
     expect(await screen.findByText(/2 attempts/)).toBeInTheDocument();
     expect(screen.getByText("Not started")).toBeInTheDocument();
   });
+
+  it("groups a larger bank by family, binary search first, and lists every problem", async () => {
+    setDevRole("student");
+    const families = ["prefix-sums", "arrays", "binary-search", "sliding-window", "two-pointers"];
+    const bank = Array.from({ length: 25 }, (_, i) => ({
+      slug: `p${i}`,
+      title: `Problem ${i}`,
+      family: families[i % families.length],
+      no_failure_observed: false,
+    }));
+    vi.mocked(globalThis.fetch).mockImplementation(async (input) =>
+      String(input).endsWith("/problems") ? json(bank) : json([]),
+    );
+    renderAt("/problems", <ProblemListPage />, "/problems");
+    const headings = await screen.findAllByRole("heading", { level: 2 });
+    expect(headings.map((h) => h.textContent)).toEqual([
+      "Binary search · 5",
+      "Arrays · 5",
+      "Two pointers · 5",
+      "Sliding window · 5",
+      "Prefix sums · 5",
+    ]);
+    expect(screen.getAllByRole("link", { name: /^Problem \d+$/ })).toHaveLength(25);
+  });
   it("pages through submissions and returns to the first page when a filter changes", async () => {
     const page = Array.from({ length: RESEARCH_PAGE_SIZE }, (_, i) => ({
       ...row,
