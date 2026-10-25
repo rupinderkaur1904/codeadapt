@@ -13212,7 +13212,7 @@
    "family": "binary-search",
    "index_outcome": "no_failure_observed",
    "index_submission": "s2",
-   "note": "Every problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
+   "note": "Every recommendable problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
    "recent_problems": [
     "count-occurrences",
     "last-less-than",
@@ -13232,7 +13232,7 @@
    "family": "binary-search",
    "index_outcome": "no_failure_observed",
    "index_submission": "s2",
-   "note": "Every problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
+   "note": "Every recommendable problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
    "recent_problems": [
     "count-occurrences",
     "lower-bound",
@@ -13252,7 +13252,7 @@
    "family": "binary-search",
    "index_outcome": "no_failure_observed",
    "index_submission": "s2",
-   "note": "Every problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
+   "note": "Every recommendable problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
    "recent_problems": [
     "last-less-than",
     "count-occurrences",
@@ -13272,7 +13272,7 @@
    "family": "binary-search",
    "index_outcome": "no_failure_observed",
    "index_submission": "s2",
-   "note": "Every problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
+   "note": "Every recommendable problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
    "recent_problems": [
     "last-less-than",
     "lower-bound",
@@ -13292,7 +13292,7 @@
    "family": "binary-search",
    "index_outcome": "no_failure_observed",
    "index_submission": "s2",
-   "note": "Every problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
+   "note": "Every recommendable problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
    "recent_problems": [
     "lower-bound",
     "count-occurrences",
@@ -13312,7 +13312,7 @@
    "family": "binary-search",
    "index_outcome": "no_failure_observed",
    "index_submission": "s2",
-   "note": "Every problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
+   "note": "Every recommendable problem in the family has an attempt with no failure observed on its tests. That is not evidence of complete understanding.",
    "recent_problems": [
     "lower-bound",
     "last-less-than",
