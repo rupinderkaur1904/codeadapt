@@ -7,7 +7,7 @@ is exactly `hi_init_last_index`; every newer problem's weak models must each car
 
 A `known_limitation` on a model that is *not* weak is allowed only where it is listed in
 NON_UNIQUE_ATTRIBUTION: a multi-group model whose skill attribution is documented as not unique
-(owner decision 2026-10-25, L20). Its diagnoses are qualified and add no negative evidence.
+(L20; ADR-032 and the bank expansion). Its diagnoses are qualified and add no negative evidence.
 """
 
 from codeadapt.content import load_catalogue
@@ -17,7 +17,10 @@ from codeadapt.evidence import OutcomeKind
 from codeadapt.execution import DockerSandbox
 from tests.paths import DEMO_CONTENT, ORIGINAL_SLUGS
 
-NON_UNIQUE_ATTRIBUTION = {"min-capacity": {"strict_day_limit", "full_day_overflows"}}
+NON_UNIQUE_ATTRIBUTION = {
+    "min-capacity": {"strict_day_limit", "full_day_overflows"},
+    "stock-profit": {"ignores_order"},
+}
 
 
 async def test_demo_catalogue_validates(sandbox: DockerSandbox) -> None:
