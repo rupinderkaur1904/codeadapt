@@ -66,7 +66,7 @@ def run_all(names, inputs):
 
 names = ["reference", *models, *alts]
 tin = [t["input"] for t in tests]
-tres = run_all(["reference", *models], tin)
+tres = run_all(["reference", *models, *alts], tin)
 ref = tres["reference"]
 bad = False
 for i, t in enumerate(tests):
@@ -99,6 +99,14 @@ for a in models:
         if a < b and tres[a] == tres[b]:
             print(f"!! {a} and {b} identical on every test (collision)")
             bad = True
+
+# alternatives that match a model on every test: the method would name that model
+for a in alts:
+    same = [m for m in models if tres[a] == tres[m]]
+    if same:
+        print(f"!! alternative {a} is identical to {same} on every test (would be named)")
+    elif tres[a] == ref:
+        print(f"   alternative {a} passes every test")
 
 rng = random.Random(20261025)
 rin = [spec["RANDOM"](rng) for _ in range(N)]

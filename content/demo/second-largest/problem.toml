@@ -89,6 +89,15 @@ purpose = "Repeated maximum including position 0."
 distinguishes = ["counts_duplicates"]
 
 [[tests]]
+key = "answer_before_max"
+input = "L 3 5 3 9"
+expected = "5"
+probes = ["answer_first", "increasing"]
+student_description = "The answer comes before the maximum, with a smaller value between them."
+purpose = "Added after the held-out evaluation (2026-10-25): separates no_demotion from a program that only looks after the maximum's position."
+distinguishes = ["no_demotion", "skips_first"]
+
+[[tests]]
 key = "two_distinct"
 input = "L 2 3 8"
 expected = "3"

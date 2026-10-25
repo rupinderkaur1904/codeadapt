@@ -40,6 +40,7 @@ TESTS = [
     dict(key="decreasing", input="L 5 9 7 5 3 1", probes=["max_first"], desc="Decreasing values.", purpose="The maximum is first; the answer is the second element."),
     dict(key="answer_first", input="L 4 8 2 10 3", probes=["answer_first", "increasing"], desc="The answer is the first element.", purpose="The second largest value is at index 0."),
     dict(key="max_first_dups", input="L 5 10 10 4 6 10", probes=["max_first", "duplicate_max"], desc="The maximum first and repeated.", purpose="Repeated maximum including position 0."),
+    dict(key="answer_before_max", input="L 3 5 3 9", probes=["answer_first", "increasing"], desc="The answer comes before the maximum, with a smaller value between them.", purpose="Added after the held-out evaluation (2026-10-25): separates no_demotion from a program that only looks after the maximum's position."),
     dict(key="two_distinct", input="L 2 3 8", probes=["increasing", "answer_first"], desc="Two different values.", purpose="Smallest case with an answer; answer first."),
     dict(key="two_equal", input="L 2 6 6", probes=["no_second", "duplicate_max"], desc="Two equal values.", purpose="Smallest case without an answer."),
     dict(key="single", input="L 1 4", probes=["single", "no_second"], desc="One element.", purpose="Minimal input; no answer."),
