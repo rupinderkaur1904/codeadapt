@@ -355,3 +355,15 @@ carry a non-unique attribution.
 | 7 | Review the integer-sqrt and min-capacity gate submissions (CE1.2, CE1.3) and the six BSX problems for acceptance | **Yes** (pending since 07:50) |
 | 8 | L22: decide whether to split `update_rule` and `index_range` before any new-family problem becomes recommendable | **Yes** |
 | 9 | Plan real-learner or independent-program validation (VAL1-B or PC1), the only route to research validation | **Yes** |
+
+### Status of the actions (owner approval 2026-10-25 13:27)
+
+| # | Status |
+| --- | --- |
+| 1 | Done (df1e832): rationale and student message corrected; golden fixture note re-recorded (6 occurrences, note only); tests prove neither message claims all problems were passed; stored rows unchanged |
+| 2 | Done (7b962ef): `/problems` labels exactly the eight provisional problems "Unreviewed" with a note on review status; `docs/demo.md` updated; frontend test |
+| 3 | Proposal written (docs/proposals/d1-technique-evidence.md); not implemented. Correction: of the eight provisional statements, six say O(log n) and six name `std::upper_bound`; across the bank, 25 state a complexity bound and 14 ban calls |
+| 4 | Search done (l20-search.md): 13 of 29 nameable models have a cross-skill twin; safeguards S1–S3 proposed; no `known_limitation` added |
+| 6 | Done: `tests/sandbox/test_family_end_to_end.py`, one problem per family, CI shard `families` under runc and gVisor |
+| 8 | Proposal written (docs/proposals/l22-skill-taxonomy.md); not implemented |
+| 5, 7, 9 | Not part of the approved actions; unchanged |
