@@ -16,7 +16,7 @@ async function replaceCode(page: Page, source: string) {
 }
 
 test("student submits, sees diagnosis feedback, fixes the bug and passes", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/problems");
   await page.getByRole("link", { name: "Lower bound" }).click();
   await expect(page.getByRole("heading", { name: "Lower bound", level: 1 })).toBeVisible();
 

@@ -23,11 +23,11 @@ const problems: ProblemSummary[] = [
   },
 ];
 
-function renderApp() {
+function renderApp(path = "/problems") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[path]}>
         <App />
       </MemoryRouter>
     </QueryClientProvider>,
@@ -98,5 +98,21 @@ describe("login", () => {
     renderApp();
     expect(await screen.findByText(/Development role/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Log out" })).not.toBeInTheDocument();
+  });
+
+  it("shows the landing page at / without a session, and asks for a login elsewhere", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => json({ type: "x/not-authenticated", title: "Login", status: 401 }, 401)),
+    );
+    const user = userEvent.setup();
+    renderApp("/");
+    expect(await screen.findByRole("heading", { name: /Fix the root/ })).toBeInTheDocument();
+    // The illustration is labelled as such and shows no learner estimates.
+    expect(screen.getByText(/It does not show anyone's progress/)).toBeInTheDocument();
+    expect(screen.queryByText(/weak|strong|mastery/i)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("link", { name: "Log in to start" }));
+    expect(await screen.findByRole("heading", { name: "Log in" })).toBeInTheDocument();
   });
 });

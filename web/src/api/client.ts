@@ -29,6 +29,9 @@ export interface ResearchFilters {
   data_class?: string;
 }
 
+/** Rows per page of the research submissions list (the API allows up to 200). */
+export const RESEARCH_PAGE_SIZE = 100;
+
 function query(params: object): string {
   const entries = Object.entries(params).filter(
     (e): e is [string, string] => typeof e[1] === "string" && e[1] !== "",
@@ -101,9 +104,17 @@ export const api = {
   getSubmission: (id: string) => request<SubmissionView>(`/submissions/${encodeURIComponent(id)}`),
   listSubmissions: (problemSlug: string) =>
     request<SubmissionView[]>(`/submissions?problem_slug=${encodeURIComponent(problemSlug)}`),
+  /** The current user's most recent submissions across every problem (the API caps it at 50). */
+  listAllSubmissions: () => request<SubmissionView[]>("/submissions?limit=50"),
   myRecommendation: () => request<LearnerNext>("/me/recommendation"),
-  researchSubmissions: (filters: ResearchFilters) =>
-    request<ResearchSubmissionRow[]>(`/research/submissions${query(filters)}`),
+  researchSubmissions: (filters: ResearchFilters, offset = 0, limit = RESEARCH_PAGE_SIZE) =>
+    request<ResearchSubmissionRow[]>(
+      `/research/submissions${query({
+        ...filters,
+        ...(offset > 0 ? { offset: String(offset) } : {}),
+        ...(limit !== RESEARCH_PAGE_SIZE ? { limit: String(limit) } : {}),
+      })}`,
+    ),
   researchMetrics: (dataClass?: string) =>
     request<ResearchMetrics>(`/research/metrics${query({ data_class: dataClass })}`),
   trace: (id: string) =>
