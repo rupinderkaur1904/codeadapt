@@ -224,11 +224,11 @@ with a stable machine `type` (e.g. `https://codeadapt.dev/errors/submission-too-
 | `POST /submissions` | student | `{problem_slug, source}` (current version resolved server-side); source ≤ 64 KiB; per-user rate limit (ADR-029); returns 202 |
 | `GET /submissions/{id}` | owner | status + **student feedback projection** |
 | `GET /me/recommendation` | student | latest recommended exercise, student-facing reason and focus, and the latest follow-up verdict (M6) |
-| `GET /research/submissions?…` | researcher | filters: problem_slug, outcome, data_class; latest diagnosis, recommendation and follow-up per row (M7) |
+| `GET /research/submissions?…` | researcher | filters: problem_slug, outcome, data_class; `limit` (default 100, at most 200) and `offset`; latest diagnosis, recommendation and follow-up per row (M7) |
 | `GET /research/submissions/{id}/trace` | researcher | full evidence chain: observations, excluded tests, candidates, rationale, environment |
 | `GET /research/metrics?data_class=` | researcher | counts of outcomes, recommendation rules, review flags and follow-up verdicts (M7). Accuracy metrics need ground truth and come from `codeadapt-eval`, not from this endpoint |
 | `GET /research/learner-model` | researcher | LM1 estimates, labelled "estimated under assumed parameters" (ADR-025) |
-| `GET /submissions` | owner | the learner's own attempts |
+| `GET /submissions` | owner | the learner's own attempts, newest first; optional `problem_slug`; `limit` (default 20, at most 50) |
 | `GET /health` | any | liveness |
 | `POST /research/replay` | researcher | **not implemented**; replay over stored evidence is done offline (`docs/evaluation/adr030-replay-2026-10-22`) |
 
@@ -238,12 +238,26 @@ source are not present in the type, so they cannot leak by accident.
 
 ## 6. Frontend architecture (M4)
 
-`web/`: React + TS + Vite SPA. Routes: `/` (problem list) and `/practice/:slug`
-(statement, CodeMirror editor, submit, feedback panel, attempt history). `/research/*`
-(submission browser, trace viewer, metrics) comes in M7. Since M6 a "Recommended next" card
-appears on the problem list and after each finished attempt. Data comes through a thin typed client over types generated from the OpenAPI schema
-(`openapi-typescript`, checked for drift in CI), with TanStack Query for polling. There is
-no global state library. Drafts are kept in `localStorage` as a convenience only.
+`web/`: React + TS + Vite SPA. Routes (since the 2026-10-25 integration of the frontend theme):
+
+| Route | Who | What |
+| --- | --- | --- |
+| `/` | anyone | Landing page. Public; it shows no learner data. |
+| `/problems` | logged in | Problem list with status and attempt counts, and the "Recommended next" card (M6). |
+| `/practice/:slug` | logged in | Statement, CodeMirror editor, submit, feedback panel and attempt history. |
+| `/attempts` | logged in | The learner's own recent attempts (`GET /submissions?limit=50`). |
+| `/research` | researcher | Submission browser with filters, pagination (100 rows per page), review filter and metrics. |
+| `/research/submissions/:id` | researcher | Trace viewer: the full evidence chain. |
+| `/research/learners` | researcher | Learners seen in the 200 most recent submissions. This is activity, not learning. |
+| `/research/learners/:username` | researcher | LM1 learner model, labelled "estimated under assumed parameters". |
+
+**Unauthenticated users.** Without a session, every route except `/` shows the login page. In
+dev and test environments, a development role switch replaces login. It is disabled in
+production.
+
+**Data access.** Data comes through a thin typed client over types generated from the OpenAPI
+schema (`openapi-typescript`, checked for drift in CI). TanStack Query handles polling. There is
+no global state library. Drafts are kept in `localStorage`, as a convenience only.
 
 ## 7. Error handling, logging, configuration
 
@@ -261,9 +275,9 @@ no global state library. Drafts are kept in `localStorage` as a convenience only
 | --- | --- | --- |
 | Unit | pure diagnosis/adaptation logic, evidence normalisation, content validation | `backend/tests/unit`, no Docker |
 | Sandbox security | adversarial C++ programs: network, filesystem, env secrets, fork bomb, memory, CPU, output flood, compile-time attacks, concurrency, cleanup | `backend/tests/sandbox`, marked `sandbox`, require Docker |
-| Integration | API + DB + worker with real sandbox on demo content | `backend/tests/integration` |
-| Content validation | every error model's mutant compiles, its fingerprint differs from the reference, test suite discrimination report | `research` CLI, run in CI |
-| Frontend | Vitest component tests; one Playwright end-to-end submit→feedback test | `web/` |
+| Integration | API + DB + worker: with a fake sandbox in `backend/tests/unit` (for example `test_pipeline_infrastructure.py`, `test_content_versions.py`); with the real sandbox on demo content in `backend/tests/sandbox/test_end_to_end.py` and `test_adaptation_end_to_end.py` | `backend/tests` |
+| Content validation | every error model's mutant compiles, its fingerprint differs from the reference, test suite discrimination report | `codeadapt-content` CLI; `tests/sandbox/test_demo_content.py` in CI |
+| Frontend | Vitest component tests; Playwright end-to-end specs for login, the student submit→feedback→fix loop, and the researcher path (landing → attempts → trace → Learners → learner model) | `web/` |
 
 Tests requiring Docker are skipped with an explicit reason when Docker is unavailable,
 and the skip count is reported — CI always runs them.

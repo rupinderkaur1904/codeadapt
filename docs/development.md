@@ -12,13 +12,16 @@
 
 ```bash
 git clone https://github.com/rupinderkaur1904/codeadapt && cd codeadapt
-cp .env.example .env                                   # optional; defaults work for dev
 docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/   # pinned toolchain image
 cd backend
 uv sync                                                # creates .venv from uv.lock
 ```
 
-On Windows, run the same commands in PowerShell (or WSL2). Use `copy` instead of `cp`.
+On Windows, run the same commands in PowerShell (or WSL2).
+
+**Configuration.** The code reads `CODEADAPT_*` environment variables only. Nothing loads a
+`.env` file automatically. `.env.example` lists every variable with its default. The defaults
+work for development; to change one, export it in your shell, or set it in compose.
 
 ## Everyday commands (run in `backend/`)
 
@@ -59,9 +62,14 @@ Interactive API docs are at `http://localhost:8000/api/docs`. In `dev` and `test
 environments the stub authentication uses the `X-Dev-Role: student|researcher` header
 (ADR-013). With `CODEADAPT_ENV=production` the stub is off: endpoints return 401 until
 the user logs in with an account created by `uv run codeadapt-admin create-user` and
-`set-password` (ADR-029, docs/deployment.md §4). The first submission for a problem takes about 45
-seconds locally, because the worker measures and caches that problem's fingerprints for
-the current environment. Later submissions take a few seconds.
+`set-password` (ADR-029, docs/deployment.md §4). The first submission for a problem takes about 45 to 105
+seconds locally (105 s observed on 2026-10-25 for lower-bound), because the worker measures and
+caches that problem's fingerprints for the current environment. Later submissions take a few
+seconds.
+
+**Routes.** After `npm run dev` (below), the web app opens on a public landing page at `/`. The
+problem list is at `/problems`, and the researcher pages are under `/research`. See
+docs/architecture.md §6.
 
 ## Web frontend (`web/`)
 
@@ -75,7 +83,7 @@ npm run dev            # http://localhost:5173, proxies /api to http://127.0.0.1
 | --- | --- |
 | Lint / format / types | `npm run lint` · `npm run format:check` · `npm run typecheck` |
 | Component tests | `npm test` |
-| Browser end-to-end test (starts its own API, worker and preview server; needs Docker + sandbox image) | `npx playwright install chromium` once, then `npm run e2e` |
+| Browser end-to-end tests: 3 specs (login, practice, research), run serially. They start their own API, worker (SQLite) and preview server on port 4173, and need Docker and the sandbox image. | `npx playwright install chromium` once, then `npm run e2e` |
 | Regenerate API types after changing the backend API | `(cd ../backend && uv run codeadapt-openapi) > openapi.json && npm run api:types` |
 
 CI fails if `openapi.json` or `src/api/schema.d.ts` is out of date.
