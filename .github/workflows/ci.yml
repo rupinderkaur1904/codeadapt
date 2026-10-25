@@ -246,6 +246,8 @@ jobs:
     needs: [backend, web]
     steps:
       - uses: actions/checkout@v4
+      - name: Login-mode demo overlay is valid
+        run: docker compose -f compose.yaml -f compose.demo.yaml config -q
       - name: Build
         run: docker compose build
       - name: Start
