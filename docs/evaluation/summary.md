@@ -89,6 +89,33 @@ Method v1.3. Columns:
 - **Coverage is not precision.** A 29/30 naming rate here says nothing about coverage on real
   code. The mutation audits measured about 9% named coverage (VAL1-A2, v1.3).
 
+## Bank expansion, 2026-10-25: four new families (synthetic, author-written, per problem)
+
+Source: [expansion-2026-10-25](expansion-2026-10-25/README.md). Method v1.3; same columns as
+above. Every problem is non-recommendable and uses the ADR-033 skill keys.
+
+| Problem | Family | Cases | Modelled: right / wrong / abstained | Unmodelled abstained | False alarms |
+| --- | --- | --- | --- | --- | --- |
+| first-max-index | arrays | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| second-largest, first run (v1) | arrays | 8 | 4 / 0 / 0 | 1 / 2 (1 named wrongly) | 0 / 2 |
+| second-largest (v2) | arrays | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| stock-profit | arrays | 7 | 3 / 0 / 0 | 2 / 2 | 0 / 2 |
+| longest-run | arrays | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| plus-one | arrays | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| closest-pair-sum | two-pointers | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| container-water | two-pointers | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| dedup-sorted | two-pointers | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| max-window-sum | sliding-window | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| longest-sum-at-most | sliding-window | 7 | 3 / 0 / 0 | 2 / 2 | 0 / 2 |
+| distinct-in-windows | sliding-window | 7 | 3 / 0 / 0 | 2 / 2 | 0 / 2 |
+| pivot-index | prefix-sums | 8 | 4 / 0 / 0 | 2 / 2 | 0 / 2 |
+| range-sum-queries | prefix-sums | 7 | 3 / 0 / 0 | 2 / 2 | 0 / 2 |
+
+- v1.1, v1.2 and v1.3 give identical outcomes on every case.
+- The second-largest v2 row follows a test added after the first run exposed a wrong design
+  claim; that case is no longer an independent check. The first-run row stays.
+- The same caveats as above apply: the cases are author-written and close to circular.
+
 ## Earlier milestones
 
 | Report | Result | Method |

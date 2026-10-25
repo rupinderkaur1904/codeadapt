@@ -23,6 +23,11 @@ docs/reviews/2026-10-25/ce1-status.md. Their author-written held-out results are
 docs/evaluation/ce1.2-2026-10-24 and ce2-2026-10-24. They are not part of the numbers in this
 abstract.
 
+*Scope note (2026-10-25, bank expansion).* On the owner's instruction the bank now has 25
+problems: the 12 binary-search problems plus 13 in four new families (5 arrays, 3 two-pointer,
+3 sliding-window, 2 prefix-sum), with their own skill keys (ADR-033) and none recommendable.
+Their results are in §4.1 and are also not part of the abstract's numbers.
+
 ## 1. Problem
 
 Automated assessment usually reports only pass or fail. Diagnostic feedback that names a likely
@@ -75,6 +80,29 @@ Incorrect programs, shown as named / right / wrong (docs/evaluation/adr030-2026-
 - Under v1.2, 10 of 11 wrong names came from one model whose fingerprint is constant. The
   eleventh rested on evidence thinned by sanitizer exclusions (docs/evaluation/val1a2-2026-10-22).
 
+### 4.1 Expanded bank (2026-10-25)
+
+Each new problem went through the same lifecycle: contract, reference, tests, error models,
+alternative-cause programs checked on 400 random inputs, sandbox validation (declared
+`distinguishes` equal to the measured matrix), a design record, held-out cases committed before
+evaluation, and evaluation under v1.1–v1.3 (docs/evaluation/expansion-2026-10-25/).
+
+- **Held-out (synthetic, author-written):** 100 cases. All 26 correct programs passed (no false
+  alarm); all 48 modelled cases were named with their labelled model; all 26 unmodelled cases
+  abstained. v1.1, v1.2 and v1.3 agreed on every case.
+- **One wrong name on the first run.** second-largest named an unmodelled program as
+  `no_demotion` because a design claim about test separation was wrong. A test was added
+  (content v2) and the case now abstains; it no longer counts as an independent check, and the
+  first-run record is kept.
+- **Non-unique attributions found at design time:** three models are output-identical to a
+  program with a cause under a different skill. They take the ADR-032 route: the diagnosis is
+  shown qualified and gives no skill evidence (L20).
+- **Recommendations:** policy 1.4 is unchanged. In the new families a diagnosis falls back to a
+  retry of the same problem and a pass gives no recommendation (L21).
+
+These results say the method behaves as designed on a broader set of array techniques. The
+circularity in §5.1 applies to them in full, and the new skill keys are unvalidated (L22).
+
 ## 5. Threats to validity
 
 1. **Circularity:** every correctly diagnosed held-out case was input–output identical to its
@@ -82,7 +110,8 @@ Incorrect programs, shown as named / right / wrong (docs/evaluation/adr030-2026-
    re-express their own mutants.
 2. **Synthetic labels:** mutants are mechanical, and their labels are behavioural or AI-assigned.
 3. **Small denominators:** "0 wrong of 30" is compatible with an error rate of several percent.
-4. **Narrow scope:** one algorithm family, with shared error models across problems.
+4. **Narrow scope:** the results in §4 come from one algorithm family with shared error models.
+   The 2026-10-25 expansion adds four families, evaluated only on author-written cases (§4.1).
 5. **No real learners:** nothing here measures learning, feedback usefulness or real error
    distributions.
 
