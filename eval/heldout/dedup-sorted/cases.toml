@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A2, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "dedup-sorted"
+
+[[cases]]
+file = "write_index_loop.cpp"
+truth = "correct"
+note = "Write index starting at 0 with a guard."
+
+[[cases]]
+file = "skip_runs.cpp"
+truth = "correct"
+note = "Writes one value, then skips its whole run."
+
+[[cases]]
+file = "last_position.cpp"
+truth = "returns_last_index"
+note = "Tracks the last kept position and returns it (documented non-unique attribution)."
+
+[[cases]]
+file = "reads_to_n_minus_one.cpp"
+truth = "skips_last"
+note = "Read loop to n - 1 exclusive."
+
+[[cases]]
+file = "against_front.cpp"
+truth = "compares_to_first"
+note = "Compares with a saved copy of the first value."
+
+[[cases]]
+file = "count_only.cpp"
+truth = "counts_without_writing"
+note = "Counts distinct values without moving any."
+
+[[cases]]
+file = "keeps_two_copies.cpp"
+truth = "unmodelled"
+note = "Keeps up to two copies of each value."
+
+[[cases]]
+file = "plus_one_count.cpp"
+truth = "unmodelled"
+note = "Returns one too many when something was removed."
