@@ -267,6 +267,57 @@ describe("researcher pages", () => {
     expect(screen.getByText("Not started")).toBeInTheDocument();
   });
 
+  it("labels exactly the eight provisional problems as unreviewed", async () => {
+    setDevRole("student");
+    const provisional = [
+      "integer-sqrt",
+      "min-capacity",
+      "upper-bound",
+      "exact-search",
+      "last-occurrence",
+      "rotated-min",
+      "rotated-search",
+      "peak-index",
+    ];
+    const others = [
+      "lower-bound",
+      "count-occurrences",
+      "last-less-than",
+      "first-true",
+      "first-max-index",
+      "second-largest",
+      "stock-profit",
+      "longest-run",
+      "plus-one",
+      "closest-pair-sum",
+      "container-water",
+      "dedup-sorted",
+      "max-window-sum",
+      "longest-sum-at-most",
+      "distinct-in-windows",
+      "pivot-index",
+      "range-sum-queries",
+    ];
+    const bank = [...provisional, ...others].map((slug) => ({
+      slug,
+      title: `Title ${slug}`,
+      family: "binary-search",
+      no_failure_observed: false,
+    }));
+    vi.mocked(globalThis.fetch).mockImplementation(async (input) =>
+      String(input).endsWith("/problems") ? json(bank) : json([]),
+    );
+    renderAt("/problems", <ProblemListPage />, "/problems");
+    await screen.findByRole("link", { name: "Title lower-bound" });
+    const labelled = screen
+      .getAllByText("Unreviewed", { exact: true })
+      .map((label) => label.closest("li")?.querySelector("a")?.textContent);
+    expect(labelled.sort()).toEqual(provisional.map((s) => `Title ${s}`).sort());
+    // The explanation is about review status, not about wrong solutions.
+    expect(screen.getByText(/not yet reviewed by the project owner/)).toBeInTheDocument();
+    expect(screen.queryByText(/incorrect|wrong/i)).toBeNull();
+  });
+
   it("groups a larger bank by family, binary search first, and lists every problem", async () => {
     setDevRole("student");
     const families = ["prefix-sums", "arrays", "binary-search", "sliding-window", "two-pointers"];
