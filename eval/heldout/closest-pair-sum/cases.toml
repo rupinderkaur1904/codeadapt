@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A2, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "closest-pair-sum"
+
+[[cases]]
+file = "long_long_gap.cpp"
+truth = "correct"
+note = "Two pointers with 64-bit differences."
+
+[[cases]]
+file = "binary_search_partner.cpp"
+truth = "correct"
+note = "Binary search for each element's best partner (O(n log n))."
+
+[[cases]]
+file = "same_index_allowed.cpp"
+truth = "allows_same_element"
+note = "for-loop with left <= right."
+
+[[cases]]
+file = "swapped_moves.cpp"
+truth = "moves_wrong_pointer"
+note = "Moves left when the sum is too large."
+
+[[cases]]
+file = "left_from_one.cpp"
+truth = "skips_first"
+note = "for-loop with left starting at 1."
+
+[[cases]]
+file = "keeps_sign.cpp"
+truth = "signed_gap"
+note = "Returns the signed difference of the best pair."
+
+[[cases]]
+file = "neighbours_only.cpp"
+truth = "unmodelled"
+note = "Only neighbouring pairs."
+
+[[cases]]
+file = "returns_sum.cpp"
+truth = "unmodelled"
+note = "Returns the closest sum."
