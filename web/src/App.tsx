@@ -1,9 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useCallback, useState } from "react";
 import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
 
 import { ApiError, api, setCsrfToken } from "./api/client";
 import { ErrorMessage } from "./components/ErrorMessage";
+import { Intro, introSeen } from "./components/Intro";
 import { type DevRole, getDevRole, setDevRole } from "./devRole";
 
 import { LandingPage } from "./pages/LandingPage";
@@ -49,6 +50,21 @@ function Brand() {
 }
 
 export function App() {
+  const location = useLocation();
+  // The intro opens the site only at the landing page, so deep links go straight through.
+  const [intro, setIntro] = useState(() => location.pathname === "/" && !introSeen());
+  const done = useCallback(() => setIntro(false), []);
+  return (
+    <>
+      {intro && <Intro onDone={done} />}
+      <div inert={intro}>
+        <AppShell />
+      </div>
+    </>
+  );
+}
+
+function AppShell() {
   const location = useLocation();
   const landing = location.pathname === "/";
   const queryClient = useQueryClient();
