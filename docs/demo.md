@@ -54,8 +54,15 @@ verdict of `not_comparable`.
 
 ## 4. Web UI path (compose stack)
 
-1. Open http://localhost:5173 and choose Lower bound.
+1. Open http://localhost:5173. The landing page links to the problem list at `/problems`;
+   choose Lower bound.
 2. Paste a program and submit. The feedback panel and the "Recommended next" card appear.
+   "My attempts" lists the student's own history.
 3. Switch the dev role to researcher, open Research, and open the submission's trace.
+4. Open Learners and choose a learner to see the researcher-only learner model.
 
-The Playwright tests automate both parts in CI: `web/e2e/practice.spec.ts` (student) and `web/e2e/research.spec.ts` (trace and learner model).
+For a login-mode demo (no development stub), use
+`docker compose -f compose.yaml -f compose.demo.yaml up --build` and the demo accounts
+described in `compose.demo.yaml`. It is for `localhost` only.
+
+The Playwright tests automate both parts in CI: `web/e2e/practice.spec.ts` (student) and `web/e2e/research.spec.ts` (landing page, attempts, trace, Learners list and learner model).
