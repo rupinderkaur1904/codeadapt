@@ -235,6 +235,7 @@ file = "error_models/strict_day_limit.cpp"
 skill = "equality_handling"
 description = "Accepts a capacity only when it needs strictly fewer than the allowed days."
 student_hint = "Is a capacity that needs exactly the allowed number of days good enough?"
+known_limitation = "Attribution not unique (owner decision 2026-10-25, L20): a day counter that starts one too high, or reading days as the number of breaks, gives identical output on every valid input, so no test can separate an equality error from a counting or specification error. Diagnoses are reported as qualified and add no equality_handling evidence (docs/reviews/2026-10-25/skill-mapping-review.md)."
 
 [[error_models]]
 key = "full_day_overflows"
@@ -242,6 +243,7 @@ file = "error_models/full_day_overflows.cpp"
 skill = "equality_handling"
 description = "Starts a new day when the load would reach the capacity, so a day filled exactly to capacity is treated as overloaded."
 student_hint = "Can a day be loaded exactly up to the capacity? Check the comparison in your feasibility check."
+known_limitation = "Attribution not unique (owner decision 2026-10-25, L20): treating the usable capacity as cap - 1 gives identical output on every valid input, so no test can separate an equality error from a misread capacity. Diagnoses are reported as qualified and add no equality_handling evidence (docs/reviews/2026-10-25/skill-mapping-review.md)."
 
 [[error_models]]
 key = "sorts_weights"
