@@ -1,0 +1,42 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A1, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "stock-profit"
+
+[[cases]]
+file = "suffix_max.cpp"
+truth = "correct"
+note = "Scans from the end keeping the highest later price."
+
+[[cases]]
+file = "kadane_differences.cpp"
+truth = "correct"
+note = "Maximum-sum run of day-to-day differences."
+
+[[cases]]
+file = "sorted_spread.cpp"
+truth = "ignores_order"
+note = "Sorts the prices: identical output to the model by a different route (documented non-unique attribution)."
+
+[[cases]]
+file = "must_trade.cpp"
+truth = "allows_loss"
+note = "Best gain starts at INT_MIN, so a loss is returned."
+
+[[cases]]
+file = "loop_short.cpp"
+truth = "misses_last_day"
+note = "Loop to n - 1 exclusive with the low updated first."
+
+[[cases]]
+file = "consecutive_days.cpp"
+truth = "unmodelled"
+note = "Only trades over consecutive days."
+
+[[cases]]
+file = "low_from_zero.cpp"
+truth = "unmodelled"
+note = "Running low starts at 0; the answer is the highest price."
