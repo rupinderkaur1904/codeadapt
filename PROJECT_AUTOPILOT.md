@@ -81,7 +81,7 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | I2 | Skill-mapping review (min-capacity, rotated-min) | — | docs/reviews/2026-10-25/skill-mapping-review.md | Evidence for/against unique attribution; no mapping change | **done** abd4b33. min-capacity attribution not unique (exact equivalences); L20 added; decision deferred until real-learner use |
 | I3 | L19 options brief with measurement | — | docs/reviews/2026-10-25/l19-policy-options.md, l19_measure.py | Current behaviour, options, consequences, recommendation; no rule change | **done** abd4b33. Recommends option B; **PROPOSED, needs owner approval** |
 | I4 | CE1.2/CE1.3/BSX factual account and isolated decision | — | docs/reviews/2026-10-25/ce1-status.md | What was done, what changed, deviations; decision card | **done**; decision card posted 2026-10-25 |
-| J1 | ADR-032: min-capacity non-unique attribution gives no `equality_handling` evidence (owner option b) | owner 08:01 | content/demo/min-capacity/problem.toml, tests/unit/test_min_capacity_attribution.py, tests/sandbox/test_{demo_content,adaptation_end_to_end}.py, docs/decisions.md, limitations.md, methodology.md | Diagnosis and trace kept; feedback qualified; no `incorrect` obs, no ledger failure, no BKT update; other mappings and policy unchanged | **VERIFIED** locally: unit 382, sandbox 4/4 (adaptation e2e incl. new test, demo-content, end-to-end), held-out re-run byte-identical. CI pending on push |
+| J1 | ADR-032: min-capacity non-unique attribution gives no `equality_handling` evidence (owner option b) | owner 08:01 | content/demo/min-capacity/problem.toml, tests/unit/test_min_capacity_attribution.py, tests/sandbox/test_{demo_content,adaptation_end_to_end}.py, docs/decisions.md, limitations.md, methodology.md | Diagnosis and trace kept; feedback qualified; no `incorrect` obs, no ledger failure, no BKT update; other mappings and policy unchanged | **VERIFIED** locally: unit 382, sandbox 4/4 (adaptation e2e incl. new test, demo-content, end-to-end), held-out re-run byte-identical. CI run 104 green |
 | I5 | End-to-end validation report with exact commands | I1 | docs/reviews/2026-10-25/validation.md | Commands, counts, skipped items | **VERIFIED**: unit 373, sandbox 31 locally, Playwright 3/3, CI run 94 |
 
 ## Log
@@ -142,7 +142,8 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Next three tasks
 
-1. **Confirm CI green** on the ADR-032 push (runs 98–101 green; 102–103 were running).
+1. **CI green** on ADR-032: run 104 (b523b1d) and run 105 (1b48e1f) passed every job; runs
+   98–103 also green. Re-confirm after any later push.
 2. **Remaining safe engineering, no policy content:** a full `compose.demo.yaml` run once Docker Hub access works. (The PracticePage chunk
    is lazily loaded and within the configured 800 kB limit; no build warning.)
 3. **On owner decisions only:** L19 (rule C stays; no change authorised), review of the 8
