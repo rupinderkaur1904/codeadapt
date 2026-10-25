@@ -47,9 +47,10 @@ Each level is kept separate; a later level is never implied by an earlier one.
   [../summary.md](../summary.md). The four original problems (first-true accepted in CE1.1) use
   held-out sets the owner has accepted; the other eight binary-search problems are still
   provisional (owner, 2026-10-25 07:50).
-- **Sandbox column.** For the 13 new problems this rests on local sandbox validation (runc) and
-  the CI `demo-content` shards of the run that contains them; see PROJECT_AUTOPILOT.md for the
-  run number.
+- **Sandbox column.** Verified for all 25 by CI run 112 on `ed35cf7` (`demo-content` shards,
+  runc and gVisor, both green).
+- **Finer-grained columns** (end-to-end pipeline in CI versus locally, researcher UI versus API)
+  are in [the 2026-10-25 audit](../../reviews/2026-10-25/expansion-audit.md#2-status-matrix).
 - **Researcher workflow, new problems.** `python3 docs/demo/bank_check.py` against a dev API and
   worker on a fresh SQLite database (2026-10-25): for each of the 13 problems a correct, a
   modelled and an unmodelled held-out program; 39/39 matched their labels (pass, the labelled
