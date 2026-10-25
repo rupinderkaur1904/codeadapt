@@ -51,12 +51,15 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--api", default="http://127.0.0.1:8000")
     parser.add_argument("--timeout", type=float, default=600)
+    parser.add_argument(
+        "--slugs", nargs="*", help="check these problems instead of every non-binary-search one"
+    )
     args = parser.parse_args()
     problems = call(args.api, "/api/v1/problems", "student")
     print(f"problems listed: {len(problems)}")  # type: ignore[arg-type]
     failures = 0
     for p in problems:  # type: ignore[union-attr]
-        if p["family"] not in NEW_FAMILIES:
+        if (p["slug"] not in args.slugs) if args.slugs else (p["family"] not in NEW_FAMILIES):
             continue
         cases = tomllib.loads((ROOT / "eval/heldout" / p["slug"] / "cases.toml").read_text())
         picks = {}

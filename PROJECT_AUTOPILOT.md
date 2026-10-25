@@ -46,7 +46,7 @@ screen once its CI is green.
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 15
+**Iteration:** 16
 
 **PC1 status:** Phase E proposed — blocked pending code-level permission and owner approval.
 
@@ -90,8 +90,8 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | I4 | CE1.2/CE1.3/BSX factual account and isolated decision | — | docs/reviews/2026-10-25/ce1-status.md | What was done, what changed, deviations; decision card | **done**; decision card posted 2026-10-25 |
 | J1 | ADR-032: min-capacity non-unique attribution gives no `equality_handling` evidence (owner option b) | owner 08:01 | content/demo/min-capacity/problem.toml, tests/unit/test_min_capacity_attribution.py, tests/sandbox/test_{demo_content,adaptation_end_to_end}.py, docs/decisions.md, limitations.md, methodology.md | Diagnosis and trace kept; feedback qualified; no `incorrect` obs, no ledger failure, no BKT update; other mappings and policy unchanged | **VERIFIED** locally: unit 382, sandbox 4/4 (adaptation e2e incl. new test, demo-content, end-to-end), held-out re-run byte-identical. CI run 104 green |
 | I5 | End-to-end validation report with exact commands | I1 | docs/reviews/2026-10-25/validation.md | Commands, counts, skipped items | **VERIFIED**: unit 373, sandbox 31 locally, Playwright 3/3, CI run 94 |
-| K1 | Bank of 25: 13 problems in four new families (ADR-033 skills) | owner 10:09, 10:21 | content/demo/*, docs/content-design/*, eval/heldout/*, docs/evaluation/expansion-2026-10-25/ | Per problem: design checks incl. alternative causes, sandbox validation ok, design record, held-out committed before eval, eval under v1.1–v1.3, pipeline check; status table with 7 levels | **VERIFIED** locally: 25 problems; 100 held-out cases (synthetic) 0 false alarms, 48/48 named right, 26/26 abstained; bank_check 39/39; unit 452. CI: see iteration 15 |
-| K2 | Problem list by family; intro screen merged | owner 10:37 | web/src/pages/ProblemListPage.tsx, LandingPage.tsx; merge of 9vflva 1fb72d5 | Web tests, build, Playwright pass | **VERIFIED** locally: web 34, Playwright 3/3; CI pending |
+| K1 | Bank of 25: 13 problems in four new families (ADR-033 skills) | owner 10:09, 10:21 | content/demo/*, docs/content-design/*, eval/heldout/*, docs/evaluation/expansion-2026-10-25/ | Per problem: design checks incl. alternative causes, sandbox validation ok, design record, held-out committed before eval, eval under v1.1–v1.3, pipeline check; status table with 7 levels | **VERIFIED** locally: 25 problems; 100 held-out cases (synthetic) 0 false alarms, 48/48 named right, 26/26 abstained; bank_check 39/39; unit 452. CI run 112 on ed35cf7: all 16 jobs green |
+| K2 | Problem list by family; intro screen merged | owner 10:37 | web/src/pages/ProblemListPage.tsx, LandingPage.tsx; merge of 9vflva 1fb72d5 | Web tests, build, Playwright pass | **VERIFIED**: web 34, Playwright 3/3 locally; CI run 112 green |
 
 ## Log
 
@@ -197,6 +197,21 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - CI runs 98, 99 (includes the compose-overlay validation step), 100, 101: all green.
 - Finalisation re-check on b523b1d: Playwright 3/3 (2.3 min); fresh-clone setup per
   docs/development.md works; web build has no warnings (docs/reviews/2026-10-25/validation.md).
+
+### Iteration 16 (2026-10-25, audit of the bank of 25)
+
+- Owner 12:41: audit only (no bank growth, no policy/mapping/rule change). Verified ed35cf7 =
+  remote, CI run 112 all 16 jobs green, local unit 452 / web 34 / Playwright 3/3.
+- docs/reviews/2026-10-25/expansion-audit.md: 9-column status matrix for 25 problems; L21
+  traced (policy note and student message both false whenever a non-recommendable problem is
+  unpassed, also in binary search; wording fix possible without policy change, needs
+  approval); L22 mapping table and confounds (pivot-index `index_range` has no model); review
+  of the 8 provisional problems (references agree with brute force on 4,800 inputs; linear
+  scan and banned calls pass 6 problems and earn rule C evidence = D1; int overflow gives
+  `unreliable_evidence`). Pipeline check 27/27 for first-true + the 8.
+- L21 row corrected to its full extent; STATUS.md and status doc record CI run 112.
+- Discrepancy: the demo does not label the 8 provisional problems "unreviewed" (owner 07:50);
+  not changed (user-facing), listed as action 2.
 
 ### Iteration 15 (2026-10-25, bank of 25)
 
