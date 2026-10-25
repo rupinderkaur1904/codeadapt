@@ -1,0 +1,169 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/dedup-sorted.md (bank expansion batch A2, 2026-10-25).
+
+slug = "dedup-sorted"
+title = "Remove duplicates in place"
+family = "two-pointers"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int remove_duplicates(std::vector<int>& a);"
+# Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
+# every new problem). They stay in the problem list and their attempts produce skill evidence.
+recommendable = false
+
+[skills]
+index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
+update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
+output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+
+[probes]
+new_value_last = ["index_range"]
+repeat_after_change = ["update_rule"]
+values_must_move = ["update_rule"]
+count_returned = ["output_contract"]
+single = ["output_contract", "index_range"]
+large_input = ["update_rule"]
+
+[curriculum]
+assumes = ["a sorted array", "a read index and a write index"]
+
+[[tests]]
+key = "sample_typical"
+visibility = "sample"
+input = "L 7 1 1 2 3 3 3 4"
+expected = "4 1 2 3 4"
+probes = ["repeat_after_change", "values_must_move", "count_returned"]
+student_description = "Some repeated values."
+purpose = "Visible typical case."
+distinguishes = ["compares_to_first", "counts_without_writing", "returns_last_index", "skips_last"]
+
+[[tests]]
+key = "sample_distinct"
+visibility = "sample"
+input = "L 3 4 5 6"
+expected = "3 4 5 6"
+probes = ["new_value_last", "count_returned"]
+student_description = "No duplicates."
+purpose = "Visible case where nothing is removed."
+distinguishes = ["returns_last_index", "skips_last"]
+
+[[tests]]
+key = "all_equal"
+input = "L 5 7 7 7 7 7"
+expected = "1 7"
+probes = ["count_returned"]
+student_description = "Every value equal."
+purpose = "One value kept."
+distinguishes = ["returns_last_index"]
+
+[[tests]]
+key = "single"
+input = "L 1 -3"
+expected = "1 -3"
+probes = ["single"]
+student_description = "One element."
+purpose = "Minimal input."
+distinguishes = ["returns_last_index"]
+
+[[tests]]
+key = "pair_new_last"
+input = "L 2 1 2"
+expected = "2 1 2"
+probes = ["new_value_last"]
+student_description = "Two different values."
+purpose = "The last element is new."
+distinguishes = ["returns_last_index", "skips_last"]
+
+[[tests]]
+key = "dups_at_start"
+input = "L 5 0 0 0 1 2"
+expected = "3 0 1 2"
+probes = ["values_must_move", "new_value_last"]
+student_description = "Duplicates only at the start."
+purpose = "Later values must move forward."
+distinguishes = ["counts_without_writing", "returns_last_index", "skips_last"]
+
+[[tests]]
+key = "dups_at_end"
+input = "L 5 1 2 3 3 3"
+expected = "3 1 2 3"
+probes = ["repeat_after_change"]
+student_description = "Duplicates only at the end."
+purpose = "Repeats after the first value."
+distinguishes = ["compares_to_first", "returns_last_index"]
+
+[[tests]]
+key = "negatives"
+input = "L 6 -5 -5 -2 -2 0 9"
+expected = "4 -5 -2 0 9"
+probes = ["repeat_after_change", "values_must_move", "new_value_last"]
+student_description = "Negative values with repeats."
+purpose = "Mixed signs; last element new."
+distinguishes = ["compares_to_first", "counts_without_writing", "returns_last_index", "skips_last"]
+
+[[tests]]
+key = "first_repeats_only"
+input = "L 4 2 2 2 2"
+expected = "1 2"
+probes = ["count_returned"]
+student_description = "Four copies of one value."
+purpose = "All duplicates of the first value."
+distinguishes = ["returns_last_index"]
+
+[[tests]]
+key = "alternating_blocks"
+input = "L 8 1 1 2 2 3 3 4 4"
+expected = "4 1 2 3 4"
+probes = ["repeat_after_change", "values_must_move"]
+student_description = "Every value twice."
+purpose = "Each value repeated once."
+distinguishes = ["compares_to_first", "counts_without_writing", "returns_last_index"]
+
+[[tests]]
+key = "large_blocks"
+input = "B 100000 3"
+expected = "33334 0 33333 14429304360125053014"
+probes = ["large_input", "repeat_after_change"]
+student_description = "A long array where each value repeats three times."
+purpose = "Large input with many duplicates."
+distinguishes = ["compares_to_first", "counts_without_writing", "returns_last_index", "skips_last"]
+
+[[tests]]
+key = "large_distinct"
+input = "B 100000 1"
+expected = "100000 0 99999 17306868778891527635"
+probes = ["large_input", "new_value_last"]
+student_description = "A long array with no repeats."
+purpose = "Large input where nothing is removed."
+distinguishes = ["returns_last_index", "skips_last"]
+
+[[error_models]]
+key = "returns_last_index"
+file = "error_models/returns_last_index.cpp"
+skill = "output_contract"
+description = "Returns one less than the number of distinct values, with the kept prefix one element short (for example by returning the index of the last kept element)."
+student_hint = "Is the value you return the number of kept elements, or the position of the last one?"
+known_limitation = "Attribution not unique (L20): keeping a value when it differs from the next one and forgetting the final element (a loop-range error) gives identical output on every valid input. Diagnoses are reported as qualified and add no skill evidence (docs/content-design/dedup-sorted.md)."
+
+[[error_models]]
+key = "skips_last"
+file = "error_models/skips_last.cpp"
+skill = "index_range"
+description = "The read loop stops one element early, so a new value in the last position is lost."
+student_hint = "Does your read pointer reach the last element? Try an array whose last value appears only once."
+
+[[error_models]]
+key = "compares_to_first"
+file = "error_models/compares_to_first.cpp"
+skill = "update_rule"
+description = "Compares each element with a[0] instead of the last kept value, so duplicates of later values are kept."
+student_hint = "Which value should each element be compared with to know whether it is new?"
+
+[[error_models]]
+key = "counts_without_writing"
+file = "error_models/counts_without_writing.cpp"
+skill = "update_rule"
+description = "Counts the distinct values correctly but never moves them, so the first k elements are not the distinct values."
+student_hint = "After your function returns k, do the first k elements of the array hold the distinct values?"
