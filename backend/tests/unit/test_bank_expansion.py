@@ -105,3 +105,29 @@ def test_new_evidence_leaves_binary_search_estimates_unchanged(slug: str) -> Non
     for skill in BINARY_SEARCH_SKILLS & before.keys():
         assert after[skill].observations == before[skill].observations
     assert set(after) - set(before) <= set(NEW_SKILLS)
+
+
+# Expansion models whose skill attribution is not unique (L20; ADR-032 route): each is
+# output-identical to a program whose cause belongs to a different skill.
+NON_UNIQUE = {
+    "stock-profit": {"ignores_order"},
+    "container-water": {"moves_taller"},
+    "dedup-sorted": {"returns_last_index"},
+}
+
+
+def test_non_unique_attributions_are_documented_collisions() -> None:
+    for slug in NEW:
+        smap = SkillMap.from_spec(PROBLEMS[slug], "v")
+        assert set(smap.documented_collisions) == NON_UNIQUE.get(slug, set()), slug
+
+
+@pytest.mark.parametrize(("slug", "key"), [(s, k) for s, ks in NON_UNIQUE.items() for k in ks])
+def test_a_non_unique_diagnosis_adds_no_incorrect_evidence(slug: str, key: str) -> None:
+    failing = tuple(t.key for t in PROBLEMS[slug].tests if key in (t.distinguishes or ()))
+    assert len(failing) >= 2
+    a = attempt(slug, Outcome.HYPOTHESIS_SUPPORTED, model=key, failing=failing)
+    assert not [o for o in skill_observations([a], PROBLEMS) if o.value == "incorrect"]
+    # Nor does the learner model see an `incorrect` observation for any skill.
+    for skill in estimate([a], PROBLEMS).skills:
+        assert all(o.observation.value != "incorrect" for o in skill.observations), skill.skill
