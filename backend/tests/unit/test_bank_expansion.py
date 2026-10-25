@@ -1,0 +1,107 @@
+"""Bank expansion beyond binary search (owner 2026-10-25; ADR-033).
+
+The new families use their own skill keys, so their evidence never touches the four
+binary-search skills. Every new problem is non-recommendable. Recommendation policy 1.4 is
+unchanged: in a family without a recommendable problem it retries or stops (L21). These checks
+run over every non-binary-search problem, so each later batch is covered automatically.
+"""
+
+from __future__ import annotations
+
+import pytest
+
+from codeadapt.adaptation import SkillMap, skill_observations
+from codeadapt.adaptation.models import Action, Rule
+from codeadapt.content.models import ProblemSpec
+from codeadapt.diagnosis import Outcome
+from codeadapt.learner.bkt import estimate
+from tests.unit.test_adaptation import LB_EQUALITY, POLICY, PROBLEMS, attempt
+
+BINARY_SEARCH_SKILLS = {
+    "search_space_boundaries",
+    "loop_termination",
+    "equality_handling",
+    "problem_specification",
+}
+# ADR-033: one definition per key, identical in every problem that declares it.
+NEW_SKILLS = {
+    "index_range": "Visiting exactly the valid positions: the loop's start and end cover every "
+    "element once.",
+    "accumulator_init": "Initialising (and re-initialising) a running best, minimum, maximum, "
+    "count or sum to the value the first real element requires.",
+    "tie_resolution": "Handling equal values as the specification says: which of several equal "
+    "candidates wins, and whether duplicates count separately.",
+    "update_rule": "Updating every piece of tracked state on each step (running candidates, "
+    "pointers, window edges) so no candidate is lost.",
+    "output_contract": "Returning exactly what the specification asks for: an index or a value, "
+    "a sentinel when there is no answer.",
+}
+NEW = sorted(s for s, p in PROBLEMS.items() if p.family != "binary-search")
+BINARY = sorted(s for s, p in PROBLEMS.items() if p.family == "binary-search")
+
+
+def named_attempt(spec: ProblemSpec, n: int = 1):  # type: ignore[no-untyped-def]
+    """An unqualified supported diagnosis with a model that counts as evidence."""
+    smap = SkillMap.from_spec(spec, "v")
+    for m in spec.error_models:
+        failing = tuple(t.key for t in spec.tests if m.key in (t.distinguishes or ()))
+        if m.key not in smap.documented_collisions and len(failing) >= 2:
+            return m, attempt(
+                spec.slug, Outcome.HYPOTHESIS_SUPPORTED, n=n, model=m.key, failing=failing
+            )
+    raise AssertionError(f"{spec.slug}: no evidence-giving model")
+
+
+def test_the_bank_has_new_families() -> None:
+    assert len(BINARY) == 12
+    assert NEW, "no non-binary-search problems"
+
+
+@pytest.mark.parametrize("slug", NEW)
+def test_new_problems_use_only_the_new_skill_keys_with_one_definition(slug: str) -> None:
+    spec = PROBLEMS[slug]
+    assert set(spec.skills) <= set(NEW_SKILLS), set(spec.skills) - set(NEW_SKILLS)
+    assert dict(spec.skills) == {k: NEW_SKILLS[k] for k in spec.skills}
+    assert not spec.recommendable
+
+
+@pytest.mark.parametrize("slug", BINARY)
+def test_binary_search_problems_keep_their_four_skills(slug: str) -> None:
+    assert set(PROBLEMS[slug].skills) <= BINARY_SEARCH_SKILLS
+
+
+@pytest.mark.parametrize("slug", NEW)
+def test_a_supported_diagnosis_retries_the_same_problem(slug: str) -> None:
+    model, a = named_attempt(PROBLEMS[slug])
+    rec = POLICY.recommend(a, [a], PROBLEMS)
+    assert rec.rule is Rule.HYPOTHESIS_SUPPORTED
+    assert rec.action is Action.RETRY and rec.problem_slug == slug
+    assert rec.target_skills == (model.skill,)
+    # The evidence lands on the model's new skill only.
+    obs = skill_observations([a], PROBLEMS)
+    assert {o.skill for o in obs} <= set(NEW_SKILLS)
+    assert ("incorrect", model.skill) in {(o.value, o.skill) for o in obs}
+
+
+@pytest.mark.parametrize("slug", NEW)
+def test_a_pass_stops_with_action_none_l21(slug: str) -> None:
+    a = attempt(slug, Outcome.NO_FAILURE_OBSERVED)
+    rec = POLICY.recommend(a, [a], PROBLEMS)
+    assert rec.rule is Rule.NO_FAILURE_OBSERVED
+    assert rec.action is Action.NONE and rec.problem_slug is None
+
+
+def test_binary_search_recommendations_never_choose_a_new_problem() -> None:
+    rec = POLICY.recommend(LB_EQUALITY, [LB_EQUALITY], PROBLEMS)
+    assert rec.problem_slug in BINARY
+    assert {r["problem"] for r in rec.rationale["ranking"]} <= set(BINARY)
+
+
+@pytest.mark.parametrize("slug", NEW)
+def test_new_evidence_leaves_binary_search_estimates_unchanged(slug: str) -> None:
+    _, a = named_attempt(PROBLEMS[slug], n=5)
+    before = {s.skill: s for s in estimate([LB_EQUALITY], PROBLEMS).skills}
+    after = {s.skill: s for s in estimate([LB_EQUALITY, a], PROBLEMS).skills}
+    for skill in BINARY_SEARCH_SKILLS & before.keys():
+        assert after[skill].observations == before[skill].observations
+    assert set(after) - set(before) <= set(NEW_SKILLS)

@@ -1,0 +1,189 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/first-max-index.md (bank expansion batch A1, 2026-10-25).
+
+slug = "first-max-index"
+title = "Index of the first maximum"
+family = "arrays"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int first_max_index(const std::vector<int>& a);"
+# Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
+# every new problem). They stay in the problem list and their attempts produce skill evidence.
+recommendable = false
+
+[skills]
+index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
+accumulator_init = "Initialising (and re-initialising) a running best, minimum, maximum, count or sum to the value the first real element requires."
+tie_resolution = "Handling equal values as the specification says: which of several equal candidates wins, and whether duplicates count separately."
+output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+
+[probes]
+max_first = ["index_range"]
+max_last = ["index_range"]
+all_negative = ["accumulator_init"]
+zero_max_later = ["accumulator_init"]
+tied_max = ["tie_resolution"]
+index_not_value = ["output_contract"]
+single = ["index_range", "accumulator_init"]
+large_input = ["index_range"]
+
+[curriculum]
+assumes = ["iterating over a std::vector by index"]
+
+[[tests]]
+key = "sample_mixed"
+visibility = "sample"
+input = "L 6 3 9 2 9 5 1"
+expected = "1"
+probes = ["tied_max", "index_not_value"]
+student_description = "Mixed values with the maximum twice."
+purpose = "Visible typical case with a tie."
+distinguishes = ["last_of_ties", "returns_value"]
+
+[[tests]]
+key = "sample_last"
+visibility = "sample"
+input = "L 4 1 2 3 7"
+expected = "3"
+probes = ["max_last", "index_not_value"]
+student_description = "Increasing values."
+purpose = "Visible case: maximum in the last position."
+distinguishes = ["returns_value", "skips_last"]
+
+[[tests]]
+key = "max_at_start"
+input = "L 5 8 1 2 3 4"
+expected = "0"
+probes = ["max_first"]
+student_description = "Maximum first."
+purpose = "The answer is index 0."
+distinguishes = ["returns_value"]
+
+[[tests]]
+key = "max_at_end_neg"
+input = "L 4 -9 -8 -7 -3"
+expected = "3"
+probes = ["max_last", "all_negative"]
+student_description = "Negative values, maximum last."
+purpose = "All negative; maximum in the last position."
+distinguishes = ["max_starts_at_zero", "returns_value", "skips_last"]
+
+[[tests]]
+key = "all_negative_mid"
+input = "L 5 -5 -4 -1 -6 -2"
+expected = "2"
+probes = ["all_negative", "index_not_value"]
+student_description = "All values negative."
+purpose = "All negative; maximum in the middle."
+distinguishes = ["max_starts_at_zero", "returns_value"]
+
+[[tests]]
+key = "all_negative_tie"
+input = "L 5 -7 -2 -9 -2 -3"
+expected = "1"
+probes = ["all_negative", "tied_max"]
+student_description = "Negative values with a tie for the maximum."
+purpose = "All negative with a tied maximum."
+distinguishes = ["last_of_ties", "max_starts_at_zero", "returns_value"]
+
+[[tests]]
+key = "zero_max_later"
+input = "L 4 -3 0 -1 0"
+expected = "1"
+probes = ["zero_max_later", "tied_max"]
+student_description = "The maximum is zero."
+purpose = "Maximum 0 after position 0, tied."
+distinguishes = ["last_of_ties", "max_starts_at_zero", "returns_value"]
+
+[[tests]]
+key = "all_equal"
+input = "L 5 4 4 4 4 4"
+expected = "0"
+probes = ["tied_max"]
+student_description = "Every value equal."
+purpose = "Every element ties."
+distinguishes = ["last_of_ties", "returns_value"]
+
+[[tests]]
+key = "tie_at_ends"
+input = "L 5 6 1 2 3 6"
+expected = "0"
+probes = ["tied_max", "max_last", "max_first"]
+student_description = "The maximum appears first and last."
+purpose = "Tie between the first and last position."
+distinguishes = ["last_of_ties", "returns_value"]
+
+[[tests]]
+key = "small_values"
+input = "L 5 0 1 0 2 1"
+expected = "3"
+probes = ["index_not_value"]
+student_description = "Small non-negative values."
+purpose = "Index and value differ."
+distinguishes = ["returns_value"]
+
+[[tests]]
+key = "single"
+input = "L 1 -5"
+expected = "0"
+probes = ["single", "all_negative"]
+student_description = "One element."
+purpose = "Minimal input."
+distinguishes = ["returns_value"]
+
+[[tests]]
+key = "two_elements"
+input = "L 2 -1 -1"
+expected = "0"
+probes = ["tied_max", "all_negative"]
+student_description = "Two equal negative values."
+purpose = "Smallest tie."
+distinguishes = ["last_of_ties", "returns_value"]
+
+[[tests]]
+key = "large_last"
+input = "R 100000 1 0 100000 -50000"
+expected = "99999"
+probes = ["large_input", "max_last"]
+student_description = "A long increasing array."
+purpose = "Large input; maximum last."
+distinguishes = ["returns_value", "skips_last"]
+
+[[tests]]
+key = "large_periodic"
+input = "R 100000 7 3 1000 -2000"
+expected = "428"
+probes = ["large_input", "tied_max", "all_negative"]
+student_description = "A long array with repeating negative values."
+purpose = "Large input with many ties, all negative."
+distinguishes = ["last_of_ties", "max_starts_at_zero", "returns_value"]
+
+[[error_models]]
+key = "max_starts_at_zero"
+file = "error_models/max_starts_at_zero.cpp"
+skill = "accumulator_init"
+description = "Starts the running maximum at 0, so an all-negative array (or a maximum of 0 after position 0) keeps index 0."
+student_hint = "What is your running maximum before you have looked at any element? Try an array whose values are all negative."
+
+[[error_models]]
+key = "last_of_ties"
+file = "error_models/last_of_ties.cpp"
+skill = "tie_resolution"
+description = "Returns the last of several equal maxima, for example by replacing the best index on >= (or, with identical output, by scanning from the end with >)."
+student_hint = "When the maximum appears more than once, which position should you return? Check how your loop decides which of two equal values to keep."
+
+[[error_models]]
+key = "skips_last"
+file = "error_models/skips_last.cpp"
+skill = "index_range"
+description = "The loop stops one element early, so a maximum in the last position is missed."
+student_hint = "Does your loop look at the last element? Try an array whose largest value is at the end."
+
+[[error_models]]
+key = "returns_value"
+file = "error_models/returns_value.cpp"
+skill = "output_contract"
+description = "Returns the maximum value instead of its index."
+student_hint = "Re-read what the function must return: a position in the array, or a value from it?"

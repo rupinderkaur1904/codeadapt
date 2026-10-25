@@ -545,3 +545,35 @@ runs the real pipeline.
 **Not covered:** rotated-min `compares_with_lo` stays as it is. The alternative tried there is
 separated by 3 tests, so its attribution is not provably non-unique. Other problems were not
 searched for exact equivalences.
+
+## ADR-033 — Skill keys for the non-binary-search families (2026-10-25)
+**Context:** On 2026-10-25 at 10:09 the owner asked to grow the bank to 25 problems with array,
+two-pointer, sliding-window and prefix-sum problems. The four existing skills are defined in
+binary-search terms, and skills are linked across problems by key. The CE1 rule was to keep the
+four skills and ask before adding one.
+**Owner decision (10:21, decision card):** "New skills for new families". The other options were
+to reuse the four existing keys, which would pool evidence with binary search, or to give no
+skill evidence, which would need an evidence-policy code change.
+**Decision:** the new families use five new keys:
+- `index_range`;
+- `accumulator_init`;
+- `tie_resolution`;
+- `update_rule`;
+- `output_contract`.
+
+Each problem declares only the keys it uses, with the same definition text everywhere
+(docs/content-design/expansion-2026-10-25/README.md).
+
+Two names were refined after the card was answered, with no change in meaning:
+- `comparison_ties` became `tie_resolution`. A `>=` comparison and a reverse scan are
+  output-identical, so the skill is named after the observable.
+- `pointer_update` became `update_rule`. Not every problem has pointers.
+
+**Unchanged:** the four binary-search skills, their mappings, and every existing observation and
+estimate. The ledger, rule C, the BKT parameters and policy 1.4 are unchanged too; no code
+changed. New problems are `recommendable = false`.
+**Consequences:**
+- BKT pools evidence across the new problems by key. That is a modelling assumption, as for the
+  original four, and it is unvalidated.
+- A pass in a family with no recommendable problem gives action `none`, with a note that is
+  inaccurate there (L21).
