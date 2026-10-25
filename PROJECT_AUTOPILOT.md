@@ -117,8 +117,9 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Blockers needing the owner
 
-1. **The 8 new problems (CE1.2, CE1.3, BSX).** Treated as unaccepted content; no further bank
-   work. Options in docs/reviews/2026-10-25/ce1-status.md; decision card posted 2026-10-25.
+1. **The 8 new problems (CE1.2, CE1.3, BSX).** Owner chose "Keep, pending review" (2026-10-25
+   07:50): content stays unchanged; integer-sqrt/min-capacity await review as CE1.2/CE1.3 gate
+   submissions, the 6 BSX problems separately. Still not accepted; no further bank work.
 2. **L19 evidence rule.** Option B recommended (no observations from failing, not-named
    attempts); evidence-policy change, not made.
 3. **Skill mappings.** Not urgent; min-capacity option (b) needed before real-learner use.
