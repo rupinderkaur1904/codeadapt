@@ -8,13 +8,20 @@ run over every non-binary-search problem, so each later batch is covered automat
 
 from __future__ import annotations
 
+import re
+from datetime import UTC, datetime
+
 import pytest
 
 from codeadapt.adaptation import SkillMap, skill_observations
 from codeadapt.adaptation.models import Action, Rule
+from codeadapt.api.recommendation import recommendation_view
+from codeadapt.content.catalogue import Catalogue
 from codeadapt.content.models import ProblemSpec
+from codeadapt.db.models import RecommendationRow
 from codeadapt.diagnosis import Outcome
 from codeadapt.learner.bkt import estimate
+from tests.paths import DEMO_CONTENT
 from tests.unit.test_adaptation import LB_EQUALITY, POLICY, PROBLEMS, attempt
 
 BINARY_SEARCH_SKILLS = {
@@ -131,3 +138,40 @@ def test_a_non_unique_diagnosis_adds_no_incorrect_evidence(slug: str, key: str) 
     # Nor does the learner model see an `incorrect` observation for any skill.
     for skill in estimate([a], PROBLEMS).skills:
         assert all(o.observation.value != "incorrect" for o in skill.observations), skill.skill
+
+
+# L21 wording (owner approval 2026-10-25 13:27): when a pass leaves nothing to recommend, neither
+# the stored rationale nor the student message may claim that every problem was passed; only
+# recommendable problems are checked. The decision itself is unchanged.
+ALL_PASSED_CLAIM = re.compile(r"every problem in (the|this) family", re.IGNORECASE)
+
+
+@pytest.mark.parametrize(
+    "history",
+    [
+        ["first-max-index"],
+        ["pivot-index"],
+        ["lower-bound", "count-occurrences", "last-less-than", "integer-sqrt"],
+    ],
+)
+def test_nothing_to_recommend_never_claims_every_problem_was_passed(history: list[str]) -> None:
+    attempts = [attempt(s, Outcome.NO_FAILURE_OBSERVED, n=i) for i, s in enumerate(history)]
+    rec = POLICY.recommend(attempts[-1], attempts, PROBLEMS)
+    assert (rec.action, rec.problem_slug, rec.criterion) == (Action.NONE, None, None)
+    assert not ALL_PASSED_CLAIM.search(rec.rationale["note"])
+    assert rec.rationale["note"].startswith("Every recommendable problem in the family")
+    row = RecommendationRow(
+        rule=rec.rule.value,
+        action=rec.action.value,
+        problem_slug=None,
+        target_skills=[],
+        rationale=rec.rationale,
+        submission_id="s",
+        created_at=datetime(2026, 10, 25, tzinfo=UTC),
+    )
+    view = recommendation_view(Catalogue.load(DEMO_CONTENT), row)
+    assert not ALL_PASSED_CLAIM.search(view.message)
+    assert view.message == (
+        "There is no further problem to recommend here yet. "
+        "You can choose any problem from the list."
+    )

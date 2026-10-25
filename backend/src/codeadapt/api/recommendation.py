@@ -33,9 +33,10 @@ def recommendation_view(catalogue: Catalogue, row: RecommendationRow) -> Recomme
     rule = Rule(row.rule)
     action = RecommendationAction(row.action)
     if action is RecommendationAction.NONE:
+        # Only recommendable problems were checked (L21), so this must not claim more.
         message = (
-            "Every problem in this family has an attempt of yours with no failing tests. "
-            "There is nothing further to recommend here yet."
+            "There is no further problem to recommend here yet. "
+            "You can choose any problem from the list."
         )
     elif rule is Rule.HYPOTHESIS_SUPPORTED and row.rationale.get("qualified_hypothesis"):
         message = (

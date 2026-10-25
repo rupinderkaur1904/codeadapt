@@ -415,6 +415,8 @@ GOLDEN = Path(__file__).parents[1] / "fixtures" / "policy_v1_golden.json"
 def test_policy_1_3_reproduces_policy_1_2_on_the_original_problems() -> None:
     # Golden recommendations were produced by policy 1.2 at commit 89a7803, before any
     # non-recommendable problem existed (tests/unit/policy_cases.py says how).
+    # 2026-10-25 (L21, owner-approved): the `none` note now says "every recommendable problem";
+    # only that string changed in the fixture (6 occurrences), no decision.
     golden = json.loads(GOLDEN.read_text())
     assert len(golden) == 286
     assert recommendations(PROBLEMS) == golden
