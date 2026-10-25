@@ -1,0 +1,42 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A3, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "longest-sum-at-most"
+
+[[cases]]
+file = "two_index_while.cpp"
+truth = "correct"
+note = "Unsigned indices with a guarded while loop."
+
+[[cases]]
+file = "non_shrinking.cpp"
+truth = "correct"
+note = "Window that never shrinks below the best length (if instead of while)."
+
+[[cases]]
+file = "width_hi_minus_lo.cpp"
+truth = "length_without_plus_one"
+note = "Length measured as hi - lo."
+
+[[cases]]
+file = "below_budget_only.cpp"
+truth = "strict_limit"
+note = "Shrinks while the sum is not below s."
+
+[[cases]]
+file = "reset_on_overflow.cpp"
+truth = "restarts_window"
+note = "Restarts the count when the next value would exceed the budget."
+
+[[cases]]
+file = "from_start_only.cpp"
+truth = "unmodelled"
+note = "Only stretches starting at index 0."
+
+[[cases]]
+file = "record_before_shrink.cpp"
+truth = "unmodelled"
+note = "Records the length before shrinking."

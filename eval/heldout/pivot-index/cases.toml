@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A4, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "pivot-index"
+
+[[cases]]
+file = "prefix_suffix_arrays.cpp"
+truth = "correct"
+note = "Separate prefix and suffix arrays."
+
+[[cases]]
+file = "shrinking_right.cpp"
+truth = "correct"
+note = "Right sum that shrinks before the comparison."
+
+[[cases]]
+file = "inclusive_prefix.cpp"
+truth = "pivot_counted_left"
+note = "Inclusive prefix array compared with total minus itself."
+
+[[cases]]
+file = "right_before_subtract.cpp"
+truth = "pivot_counted_right"
+note = "Compares before removing a[i] from the right sum."
+
+[[cases]]
+file = "scan_from_right.cpp"
+truth = "last_pivot"
+note = "Scans from the right and returns the first balance found there."
+
+[[cases]]
+file = "while_index.cpp"
+truth = "size_when_none"
+note = "While loop that returns the index it stopped at, n when nothing balances."
+
+[[cases]]
+file = "halved_total.cpp"
+truth = "unmodelled"
+note = "Compares with (total - a[i]) / 2, so an odd remainder can balance falsely."
+
+[[cases]]
+file = "returns_value.cpp"
+truth = "unmodelled"
+note = "Returns the pivot's value instead of its index."
