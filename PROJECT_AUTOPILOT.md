@@ -198,6 +198,22 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - Finalisation re-check on b523b1d: Playwright 3/3 (2.3 min); fresh-clone setup per
   docs/development.md works; web build has no warnings (docs/reviews/2026-10-25/validation.md).
 
+### Iteration 17 (2026-10-25, approved audit actions 1–5)
+
+- Owner 13:27 approved five actions. CI run 113 on 63b0a45 (the audit): all 16 jobs green.
+- df1e832 (action 1): L21 wording; golden note re-recorded; unit 455.
+- 7b962ef (action 2): Unreviewed label on the 8 provisional problems; web 35.
+- Action 3: docs/reviews/2026-10-25/l20-search.md + l20-search/ (26 alternatives, fork-per-call
+  driver, exhaustive + random domains). 13 of 29 nameable models have a cross-skill twin;
+  safeguards S1–S3 proposed, none applied. L20 row updated.
+- Action 4: tests/sandbox/test_family_end_to_end.py (last-less-than, stock-profit,
+  dedup-sorted, distinct-in-windows, range-sum-queries: correct, named, unmodelled, and
+  qualified where available). 5 passed locally in 4 min 54 s (runc). New CI shard
+  `families` (runc and gVisor), parallel to the others, so wall-clock CI time should stay set
+  by demo-content (~28 min); adds about 2 × 5–8 runner-minutes per push.
+- Action 5: docs/proposals/d1-technique-evidence.md and l22-skill-taxonomy.md (documents
+  only). L23 added to limitations.
+
 ### Iteration 16 (2026-10-25, audit of the bank of 25)
 
 - Owner 12:41: audit only (no bank growth, no policy/mapping/rule change). Verified ed35cf7 =
