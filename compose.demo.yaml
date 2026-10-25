@@ -1,0 +1,57 @@
+# Local demo in login mode: the same stack as compose.yaml, but the API runs with
+# CODEADAPT_ENV=production, so there is no development stub and the real login page
+# shows. Two demo accounts are created on first start.
+#
+#   docker compose -f compose.yaml -f compose.demo.yaml up --build
+#   then open http://localhost:5173
+#
+#   demo-student     / student demo password
+#   demo-researcher  / researcher demo password
+#
+# LOCAL DEMO ONLY. These passwords are public (they are in this file), the accounts are
+# data class "dev", and the worker still mounts the host Docker socket and runs runc.
+# Never expose this stack beyond 127.0.0.1; deployment is a separate, approved step.
+# Demo data lives in its own volume (demodata), apart from the development stack's.
+
+x-demo-env: &demo-env
+  CODEADAPT_ENV: production
+  CODEADAPT_DATABASE_URL: sqlite:////data/codeadapt-demo.sqlite3
+
+services:
+  migrate:
+    environment: *demo-env
+    volumes: ["demodata:/data"]
+
+  demo-accounts:
+    build: ./backend
+    image: codeadapt-backend:dev
+    environment: *demo-env
+    volumes: ["demodata:/data"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    # Passwords go through stdin; codeadapt-admin never takes them as arguments.
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        if ! codeadapt-admin list | grep -q '^demo-student'; then
+          echo 'student demo password' | codeadapt-admin create-user demo-student --role student --data-class dev
+        fi
+        if ! codeadapt-admin list | grep -q '^demo-researcher'; then
+          echo 'researcher demo password' | codeadapt-admin create-user demo-researcher --role researcher --data-class dev
+        fi
+        codeadapt-admin list
+
+  api:
+    environment: *demo-env
+    volumes: ["demodata:/data"]
+    depends_on:
+      demo-accounts: { condition: service_completed_successfully }
+
+  worker:
+    environment: *demo-env
+    volumes: ["demodata:/data"]
+
+volumes:
+  demodata:

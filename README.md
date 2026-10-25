@@ -62,6 +62,13 @@ With Docker only (development stack, never expose it publicly):
 docker compose up --build        # then open http://localhost:5173
 ```
 
+To demo the real login page instead of the development role switch, add the demo file. It
+creates `demo-student` and `demo-researcher` (passwords in `compose.demo.yaml`; local use only):
+
+```bash
+docker compose -f compose.yaml -f compose.demo.yaml up --build
+```
+
 For development without compose (Docker, [uv](https://docs.astral.sh/uv/), Node 22):
 
 ```bash

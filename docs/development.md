@@ -87,6 +87,13 @@ CI fails if `openapi.json` or `src/api/schema.d.ts` is out of date.
 volume; `docker compose down -v` removes it. The worker mounts the host Docker socket, which
 is root-equivalent, so never run this stack where untrusted users can reach it.
 
+`docker compose -f compose.yaml -f compose.demo.yaml up --build` runs the same stack in login
+mode (`CODEADAPT_ENV=production`, so no development stub) for showing the product. It creates
+two accounts with data class `dev`, `demo-student` and `demo-researcher`, whose passwords are
+written in `compose.demo.yaml`, and keeps its data in a separate `demodata` volume. It is for
+`localhost` only: the passwords are public and the sandbox still runs under runc. Session
+cookies carry `Secure`; browsers accept that on `http://localhost`.
+
 ## Tested environment
 
 Local results are evidence about *this* environment only.
