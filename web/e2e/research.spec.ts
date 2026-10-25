@@ -12,6 +12,10 @@ const read = (rel: string) => readFileSync(problemDir + rel, "utf-8");
 test("researcher follows a submission to its trace and the learner model", async ({ page }) => {
   // The landing page leads to the problem list (frontend theme, routes from branch 9vflva).
   await page.goto("/");
+  // The intro opens the site once per tab session; a click anywhere continues.
+  const intro = page.getByRole("button", { name: "Enter CodeAdapt" });
+  await intro.click();
+  await expect(intro).toHaveCount(0);
   await page.getByRole("link", { name: "Start digging" }).click();
   await expect(page).toHaveURL(/\/problems$/);
   await page.getByRole("link", { name: "Lower bound" }).click();
