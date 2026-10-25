@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A2, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "container-water"
+
+[[cases]]
+file = "while_skip_shorter.cpp"
+truth = "correct"
+note = "64-bit areas; moves the left side on ties."
+
+[[cases]]
+file = "skip_until_taller.cpp"
+truth = "correct"
+note = "Skips every line not taller than the current level."
+
+[[cases]]
+file = "drop_taller_side.cpp"
+truth = "moves_taller"
+note = "Moves the taller side (documented non-unique attribution)."
+
+[[cases]]
+file = "counts_lines.cpp"
+truth = "width_plus_one"
+note = "Width counted as the number of lines."
+
+[[cases]]
+file = "taller_level.cpp"
+truth = "uses_taller_height"
+note = "Water level from the taller line."
+
+[[cases]]
+file = "gap_two_stop.cpp"
+truth = "stops_before_adjacent"
+note = "for-loop that stops when the pointers are neighbours."
+
+[[cases]]
+file = "tallest_pair.cpp"
+truth = "unmodelled"
+note = "Uses the two tallest lines."
+
+[[cases]]
+file = "average_level.cpp"
+truth = "unmodelled"
+note = "Average of the two heights as the level."
