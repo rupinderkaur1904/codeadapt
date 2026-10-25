@@ -117,23 +117,30 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Blockers needing the owner
 
-1. **The 8 new problems (CE1.2, CE1.3, BSX).** Owner chose "Keep, pending review" (2026-10-25
-   07:50): content stays unchanged; integer-sqrt/min-capacity await review as CE1.2/CE1.3 gate
-   submissions, the 6 BSX problems separately. Still not accepted; no further bank work.
-2. **L19 evidence rule.** Option B recommended (no observations from failing, not-named
-   attempts); evidence-policy change, not made.
-3. **Skill mappings.** Not urgent; min-capacity option (b) needed before real-learner use.
+1. **The 8 new problems (CE1.2, CE1.3, BSX).** Owner (2026-10-25 07:50, 07:52): keep
+   **provisionally** in the development bank; **not research-validated**; preserve content,
+   evaluation records, limitations and `recommendable = false`; no removal, no expansion
+   until the review is complete.
+2. **L19 evidence rule: UNRESOLVED.** Option B is **not approved**; rule C unchanged. Focused
+   analysis delivered: docs/reviews/2026-10-25/l19-focused-analysis.md (breakdown of 421
+   programs, label independence: the 94/28 are the system's own attributions, not scored against
+   independent labels; trade-off; tests B would need).
+3. **L20 (owner principle, 2026-10-25):** where two causes are observationally
+   indistinguishable on the valid input domain, the system must not claim to distinguish them.
+   Current gap: a named min-capacity exact-boundary diagnosis still records `incorrect` on
+   `equality_handling`. Closing it is option (b) in skill-mapping-review.md, an evidence-policy
+   decision for the owner. Nothing changed.
 4. PC1 Phase E: deferred (permission basis P, then D1–D12). Gate closed.
 5. Hosting/deployment (M8).
 
 ## Next three tasks
 
-1. **Watch CI** on the latest push (adds the demo-overlay validation step).
-2. **Wait for owner decisions** (8 problems, L19, mappings). Do not start bank or evidence
-   work. If option B for L19 is approved: new selectable evidence-rule version, regression
-   tests, case-by-case replay, CE1.4 rerun.
-3. **Remaining safe engineering:** PracticePage bundle size (650 kB chunk warning); a full
-   compose.demo.yaml run once Docker Hub access works.
+1. **Confirm CI green** on the latest push (CI run 94 was green on 159162a; later pushes are
+   tests, docs and the demo-overlay validation step).
+2. **Remaining safe engineering, no policy content:** PracticePage bundle size (650 kB chunk
+   warning); a full `compose.demo.yaml` run once Docker Hub access works.
+3. **On owner decisions only:** L19 option B (tests listed in the focused analysis), L20
+   option (b), review of the 8 provisional problems. No bank or evidence work before then.
 
 ## Resume instruction
 
@@ -153,6 +160,11 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - 887036b: login-mode rehearsal (production settings, demo accounts) with observed output in
   docs/demo.md §5; compose.demo.yaml itself could not be built locally (Docker Hub 429).
 - CI compose job now validates the compose.demo.yaml overlay.
+- 12420fa: L19 focused analysis (analysis only); L20 owner principle and provisional status
+  recorded.
+- c43ba45: docs checked against the integrated app: architecture routes, API paging, test layout,
+  `.env.example` completeness, development guide. The scripted demo was re-run with identical
+  outcomes (2 min 29 s).
 
 ### Iterations 7–8
 
