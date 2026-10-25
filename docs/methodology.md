@@ -204,6 +204,11 @@ append-only `recommendations` and `followup_evaluations` tables.
 * *Qualified hypotheses.* When the diagnosis is single-behaviour or the model has a
   `known_limitation`, the recommendation records `qualified_hypothesis` and the student
   wording says the pattern has more than one possible cause. The target is the skill.
+  A documented collision is either a model with a single behaviour group, or (ADR-032) a
+  multi-group model whose behaviour is identical to another plausible cause on every valid
+  input, so the skill attribution is not unique. The case is min-capacity
+  `strict_day_limit` and `full_day_overflows`. Either way, the diagnosis is kept and traced but
+  adds no failure evidence.
 * *Candidate problems* are those in the same `family` as the index problem. Skills are
   linked across problems by key, which is a content-authoring assumption. Since policy 1.3
   (ADR-026) problems marked `recommendable = false` (first-true) are left out; their

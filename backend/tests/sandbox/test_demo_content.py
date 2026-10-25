@@ -4,6 +4,10 @@ CE0: every declared `distinguishes` agrees with the measurement (a mismatch is a
 and every weakness is a documented single-behaviour model. For the original four problems that
 is exactly `hi_init_last_index`; every newer problem's weak models must each carry a
 `known_limitation`, and no undocumented weakness is allowed.
+
+A `known_limitation` on a model that is *not* weak is allowed only where it is listed in
+NON_UNIQUE_ATTRIBUTION: a multi-group model whose skill attribution is documented as not unique
+(owner decision 2026-10-25, L20). Its diagnoses are qualified and add no negative evidence.
 """
 
 from codeadapt.content import load_catalogue
@@ -12,6 +16,8 @@ from codeadapt.content.validate import validate_fingerprints
 from codeadapt.evidence import OutcomeKind
 from codeadapt.execution import DockerSandbox
 from tests.paths import DEMO_CONTENT, ORIGINAL_SLUGS
+
+NON_UNIQUE_ATTRIBUTION = {"min-capacity": {"strict_day_limit", "full_day_overflows"}}
 
 
 async def test_demo_catalogue_validates(sandbox: DockerSandbox) -> None:
@@ -22,7 +28,10 @@ async def test_demo_catalogue_validates(sandbox: DockerSandbox) -> None:
         assert not report.warnings, report.warnings
         weak = {m.key for m in report.models if m.behaviour_groups < 2}
         documented = {m.key for m in problem.spec.error_models if m.known_limitation}
-        assert weak == documented, (problem.spec.slug, weak, documented)
+        non_unique = NON_UNIQUE_ATTRIBUTION.get(problem.spec.slug, set())
+        assert weak == documented - non_unique, (problem.spec.slug, weak, documented)
+        # The non-unique ones really span several behaviour groups (they are not weak).
+        assert non_unique <= documented and not non_unique & weak, (problem.spec.slug, weak)
         assert len(report.limitations) == len(weak)
         if problem.spec.slug in ORIGINAL_SLUGS:
             assert weak == {"hi_init_last_index"}, weak

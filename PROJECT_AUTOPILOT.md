@@ -30,10 +30,16 @@ validation; keep rules/evidence/BKT/policy unchanged without an explicit decisio
 closed; continue autonomously on authorised work only. No further problem-bank work until the
 owner decides on the 8 new problems.
 
+**Owner decisions (2026-10-25 08:01):** option (b) approved for min-capacity (implemented as
+ADR-032, narrowest correction, no code change). L19 option B **not** approved: rule C unchanged;
+the 421-program observations describe system behaviour and are not independently validated
+skill labels. Then finalise: researcher journey, setup and demo instructions, engineering
+defects. Phase E stays blocked.
+
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 13
+**Iteration:** 14
 
 **PC1 status:** Phase E proposed — blocked pending code-level permission and owner approval.
 
@@ -75,6 +81,7 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | I2 | Skill-mapping review (min-capacity, rotated-min) | — | docs/reviews/2026-10-25/skill-mapping-review.md | Evidence for/against unique attribution; no mapping change | **done** abd4b33. min-capacity attribution not unique (exact equivalences); L20 added; decision deferred until real-learner use |
 | I3 | L19 options brief with measurement | — | docs/reviews/2026-10-25/l19-policy-options.md, l19_measure.py | Current behaviour, options, consequences, recommendation; no rule change | **done** abd4b33. Recommends option B; **PROPOSED, needs owner approval** |
 | I4 | CE1.2/CE1.3/BSX factual account and isolated decision | — | docs/reviews/2026-10-25/ce1-status.md | What was done, what changed, deviations; decision card | **done**; decision card posted 2026-10-25 |
+| J1 | ADR-032: min-capacity non-unique attribution gives no `equality_handling` evidence (owner option b) | owner 08:01 | content/demo/min-capacity/problem.toml, tests/unit/test_min_capacity_attribution.py, tests/sandbox/test_{demo_content,adaptation_end_to_end}.py, docs/decisions.md, limitations.md, methodology.md | Diagnosis and trace kept; feedback qualified; no `incorrect` obs, no ledger failure, no BKT update; other mappings and policy unchanged | **VERIFIED** locally: unit 382, sandbox 4/4 (adaptation e2e incl. new test, demo-content, end-to-end), held-out re-run byte-identical. CI pending on push |
 | I5 | End-to-end validation report with exact commands | I1 | docs/reviews/2026-10-25/validation.md | Commands, counts, skipped items | **VERIFIED**: unit 373, sandbox 31 locally, Playwright 3/3, CI run 94 |
 
 ## Log
@@ -127,20 +134,20 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
    independent labels; trade-off; tests B would need).
 3. **L20 (owner principle, 2026-10-25):** where two causes are observationally
    indistinguishable on the valid input domain, the system must not claim to distinguish them.
-   Current gap: a named min-capacity exact-boundary diagnosis still records `incorrect` on
-   `equality_handling`. Closing it is option (b) in skill-mapping-review.md, an evidence-policy
-   decision for the owner. Nothing changed.
+   min-capacity: **resolved** by ADR-032 (owner approved option (b) at 08:01). Still open: no
+   systematic search for exact equivalences in the other problems; rotated-min mapping left as
+   is (documented).
 4. PC1 Phase E: deferred (permission basis P, then D1–D12). Gate closed.
 5. Hosting/deployment (M8).
 
 ## Next three tasks
 
-1. **Confirm CI green** on the latest push (CI run 94 was green on 159162a; later pushes are
-   tests, docs and the demo-overlay validation step).
-2. **Remaining safe engineering, no policy content:** PracticePage bundle size (650 kB chunk
-   warning); a full `compose.demo.yaml` run once Docker Hub access works.
-3. **On owner decisions only:** L19 option B (tests listed in the focused analysis), L20
-   option (b), review of the 8 provisional problems. No bank or evidence work before then.
+1. **Confirm CI green** on the ADR-032 push (runs 98–101 green; 102–103 were running).
+2. **Remaining safe engineering, no policy content:** Playwright re-run on the integrated
+   branch; a full `compose.demo.yaml` run once Docker Hub access works. (The PracticePage chunk
+   is lazily loaded and within the configured 800 kB limit; no build warning.)
+3. **On owner decisions only:** L19 (rule C stays; no change authorised), review of the 8
+   provisional problems. No bank or evidence-rule work before then.
 
 ## Resume instruction
 
@@ -165,6 +172,20 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - c43ba45: docs checked against the integrated app: architecture routes, API paging, test layout,
   `.env.example` completeness, development guide. The scripted demo was re-run with identical
   outcomes (2 min 29 s).
+
+### Iteration 14 (2026-10-25)
+
+- Owner 08:01: option (b) for min-capacity approved; L19 option B not approved.
+- ADR-032 implemented through the existing documented-collision route (ADR-019, ADR-023 D2):
+  `known_limitation` on `strict_day_limit` and `full_day_overflows`. No change to diagnosis,
+  ledger, BKT, policy code, other mappings, thresholds or parameters. New min-capacity content
+  version; earlier-version snapshots keep their own attribution (D4, pinned by a test).
+- Tests: 9 new unit tests (5 fail without the content change); unit suite 382 passed; ruff,
+  format, mypy clean; sandbox `test_adaptation_end_to_end.py`, `test_demo_content.py`,
+  `test_end_to_end.py`: 4 passed (1427 s).
+- min-capacity held-out re-run on the new version: byte-identical outcomes
+  (docs/evaluation/adr032-2026-10-25/). Content report regenerated.
+- CI runs 98, 99 (includes the compose-overlay validation step), 100, 101: all green.
 
 ### Iterations 7–8
 

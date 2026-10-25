@@ -487,3 +487,61 @@ alive. **Still not solved:** a worker that is alive but stalled (event loop bloc
 lease) can lose its claim mid-run. Both runs then commit a diagnosis, and only the claim holder
 finishes the job. Tests: `tests/unit/test_queue.py` (including a job that outlives two lease
 periods), `tests/unit/test_pipeline_redelivery.py`.
+
+## ADR-032 — No skill evidence from a provably non-unique attribution: min-capacity (2026-10-25)
+**Context:** Two min-capacity error models are mapped to `equality_handling`: `strict_day_limit`
+and `full_day_overflows`. Each spans 5 or more behaviour groups, so v1.3 names them unqualified,
+and a named diagnosis recorded an `incorrect` observation on `equality_handling`. Programs with
+a different cause are output-identical to these models on every valid input. This is exact
+integer algebra, not just agreement on the tests
+(docs/reviews/2026-10-25/skill-mapping-review.md):
+- a day counter that starts one too high;
+- reading "days" as the number of breaks;
+- treating the usable capacity as `cap - 1`.
+
+No test can separate the causes, so the attribution to `equality_handling` is not supported
+(limitation L20).
+**Owner decision (2026-10-25 08:01):** option (b). The system must not record negative
+`equality_handling` evidence when the observed behaviour cannot distinguish that misconception
+from another plausible cause. The decision asks for the narrowest correction consistent with
+the existing architecture. The diagnosis and trace are preserved, and nothing unrelated
+changes.
+**Decision:** both models carry a `known_limitation` in `content/demo/min-capacity/problem.toml`.
+That is the existing documented-collision route (ADR-019; ADR-023 D2), which already gives
+these results:
+- **Diagnosis:** unchanged. The method does not read the field; the model is still named and
+  the full trace is kept.
+- **Student feedback:** shown as qualified ("other mistakes can produce the same pattern…
+  one possible cause"), with the same hint.
+- **Skill evidence:** the diagnosis adds no `incorrect` observation and no ledger failure entry.
+  So `equality_handling` gets no BKT update from it. Rule C for the other skills is unchanged
+  (L19 is not decided).
+- **Recommendation:** policy 1.4 code is unchanged, and so is the problem it chooses. The
+  recommendation still targets `equality_handling`, and its rationale now records
+  `qualified_hypothesis: true` and the limitation.
+
+No code in the diagnosis, ledger, BKT or policy changed. The skill mapping itself stays
+`equality_handling`: it is still recorded, it just no longer counts as evidence.
+**Content version:** the edit creates a new min-capacity content version. Attempts stored against
+the earlier version keep that version's snapshot (ADR-023 D4), so they would still carry the old
+evidence. No such attempts exist outside development and test databases, and a unit test pins
+this behaviour. The held-out evaluation records in `docs/evaluation/ce2-2026-10-24/` are
+historical and left unchanged. A re-run on the new version (docs/evaluation/adr032-2026-10-25/)
+gives byte-identical held-out outcomes under v1.1, v1.2 and v1.3.
+**Test contract:** `tests/sandbox/test_demo_content.py` previously required the documented
+models to equal the weak (single-behaviour-group) models. It now also allows the listed
+non-unique attributions (`NON_UNIQUE_ATTRIBUTION`), and asserts that they are *not* weak.
+**Tests:** `tests/unit/test_min_capacity_attribution.py` covers:
+- the ambiguous diagnosis gives no negative observation;
+- no BKT update for `equality_handling`;
+- rule C unchanged for the other skills;
+- `sorts_weights` is still evidence;
+- every other problem's collisions are unchanged;
+- feedback and recommendation behave as listed above;
+- the old-version snapshot keeps its original evidence.
+
+`tests/sandbox/test_adaptation_end_to_end.py::test_non_unique_min_capacity_attribution_end_to_end`
+runs the real pipeline.
+**Not covered:** rotated-min `compares_with_lo` stays as it is. The alternative tried there is
+separated by 3 tests, so its attribution is not provably non-unique. Other problems were not
+searched for exact equivalences.

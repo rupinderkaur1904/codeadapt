@@ -105,3 +105,21 @@ There are 8 cases in `eval/heldout/min-capacity/`, all written by the models' au
 - 2 correct;
 - 4 modelled in different styles;
 - 2 unmodelled.
+
+## 7. Change after review: non-unique attribution (2026-10-25, ADR-032)
+
+**Change.** On the owner's decision (option b, L20), `strict_day_limit` and
+`full_day_overflows` now carry a `known_limitation`.
+
+**Why.** Each is output-identical, on every valid input, to a program with a counting or
+specification error (docs/reviews/2026-10-25/skill-mapping-review.md).
+
+**Effect.**
+
+- Their diagnoses are kept and traced.
+- They are shown to the student as one possible cause.
+- They add no `equality_handling` evidence.
+
+**Versioning.** This edit created a new content version. The earlier version's held-out
+evaluation (docs/evaluation/ce2-2026-10-24/) is historical and unchanged. The problem
+remains provisional and not research-validated.
