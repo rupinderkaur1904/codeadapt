@@ -192,3 +192,15 @@ current min-capacity behaviour is as follows.
   decision.
 
 Nothing was changed.
+
+## Decision (2026-10-25 08:01) and implementation
+
+The owner approved **option (b)** for min-capacity, implemented as ADR-032 in docs/decisions.md.
+
+- Both models carry a `known_limitation`, which routes them through the existing
+  documented-collision mechanism.
+- The diagnosis and trace are unchanged.
+- The student sees the qualified wording, with the same hint.
+- There is no `equality_handling` observation and no BKT update.
+- Policy 1.4 is unchanged; its rationale records `qualified_hypothesis: true`.
+- rotated-min is unchanged.

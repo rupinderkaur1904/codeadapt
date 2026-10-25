@@ -7,7 +7,10 @@ unchanged.** No change was made to:
 - the skill mappings or any threshold;
 - any historical evaluation result.
 
-Option B is **not approved**. Every number here comes from committed records, and nothing was
+Option B is **not approved** (owner, 2026-10-25 08:01): rule C stays unchanged, and no L19
+policy change is authorised. The owner also notes that the 421-program observations describe
+system behaviour only. They are not independently validated skill labels, and they must not be
+presented as evidence of diagnostic accuracy. Every number here comes from committed records, and nothing was
 re-executed. To reproduce:
 
 ```

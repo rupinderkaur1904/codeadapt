@@ -144,3 +144,38 @@ async def test_recommendation_and_followup_end_to_end(harness: Harness) -> None:
     # Students never see learner-model output.
     me = harness.client.get("/api/v1/me/recommendation", headers=STUDENT).json()
     assert "p_known" not in str(me) and "assumed parameters" not in str(me)
+
+
+async def test_non_unique_min_capacity_attribution_end_to_end(harness: Harness) -> None:
+    # Owner decision 2026-10-25 (option b, L20): `strict_day_limit` is still diagnosed and
+    # traced, shown to the student as one possible cause, and adds no equality_handling
+    # evidence or BKT update.
+    view, trace = await harness.submit(
+        source("min-capacity", "error_models/strict_day_limit.cpp"), "min-capacity"
+    )
+    diagnosis = trace["diagnosis"]
+    assert diagnosis["outcome"] == "hypothesis_supported"
+    assert diagnosis["selected_model"] == "strict_day_limit"
+    # Unqualified by the method itself (several behaviour groups); the trace keeps it all.
+    assert diagnosis["rationale"]["evidence_strength"] == "multiple"
+    assert "not proof" in diagnosis["rationale"]["caveat"]
+    assert trace["observations"]
+
+    feedback = view["feedback"]
+    assert "other mistakes can produce the same pattern" in feedback["message"]
+    assert "exactly the allowed number of days" in feedback["hint"]
+    assert "strict_day_limit" not in str(view)
+
+    rec = trace["recommendation"]
+    assert rec["rule"] == "hypothesis_supported"
+    assert rec["target_skills"] == ["equality_handling"]
+    assert rec["rationale"]["qualified_hypothesis"] is True
+
+    r = harness.client.get(
+        "/api/v1/research/learner-model", params={"username": "dev-student"}, headers=RESEARCHER
+    )
+    assert r.status_code == 200, r.text
+    skills = {s["skill"]: s for s in r.json()["estimate"]["skills"]}
+    assert "equality_handling" not in skills
+    values = [t["observation"]["value"] for s in skills.values() for t in s["observations"]]
+    assert "incorrect" not in values
