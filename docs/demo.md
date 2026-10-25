@@ -15,8 +15,9 @@ uv run codeadapt-worker &                                             # runner
 cd ..
 ```
 
-Alternatively, `docker compose up --build` starts the same stack plus the web UI on
-http://localhost:5173.
+For the web UI without compose, run `cd web && npm ci && npm run dev` in a third terminal, then
+open http://localhost:5173. The Vite server proxies `/api` to port 8000. Alternatively,
+`docker compose up --build` starts the same stack plus the web UI.
 
 ## 2. Run the scripted demo
 
@@ -29,7 +30,8 @@ For each one, it prints what the student sees next to the researcher's view. The
 about 3 minutes here, mostly on the first submission, because the worker measures and caches
 the problem's fingerprints first.
 
-**Observed output (2026-10-24, runc, 4 vCPUs):**
+**Observed output (2026-10-24, runc, 4 vCPUs).** It was re-run on 2026-10-25 after the frontend
+integration, with identical outcomes, feedback and recommendation, in 2 min 29 s.
 
 | Program | Author's intent | Outcome (researcher) | What the student sees |
 | --- | --- | --- | --- |
