@@ -66,3 +66,38 @@ For a login-mode demo (no development stub), use
 described in `compose.demo.yaml`. It is for `localhost` only.
 
 The Playwright tests automate both parts in CI: `web/e2e/practice.spec.ts` (student) and `web/e2e/research.spec.ts` (landing page, attempts, trace, Learners list and learner model).
+
+## 5. Login-mode rehearsal (2026-10-25)
+
+`compose.demo.yaml` could not be built in the development container: Docker Hub refused the
+`node:22-alpine` pull (HTTP 429). So the same settings were rehearsed without compose:
+`CODEADAPT_ENV=production`, SQLite, and the two demo accounts. Commands, from the repository
+root:
+
+```
+docs/demo/login_mode_start.sh /tmp/codeadapt-login-demo
+cd backend && uv run --with httpx python ../docs/demo/login_mode_rehearsal.py
+```
+
+Observed output (2026-10-25, runc):
+
+```
+1. no session, dev header ignored: 401
+   wrong password: 401
+2. student me: student | problems: 12
+3. buggy submission: completed in 105s; internal label hidden from student: True | P(known) hidden: True
+   student blocked from research: 403 403
+   no CSRF token ->  403
+4. researcher list: [('demo-student', 'hypothesis_supported', 'exact_match_sentinel')]
+   trace diagnosis: fingerprint_consistency hypothesis_supported exact_match_sentinel
+   learner model: estimated under assumed parameters [('problem_specification', 'insufficient_data', ['incorrect'])]
+5. logout: 204 -> me after logout: 401
+```
+
+**Notes on the output.**
+
+- **Session cookie.** It carries `Secure`. Browsers accept it on `http://localhost`, but the
+  script's HTTP client does not, so the script sends the cookie by hand.
+- **Unaccepted problems.** The 12 problems include the 8 that the owner has not accepted (see
+  docs/reviews/2026-10-25/ce1-status.md).
+- **The compose packaging itself is untested here.** It needs a run with Docker Hub access.
