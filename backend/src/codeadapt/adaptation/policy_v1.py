@@ -176,8 +176,9 @@ class PolicyV1:
                 Action.NONE,
                 None,
                 rationale={
-                    "note": "Every problem in the family has an attempt with no failure "
-                    "observed on its tests. That is not evidence of complete understanding."
+                    "note": "Every recommendable problem in the family has an attempt with no "
+                    "failure observed on its tests. That is not evidence of complete "
+                    "understanding."
                 },
             )
         ledger = build_ledger(attempts, problems, skill_maps)
