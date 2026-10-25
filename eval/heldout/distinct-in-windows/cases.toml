@@ -1,0 +1,42 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A4, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "distinct-in-windows"
+
+[[cases]]
+file = "distinct_counter.cpp"
+truth = "correct"
+note = "Frequency map with a separate distinct counter."
+
+[[cases]]
+file = "ordered_map_erase.cpp"
+truth = "correct"
+note = "First window built up front, then slide with std::map and erase at zero."
+
+[[cases]]
+file = "counter_never_drops.cpp"
+truth = "keeps_zero_counts"
+note = "Distinct counter that only ever increases; leaving values are decremented but never dropped."
+
+[[cases]]
+file = "starts_stop_early.cpp"
+truth = "misses_last_window"
+note = "Records before sliding, over window starts s + k < n, so the last window is never recorded."
+
+[[cases]]
+file = "singles_tracker.cpp"
+truth = "counts_unique_only"
+note = "Tracks how many values have frequency exactly 1."
+
+[[cases]]
+file = "runs_in_window.cpp"
+truth = "unmodelled"
+note = "Counts runs of equal neighbours in each window."
+
+[[cases]]
+file = "window_k_plus_one.cpp"
+truth = "unmodelled"
+note = "Removes the element k + 1 back, so windows after the first hold k + 1 elements."
