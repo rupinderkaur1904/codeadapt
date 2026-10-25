@@ -603,6 +603,11 @@ table.research {
   background: var(--flag);
   color: var(--fg);
 }
+.status-unreviewed {
+  margin-left: 8px;
+  vertical-align: middle;
+  border: 1px dashed var(--border);
+}
 .how-feedback {
   margin: 12px 0;
   color: var(--muted);
