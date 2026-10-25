@@ -1,0 +1,205 @@
+{
+ "A": {
+  "categories": {
+   "equivalent": 4,
+   "incorrect_failing": 34,
+   "unreliable": 6
+  },
+  "coverage": [
+   14,
+   34
+  ],
+  "cross_lenient": [
+   5,
+   14
+  ],
+  "cross_skill_unqualified_lenient": 5,
+  "cross_skill_unqualified_strict": 5,
+  "cross_strict": [
+   5,
+   14
+  ],
+  "library_labelled": [
+   9,
+   44
+  ],
+  "programs": 44,
+  "recall_lenient": [
+   9,
+   9
+  ],
+  "recall_strict": [
+   9,
+   9
+  ],
+  "suite_gap": [
+   0,
+   34
+  ]
+ },
+ "B": {
+  "categories": {
+   "equivalent": 6,
+   "incorrect_failing": 42,
+   "unreliable": 9
+  },
+  "coverage": [
+   14,
+   42
+  ],
+  "cross_lenient": [
+   6,
+   14
+  ],
+  "cross_skill_unqualified_lenient": 6,
+  "cross_skill_unqualified_strict": 12,
+  "cross_strict": [
+   12,
+   14
+  ],
+  "library_labelled": [
+   2,
+   57
+  ],
+  "programs": 57,
+  "recall_lenient": [
+   8,
+   10
+  ],
+  "recall_strict": [
+   2,
+   2
+  ],
+  "suite_gap": [
+   0,
+   42
+  ]
+ },
+ "BC": {
+  "categories": {
+   "equivalent": 10,
+   "incorrect_failing": 64,
+   "unreliable": 29
+  },
+  "coverage": [
+   18,
+   64
+  ],
+  "cross_lenient": [
+   6,
+   18
+  ],
+  "cross_skill_unqualified_lenient": 6,
+  "cross_skill_unqualified_strict": 12,
+  "cross_strict": [
+   12,
+   18
+  ],
+  "library_labelled": [
+   11,
+   103
+  ],
+  "programs": 103,
+  "recall_lenient": [
+   12,
+   14
+  ],
+  "recall_strict": [
+   6,
+   6
+  ],
+  "suite_gap": [
+   0,
+   64
+  ]
+ },
+ "C": {
+  "categories": {
+   "equivalent": 4,
+   "incorrect_failing": 22,
+   "unreliable": 20
+  },
+  "coverage": [
+   4,
+   22
+  ],
+  "cross_lenient": [
+   0,
+   4
+  ],
+  "cross_skill_unqualified_lenient": 0,
+  "cross_skill_unqualified_strict": 0,
+  "cross_strict": [
+   0,
+   4
+  ],
+  "library_labelled": [
+   9,
+   46
+  ],
+  "programs": 46,
+  "recall_lenient": [
+   4,
+   4
+  ],
+  "recall_strict": [
+   4,
+   4
+  ],
+  "suite_gap": [
+   0,
+   22
+  ]
+ },
+ "all": {
+  "categories": {
+   "equivalent": 14,
+   "incorrect_failing": 98,
+   "unreliable": 35
+  },
+  "coverage": [
+   32,
+   98
+  ],
+  "cross_lenient": [
+   11,
+   32
+  ],
+  "cross_skill_unqualified_lenient": 11,
+  "cross_skill_unqualified_strict": 17,
+  "cross_strict": [
+   17,
+   32
+  ],
+  "library_labelled": [
+   20,
+   147
+  ],
+  "programs": 147,
+  "recall_lenient": [
+   21,
+   23
+  ],
+  "recall_strict": [
+   15,
+   15
+  ],
+  "suite_gap": [
+   0,
+   98
+  ]
+ },
+ "native_pipeline_disagreements": [],
+ "originals": {
+  "original:closed_answer": "no_failure_observed",
+  "original:half_open": "no_failure_observed",
+  "original:recursive": "no_failure_observed"
+ },
+ "thresholds": {
+  "T1_cross_pattern": true,
+  "T1b_unqualified_cross_skill": 17,
+  "T2_coverage_below_20pct": false,
+  "T3_style_bias": false,
+  "T4_suite_gap_above_10pct": false
+ }
+}

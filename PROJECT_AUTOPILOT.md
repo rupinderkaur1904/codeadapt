@@ -1,0 +1,228 @@
+# Project autopilot
+
+Persistent progress file for the self-directed loop requested by the owner on 2026-10-24.
+Reread it and check it against the repository before each task. Status report:
+[docs/status-2026-10-24.md](docs/status-2026-10-24.md).
+
+**Overnight directive (owner, 2026-10-24 18:13):** autonomous loop, with these priorities:
+
+1. end-to-end correctness;
+2. bank expansion (6–10 complete binary-search problems);
+3. diagnosis tests (no rule changes);
+4. evidence and attribution;
+5. BKT and recommendation integrity;
+6. sandbox reliability;
+7. evaluation reproducibility;
+8. researcher UI and docs.
+
+Status labels: VERIFIED / PARTIALLY VERIFIED / UNVERIFIED / BLOCKED / PROPOSED.
+
+**Current objective (owner, 2026-10-24 17:04):** finish the full existing scope (sandbox,
+diagnosis, evidence, attribution, BKT, recommendations, problem bank, researcher UI,
+evaluation), integrated and verified, by Wednesday 2026-10-28. Functional completion by Tuesday
+night; Wednesday for regression, demo, report checks. No scope cuts, no unrelated features, no
+frozen rule/threshold/parameter changes. Phase E deferred (gate closed).
+
+**Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
+force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
+
+**Iteration:** 12
+
+**PC1 status:** Phase E proposed — blocked pending code-level permission and owner approval.
+
+## Hard limits (owner rules, override everything below)
+
+- PC1: gate open at `metadata` only (owner's version 2 record, A1). Phase F done; Phase E
+  deferred. Never read or run CodeNet source code, activate A2, send the maintainer enquiry,
+  edit `record.json` or commit counts. Never claim supervisor approval.
+- Pushing main-project work (never CodeNet data) to this branch: approved again 2026-10-24 17:05.
+- Do not change the diagnosis method, skill maps, BKT parameters, ledger, policy, feedback
+  wording or frozen protocols without owner approval. Label synthetic results as synthetic.
+- No deployment, no real-student data, no publication of derived statistics.
+
+## Completion plan
+
+| Id | Objective | Depends | Files | Acceptance | Status |
+| --- | --- | --- | --- | --- | --- |
+| A1 | Record PC1 withdrawal, deviations, status truthfully | — | docs/preregistration/pc1/{STATUS,DEVIATIONS}.md, permission/CORRECTIONS.md | Frozen files unchanged; gate closed and pinned by tests | **done** a14fcde |
+| A2 | Keep amendment A1 + A1b ready as an inactive proposal on the current branch | owner | project files codeadapt/pc1/a1-proposal/a1-v2.patch | Patch applies cleanly; tests pass in a scratch worktree; nothing activated | **done** (54 PC1 tests pass in scratch; not applied; waits for owner) |
+| A3 | Claims audit: no doc states real-student accuracy, learning gains or calibrated mastery | — | README, docs/* | Every accuracy figure labelled synthetic or author-written | **done** (no change needed) |
+| B1 | Queue/worker idempotency | — | db/queue.py, worker/pipeline.py | Stale worker cannot overwrite; redelivery does not re-run | **done** d78ee21 (ADR-031) |
+| B2 | Review sandbox limits and status classification against ADR-020/023/024/028 | — | execution/* | Each limit and status has a test; gaps fixed or documented | **done** f570b5b (compile output limit and stream-mismatch edge cases pinned; SIGKILL-without-deadline is a runtime error, documented) |
+| B3 | API validation and error-handling review | — | api/app.py, schemas.py | Malformed input gets 4xx, not 500; tests | **done** f570b5b (18 malformed requests probed; NUL in source was accepted and would fail on PostgreSQL, now 422) |
+| C1 | Full test run, recorded | — | PROJECT_AUTOPILOT.md, docs/status-2026-10-24.md | Commands verified today with counts | **done**: unit 348, sandbox 33 + end-to-end re-run 2/2 on d78ee21, web 21 |
+| C2 | One documented command per evaluation to reproduce reported numbers | — | docs/evaluation/*, docs/development.md | Re-run reproduces held-out/calibration tables | **done**: fresh held-out and calibration re-runs identical to the adr030 records |
+| D1 | CodeNet PC1 Phase F counts | A2 + owner | — | Only after a truthful, accepted record | **done** 2026-10-24 on dc4c0e1 (feasible; counts in owner's project files only) |
+| D2 | PC1 Phase E: permission assessment, maintainer enquiry draft, preregistration draft, suitability review | D1 + owner | owner's project files `codeadapt/pc1/phase-e-proposal/` | Drafts only; no code read; nothing activated | **proposed — blocked pending code-level permission and owner approval** |
+| E1 | Consolidated, labelled results table across all evaluations | — | docs/evaluation/summary.md | Every number traceable to a report; labels on every row | **done** fca1432 |
+| F1 | Architecture document matches the code | — | docs/architecture.md | Known mismatch fixed (queue uses an optimistic conditional UPDATE, not SKIP LOCKED); every component checked | **done** 987cc50 |
+| F2 | Research report draft with evidence-supported claims only | E1 | docs/research-report-draft.md | Each claim cites a result; limitations section | **done** (draft) 91cb35a |
+| F3 | Limitations and future work list | E1 | docs/limitations.md | Complete, consistent with status report | **done** 91cb35a |
+| G1 | Demo workflow with expected results, verified locally | C1 | docs/demo.md | Steps run today; outputs match | **done** (run 2026-10-24, output recorded) |
+| G2 | Interview-preparation document | F1, E1 | docs/interview-prep.md | Architecture, algorithms, trade-offs, evaluation, limitations | **done** 91cb35a |
+| H1 | Bank expansion: complete binary-search problems | — | content/demo/*, docs/content-design/*, docs/content-reports/*, eval/heldout/* | Per problem: sandbox validation ok, distinguishes = measured, design record, held-out committed before eval, eval recorded, E2 not recommendable | **VERIFIED** for 8 problems: integer-sqrt, upper-bound, exact-search, last-occurrence, min-capacity, rotated-min, rotated-search, peak-index. CI green (runs 90–92) |
+| H2 | Integration tests: infrastructure failure, redelivery, content versions | — | backend/tests/unit/test_pipeline_infrastructure.py, test_content_versions.py | Outage leaves no run, diagnosis, recommendation or learner attempt; redelivery adds no attempt; old version keeps its snapshot | **VERIFIED** (unit suite 373 pass) |
+| H3 | CE1.4 family report: observation capacity and BKT sensitivity on the 12-problem bank | H1 | docs/evaluation/ce1.4-2026-10-24/ | Technical measurements only | **VERIFIED** 8dbc328 |
+| H4 | Playwright specs no longer race for the single worker | — | web/playwright.config.ts | 3/3 pass locally serially | **VERIFIED**: CI run 92 green on eb05bf9 |
+
+## Log
+
+### Iteration 1 (2026-10-24, read-only audit)
+
+- Verified: withdrawn record 323f3a9 closes the gate at both levels (exit 3). Frozen PC1
+  files match the manifest. Amendment A1 is in the project files only and was not applied.
+- Gap: `scope.publish_derived_statistics` is never read by `pc1.py` (documented as A1b in
+  docs/preregistration/pc1/STATUS.md; needs approval because it changes the frozen script).
+- Merged `zyjfh1` into the thread branch locally (no conflicts).
+- Tests: unit 334 passed; ruff/format/mypy clean; web lint/typecheck/21 tests/build ok.
+
+### Iteration 2
+
+- a14fcde (A1) and d78ee21 (B1) committed and pushed. Unit tests: 341 passed.
+- Sandbox suite (Docker, runc, `CODEADAPT_REQUIRE_SANDBOX=1`, started before d78ee21 was
+  imported, so it tested 323f3a9 + zyjfh1 + a14fcde): **33 passed in 1570 s**. The two
+  end-to-end files were re-run on d78ee21 (see iteration 4).
+
+### Iteration 3
+
+- 987cc50: status report, this plan, architecture matches the code (F1 done).
+- fca1432: docs/evaluation/summary.md (E1 done).
+- A3 claims audit: grep over README and docs for accuracy, validation, mastery and
+  learning-gain wording found no unsupported claim; no change needed.
+
+### Iteration 4
+
+- 91cb35a: docs/limitations.md (F3), docs/interview-prep.md (G2),
+  docs/research-report-draft.md (F2). Pushed.
+- G1 demo: `docs/demo/run_demo.py` drafted; verification run pending.
+
+### Iterations 5–6
+
+- End-to-end sandbox tests re-run on d78ee21 (worker change): 2 passed in 667 s.
+- f570b5b: B2 and B3 (see the table). Unit tests: 348 passed; mypy and ruff clean; the
+  OpenAPI schema is unchanged.
+- Demo verified on a live API and worker (docs/demo.md, observed output recorded).
+
+## Blockers needing the owner
+
+1. **CE1.2/CE1.3 resumed.**
+   - I closed the decision card on the owner's overnight instruction to expand the bank; the
+     owner did not tap it.
+   - The owner should confirm that reading.
+2. **Skill-mapping flags (no change made; owner review).**
+   - `min-capacity` maps two exact-boundary errors (`<` against `<=` on day count and load) to
+     `equality_handling`.
+   - `rotated-min` maps `compares_with_lo` (wrong reference element) to
+     `search_space_boundaries`.
+   - Each could argue for a new skill. None was added.
+3. Rule C limitation L19 (positive evidence from an abstained, mostly failing attempt): policy
+   decision, not changed.
+4. PC1 Phase E: deferred (permission basis P, then D1–D12).
+5. Hosting/deployment (M8).
+
+## Next three tasks
+
+1. **Keep CI green.** It is green on eb05bf9 (run 92, all jobs, about 23 min wall).
+2. **Frontend branch `9vflva`**: integrate after checking with that thread, so the two do not
+   make conflicting edits.
+3. **Refresh the docs for the final state.** That means the status report, the research-report
+   draft and `docs/demo.md`. Then integrate the frontend branch `9vflva` without conflicting
+   edits.
+
+## Resume instruction
+
+`git fetch origin && git checkout claude/project-thread-dyivyy`, reread this file, run
+`cd backend && uv sync && uv run pytest tests/unit -q`, then continue with "Next three tasks".
+
+### Iterations 7–8
+
+- 43779b6: README links to all deliverables.
+- A1 + A1b rebased as `a1-v2.patch` (project files); applied only in a scratch worktree, where
+  54 PC1 tests pass. **Not applied to the branch.**
+- Held-out evaluation re-run from scratch: identical to docs/evaluation/adr030-2026-10-23/heldout.md.
+- Calibration re-run: identical to the adr030 record. CI green on every pushed commit
+  (runs 63–66, including the lost-output probe).
+
+### Iteration 9
+
+- A1 + A1b applied (63e3773, b11e60d); the owner committed a truthful version 2 record (dc4c0e1).
+  CI green on all three (runs 69–71).
+- PC1 Phase F run with the frozen script: identification identical, confirm by owner,
+  feasibility exit 0, band feasible. Counts kept out of the repository (not publishable).
+
+### Iteration 10 (local commit; owner said not to push)
+
+- Phase E prepared, not approved. Permission assessment: no first-hand evidence covers the full
+  archive's source code (IBM's own download page `readme.html` has no licence statement; the
+  CODAIT statement covers samples only; AIZU rights unknown). Enquiry drafted, not sent.
+  Preregistration draft 0.1 and suitability review written to project files.
+- Code gate re-checked: `pc1.py gate --level code` exit 3. No code extracted or read.
+
+### Iteration 11 (owner's completion directive)
+
+- Audit: unit 368 → 370 pass; ruff/mypy clean; web 21 + Playwright 3 pass; CI green on fc4d427.
+- 91b41f0: adaptation end-to-end test extended through the LM1 learner model (compile error,
+  named, abstained, retry, follow-up); passes in the sandbox (207 s). Pinned limitation L19.
+- 91b41f0: worker lease heartbeat (`queue.renew`, fenced); heartbeat test fails without it.
+- fc4d427: Playwright test for researcher trace + learner model (3/3 pass locally).
+- f583d98: CI job running both end-to-end tests on PostgreSQL 16 (passed locally, 446 s);
+  gVisor job now runs every sandbox shard.
+
+### Iteration 12 (overnight directive)
+
+**Bank expansion.**
+
+- 8 new binary-search problems:
+  - integer-sqrt (G2);
+  - upper-bound;
+  - exact-search;
+  - last-occurrence;
+  - min-capacity (G3);
+  - rotated-min;
+  - rotated-search;
+  - peak-index.
+- Each has:
+  - a design record;
+  - sandbox validation `ok` with measured `distinguishes`;
+  - a content report;
+  - 7–8 held-out cases, committed before evaluation;
+  - an evaluation under v1.1, v1.2 and v1.3.
+- **Results.** These are synthetic, author-written cases and are kept separate per problem
+  (`docs/evaluation/ce1.2-2026-10-24/`, `docs/evaluation/ce2-2026-10-24/`):
+  - every named diagnosis was correct;
+  - one predicted safe abstention (last-occurrence, upper midpoint);
+  - 0 false alarms;
+  - all cases reproducible;
+  - no method differences.
+- **Recommendations.** All new problems are `recommendable = false`. Policy 1.4 and its golden
+  test are unchanged.
+- **Single-group models.** These are documented as `known_limitation`:
+  - last-occurrence `missing_equality_check`;
+  - rotated-min `hi_skips_candidate`;
+  - rotated-search `left_half_test_strict`.
+
+**CI failure since run 83.** It was caught late.
+
+- `test_demo_content` asserted exactly one weak model (`hi_init_last_index`) per problem.
+- It now requires the weak set to equal the documented `known_limitation` set: stricter for new
+  problems, unchanged for the original four. It passed locally in 780 s.
+
+**New tests.**
+
+- Sandbox outage → requeue → failed after 3 attempts, with no run, diagnosis, recommendation or
+  learner attempt.
+- Redelivery adds no second learner attempt.
+- Content-version change keeps the old snapshot through the database.
+- Unit total: 373.
+
+**Label slip.** Commits and content comments call the new problems "CE2". The docs now say
+these are a binary-search extension (BSX), not the planned CE2 stage (arrays). Content and
+held-out files were not edited, because editing them would change content versions and
+manifests.
+
+**Iteration 12, continued.**
+
+- CE1.4 report written (8dbc328).
+- Evaluation summary table for the bank expansion added (f88e9b8).
+- Playwright `research.spec` timed out in CI run 89. It was waiting behind other specs' jobs on
+  the single worker. The specs now run serially (`workers: 1`) and pass 3/3 locally.

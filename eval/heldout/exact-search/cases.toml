@@ -1,0 +1,42 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for CE2 (2026-10-24) by the models' author, in styles different from the models,
+# and committed before the method was run on them. See docs/methodology.md §6.1 for what that
+# does and does not allow us to claim.
+
+problem = "exact-search"
+
+[[cases]]
+file = "recursive_closed.cpp"
+truth = "correct"
+note = "Recursive closed-interval search."
+
+[[cases]]
+file = "lower_bound_then_check.cpp"
+truth = "correct"
+note = "Half-open lower bound, then one equality check."
+
+[[cases]]
+file = "for_loop_stops_early.cpp"
+truth = "closed_loop_lt"
+note = "For-loop over a closed range running while left < right."
+
+[[cases]]
+file = "lower_bound_no_check.cpp"
+truth = "returns_insertion_point"
+note = "Lower bound returned without checking that it holds the target."
+
+[[cases]]
+file = "recursive_from_one.cpp"
+truth = "lo_init_one"
+note = "Recursive search whose first call starts at index 1."
+
+[[cases]]
+file = "one_based_index.cpp"
+truth = "unmodelled"
+note = "Correct search reporting a 1-based position."
+
+[[cases]]
+file = "from_one_insertion_point.cpp"
+truth = "unmodelled"
+note = "Two modelled errors at once: lo = 1 and the insertion point when absent."

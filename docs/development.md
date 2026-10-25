@@ -1,0 +1,247 @@
+# Development guide
+
+## Prerequisites
+
+* **Docker** (Engine on Linux; Docker Desktop on macOS/Windows). The sandbox needs a
+  running daemon. No host bind mounts are used, so Docker Desktop behaves like Linux.
+* **uv** ≥ 0.5 (installs Python 3.12+ and the locked dependencies).
+* Optional: **gVisor** (`runsc`) registered as a Docker runtime, to test the production
+  isolation tier (Linux only).
+
+## Setup from a fresh clone
+
+```bash
+git clone https://github.com/rupinderkaur1904/codeadapt && cd codeadapt
+cp .env.example .env                                   # optional; defaults work for dev
+docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/   # pinned toolchain image
+cd backend
+uv sync                                                # creates .venv from uv.lock
+```
+
+On Windows, run the same commands in PowerShell (or WSL2). Use `copy` instead of `cp`.
+
+## Everyday commands (run in `backend/`)
+
+| Purpose | Command |
+| --- | --- |
+| All tests | `uv run pytest` |
+| Unit tests only (no Docker) | `uv run pytest tests/unit` |
+| Sandbox tests only | `uv run pytest -m sandbox` |
+| Lint / format / types | `uv run ruff check src tests` · `uv run ruff format src tests` · `uv run mypy` |
+| Dependency audit | `uv export --no-hashes --no-emit-project --format requirements-txt > req.txt && uvx pip-audit -r req.txt` |
+| Validate problem content (executes it) | `uv run codeadapt-content validate ../content/demo` |
+| Synthetic evaluation report (executes it; several minutes) | `uv run codeadapt-eval --json report.json --markdown report.md` |
+| Run code by hand | `uv run codeadapt-run main.cpp [harness.cpp] --input in1.txt [--sanitize]` |
+| Remove sandbox leftovers after a crash | `docker rm -f $(docker ps -aq --filter label=org.codeadapt.sandbox=1)`; `docker volume rm $(docker volume ls -q --filter label=org.codeadapt.sandbox=1)` |
+
+Sandbox tests are **skipped with a stated reason** if Docker or the image is missing. Set
+`CODEADAPT_REQUIRE_SANDBOX=1` to make them fail instead; CI always does.
+
+In CI the `backend` job runs everything except `tests/sandbox`. The sandbox tests run in a
+`sandbox` matrix with one shard per long pipeline test (`demo-content`,
+`heldout-evaluation`, `end-to-end`, `adaptation`) and a `core` shard for every other sandbox
+file. Locally (4 cores) those four tests take about 1000 s of the 1080 s full suite, run
+one after another; on CI the backend job alone took about 41 min on e94ec81. A new sandbox
+test file lands in `core` automatically; give it its own shard only if it is long.
+
+To test the production tier: `CODEADAPT_SANDBOX_RUNTIME=runsc uv run pytest -m sandbox`.
+
+## Running the API and worker locally
+
+```bash
+cd backend
+uv run alembic upgrade head                                   # creates ./codeadapt-dev.sqlite3
+uv run uvicorn codeadapt.api.app:create_app --factory --port 8000
+uv run codeadapt-worker            # second terminal; --once drains the queue and exits
+```
+
+Interactive API docs are at `http://localhost:8000/api/docs`. In `dev` and `test`
+environments the stub authentication uses the `X-Dev-Role: student|researcher` header
+(ADR-013). With `CODEADAPT_ENV=production` the stub is off: endpoints return 401 until
+the user logs in with an account created by `uv run codeadapt-admin create-user` and
+`set-password` (ADR-029, docs/deployment.md §4). The first submission for a problem takes about 45
+seconds locally, because the worker measures and caches that problem's fingerprints for
+the current environment. Later submissions take a few seconds.
+
+## Web frontend (`web/`)
+
+```bash
+cd web
+npm ci
+npm run dev            # http://localhost:5173, proxies /api to http://127.0.0.1:8000
+```
+
+| Purpose | Command |
+| --- | --- |
+| Lint / format / types | `npm run lint` · `npm run format:check` · `npm run typecheck` |
+| Component tests | `npm test` |
+| Browser end-to-end test (starts its own API, worker and preview server; needs Docker + sandbox image) | `npx playwright install chromium` once, then `npm run e2e` |
+| Regenerate API types after changing the backend API | `(cd ../backend && uv run codeadapt-openapi) > openapi.json && npm run api:types` |
+
+CI fails if `openapi.json` or `src/api/schema.d.ts` is out of date.
+
+## Docker compose (development only)
+
+`docker compose up --build` builds the sandbox image, runs migrations, and starts the API
+(port 8000), the worker and the Vite dev server (port 5173). Data persists in the `appdata`
+volume; `docker compose down -v` removes it. The worker mounts the host Docker socket, which
+is root-equivalent, so never run this stack where untrusted users can reach it.
+
+`docker compose -f compose.yaml -f compose.demo.yaml up --build` runs the same stack in login
+mode (`CODEADAPT_ENV=production`, so no development stub) for showing the product. It creates
+two accounts with data class `dev`, `demo-student` and `demo-researcher`, whose passwords are
+written in `compose.demo.yaml`, and keeps its data in a separate `demodata` volume. It is for
+`localhost` only: the passwords are public and the sandbox still runs under runc. Session
+cookies carry `Secure`; browsers accept that on `http://localhost`.
+
+## Tested environment
+
+Local results are evidence about *this* environment only.
+
+### M1 (2026-10-15)
+
+| Item | Value |
+| --- | --- |
+| Host | Linux 6.18.44 x86_64 (cloud VM), Ubuntu 24.04.5 userland, running as root |
+| Docker | Engine 29.8.2, runtime runc, cgroup **v1** (cgroupfs driver), builtin seccomp profile |
+| Sandbox image | `codeadapt-sandbox:gcc14.2-1` on `gcc:14.2.0@sha256:b99b86a2…f5d24c`; g++ 14.2.0 |
+| Python / uv | CPython 3.13.16 / uv 0.11.32 |
+| Results | `pytest`: **70 passed, 0 skipped, 0 failed** (42 unit, 28 sandbox; ≈ 49 s). `ruff check`, `ruff format --check`, `mypy --strict`: clean. `pip-audit`: no known vulnerabilities. No labelled containers or volumes left afterwards. |
+| Not tested | gVisor (`runsc`) runtime (tested 2026-10-22, see ADR-028); cgroup v2 hosts; macOS/Windows Docker Desktop; arm64. GitHub Actions (ubuntu-24.04 runner) is the second reference environment: the M1 commit passed all CI steps there, including the sandbox tests. |
+
+### M2 (2026-10-15)
+
+Same environment as M1. `pytest`: **106 passed, 0 skipped, 0 failed** (77 unit, 29 sandbox;
+about 92 s). `ruff check`, `ruff format --check` and `mypy --strict` were clean.
+`codeadapt-content validate ../content/demo` reported `RESULT ok` with no warnings.
+
+### M3 (2026-10-15)
+
+Same environment as M1. `pytest`: **138 passed, 0 skipped, 0 failed** (107 unit, 31 sandbox; about 3.5 min).
+`ruff check`, `ruff format --check` and `mypy --strict` were clean. A manual run with
+`alembic upgrade`, `uvicorn` and `codeadapt-worker --once` against SQLite processed a
+submission end to end. PostgreSQL is not exercised yet: the SQL is written to be portable
+and the queue uses conditional updates, but no test runs against PostgreSQL. This is
+tracked for M8.
+
+### M4 (2026-10-15)
+
+Same environment as M1, plus Node 22.22.0 and Chromium (Playwright 1.56.1). `npm test`:
+11 passed. Lint, format check, `tsc` and `vite build` were clean, and `npm audit` found 0
+vulnerabilities. `npx playwright test`: 1 passed (about 1.2 min, most of it the first
+fingerprint measurement). **Not verified locally:** `docker compose build`, because base
+images could not be downloaded here (Docker Hub returned 429, GHCR was blocked, and PyPI was
+unreachable from build containers). The CI `compose` job covers it.
+
+### M5 (2026-10-15)
+
+Same environment as M1. `pytest`: **152 passed, 0 skipped, 0 failed** (122 unit, 30
+sandbox; about 5.7 min). `npm test`: 12 passed. `npx playwright test`: 1 passed (about
+1.9 min, because the first fingerprint measurement now includes the sanitiser build).
+Lint, format and type checks were clean.
+
+### M6 (2026-10-15)
+
+Same environment as M1. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **173 passed, 0
+skipped, 0 failed** (142 unit, 31 sandbox; about 12.4 min, mostly the first fingerprint
+measurement of three problems). `npm test`: 15 passed. `npx playwright test`: 1 passed
+(about 2.0 min). `codeadapt-content validate ../content/demo` reported `RESULT ok` for all
+three problems with no warnings. Lint, format, type and API-type drift checks were clean.
+No sandbox containers or volumes were left behind.
+
+### M7 (2026-10-15)
+
+Same environment as M1. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **179 passed, 0
+skipped, 0 failed** (147 unit, 32 sandbox; about 14.6 min). `npm test`: 18 passed.
+`npx playwright test`: 1 passed (about 1.8 min). `codeadapt-eval` over all 17 held-out
+cases took about 8.5 min; two separate invocations produced byte-identical JSON and
+Markdown reports (saved as docs/evaluation/synthetic-2026-10-15.md). Lint, format, type and
+API-type drift checks were clean. No sandbox containers or volumes were left behind.
+
+### CE0 and review resolution (2026-10-15)
+
+Same environment as M1. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **200 passed, 1
+failed** in the full run (169 unit, 32 sandbox; about 14 min). The failure was
+`test_lower_bound_heldout_evaluation_is_reproducible`, aborted by
+`SandboxUnavailableError: docker kill timed out`: `docker kill` on a timed-out container
+exceeded its 15 s limit while the host's load average was about 8 on 4 cores. Re-run alone,
+it passed (1 passed, 2.8 min). The same timeout once aborted a `codeadapt-eval` run, and
+appeared in the Playwright run, where the worker requeued the job as designed. It is an
+infrastructure timeout, not a test result. The harness aborting on it, rather than
+recording an infrastructure error for the affected case, is a known limit for M8. No
+sandbox containers were left behind. `npm test`: 18 passed. `npx playwright test`:
+1 passed (2.3 min). `codeadapt-content report` produced byte-identical reports on two
+runs. Held-out and calibration reports for both methods are in
+docs/evaluation/review-2026-10-15/. Lint, format, type and API-type drift checks were
+clean.
+
+On GitHub Actions (commit d4c218a), the web and compose jobs passed. The backend job
+failed once on the same `docker kill` timeout and passed on re-run. The end-to-end job
+then failed: `upper_bound_confusion` produced empty output on one run of `large_absent`,
+so worker-side validation rejected the content as non-deterministic and the job failed.
+Execution-layer reliability under load is an open issue.
+
+Follow-up (ADR-020): kill wait raised to 60 s, client/container exit mismatch classified as
+an infrastructure error, and fingerprint measurement re-measures infrastructure errors.
+Unit: 174 passed. Sandbox execution, security and demo-content tests: 29 passed. The lost
+output was not reproduced in 200 stressed local runs, so whether the mismatch check
+catches it is not yet shown.
+
+### C1–C2, C6 comparison and ADR-020 regression tests (2026-10-16)
+Same environment. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **214 passed, 0 skipped,
+0 failed** (≈ 15 min). `ruff check`, `ruff format --check`, `mypy --strict`: clean.
+`codeadapt-content validate --repeats 3` on lower-bound after C1–C2: valid, 0 errors,
+0 warnings, 1 documented limitation (E2). Held-out and calibration comparisons:
+docs/evaluation/c6-2026-10-16/. The ADR-020 regression tests use a fake `docker` binary;
+they do not reproduce the original CI lost-output failure.
+
+### EV1: trustworthy skill evidence (2026-10-17)
+Same environment. `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **241 passed, 0 skipped,
+0 failed** (≈ 15 min). `ruff check`, `ruff format --check`, `mypy --strict`: clean.
+`npx playwright test`: 1 passed. Held-out and calibration comparisons: identical case for
+case to docs/evaluation/c6-2026-10-16 (after C1–C2). The loaded-timeout sandbox test (12
+concurrent infinite loops plus host CPU load) needed the stall re-run on 12 of 12 runs
+locally and ended every one as a CPU-limit time limit. Not tested: gVisor; the original CI
+stall and lost-output events (neither reproduced).
+
+ADR-024 (end-of-output marker, after CI on d3919b0 showed lost output during
+fingerprinting): `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1`: **244 passed, 0 skipped,
+0 failed** (≈ 15 min); ruff, format and mypy clean. Held-out and calibration comparisons
+unchanged. The marker check is tested with a fake docker that drops the marker; the real
+lost-output event has not been reproduced locally, so the root cause is still unknown.
+
+### LM1: researcher-only learner model (2026-10-17)
+Same environment.
+- Backend: `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1` gave **266 passed, 0 skipped, 0
+  failed** (about 15 min). Of these, 22 are new: 21 in `tests/unit/test_learner_model.py`
+  and one API test in `test_trajectories.py`.
+- Web: `vitest` gave 19 passed, including the new learner-model page test.
+- Browser: `npx playwright test` gave 1 passed.
+- `ruff check`, `ruff format --check`, `mypy --strict`, `tsc` and `eslint` are clean.
+
+These tests check the arithmetic and the counting rules on synthetic attempts. They say
+nothing about whether the estimates describe real learners.
+
+### CE1.1: first-true (2026-10-18)
+Same environment.
+- Backend: `pytest` with `CODEADAPT_REQUIRE_SANDBOX=1` gave **274 passed, 0 skipped, 0
+  failed** (about 19 min). New tests:
+  - the policy 1.3 golden regression (286 recommendations from policy 1.2 at `89a7803`);
+  - non-recommendable problems are never chosen;
+  - first-true stays listed and does not leak to students;
+  - first-true feeds the learner model.
+- Web: `vitest` gave 19 passed. Browser: `npx playwright test` gave 1 passed.
+- `ruff check`, `ruff format --check`, `mypy --strict`, `tsc` and `eslint` are clean.
+  OpenAPI is unchanged.
+- Content: `codeadapt-content validate ../content/demo` is valid for all four problems, and
+  the first-true report regenerates identically.
+
+### gVisor runtime (2026-10-22, ADR-028)
+Development container (4 cores, cgroup v1, kernel 6.18, Docker 29.9.1) with `runsc`
+release-20261005.0 (systrap) registered by `runsc install`.
+- Before ADR-028: `CODEADAPT_SANDBOX_RUNTIME=runsc pytest tests/sandbox`: 26 failed, 7 passed
+  (run containers could not start under `--pids-limit 16`).
+- After: **33 passed** in 1224 s (runc: 33 passed, about 1000 s of the 1078 s full suite).
+- Unit: `tests/unit/test_sandbox_flags.py` (runc flags unchanged, runsc flags as decided).
+- CI: the `sandbox-gvisor` job installs the same pinned release (sha512 checked) and runs the
+  `core` sandbox shard under `runsc`.

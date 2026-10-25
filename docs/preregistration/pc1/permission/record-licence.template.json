@@ -1,0 +1,47 @@
+{
+  "record_version": 2,
+  "status": "TEMPLATE",
+  "dataset": "IBM Project CodeNet 1.0.0",
+  "basis": "published dataset licence",
+  "licence_id": "CDLA-Permissive-2.0",
+  "licence_text_sha256": "4531a67d443284d93ffed0803df5b10634aff21c3d77e381f2d48af01d875868",
+  "licence_evidence": [
+    {
+      "source": "CodeNet paper (Puri et al., NeurIPS 2021 Datasets and Benchmarks), datasheet",
+      "locator": "arXiv 2105.12655 (give version), datasheet question on the dataset's license",
+      "publisher": "dataset provider",
+      "seen": "first-hand",
+      "accessed_on": "YYYY-MM-DD",
+      "quote": "Copy the exact sentence naming the licence."
+    },
+    {
+      "source": "Linux Foundation press release, June 2021, on CDLA-Permissive-2.0",
+      "locator": "linuxfoundation.org press release URL",
+      "publisher": "third party",
+      "seen": "first-hand or secondary",
+      "accessed_on": "YYYY-MM-DD",
+      "quote": "Copy the exact sentence about IBM and Project CodeNet."
+    }
+  ],
+  "unverified": "Say what you could not check, e.g. whether a current IBM distribution page states the licence.",
+  "known_risks": "Upstream rights of AIZU/AtCoder submitters are not covered by any warranty (CDLA section 4); user ids are pseudonymous and could in principle be matched to public judge pages.",
+  "recorded_on": "YYYY-MM-DD",
+  "recorded_by": "owner",
+  "self_imposed_conditions": {
+    "aggregate_outputs_only": true,
+    "no_reidentification": true,
+    "no_linkage_with_other_sources": true,
+    "no_source_code_access": true,
+    "no_redistribution": true,
+    "data_outside_repository": true
+  },
+  "scope": {
+    "download_full_archive": true,
+    "store_outside_repository": true,
+    "metadata_analysis": true,
+    "source_code_analysis": false,
+    "publish_derived_statistics": false,
+    "publish_submission_ids": false,
+    "redistribute_code": false
+  }
+}

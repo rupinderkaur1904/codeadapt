@@ -1,0 +1,40 @@
+{
+  "by_language": {
+    "C++": 318,
+    "Java": 2
+  },
+  "conflicting_duplicate_rows_excluded": 2,
+  "cpp_by_class": {
+    "accepted": 207,
+    "compile_error": 1,
+    "eligible_rejected": 108,
+    "judge_infrastructure": 1,
+    "presentation_error": 1,
+    "unknown_status": 0
+  },
+  "cpp_users": 208,
+  "eligible_rejected_by_timing": {
+    "after_first_accept": 1,
+    "before_first_accept": 105,
+    "never_accepted": 1,
+    "same_second_as_first_accept": 1
+  },
+  "exact_duplicates_dropped": 1,
+  "malformed": {
+    "bad_date": 1,
+    "missing_user_id": 1,
+    "problem_id_mismatch": 1
+  },
+  "pairs_with_gap_over_30_days": 1,
+  "pairs_with_language_version_change": 1,
+  "primary_pairs": 104,
+  "primary_pairs_by_rejected_status": {
+    "Runtime Error": 1,
+    "Time Limit Exceeded": 1,
+    "Wrong Answer": 102
+  },
+  "rows_read": 326,
+  "secondary_pairs": 105,
+  "unique_submissions": 320,
+  "users_with_accept": 207
+}

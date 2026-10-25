@@ -1,0 +1,233 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/rotated-min.md (CE2).
+
+slug = "rotated-min"
+title = "Minimum of a rotated array"
+family = "binary-search"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int rotated_min_index(const std::vector<int>& a);"
+# CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
+# problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
+recommendable = false
+
+[skills]
+search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."
+loop_termination = "Ensuring each iteration shrinks the search space so the loop terminates."
+problem_specification = "Returning what the specification asks for, including when the target is absent."
+
+# A probe is a property of an input that a test exercises. Each probe names the skills
+# whose errors it can expose; this mapping is a modelling assumption, not a fact.
+[probes]
+not_rotated = ["search_space_boundaries"]
+rotated = ["search_space_boundaries", "problem_specification"]
+min_at_end = ["search_space_boundaries"]
+single_element = ["search_space_boundaries", "loop_termination"]
+two_elements = ["loop_termination"]
+large_input = ["loop_termination"]
+
+[curriculum]
+assumes = ["indexing a std::vector", "a loop invariant over a closed range [lo, hi]"]
+prerequisites = ["first-true", "lower-bound"]
+
+[[tests]]
+key = "sample_rotated"
+visibility = "sample"
+input = "L 5 4 5 1 2 3"
+expected = "2"
+probes = ["rotated"]
+student_description = "A rotated array."
+purpose = "Visible typical case."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "sample_sorted"
+visibility = "sample"
+input = "L 4 11 12 13 14"
+expected = "0"
+probes = ["not_rotated"]
+student_description = "An array that was not rotated."
+purpose = "Visible case: answer 0."
+distinguishes = ["compares_with_lo", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "single"
+input = "L 1 7"
+expected = "0"
+probes = ["single_element", "not_rotated"]
+student_description = "A single element."
+purpose = "Smallest input."
+distinguishes = ["returns_value"]
+
+[[tests]]
+key = "two_rotated"
+input = "L 2 9 3"
+expected = "1"
+probes = ["two_elements", "rotated", "min_at_end"]
+student_description = "Two elements, rotated."
+purpose = "Answer 1 with two elements."
+distinguishes = ["no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "two_sorted"
+input = "L 2 3 9"
+expected = "0"
+probes = ["two_elements", "not_rotated"]
+student_description = "Two elements, not rotated."
+purpose = "Answer 0 with two elements."
+distinguishes = ["compares_with_lo", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "min_last"
+input = "L 5 12 13 14 15 11"
+expected = "4"
+probes = ["rotated", "min_at_end"]
+student_description = "The smallest element is last."
+purpose = "Answer n - 1."
+distinguishes = ["no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "min_second"
+input = "L 5 19 11 12 13 14"
+expected = "1"
+probes = ["rotated"]
+student_description = "The smallest element is second."
+purpose = "Rotation by one from the end."
+distinguishes = ["no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "min_middle_even"
+input = "L 6 17 18 19 11 12 13"
+expected = "3"
+probes = ["rotated"]
+student_description = "Even length, minimum in the middle."
+purpose = "Typical case, even length."
+distinguishes = ["compares_with_lo", "no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "sorted_long"
+input = "L 7 21 23 25 27 29 31 33"
+expected = "0"
+probes = ["not_rotated"]
+student_description = "A longer array that was not rotated."
+purpose = "Answer 0 with more elements."
+distinguishes = ["compares_with_lo", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "three_min_last"
+input = "L 3 15 17 12"
+expected = "2"
+probes = ["rotated", "min_at_end"]
+student_description = "Three elements, smallest last."
+purpose = "Small range with the answer at the end."
+distinguishes = ["no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "three_min_middle"
+input = "L 3 17 12 15"
+expected = "1"
+probes = ["rotated"]
+student_description = "Three elements, smallest in the middle."
+purpose = "Small range with the answer in the middle."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "min_fifth_of_six"
+input = "L 6 13 14 15 16 11 12"
+expected = "4"
+probes = ["rotated"]
+student_description = "Six elements, smallest fifth."
+purpose = "The midpoint lands just after the minimum."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "min_fourth_of_seven"
+input = "L 7 15 16 17 11 12 13 14"
+expected = "3"
+probes = ["rotated"]
+student_description = "Seven elements, smallest fourth."
+purpose = "The minimum is the first midpoint."
+distinguishes = ["hi_skips_candidate", "no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "negatives"
+input = "L 5 -3 0 4 -10 -6"
+expected = "3"
+probes = ["rotated"]
+student_description = "Negative and positive values."
+purpose = "Values are not indices."
+distinguishes = ["compares_with_lo", "no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "large_sorted"
+input = "R 200000 0 100 3"
+expected = "0"
+probes = ["large_input", "not_rotated"]
+student_description = "A large array that was not rotated."
+purpose = "Answer 0 at scale."
+distinguishes = ["compares_with_lo", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "large_half"
+input = "R 200000 100000 100 3"
+expected = "100000"
+probes = ["large_input", "rotated"]
+student_description = "A large array rotated by half."
+purpose = "Typical answer at scale."
+distinguishes = ["compares_with_lo", "no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "large_min_last"
+input = "R 200000 199999 100 3"
+expected = "199999"
+probes = ["large_input", "rotated", "min_at_end"]
+student_description = "A large array whose smallest element is last."
+purpose = "Answer n - 1 at scale."
+distinguishes = ["no_progress_update", "returns_pivot", "returns_value"]
+
+[[tests]]
+key = "large_min_second"
+input = "R 200000 1 100 3"
+expected = "1"
+probes = ["large_input", "rotated"]
+student_description = "A large array whose smallest element is second."
+purpose = "Answer 1 at scale."
+distinguishes = ["no_progress_update", "returns_pivot", "returns_value"]
+
+[[error_models]]
+key = "compares_with_lo"
+file = "error_models/compares_with_lo.cpp"
+skill = "search_space_boundaries"
+description = "Compares the midpoint with the first element of the range instead of the last, which discards the minimum when the range is not rotated."
+student_hint = "Does your comparison still keep the minimum in the search space when the array was not rotated at all?"
+
+[[error_models]]
+key = "hi_skips_candidate"
+file = "error_models/hi_skips_candidate.cpp"
+skill = "search_space_boundaries"
+description = "Sets hi = mid - 1 when the midpoint is not larger than the last element, which can discard the minimum itself."
+student_hint = "When the midpoint could itself be the minimum, does your update keep it in the search space?"
+known_limitation = "Detected only by rotated arrays whose minimum becomes a midpoint (one behaviour group). Any error that fails exactly those tests produces the same failures, so diagnoses are reported as qualified."
+
+[[error_models]]
+key = "no_progress_update"
+file = "error_models/no_progress_update.cpp"
+skill = "loop_termination"
+description = "Sets lo = mid instead of mid + 1, so the range stops shrinking once hi == lo + 1."
+student_hint = "When only two candidates remain, does every iteration still shrink the range?"
+
+[[error_models]]
+key = "returns_value"
+file = "error_models/returns_value.cpp"
+skill = "problem_specification"
+description = "Returns the minimum value instead of its index."
+student_hint = "Re-read what the function must return: a position or a value?"
+
+[[error_models]]
+key = "returns_pivot"
+file = "error_models/returns_pivot.cpp"
+skill = "problem_specification"
+description = "Returns the index of the maximum (just before the minimum, cyclically) instead of the minimum."
+student_hint = "Re-read which element's index is asked for: the smallest, not the largest."
