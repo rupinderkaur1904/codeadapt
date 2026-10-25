@@ -10,7 +10,10 @@ const read = (rel: string) => readFileSync(problemDir + rel, "utf-8");
 // through the real API, worker and sandbox. Synthetic programs (ADR-008); this checks the
 // mechanism, not accuracy.
 test("researcher follows a submission to its trace and the learner model", async ({ page }) => {
+  // The landing page leads to the problem list (frontend theme, routes from branch 9vflva).
   await page.goto("/");
+  await page.getByRole("link", { name: "Start digging" }).click();
+  await expect(page).toHaveURL(/\/problems$/);
   await page.getByRole("link", { name: "Lower bound" }).click();
   const editor = page.locator(".cm-content");
   await editor.click();
@@ -25,6 +28,12 @@ test("researcher follows a submission to its trace and the learner model", async
   await expect(page.locator("body")).not.toContainText("exact_match_sentinel");
   await expect(page.locator("body")).not.toContainText("P(known)");
 
+  // The student's own history lists the attempt, still without internal labels.
+  await page.getByRole("link", { name: "My attempts" }).click();
+  await expect(page.getByRole("heading", { name: "My attempts" })).toBeVisible();
+  await expect(page.getByRole("row").filter({ hasText: "Lower bound" }).first()).toBeVisible();
+  await expect(page.locator("body")).not.toContainText("exact_match_sentinel");
+
   await page.getByLabel("Development role").selectOption("researcher");
   await page.getByRole("link", { name: "Research" }).click();
   await expect(page.getByRole("heading", { name: "Research" })).toBeVisible();
@@ -38,12 +47,10 @@ test("researcher follows a submission to its trace and the learner model", async
   await expect(page.locator("body")).toContainText("exact_match_sentinel");
   await expect(page.getByRole("heading", { name: "Adaptation" })).toBeVisible();
 
-  await page.getByRole("link", { name: "← All submissions" }).click();
-  await page
-    .getByRole("row")
-    .filter({ hasText: "exact_match_sentinel" })
-    .getByRole("link", { name: "dev-student" })
-    .click();
+  // Reach the learner model through the Learners list.
+  await page.getByRole("link", { name: "Learners" }).click();
+  await expect(page.getByRole("heading", { name: "Learners" })).toBeVisible();
+  await page.getByRole("link", { name: "dev-student" }).click();
   await expect(page.getByRole("heading", { name: "Learner model: dev-student" })).toBeVisible();
   await expect(page.locator("body")).toContainText("estimated under assumed parameters");
   // The named diagnosis is an incorrect observation on its model's skill.
