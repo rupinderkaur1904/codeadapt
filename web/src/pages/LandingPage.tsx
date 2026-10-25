@@ -102,14 +102,14 @@ export function LandingPage({ loggedIn }: { loggedIn: boolean }) {
           <figure className="roots">
             <RootsIllustration />
             <figcaption>
-              Illustration: the four skills the current binary-search problems exercise. The dashed
-              line follows the example above. It does not show anyone&apos;s progress.
+              Illustration: the four skills the binary-search problems exercise. The dashed line
+              follows the example above. It does not show anyone&apos;s progress.
             </figcaption>
           </figure>
         </div>
         <p className="soil-footnote">
-          Research prototype · four binary-search problems in C++ · not yet evaluated with real
-          students.
+          Research prototype · 25 C++ problems in five families (binary search, arrays, two
+          pointers, sliding window, prefix sums) · not yet evaluated with real students.
         </p>
       </section>
     </div>
