@@ -34,7 +34,10 @@ function renderApp(path = "/problems") {
   );
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  window.sessionStorage.clear();
+});
 
 describe("login", () => {
   it("shows the login form without a session, then the app after logging in", async () => {
@@ -114,5 +117,35 @@ describe("login", () => {
 
     await user.click(screen.getByRole("link", { name: "Log in to start" }));
     expect(await screen.findByRole("heading", { name: "Log in" })).toBeInTheDocument();
+  });
+
+  it("opens the site with the intro, which Enter dismisses once per session", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => json({ type: "x/not-authenticated", title: "Login", status: 401 }, 401)),
+    );
+    const user = userEvent.setup();
+    const first = renderApp("/");
+    const intro = screen.getByRole("button", { name: "Enter CodeAdapt" });
+    expect(intro).toHaveFocus();
+    await user.keyboard("{Enter}");
+    await waitFor(() =>
+      expect(screen.queryByRole("button", { name: "Enter CodeAdapt" })).not.toBeInTheDocument(),
+    );
+    first.unmount();
+
+    renderApp("/");
+    expect(await screen.findByRole("heading", { name: /Fix the root/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Enter CodeAdapt" })).not.toBeInTheDocument();
+  });
+
+  it("skips the intro on deep links", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => json({ type: "x/not-authenticated", title: "Login", status: 401 }, 401)),
+    );
+    renderApp("/problems");
+    expect(await screen.findByRole("heading", { name: "Log in" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Enter CodeAdapt" })).not.toBeInTheDocument();
   });
 });
