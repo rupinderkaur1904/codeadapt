@@ -92,3 +92,13 @@ as **unaccepted content**:
    bank.
 
 The CE1.4 report stays valid as a technical measurement in options 1 and 2.
+
+## Owner decision (2026-10-25 07:50)
+
+The owner chose **"Keep, pending review"**.
+
+- The 8 problems stay in the bank, unchanged.
+- integer-sqrt and min-capacity are the CE1.2 and CE1.3 gate submissions, awaiting the owner's
+  review. The six BSX problems await acceptance separately.
+- Until that review, no problem is accepted, no further problem-bank work happens, and the demo
+  presents them as unreviewed.
