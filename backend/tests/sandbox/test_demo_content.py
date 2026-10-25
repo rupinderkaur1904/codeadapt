@@ -20,6 +20,8 @@ from tests.paths import DEMO_CONTENT, ORIGINAL_SLUGS
 NON_UNIQUE_ATTRIBUTION = {
     "min-capacity": {"strict_day_limit", "full_day_overflows"},
     "stock-profit": {"ignores_order"},
+    "container-water": {"moves_taller"},
+    "dedup-sorted": {"returns_last_index"},
 }
 
 
