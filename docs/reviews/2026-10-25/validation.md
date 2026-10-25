@@ -70,3 +70,18 @@ LM1 BKT → recommendation:
 | The `compose.demo.yaml` login-mode stack end to end | CI's compose job runs `compose.yaml` only | Config validated locally. The login flow is covered by `e2e/login.spec.ts`, not under compose. |
 | Research-page pagination against a real API with more than 100 rows | No e2e fixture | `ResearchPage.test.tsx` (unit). The backend clamps `limit` to 200 and `offset` to at least 0. |
 | Real learners, real code | Not authorised; no data | — |
+
+## Re-check after ADR-032 (b523b1d, 2026-10-25 08:30–08:40)
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Backend unit tests | `cd backend && uv run pytest -q tests/unit` | **382 passed** |
+| Lint, format, types | as above | Clean (102 files) |
+| Sandbox: adaptation (incl. the new min-capacity pipeline test), demo content (all 12 problems), end-to-end | `CODEADAPT_REQUIRE_SANDBOX=1 uv run pytest -q tests/sandbox/test_adaptation_end_to_end.py tests/sandbox/test_demo_content.py tests/sandbox/test_end_to_end.py` | **4 passed** (1427 s) |
+| min-capacity held-out on the new content version | see docs/evaluation/adr032-2026-10-25/README.md | Byte-identical to the 2026-10-24 record |
+| Browser, all specs | `cd web && npx playwright test` | **3 passed** (2.3 min): login, student practice, researcher journey |
+| Web build | `npm run build` | No warnings; the lazily loaded PracticePage chunk (651 kB, 209 kB gzipped) is under the configured 800 kB limit |
+| Setup from a fresh clone | `git clone`, `uv sync`, `uv run alembic upgrade head`, `uvicorn … --factory`, `GET /api/v1/problems` with `X-Dev-Role: student` | Works as documented in docs/development.md; 12 problems listed |
+
+The scripted demo (docs/demo.md) does not use min-capacity, so ADR-032 does not affect it; it
+was last re-run on c43ba45 with identical outcomes.
