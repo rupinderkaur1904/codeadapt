@@ -23,10 +23,17 @@ evaluation), integrated and verified, by Wednesday 2026-10-28. Functional comple
 night; Wednesday for regression, demo, report checks. No scope cuts, no unrelated features, no
 frozen rule/threshold/parameter changes. Phase E deferred (gate closed).
 
+**Owner direction (2026-10-25 07:06):** integrate `9vflva`; investigate the two skill-mapping
+flags; clarify CE1.2/CE1.3/L19 ("I have not explicitly approved an unresolved research decision
+merely because I asked you to continue development autonomously"); continue end-to-end
+validation; keep rules/evidence/BKT/policy unchanged without an explicit decision; CodeNet gate
+closed; continue autonomously on authorised work only. No further problem-bank work until the
+owner decides on the 8 new problems.
+
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 12
+**Iteration:** 13
 
 **PC1 status:** Phase E proposed — blocked pending code-level permission and owner approval.
 
@@ -60,10 +67,15 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | F3 | Limitations and future work list | E1 | docs/limitations.md | Complete, consistent with status report | **done** 91cb35a |
 | G1 | Demo workflow with expected results, verified locally | C1 | docs/demo.md | Steps run today; outputs match | **done** (run 2026-10-24, output recorded) |
 | G2 | Interview-preparation document | F1, E1 | docs/interview-prep.md | Architecture, algorithms, trade-offs, evaluation, limitations | **done** 91cb35a |
-| H1 | Bank expansion: complete binary-search problems | — | content/demo/*, docs/content-design/*, docs/content-reports/*, eval/heldout/* | Per problem: sandbox validation ok, distinguishes = measured, design record, held-out committed before eval, eval recorded, E2 not recommendable | **VERIFIED** for 8 problems: integer-sqrt, upper-bound, exact-search, last-occurrence, min-capacity, rotated-min, rotated-search, peak-index. CI green (runs 90–92) |
+| H1 | Bank expansion: complete binary-search problems (**not accepted by the owner; decision pending, see docs/reviews/2026-10-25/ce1-status.md**) | — | content/demo/*, docs/content-design/*, docs/content-reports/*, eval/heldout/* | Per problem: sandbox validation ok, distinguishes = measured, design record, held-out committed before eval, eval recorded, E2 not recommendable | **VERIFIED** for 8 problems: integer-sqrt, upper-bound, exact-search, last-occurrence, min-capacity, rotated-min, rotated-search, peak-index. CI green (runs 90–92) |
 | H2 | Integration tests: infrastructure failure, redelivery, content versions | — | backend/tests/unit/test_pipeline_infrastructure.py, test_content_versions.py | Outage leaves no run, diagnosis, recommendation or learner attempt; redelivery adds no attempt; old version keeps its snapshot | **VERIFIED** (unit suite 373 pass) |
 | H3 | CE1.4 family report: observation capacity and BKT sensitivity on the 12-problem bank | H1 | docs/evaluation/ce1.4-2026-10-24/ | Technical measurements only | **VERIFIED** 8dbc328 |
 | H4 | Playwright specs no longer race for the single worker | — | web/playwright.config.ts | 3/3 pass locally serially | **VERIFIED**: CI run 92 green on eb05bf9 |
+| I1 | Integrate frontend branch `9vflva` (landing page, `/problems`, My attempts, Learners, research pagination, demo compose) | — | web/*, compose.demo.yaml, docs/demo.md | Merge without conflicts; e2e follow new routes; all web checks and Playwright pass | **VERIFIED** 159162a: web 27 tests, Playwright 3/3 locally, CI run 94 |
+| I2 | Skill-mapping review (min-capacity, rotated-min) | — | docs/reviews/2026-10-25/skill-mapping-review.md | Evidence for/against unique attribution; no mapping change | **done** abd4b33. min-capacity attribution not unique (exact equivalences); L20 added; decision deferred until real-learner use |
+| I3 | L19 options brief with measurement | — | docs/reviews/2026-10-25/l19-policy-options.md, l19_measure.py | Current behaviour, options, consequences, recommendation; no rule change | **done** abd4b33. Recommends option B; **PROPOSED, needs owner approval** |
+| I4 | CE1.2/CE1.3/BSX factual account and isolated decision | — | docs/reviews/2026-10-25/ce1-status.md | What was done, what changed, deviations; decision card | **done**; decision card posted 2026-10-25 |
+| I5 | End-to-end validation report with exact commands | I1 | docs/reviews/2026-10-25/validation.md | Commands, counts, skipped items | **VERIFIED**: unit 373, sandbox 31 locally, Playwright 3/3, CI run 94 |
 
 ## Log
 
@@ -105,34 +117,36 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Blockers needing the owner
 
-1. **CE1.2/CE1.3 resumed.**
-   - I closed the decision card on the owner's overnight instruction to expand the bank; the
-     owner did not tap it.
-   - The owner should confirm that reading.
-2. **Skill-mapping flags (no change made; owner review).**
-   - `min-capacity` maps two exact-boundary errors (`<` against `<=` on day count and load) to
-     `equality_handling`.
-   - `rotated-min` maps `compares_with_lo` (wrong reference element) to
-     `search_space_boundaries`.
-   - Each could argue for a new skill. None was added.
-3. Rule C limitation L19 (positive evidence from an abstained, mostly failing attempt): policy
-   decision, not changed.
-4. PC1 Phase E: deferred (permission basis P, then D1–D12).
+1. **The 8 new problems (CE1.2, CE1.3, BSX).** Treated as unaccepted content; no further bank
+   work. Options in docs/reviews/2026-10-25/ce1-status.md; decision card posted 2026-10-25.
+2. **L19 evidence rule.** Option B recommended (no observations from failing, not-named
+   attempts); evidence-policy change, not made.
+3. **Skill mappings.** Not urgent; min-capacity option (b) needed before real-learner use.
+4. PC1 Phase E: deferred (permission basis P, then D1–D12). Gate closed.
 5. Hosting/deployment (M8).
 
 ## Next three tasks
 
-1. **Keep CI green.** It is green on eb05bf9 (run 92, all jobs, about 23 min wall).
-2. **Frontend branch `9vflva`**: integrate after checking with that thread, so the two do not
-   make conflicting edits.
-3. **Refresh the docs for the final state.** That means the status report, the research-report
-   draft and `docs/demo.md`. Then integrate the frontend branch `9vflva` without conflicting
-   edits.
+1. **Researcher workflow polish within existing scope:** check every researcher page (trace,
+   learners, learner model, research list) against the API for missing states (empty, error,
+   pagination) and add tests where gaps exist. No rule or policy change.
+2. **Refresh status and report docs** (docs/status-2026-10-24.md, research-report-draft,
+   interview-prep) for the integrated UI, L20 and the pending decisions.
+3. **Demo rehearsal** of docs/demo.md on the compose stack, including `compose.demo.yaml` login
+   mode, recording observed output.
 
 ## Resume instruction
 
 `git fetch origin && git checkout claude/project-thread-dyivyy`, reread this file, run
 `cd backend && uv sync && uv run pytest tests/unit -q`, then continue with "Next three tasks".
+
+### Iteration 13 (2026-10-25)
+
+- 1d16d74 merge of `9vflva` (clean). 159162a: research.spec starts at the landing page and
+  reaches the learner model via Learners; checks My attempts hides internal labels; demo.md
+  routes. CI run 94: all 16 jobs green.
+- abd4b33: owner-decision reviews (skill mappings, L19, CE1 status), L20 in limitations.
+- Local: unit 373, sandbox 31 (560 s), web 27, Playwright 3/3.
 
 ### Iterations 7–8
 
