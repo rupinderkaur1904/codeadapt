@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A3, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "max-window-sum"
+
+[[cases]]
+file = "prefix_differences.cpp"
+truth = "correct"
+note = "Prefix sums with 64-bit differences."
+
+[[cases]]
+file = "window_struct.cpp"
+truth = "correct"
+note = "Single loop that adds, subtracts and records once the window is full."
+
+[[cases]]
+file = "zero_start_prefix.cpp"
+truth = "best_starts_zero"
+note = "Prefix sums with the best starting at 0."
+
+[[cases]]
+file = "slide_stops_early.cpp"
+truth = "misses_last_window"
+note = "Loop over window starts that stops before the last one."
+
+[[cases]]
+file = "running_total.cpp"
+truth = "never_subtracts"
+note = "Running total from the start, recorded from the first full window on."
+
+[[cases]]
+file = "off_by_one_leaver.cpp"
+truth = "subtracts_wrong_element"
+note = "Subtracts a[i + 1 - k]."
+
+[[cases]]
+file = "window_one_short.cpp"
+truth = "unmodelled"
+note = "Windows of k - 1 elements."
+
+[[cases]]
+file = "top_k_values.cpp"
+truth = "unmodelled"
+note = "Sums the k largest values."

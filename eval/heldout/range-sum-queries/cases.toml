@@ -1,0 +1,42 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A4, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "range-sum-queries"
+
+[[cases]]
+file = "one_based_prefix_ll.cpp"
+truth = "correct"
+note = "One-based prefix array with converted query ends."
+
+[[cases]]
+file = "inclusive_with_guard.cpp"
+truth = "correct"
+note = "Inclusive prefix array with a guard for l = 0."
+
+[[cases]]
+file = "inclusive_stops_short.cpp"
+truth = "excludes_right_end"
+note = "Inclusive prefix up to r - 1, so a[r] is left out."
+
+[[cases]]
+file = "copy_not_running.cpp"
+truth = "prefix_not_accumulated"
+note = "Inclusive 'prefix' array that copies the elements instead of summing them."
+
+[[cases]]
+file = "total_up_to_r.cpp"
+truth = "ignores_left_end"
+note = "Returns the sum from the start of the array up to r."
+
+[[cases]]
+file = "drops_left_end.cpp"
+truth = "unmodelled"
+note = "Uses s[l + 1], so a[l] is left out."
+
+[[cases]]
+file = "one_extra_left.cpp"
+truth = "unmodelled"
+note = "Subtracts the prefix up to l - 2, so a[l - 1] is included."
