@@ -65,9 +65,11 @@ is still about a single observable: the output on "no answer" inputs.
 - **Sorting descending and taking the second element** is identical to `counts_duplicates` on
   every input. Both treat duplicates as separate values (`tie_resolution`), so the skill
   attribution is unique. The description names both routes.
-- **"Largest value after the maximum's position"** is identical to `no_demotion` on 365 of 400
-  inputs. The tests separate them: for example, `answer_first` gives 3 for `no_demotion` and -1
-  for the alternative. So it is not an exact equivalence.
+- **"Largest value after the maximum's position"** (`alternatives/max_of_rest.cpp`) is
+  identical to `no_demotion` on 365 of 400 random inputs. **Correction:** the first version of
+  this record said the tests separate the two, citing `answer_first`. That was wrong: both give
+  3 there, and the two programs agree on every original test. The held-out case
+  `after_max_only.cpp` (truth `unmodelled`) was therefore named `no_demotion` (see §7).
 
 ## 5. Role in the bank
 
@@ -81,3 +83,19 @@ There are 8 cases:
 - 2 correct (sort and unique; two passes);
 - 4 modelled, in different styles;
 - 2 unmodelled.
+
+## 7. Change after the held-out evaluation (2026-10-25)
+
+**What happened.** The first held-out evaluation, on content version 1, named the unmodelled case
+`after_max_only.cpp` as `no_demotion`. This is a wrong diagnosis, and it is kept on record in
+`docs/evaluation/expansion-2026-10-25/second-largest.md`. The design tool had only compared the
+alternatives on random inputs. It now also reports any alternative that matches a model on every
+test.
+
+**What changed.** The test `answer_before_max` (`[5, 3, 9]`, answer 5) was added. It separates
+the two programs: `no_demotion` gives 3, and the alternative gives -1. This creates a new content
+version. The held-out set was re-run on it and recorded separately (`second-largest-v2.*`).
+
+**What the re-run can and cannot show.** The change was made *after* seeing a held-out result. So
+that case no longer counts as an independent check of the new version. The re-run only shows
+that the added test does what it was designed to do.
