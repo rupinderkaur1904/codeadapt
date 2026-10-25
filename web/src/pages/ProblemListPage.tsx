@@ -6,6 +6,22 @@ import { ErrorMessage } from "../components/ErrorMessage";
 import { RecommendationCard } from "../components/RecommendationCard";
 
 const RECENT_LIMIT = 50;
+// The eight binary-search problems added on 2026-10-24 that the owner keeps provisionally until
+// their review (decision 2026-10-25 07:50). The label is about review status only: the problems
+// work and their reference solutions pass every test.
+const UNREVIEWED = new Set([
+  "integer-sqrt",
+  "min-capacity",
+  "upper-bound",
+  "exact-search",
+  "last-occurrence",
+  "rotated-min",
+  "rotated-search",
+  "peak-index",
+]);
+const UNREVIEWED_NOTE =
+  "Added for the research prototype and not yet reviewed by the project owner. The problem " +
+  "works and can be practised; its tests and hints have not been accepted for research use.";
 // Families in teaching order; a family not listed here follows them in the order the API sends.
 const FAMILY_ORDER = ["binary-search", "arrays", "two-pointers", "sliding-window", "prefix-sums"];
 
@@ -68,6 +84,11 @@ export function ProblemListPage() {
               return (
                 <li key={p.slug}>
                   <Link to={`/practice/${p.slug}`}>{p.title}</Link>
+                  {UNREVIEWED.has(p.slug) && (
+                    <span className="status status-unreviewed" title={UNREVIEWED_NOTE}>
+                      Unreviewed
+                    </span>
+                  )}
                   <p className="problem-meta">
                     {status(p, attempts)}
                     {attempts !== undefined && attempts > 0 && (
@@ -84,6 +105,9 @@ export function ProblemListPage() {
           </ul>
         </section>
       ))}
+      {problems.data.some((p) => UNREVIEWED.has(p.slug)) && (
+        <p className="muted unreviewed-note">Unreviewed: {UNREVIEWED_NOTE}</p>
+      )}
     </section>
   );
 }

@@ -57,7 +57,12 @@ verdict of `not_comparable`.
 ## 4. Web UI path (compose stack)
 
 1. Open http://localhost:5173. The landing page links to the problem list at `/problems`;
-   choose Lower bound.
+   choose Lower bound. The list has 25 problems in five families. Eight binary-search problems
+   carry an **Unreviewed** label: integer-sqrt, min-capacity, upper-bound, exact-search,
+   last-occurrence, rotated-min, rotated-search and peak-index. They work and can be practised,
+   but the owner has not yet reviewed them for research use (decision 2026-10-25 07:50). The
+   label says nothing about their reference solutions, which pass every test. When presenting,
+   describe them as unreviewed.
 2. Paste a program and submit. The feedback panel and the "Recommended next" card appear.
    "My attempts" lists the student's own history.
 3. Switch the dev role to researcher, open Research, and open the submission's trace.
@@ -100,6 +105,7 @@ Observed output (2026-10-25, runc):
 
 - **Session cookie.** It carries `Secure`. Browsers accept it on `http://localhost`, but the
   script's HTTP client does not, so the script sends the cookie by hand.
-- **Unaccepted problems.** The 12 problems include the 8 that the owner has not accepted (see
-  docs/reviews/2026-10-25/ce1-status.md).
+- **Unaccepted problems.** The 12 problems (25 since the 2026-10-25 expansion) include the 8 that
+  the owner has not accepted (see docs/reviews/2026-10-25/ce1-status.md). They are labelled
+  Unreviewed on `/problems`.
 - **The compose packaging itself is untested here.** It needs a run with Docker Hub access.
