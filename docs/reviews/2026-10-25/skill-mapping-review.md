@@ -168,3 +168,27 @@ python3 docs/reviews/2026-10-25/skill-mapping-alternatives/compare.py rotated-mi
 
 These are native runs, which approximate the sandbox. The alternative programs were written by
 the same author as the models. They are review evidence, not held-out cases.
+
+## Owner principle and the current gap (2026-10-25)
+
+The owner's principle: where two distinct error causes are observationally indistinguishable on
+the valid input domain, **the system must not claim to distinguish them**. Against that, the
+current min-capacity behaviour is as follows.
+
+- **Researcher trace: consistent.** Every named diagnosis carries the caveat "consistent with
+  this error model; that is not proof of it, and explanations outside the modelled error space
+  remain possible".
+- **Student hints: mostly consistent.** Both hints ask about behaviour:
+  - `strict_day_limit`: "Is a capacity that needs exactly the allowed number of days good
+    enough?"
+  - `full_day_overflows`: "Can a day be loaded exactly up to the capacity? Check the comparison
+    in your feasibility check."
+
+  The second sentence points at the comparison. The `cap - 1` alternative also lives in that
+  comparison, so it is not contradicted.
+- **Skill evidence: not consistent.** A named diagnosis records `incorrect` on
+  `equality_handling`, and that attributes the error to one of several indistinguishable causes.
+  Closing this gap is option (b) above, an evidence-policy change that needs the owner's
+  decision.
+
+Nothing was changed.
