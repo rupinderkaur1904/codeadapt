@@ -70,6 +70,14 @@ Two bugs at once, or noise, give `unmodelled_behaviour`.
 - **Ledger (ADR-023):** only an unqualified supported diagnosis adds an `incorrect` skill
   observation. Infrastructure errors, inconclusive runs, ambiguity and unmodelled behaviour
   add none. There is one observation per (attempt, skill).
+- **Known weaknesses (be ready to discuss).**
+  - **L19.** Rule C gives `correct` to any skill whose probing tests all passed, even when the
+    attempt failed elsewhere and was abstained on. On 421 synthetic mutants, wrong programs gave
+    94 `correct` and 28 `incorrect` observations. A fix (option B) is proposed and awaits the
+    owner.
+  - **L20.** Some attributions are not unique: the min-capacity exact-boundary models give the
+    same output as counting or specification errors on every input. See
+    docs/reviews/2026-10-25/.
 - **LM1 (ADR-025):** Bayesian knowledge tracing with **assumed** parameters. It counts only
   the first reliably evaluated attempt per problem version, is shown only to researchers, is
   labelled "estimated under assumed parameters", and is never used to recommend anything.

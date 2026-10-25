@@ -17,6 +17,12 @@ held-out set is close to circular, and the denominators are small. The main cont
 therefore the method and an audit trail showing how evidence quality changed what the system
 may say. It is not a demonstration of accuracy on real learners.
 
+*Scope note (2026-10-25).* The repository now also holds 8 further binary-search problems,
+added on 2026-10-24. The owner has not yet accepted them; see
+docs/reviews/2026-10-25/ce1-status.md. Their author-written held-out results are in
+docs/evaluation/ce1.2-2026-10-24 and ce2-2026-10-24. They are not part of the numbers in this
+abstract.
+
 ## 1. Problem
 
 Automated assessment usually reports only pass or fail. Diagnostic feedback that names a likely
