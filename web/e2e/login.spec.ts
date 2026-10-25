@@ -5,6 +5,11 @@ import { expect, test } from "@playwright/test";
 // logout are exercised here through the browser and the dev-server proxy.
 test("a password login replaces the dev stub until logout", async ({ page }) => {
   await page.goto("/");
+  // The intro opens the site once per tab session; Enter continues to the landing page.
+  const intro = page.getByRole("button", { name: "Enter CodeAdapt" });
+  await expect(intro).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(intro).toHaveCount(0);
   await expect(page.getByText("Development role")).toBeVisible();
 
   const status = await page.evaluate(async () => {
