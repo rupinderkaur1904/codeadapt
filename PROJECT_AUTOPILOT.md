@@ -36,10 +36,17 @@ the 421-program observations describe system behaviour and are not independently
 skill labels. Then finalise: researcher journey, setup and demo instructions, engineering
 defects. Phase E stays blocked.
 
+**Owner directive (2026-10-25 10:09): bank of 25.** Add 13 problems in new families (5 arrays,
+3 two-pointer, 3 sliding-window, 2 prefix-sum) through the full lifecycle, in batches; keep
+every rule, ADR-032, rule C (L19), L20, BKT parameters and policy unchanged; new problems
+non-recommendable; keep the seven completion levels apart; then full regression, demo and
+report. Owner 10:21: new skill keys for the new families (ADR-033). Owner 10:37: merge the intro
+screen once its CI is green.
+
 **Branch:** `claude/project-thread-dyivyy` (owner approved pushing here on 2026-10-24; never
 force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
-**Iteration:** 14
+**Iteration:** 15
 
 **PC1 status:** Phase E proposed — blocked pending code-level permission and owner approval.
 
@@ -83,6 +90,8 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 | I4 | CE1.2/CE1.3/BSX factual account and isolated decision | — | docs/reviews/2026-10-25/ce1-status.md | What was done, what changed, deviations; decision card | **done**; decision card posted 2026-10-25 |
 | J1 | ADR-032: min-capacity non-unique attribution gives no `equality_handling` evidence (owner option b) | owner 08:01 | content/demo/min-capacity/problem.toml, tests/unit/test_min_capacity_attribution.py, tests/sandbox/test_{demo_content,adaptation_end_to_end}.py, docs/decisions.md, limitations.md, methodology.md | Diagnosis and trace kept; feedback qualified; no `incorrect` obs, no ledger failure, no BKT update; other mappings and policy unchanged | **VERIFIED** locally: unit 382, sandbox 4/4 (adaptation e2e incl. new test, demo-content, end-to-end), held-out re-run byte-identical. CI run 104 green |
 | I5 | End-to-end validation report with exact commands | I1 | docs/reviews/2026-10-25/validation.md | Commands, counts, skipped items | **VERIFIED**: unit 373, sandbox 31 locally, Playwright 3/3, CI run 94 |
+| K1 | Bank of 25: 13 problems in four new families (ADR-033 skills) | owner 10:09, 10:21 | content/demo/*, docs/content-design/*, eval/heldout/*, docs/evaluation/expansion-2026-10-25/ | Per problem: design checks incl. alternative causes, sandbox validation ok, design record, held-out committed before eval, eval under v1.1–v1.3, pipeline check; status table with 7 levels | **VERIFIED** locally: 25 problems; 100 held-out cases (synthetic) 0 false alarms, 48/48 named right, 26/26 abstained; bank_check 39/39; unit 452. CI: see iteration 15 |
+| K2 | Problem list by family; intro screen merged | owner 10:37 | web/src/pages/ProblemListPage.tsx, LandingPage.tsx; merge of 9vflva 1fb72d5 | Web tests, build, Playwright pass | **VERIFIED** locally: web 34, Playwright 3/3; CI pending |
 
 ## Log
 
@@ -142,12 +151,12 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Next three tasks
 
-1. **CI green** on ADR-032: run 104 (b523b1d) and run 105 (1b48e1f) passed every job; runs
-   98–103 also green. Re-confirm after any later push.
-2. **Remaining safe engineering, no policy content:** a full `compose.demo.yaml` run once Docker Hub access works. (The PracticePage chunk
-   is lazily loaded and within the configured 800 kB limit; no build warning.)
-3. **On owner decisions only:** L19 (rule C stays; no change authorised), review of the 8
-   provisional problems. No bank or evidence-rule work before then.
+1. **CI green on the merged head** (bank of 25 + intro screen): every shard, including
+   `demo-content` with 25 problems under runc and gVisor. Watch its duration (L16).
+2. **Remaining safe engineering, no policy content:** a full `compose.demo.yaml` run once
+   Docker Hub access works.
+3. **On owner decisions only:** L19 (rule C stays), review of the 8 provisional binary-search
+   problems, any recommendable status for the new families (L21, L22). No evidence-rule work.
 
 ## Resume instruction
 
@@ -188,6 +197,27 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - CI runs 98, 99 (includes the compose-overlay validation step), 100, 101: all green.
 - Finalisation re-check on b523b1d: Playwright 3/3 (2.3 min); fresh-clone setup per
   docs/development.md works; web build has no warnings (docs/reviews/2026-10-25/validation.md).
+
+### Iteration 15 (2026-10-25, bank of 25)
+
+- Batches: A1 first-max-index, second-largest, stock-profit, longest-run (b09d42f, held-out
+  99c1bb3); A2 plus-one, closest-pair-sum, container-water, dedup-sorted (dc3f07c, a9925ae);
+  second-largest v2 (658426c); A3–A4 max-window-sum, longest-sum-at-most, distinct-in-windows,
+  pivot-index, range-sum-queries (3b079a2, held-out 778fbbf); evaluations e852b17.
+- Design tool `docs/content-design/expansion-2026-10-25/native_matrix.py`: oracle, collisions,
+  alternative-cause programs on the tests and on 400 random inputs. Three cross-skill
+  equivalences documented via the ADR-032 route; models that collided were dropped
+  (min_from_zero, never_removes, squares-sorted problem); shrinking with `if` in
+  longest-sum-at-most turned out correct and is not a model.
+- Held-out finding: second-largest named an unmodelled case wrongly; the design record's claim
+  was wrong; a test was added (v2), first-run record kept, case no longer independent.
+- fb95e16: STATUS.md (7 levels × 25), bank_check.py (39/39), unit tests for the non-unique
+  models (fail without the `known_limitation`), L20 updated, L22, report §4.1, summary.
+- cc58377: problem list grouped by family; landing footnote names the five families.
+- 63bfb99: merge of the intro screen (9vflva 1fb72d5, its CI run 110 green); one CSS conflict
+  resolved by keeping both blocks. Web 34 tests, build ok; Playwright 3/3 locally (2.5 min) on the merged tree.
+- Sandbox daemon had stopped once mid-session (evaluations failed with "docker daemon
+  unavailable"); restarted and re-ran; no result came from the failed run.
 
 ### Iterations 7–8
 
