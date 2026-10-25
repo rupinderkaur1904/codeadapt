@@ -102,3 +102,14 @@ The owner chose **"Keep, pending review"**.
   review. The six BSX problems await acceptance separately.
 - Until that review, no problem is accepted, no further problem-bank work happens, and the demo
   presents them as unreviewed.
+
+**Owner instruction (2026-10-25 07:52).** The 8 problems are kept **provisionally** in the
+development bank. They are **not research-validated**: passing implementation tests and green CI
+do not make them so. The following stay as they are until the review is complete:
+
+- their content;
+- their evaluation records;
+- their documented limitations;
+- `recommendable = false`.
+
+No problem is removed, and the bank is not expanded.
