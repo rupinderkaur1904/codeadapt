@@ -4,11 +4,12 @@ import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
-import type {
-  LearnerModelView,
-  ResearchMetrics,
-  ResearchSubmissionRow,
-  TraceView,
+import {
+  RESEARCH_PAGE_SIZE,
+  type LearnerModelView,
+  type ResearchMetrics,
+  type ResearchSubmissionRow,
+  type TraceView,
 } from "../api/client";
 import { setDevRole } from "../devRole";
 import { supported } from "../test/fixtures";
@@ -264,5 +265,69 @@ describe("researcher pages", () => {
     renderAt("/problems", <ProblemListPage />, "/problems");
     expect(await screen.findByText(/2 attempts/)).toBeInTheDocument();
     expect(screen.getByText("Not started")).toBeInTheDocument();
+  });
+  it("pages through submissions and returns to the first page when a filter changes", async () => {
+    const page = Array.from({ length: RESEARCH_PAGE_SIZE }, (_, i) => ({
+      ...row,
+      id: `p${i}`,
+      username: `learner-${i}`,
+    }));
+    vi.mocked(globalThis.fetch).mockImplementation(async (input) => {
+      const url = String(input);
+      requests.push({ url, role: null });
+      if (url.includes("/research/submissions?offset=100")) return json([row]);
+      if (url.includes("/research/submissions")) return json(page);
+      if (url.includes("/research/metrics")) return json(metrics);
+      if (url.endsWith("/problems")) return json([]);
+      throw new Error(`unexpected request ${url}`);
+    });
+    renderAt("/research", <ResearchPage />, "/research");
+    expect(await screen.findByText("learner-0")).toBeInTheDocument();
+    expect(screen.getByText(`Rows 1–${RESEARCH_PAGE_SIZE}`)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Newer" })).toBeDisabled();
+
+    await userEvent.click(screen.getByRole("button", { name: "Older" }));
+    expect(await screen.findByText("synthetic-a")).toBeInTheDocument();
+    expect(
+      screen.getByText(`Rows ${RESEARCH_PAGE_SIZE + 1}–${RESEARCH_PAGE_SIZE + 1}`),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Older" })).toBeDisabled();
+
+    // A new filter starts again from the newest rows.
+    await userEvent.selectOptions(screen.getByLabelText("Outcome"), "ambiguous");
+    expect(await screen.findByText("learner-0")).toBeInTheDocument();
+    const last = requests.filter((r) => r.url.includes("/research/submissions")).at(-1);
+    expect(last?.url).toContain("outcome=ambiguous");
+    expect(last?.url).not.toContain("offset=");
+  });
+
+  it("says when no submission matches", async () => {
+    vi.mocked(globalThis.fetch).mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes("/research/submissions")) return json([]);
+      if (url.includes("/research/metrics")) return json(metrics);
+      if (url.endsWith("/problems")) return json([]);
+      throw new Error(`unexpected request ${url}`);
+    });
+    renderAt("/research", <ResearchPage />, "/research");
+    expect(await screen.findByText("No submissions match.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Older" })).toBeNull();
+  });
+
+  it("shows API errors on the trace and learner-model pages instead of a blank page", async () => {
+    vi.mocked(globalThis.fetch).mockImplementation(async () =>
+      json({ detail: "submission not found" }, 404),
+    );
+    renderAt("/research/submissions/nope", <TracePage />, "/research/submissions/:id");
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+  });
+
+  it("shows an error, not an empty model, when the learner model is refused", async () => {
+    vi.mocked(globalThis.fetch).mockImplementation(async () =>
+      json({ detail: "researcher role required" }, 403),
+    );
+    renderAt("/research/learners/x", <LearnerModelPage />, "/research/learners/:username");
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    expect(screen.queryByText(/No skill observations yet/)).toBeNull();
   });
 });
