@@ -127,13 +127,12 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 ## Next three tasks
 
-1. **Researcher workflow polish within existing scope:** check every researcher page (trace,
-   learners, learner model, research list) against the API for missing states (empty, error,
-   pagination) and add tests where gaps exist. No rule or policy change.
-2. **Refresh status and report docs** (docs/status-2026-10-24.md, research-report-draft,
-   interview-prep) for the integrated UI, L20 and the pending decisions.
-3. **Demo rehearsal** of docs/demo.md on the compose stack, including `compose.demo.yaml` login
-   mode, recording observed output.
+1. **Watch CI** on the latest push (adds the demo-overlay validation step).
+2. **Wait for owner decisions** (8 problems, L19, mappings). Do not start bank or evidence
+   work. If option B for L19 is approved: new selectable evidence-rule version, regression
+   tests, case-by-case replay, CE1.4 rerun.
+3. **Remaining safe engineering:** PracticePage bundle size (650 kB chunk warning); a full
+   compose.demo.yaml run once Docker Hub access works.
 
 ## Resume instruction
 
@@ -147,6 +146,12 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
   routes. CI run 94: all 16 jobs green.
 - abd4b33: owner-decision reviews (skill mappings, L19, CE1 status), L20 in limitations.
 - Local: unit 373, sandbox 31 (560 s), web 27, Playwright 3/3.
+- 2dc008a: researcher-page tests (pagination, filter resets offset, empty and error states);
+  web 31 tests.
+- c3d72cb: dated notes in status, report draft, interview prep.
+- 887036b: login-mode rehearsal (production settings, demo accounts) with observed output in
+  docs/demo.md §5; compose.demo.yaml itself could not be built locally (Docker Hub 429).
+- CI compose job now validates the compose.demo.yaml overlay.
 
 ### Iterations 7–8
 
