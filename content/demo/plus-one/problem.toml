@@ -1,0 +1,178 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/plus-one.md (bank expansion batch A2, 2026-10-25).
+
+slug = "plus-one"
+title = "Add one to a digit array"
+family = "arrays"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "std::vector<int> plus_one(const std::vector<int>& digits);"
+# Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
+# every new problem). They stay in the problem list and their attempts produce skill evidence.
+recommendable = false
+
+[skills]
+index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
+update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
+output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+
+[probes]
+no_carry = ["index_range"]
+one_carry = ["index_range", "update_rule"]
+carry_chain = ["update_rule"]
+all_nines = ["output_contract"]
+front_digit_small = ["index_range"]
+large_input = ["update_rule"]
+
+[curriculum]
+assumes = ["iterating over a std::vector from the back"]
+prerequisites = ["first-max-index"]
+
+[[tests]]
+key = "sample_simple"
+visibility = "sample"
+input = "L 3 1 2 3"
+expected = "1 2 4"
+probes = ["no_carry", "front_digit_small"]
+student_description = "No carry needed."
+purpose = "Visible typical case."
+distinguishes = ["adds_at_front", "carry_never_cleared"]
+
+[[tests]]
+key = "sample_chain"
+visibility = "sample"
+input = "L 4 1 2 9 9"
+expected = "1 3 0 0"
+probes = ["carry_chain"]
+student_description = "Two trailing nines."
+purpose = "Visible carry chain."
+distinguishes = ["adds_at_front", "carry_never_cleared", "single_carry"]
+
+[[tests]]
+key = "one_carry"
+input = "L 3 4 5 9"
+expected = "4 6 0"
+probes = ["one_carry"]
+student_description = "One trailing nine."
+purpose = "A single carry."
+distinguishes = ["adds_at_front", "carry_never_cleared"]
+
+[[tests]]
+key = "long_chain"
+input = "L 6 3 9 9 9 9 9"
+expected = "4 0 0 0 0 0"
+probes = ["carry_chain"]
+student_description = "Many trailing nines."
+purpose = "A carry through five digits."
+distinguishes = ["adds_at_front", "single_carry"]
+
+[[tests]]
+key = "all_nines"
+input = "L 3 9 9 9"
+expected = "1 0 0 0"
+probes = ["all_nines", "carry_chain"]
+student_description = "Every digit is nine."
+purpose = "The result gains a digit."
+distinguishes = ["adds_at_front", "no_new_digit", "single_carry"]
+
+[[tests]]
+key = "single_nine"
+input = "L 1 9"
+expected = "1 0"
+probes = ["all_nines"]
+student_description = "The number 9."
+purpose = "Smallest case that gains a digit."
+distinguishes = ["adds_at_front", "no_new_digit"]
+
+[[tests]]
+key = "single_zero"
+input = "L 1 0"
+expected = "1"
+probes = ["no_carry"]
+student_description = "The number 0."
+purpose = "Minimal input."
+distinguishes = []
+
+[[tests]]
+key = "nine_front"
+input = "L 3 9 0 0"
+expected = "9 0 1"
+probes = ["no_carry"]
+student_description = "A leading nine, no carry."
+purpose = "A nine that must not change."
+distinguishes = ["adds_at_front", "carry_never_cleared"]
+
+[[tests]]
+key = "nines_front_eight_end"
+input = "L 4 9 9 9 8"
+expected = "9 9 9 9"
+probes = ["no_carry"]
+student_description = "Leading nines, last digit eight."
+purpose = "Front nines that must not change."
+distinguishes = ["adds_at_front", "carry_never_cleared"]
+
+[[tests]]
+key = "middle_zero"
+input = "L 4 2 0 9 9"
+expected = "2 1 0 0"
+probes = ["carry_chain", "front_digit_small"]
+student_description = "A zero before the trailing nines."
+purpose = "The carry stops at a zero."
+distinguishes = ["adds_at_front", "carry_never_cleared", "single_carry"]
+
+[[tests]]
+key = "ten"
+input = "L 2 1 9"
+expected = "2 0"
+probes = ["one_carry", "front_digit_small"]
+student_description = "The number 19."
+purpose = "Two digits with one carry."
+distinguishes = ["adds_at_front"]
+
+[[tests]]
+key = "large_all_nines"
+input = "N 100000"
+expected = "len=100001 first=1 last=0 hash=12078967684429019186"
+probes = ["large_input", "all_nines"]
+student_description = "A very long run of nines."
+purpose = "Large input; the result gains a digit."
+distinguishes = ["adds_at_front", "no_new_digit", "single_carry"]
+
+[[tests]]
+key = "large_pattern"
+input = "P 99999"
+expected = "len=99999 first=1 last=0 hash=13224127510223067027"
+probes = ["large_input", "carry_chain"]
+student_description = "A very long number ending in 9."
+purpose = "Large input with a carry."
+distinguishes = ["adds_at_front", "carry_never_cleared"]
+
+[[error_models]]
+key = "single_carry"
+file = "error_models/single_carry.cpp"
+skill = "update_rule"
+description = "Propagates a carry into the next digit only once, so a second 9 becomes 10."
+student_hint = "What happens when the digit that receives the carry is also a 9? Try a number ending in 99."
+
+[[error_models]]
+key = "no_new_digit"
+file = "error_models/no_new_digit.cpp"
+skill = "output_contract"
+description = "Drops the carry out of the most significant digit, so 999 becomes 000."
+student_hint = "What is 999 + 1? Check what you return when every digit is 9."
+
+[[error_models]]
+key = "adds_at_front"
+file = "error_models/adds_at_front.cpp"
+skill = "index_range"
+description = "Adds at digits[0] and carries towards the end, treating the first digit as the least significant."
+student_hint = "Which digit is the least significant one? The first element is the most significant digit."
+
+[[error_models]]
+key = "carry_never_cleared"
+file = "error_models/carry_never_cleared.cpp"
+skill = "update_rule"
+description = "The carry starts at 1 but is never cleared, so 1 is added to every digit."
+student_hint = "After a digit absorbs the carry without overflowing, should later digits still receive it?"

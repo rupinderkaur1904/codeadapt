@@ -1,0 +1,177 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/closest-pair-sum.md (bank expansion batch A2, 2026-10-25).
+
+slug = "closest-pair-sum"
+title = "Closest pair sum"
+family = "two-pointers"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int closest_pair_gap(const std::vector<int>& a, int target);"
+# Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
+# every new problem). They stay in the problem list and their attempts produce skill evidence.
+recommendable = false
+
+[skills]
+index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
+update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
+output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+
+[probes]
+self_pair_tempting = ["index_range"]
+first_element_needed = ["index_range"]
+pointer_direction = ["update_rule"]
+gap_below_target = ["output_contract"]
+exact_hit = ["update_rule"]
+large_input = ["update_rule"]
+
+[curriculum]
+assumes = ["a sorted array", "two indices moving towards each other"]
+
+[[tests]]
+key = "sample_typical"
+visibility = "sample"
+input = "L 5 1 3 5 8 12 14"
+expected = "1"
+probes = ["pointer_direction", "gap_below_target"]
+student_description = "A small sorted array."
+purpose = "Visible typical case."
+distinguishes = ["signed_gap"]
+
+[[tests]]
+key = "sample_exact"
+visibility = "sample"
+input = "L 4 2 4 7 11 11"
+expected = "0"
+probes = ["exact_hit", "pointer_direction"]
+student_description = "Some pair hits the target exactly."
+purpose = "Visible exact case."
+distinguishes = ["moves_wrong_pointer"]
+
+[[tests]]
+key = "self_pair_middle"
+input = "L 5 1 4 10 30 40 20"
+expected = "6"
+probes = ["self_pair_tempting"]
+student_description = "One element doubled would hit the target."
+purpose = "Only a self-pair hits the target."
+distinguishes = ["allows_same_element", "moves_wrong_pointer", "signed_gap"]
+
+[[tests]]
+key = "self_pair_two"
+input = "L 2 5 9 10"
+expected = "4"
+probes = ["self_pair_tempting", "first_element_needed"]
+student_description = "Two elements; doubling the first is closest."
+purpose = "Smallest self-pair case."
+distinguishes = ["allows_same_element", "skips_first"]
+
+[[tests]]
+key = "first_needed"
+input = "L 4 -5 6 7 9 1"
+expected = "0"
+probes = ["first_element_needed"]
+student_description = "The best pair uses the first element."
+purpose = "The answer needs a[0]."
+distinguishes = ["moves_wrong_pointer", "skips_first"]
+
+[[tests]]
+key = "two_elements"
+input = "L 2 3 4 10"
+expected = "3"
+probes = ["first_element_needed", "gap_below_target"]
+student_description = "Exactly two elements, sum below the target."
+purpose = "Only one pair exists."
+distinguishes = ["allows_same_element", "signed_gap", "skips_first"]
+
+[[tests]]
+key = "all_above"
+input = "L 4 10 20 30 40 5"
+expected = "25"
+probes = ["gap_below_target", "first_element_needed"]
+student_description = "Every sum is above the target."
+purpose = "The closest sum is the smallest one."
+distinguishes = ["allows_same_element", "moves_wrong_pointer", "skips_first"]
+
+[[tests]]
+key = "all_below"
+input = "L 4 1 2 3 4 100"
+expected = "93"
+probes = ["gap_below_target"]
+student_description = "Every sum is below the target."
+purpose = "The closest sum is the largest one."
+distinguishes = ["allows_same_element", "moves_wrong_pointer", "signed_gap"]
+
+[[tests]]
+key = "negatives"
+input = "L 6 -9 -7 -2 3 8 12 -10"
+expected = "1"
+probes = ["pointer_direction", "first_element_needed"]
+student_description = "Negative values and a negative target."
+purpose = "Pointer moves with negative sums."
+distinguishes = ["moves_wrong_pointer", "signed_gap"]
+
+[[tests]]
+key = "duplicates"
+input = "L 6 2 2 2 5 5 9 7"
+expected = "0"
+probes = ["exact_hit"]
+student_description = "Repeated values."
+purpose = "Exact hit among duplicates."
+distinguishes = ["moves_wrong_pointer"]
+
+[[tests]]
+key = "direction_matters"
+input = "L 6 1 2 3 50 60 70 52"
+expected = "0"
+probes = ["pointer_direction"]
+student_description = "Small and large values far apart."
+purpose = "Moving the wrong pointer skips the best pair."
+distinguishes = ["moves_wrong_pointer"]
+
+[[tests]]
+key = "large_steps"
+input = "S 100000 3 -150000 1000001"
+expected = "700010"
+probes = ["large_input", "pointer_direction"]
+student_description = "A long arithmetic sequence."
+purpose = "Large input; target not reachable exactly."
+distinguishes = ["allows_same_element", "moves_wrong_pointer", "signed_gap"]
+
+[[tests]]
+key = "large_exact"
+input = "S 100000 2 0 199996"
+expected = "0"
+probes = ["large_input", "exact_hit"]
+student_description = "A long arithmetic sequence with an exact pair."
+purpose = "Large input; exact pair at the far end."
+distinguishes = ["moves_wrong_pointer"]
+
+[[error_models]]
+key = "allows_same_element"
+file = "error_models/allows_same_element.cpp"
+skill = "index_range"
+description = "Loops while lo <= hi, so an element can be paired with itself."
+student_hint = "Can the two numbers of a pair be the same element of the array? Check when your loop stops."
+
+[[error_models]]
+key = "moves_wrong_pointer"
+file = "error_models/moves_wrong_pointer.cpp"
+skill = "update_rule"
+description = "Moves hi when the sum is too small and lo when it is too large, so the sum moves away from the target."
+student_hint = "If the current sum is too small, which pointer must move to make it larger?"
+
+[[error_models]]
+key = "skips_first"
+file = "error_models/skips_first.cpp"
+skill = "index_range"
+description = "The left pointer starts at index 1, so pairs using the first element are never considered."
+student_hint = "Where does your left pointer start? Can the first element be part of the best pair?"
+
+[[error_models]]
+key = "signed_gap"
+file = "error_models/signed_gap.cpp"
+skill = "output_contract"
+description = "Returns the signed difference (sum - target) of the closest pair instead of its absolute value."
+student_hint = "Can the answer be negative? Re-read what distance the function must return."
