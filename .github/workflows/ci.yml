@@ -75,6 +75,8 @@ jobs:
             tests: tests/sandbox/test_end_to_end.py
           - shard: adaptation
             tests: tests/sandbox/test_adaptation_end_to_end.py
+          - shard: families
+            tests: tests/sandbox/test_family_end_to_end.py
           - shard: core
             tests: >-
               tests/sandbox
@@ -82,6 +84,7 @@ jobs:
               --ignore=tests/sandbox/test_evaluation_harness.py
               --ignore=tests/sandbox/test_end_to_end.py
               --ignore=tests/sandbox/test_adaptation_end_to_end.py
+              --ignore=tests/sandbox/test_family_end_to_end.py
     name: sandbox (${{ matrix.shard }})
     defaults:
       run:
@@ -150,6 +153,8 @@ jobs:
             tests: tests/sandbox/test_end_to_end.py
           - shard: adaptation
             tests: tests/sandbox/test_adaptation_end_to_end.py
+          - shard: families
+            tests: tests/sandbox/test_family_end_to_end.py
           - shard: core
             tests: >-
               tests/sandbox
@@ -157,6 +162,7 @@ jobs:
               --ignore=tests/sandbox/test_evaluation_harness.py
               --ignore=tests/sandbox/test_end_to_end.py
               --ignore=tests/sandbox/test_adaptation_end_to_end.py
+              --ignore=tests/sandbox/test_family_end_to_end.py
     name: sandbox-gvisor (${{ matrix.shard }})
     defaults:
       run:
