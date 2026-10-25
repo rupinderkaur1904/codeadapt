@@ -6,6 +6,23 @@ import { ErrorMessage } from "../components/ErrorMessage";
 import { RecommendationCard } from "../components/RecommendationCard";
 
 const RECENT_LIMIT = 50;
+// Families in teaching order; a family not listed here follows them in the order the API sends.
+const FAMILY_ORDER = ["binary-search", "arrays", "two-pointers", "sliding-window", "prefix-sums"];
+
+function familyLabel(family: string): string {
+  const words = family.replace(/-/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+function byFamily(problems: ProblemSummary[]): [string, ProblemSummary[]][] {
+  const groups = new Map<string, ProblemSummary[]>();
+  for (const p of problems) groups.set(p.family, [...(groups.get(p.family) ?? []), p]);
+  const rank = (f: string) => {
+    const i = FAMILY_ORDER.indexOf(f);
+    return i === -1 ? FAMILY_ORDER.length : i;
+  };
+  return [...groups].sort(([a], [b]) => rank(a) - rank(b));
+}
 
 function status(p: ProblemSummary, attempts: number | undefined) {
   if (p.no_failure_observed) {
@@ -40,27 +57,33 @@ export function ProblemListPage() {
     <section>
       <h1>Problems</h1>
       <RecommendationCard />
-      <ul className="problem-list">
-        {problems.data.map((p) => {
-          const attempts = counts ? (counts.get(p.slug) ?? 0) : undefined;
-          return (
-            <li key={p.slug}>
-              <p className="eyebrow">{p.family}</p>
-              <Link to={`/practice/${p.slug}`}>{p.title}</Link>
-              <p className="problem-meta">
-                {status(p, attempts)}
-                {attempts !== undefined && attempts > 0 && (
-                  <span className="muted">
-                    {" "}
-                    · {attempts}
-                    {capped ? "+" : ""} attempt{attempts === 1 && !capped ? "" : "s"}
-                  </span>
-                )}
-              </p>
-            </li>
-          );
-        })}
-      </ul>
+      {byFamily(problems.data).map(([family, list]) => (
+        <section key={family} aria-labelledby={`family-${family}`}>
+          <h2 id={`family-${family}`} className="family-heading">
+            {familyLabel(family)} <span className="muted">· {list.length}</span>
+          </h2>
+          <ul className="problem-list">
+            {list.map((p) => {
+              const attempts = counts ? (counts.get(p.slug) ?? 0) : undefined;
+              return (
+                <li key={p.slug}>
+                  <Link to={`/practice/${p.slug}`}>{p.title}</Link>
+                  <p className="problem-meta">
+                    {status(p, attempts)}
+                    {attempts !== undefined && attempts > 0 && (
+                      <span className="muted">
+                        {" "}
+                        · {attempts}
+                        {capped ? "+" : ""} attempt{attempts === 1 && !capped ? "" : "s"}
+                      </span>
+                    )}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
     </section>
   );
 }

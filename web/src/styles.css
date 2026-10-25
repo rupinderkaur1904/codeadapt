@@ -584,9 +584,6 @@ table.research {
 .statement pre {
   overflow-x: auto;
 }
-.problem-list .eyebrow {
-  margin-bottom: 4px;
-}
 .problem-meta {
   margin: 8px 0 0;
   font-size: 0.9rem;
@@ -620,4 +617,8 @@ table.research {
 table.research-matrix td:not(:first-child),
 table.research-matrix th:not(:first-child) {
   text-align: right;
+}
+.family-heading {
+  font-size: 1.1rem;
+  margin: 24px 0 8px;
 }
