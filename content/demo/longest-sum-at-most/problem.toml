@@ -1,0 +1,180 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/longest-sum-at-most.md (bank expansion batch A3, 2026-10-25).
+
+slug = "longest-sum-at-most"
+title = "Longest stretch within a budget"
+family = "sliding-window"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int longest_at_most(const std::vector<int>& a, int s);"
+# Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
+# every new problem). They stay in the problem list and their attempts produce skill evidence.
+recommendable = false
+
+[skills]
+index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
+update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
+output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+
+[probes]
+multi_shrink = ["update_rule"]
+partial_overlap = ["update_rule"]
+exact_budget = ["output_contract"]
+length_counted = ["index_range"]
+nothing_fits = ["output_contract", "update_rule"]
+large_input = ["update_rule"]
+
+[curriculum]
+assumes = ["a window with a left and a right edge"]
+prerequisites = ["max-window-sum"]
+
+[[tests]]
+key = "sample_typical"
+visibility = "sample"
+input = "L 6 3 1 2 1 4 2 5"
+expected = "3"
+probes = ["partial_overlap", "length_counted"]
+student_description = "A small array with budget 5."
+purpose = "Visible typical case."
+distinguishes = ["length_without_plus_one", "restarts_window"]
+
+[[tests]]
+key = "sample_exact"
+visibility = "sample"
+input = "L 4 2 2 2 2 6"
+expected = "3"
+probes = ["exact_budget", "length_counted"]
+student_description = "Equal values; the budget fits three exactly."
+purpose = "Visible case with an exact fit."
+distinguishes = ["length_without_plus_one", "strict_limit"]
+
+[[tests]]
+key = "big_then_small"
+input = "L 6 9 1 1 1 1 1 5"
+expected = "5"
+probes = ["multi_shrink"]
+student_description = "One large value then small ones."
+purpose = "Removing one element at a time is needed after the large value."
+distinguishes = ["length_without_plus_one", "strict_limit"]
+
+[[tests]]
+key = "many_to_drop"
+input = "L 6 1 1 1 1 8 1 9"
+expected = "4"
+probes = ["multi_shrink", "partial_overlap"]
+student_description = "Many small values then a large one."
+purpose = "Several elements must leave the window at once."
+distinguishes = ["length_without_plus_one"]
+
+[[tests]]
+key = "keep_tail"
+input = "L 4 5 1 1 3 6"
+expected = "3"
+probes = ["partial_overlap"]
+student_description = "The best window keeps part of an earlier one."
+purpose = "Restarting the window loses the answer."
+distinguishes = ["length_without_plus_one", "restarts_window"]
+
+[[tests]]
+key = "drop_one_keep_rest"
+input = "L 5 6 1 1 1 1 7"
+expected = "4"
+probes = ["partial_overlap", "multi_shrink"]
+student_description = "A large first value, then small ones."
+purpose = "Only the first element must leave; restarting loses one."
+distinguishes = ["length_without_plus_one", "restarts_window"]
+
+[[tests]]
+key = "exact_after_overlap"
+input = "L 6 5 2 5 2 2 1 12"
+expected = "5"
+probes = ["partial_overlap", "exact_budget"]
+student_description = "The best stretch sums exactly to the budget and overlaps an earlier one."
+purpose = "Separates the strict limit from restarting the window."
+distinguishes = ["length_without_plus_one", "restarts_window", "strict_limit"]
+
+[[tests]]
+key = "whole_array"
+input = "L 4 1 2 3 4 10"
+expected = "4"
+probes = ["exact_budget", "length_counted"]
+student_description = "Everything fits exactly."
+purpose = "The whole array sums to the budget."
+distinguishes = ["length_without_plus_one", "strict_limit"]
+
+[[tests]]
+key = "nothing_fits"
+input = "L 3 7 8 9 5"
+expected = "0"
+probes = ["nothing_fits"]
+student_description = "Every value is above the budget."
+purpose = "The answer is 0."
+distinguishes = []
+
+[[tests]]
+key = "one_fits"
+input = "L 3 7 3 9 5"
+expected = "1"
+probes = ["nothing_fits", "length_counted"]
+student_description = "Only one value fits."
+purpose = "The answer is 1."
+distinguishes = ["length_without_plus_one"]
+
+[[tests]]
+key = "single_exact"
+input = "L 1 5 5"
+expected = "1"
+probes = ["exact_budget"]
+student_description = "One element equal to the budget."
+purpose = "Minimal exact case."
+distinguishes = ["length_without_plus_one", "strict_limit"]
+
+[[tests]]
+key = "loose_budget"
+input = "L 5 1 2 3 4 5 100"
+expected = "5"
+probes = ["length_counted"]
+student_description = "A budget larger than the total."
+purpose = "Nothing ever leaves the window."
+distinguishes = ["length_without_plus_one"]
+
+[[tests]]
+key = "large_ramp"
+input = "R 100000 1 0 100 1 5000"
+expected = "99"
+probes = ["large_input", "multi_shrink"]
+student_description = "A long array of repeated ramps."
+purpose = "Large input."
+distinguishes = ["length_without_plus_one"]
+
+[[tests]]
+key = "large_exact"
+input = "R 100000 0 0 1 3 30000"
+expected = "10000"
+probes = ["large_input", "exact_budget"]
+student_description = "A long array of equal values."
+purpose = "Large input; windows fit the budget exactly."
+distinguishes = ["length_without_plus_one", "strict_limit"]
+
+[[error_models]]
+key = "length_without_plus_one"
+file = "error_models/length_without_plus_one.cpp"
+skill = "index_range"
+description = "Measures the window as right - left, one less than its number of elements."
+student_hint = "How many elements are there between positions left and right, both included?"
+
+[[error_models]]
+key = "strict_limit"
+file = "error_models/strict_limit.cpp"
+skill = "output_contract"
+description = "Treats 'at most s' as 'less than s', so a window whose sum equals s is rejected."
+student_hint = "Is a stretch whose sum is exactly the budget allowed?"
+
+[[error_models]]
+key = "restarts_window"
+file = "error_models/restarts_window.cpp"
+skill = "update_rule"
+description = "When the sum goes over s, starts a new window at the current element instead of shrinking from the left."
+student_hint = "When the sum goes over the budget, do you need to drop the whole window, or only some elements from its left end?"

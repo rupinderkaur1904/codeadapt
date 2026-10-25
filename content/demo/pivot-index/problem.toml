@@ -1,0 +1,196 @@
+# DEMO CONTENT — public repository, therefore NOT secret (ADR-009).
+# Design record: docs/content-design/pivot-index.md (bank expansion batch A4, 2026-10-25).
+
+slug = "pivot-index"
+title = "Balance point of an array"
+family = "prefix-sums"
+statement = "statement.md"
+harness = "harness.cpp"
+reference = "reference.cpp"
+solution_file = "solution.cpp" # name the student's code is compiled under
+interface = "int pivot_index(const std::vector<int>& a);"
+# Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
+# every new problem). They stay in the problem list and their attempts produce skill evidence.
+recommendable = false
+
+[skills]
+index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
+tie_resolution = "Handling equal values as the specification says: which of several equal candidates wins, and whether duplicates count separately."
+update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
+output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+
+[probes]
+pivot_excluded = ["index_range", "update_rule"]
+several_pivots = ["tie_resolution"]
+no_pivot = ["output_contract"]
+pivot_at_edge = ["index_range"]
+negatives = ["update_rule"]
+large_input = ["update_rule"]
+
+[curriculum]
+assumes = ["a running sum while scanning"]
+
+[[tests]]
+key = "sample_typical"
+visibility = "sample"
+input = "L 6 1 7 3 6 5 6"
+expected = "3"
+probes = ["pivot_excluded"]
+student_description = "A typical array."
+purpose = "Visible typical case."
+distinguishes = ["pivot_counted_left", "pivot_counted_right"]
+
+[[tests]]
+key = "sample_none"
+visibility = "sample"
+input = "L 3 1 2 3"
+expected = "-1"
+probes = ["no_pivot"]
+student_description = "No balance point."
+purpose = "Visible case with answer -1."
+distinguishes = ["pivot_counted_left", "pivot_counted_right", "size_when_none"]
+
+[[tests]]
+key = "pivot_first"
+input = "L 3 2 1 -1"
+expected = "0"
+probes = ["pivot_at_edge", "negatives"]
+student_description = "The first index balances."
+purpose = "Left side is empty."
+distinguishes = ["pivot_counted_left", "pivot_counted_right"]
+
+[[tests]]
+key = "pivot_last"
+input = "L 3 -1 1 5"
+expected = "2"
+probes = ["pivot_at_edge", "negatives"]
+student_description = "The last index balances."
+purpose = "Right side is empty."
+distinguishes = ["pivot_counted_left", "pivot_counted_right"]
+
+[[tests]]
+key = "zeros"
+input = "L 4 0 0 0 0"
+expected = "0"
+probes = ["several_pivots"]
+student_description = "Every value zero."
+purpose = "Every index balances; the first wins."
+distinguishes = ["last_pivot"]
+
+[[tests]]
+key = "two_pivots"
+input = "L 5 1 -1 0 1 -1"
+expected = "2"
+probes = ["several_pivots", "negatives"]
+student_description = "More than one balance point."
+purpose = "The first of several pivots."
+distinguishes = ["pivot_counted_left", "pivot_counted_right"]
+
+[[tests]]
+key = "two_pivots_mixed"
+input = "L 5 3 0 -1 2 2"
+expected = "1"
+probes = ["several_pivots", "negatives"]
+student_description = "Two balance points with mixed signs."
+purpose = "Indices 1 and 3 both balance; the first wins."
+distinguishes = ["last_pivot", "pivot_counted_left"]
+
+[[tests]]
+key = "single"
+input = "L 1 5"
+expected = "0"
+probes = ["pivot_at_edge"]
+student_description = "One element."
+purpose = "Both sides empty: index 0."
+distinguishes = ["pivot_counted_left", "pivot_counted_right"]
+
+[[tests]]
+key = "pivot_value_matters"
+input = "L 5 3 3 9 4 2"
+expected = "2"
+probes = ["pivot_excluded"]
+student_description = "A large middle value."
+purpose = "Counting the pivot on one side gives a different index."
+distinguishes = ["pivot_counted_left", "pivot_counted_right"]
+
+[[tests]]
+key = "left_heavy_trap"
+input = "L 4 2 3 1 4"
+expected = "-1"
+probes = ["pivot_excluded"]
+student_description = "A pivot only if it is counted on the left."
+purpose = "No pivot; counting the pivot on the left finds one."
+distinguishes = ["pivot_counted_left", "pivot_counted_right", "size_when_none"]
+
+[[tests]]
+key = "right_heavy_trap"
+input = "L 4 4 1 3 2"
+expected = "-1"
+probes = ["pivot_excluded", "no_pivot"]
+student_description = "A pivot only if it is counted on the right."
+purpose = "No pivot; counting the pivot on the right finds one."
+distinguishes = ["pivot_counted_left", "pivot_counted_right", "size_when_none"]
+
+[[tests]]
+key = "negative_sum"
+input = "L 6 -3 -2 -4 1 -6 1"
+expected = "-1"
+probes = ["negatives", "pivot_excluded"]
+student_description = "Mostly negative values."
+purpose = "Balance with negative sums."
+distinguishes = ["size_when_none"]
+
+[[tests]]
+key = "large_symmetric"
+input = "R 99999 0 3 4 0"
+expected = "49999"
+probes = ["large_input"]
+student_description = "A long array of equal values."
+purpose = "Large input; the middle index balances."
+distinguishes = ["pivot_counted_left", "pivot_counted_right"]
+
+[[tests]]
+key = "large_zeros"
+input = "R 100000 0 0 1 0"
+expected = "0"
+probes = ["large_input", "several_pivots"]
+student_description = "A long array of zeros."
+purpose = "Large input; every index balances."
+distinguishes = ["last_pivot"]
+
+[[tests]]
+key = "large_none"
+input = "R 100000 1 0 7 1"
+expected = "-1"
+probes = ["large_input", "no_pivot"]
+student_description = "A long array with no balance point."
+purpose = "Large input; answer -1."
+distinguishes = ["size_when_none"]
+
+[[error_models]]
+key = "pivot_counted_left"
+file = "error_models/pivot_counted_left.cpp"
+skill = "update_rule"
+description = "Adds a[i] to the left sum before comparing, so the pivot itself is counted on the left side."
+student_hint = "Is the element at the balance point part of the left side, the right side, or neither? Check when you add it to your running sum."
+
+[[error_models]]
+key = "pivot_counted_right"
+file = "error_models/pivot_counted_right.cpp"
+skill = "update_rule"
+description = "Computes the right side as total - left, so the pivot itself is counted on the right side."
+student_hint = "Does your right-hand sum leave out the element at the balance point?"
+
+[[error_models]]
+key = "last_pivot"
+file = "error_models/last_pivot.cpp"
+skill = "tie_resolution"
+description = "Returns the last balancing index instead of the first."
+student_hint = "If several indices balance, which one must you return?"
+
+[[error_models]]
+key = "size_when_none"
+file = "error_models/size_when_none.cpp"
+skill = "output_contract"
+description = "When no index balances, returns n (the loop index after the loop) instead of -1."
+student_hint = "What must you return when no index balances the array?"
