@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A1, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "first-max-index"
+
+[[cases]]
+file = "while_loop_value.cpp"
+truth = "correct"
+note = "While loop tracking the best value and its position."
+
+[[cases]]
+file = "reverse_non_strict.cpp"
+truth = "correct"
+note = "Scans from the end with >=, which also yields the first maximum."
+
+[[cases]]
+file = "zero_sentinel_range_for.cpp"
+truth = "max_starts_at_zero"
+note = "Range-for with a long long running maximum starting at 0."
+
+[[cases]]
+file = "while_non_strict.cpp"
+truth = "last_of_ties"
+note = "While loop; !(a[i] < a[pos]) is a non-strict comparison."
+
+[[cases]]
+file = "stops_before_end.cpp"
+truth = "skips_last"
+note = "Loop condition i + 1 < n stops before the last element."
+
+[[cases]]
+file = "largest_value_back.cpp"
+truth = "returns_value"
+note = "Tracks only the value and returns it."
+
+[[cases]]
+file = "one_based.cpp"
+truth = "unmodelled"
+note = "Returns a 1-based position."
+
+[[cases]]
+file = "zero_start_and_ties.cpp"
+truth = "unmodelled"
+note = "Two modelled errors at once: a 0 sentinel and >=."

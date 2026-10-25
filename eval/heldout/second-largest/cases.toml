@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A1, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "second-largest"
+
+[[cases]]
+file = "sort_unique.cpp"
+truth = "correct"
+note = "Sorts, removes duplicates, takes the second-last value."
+
+[[cases]]
+file = "two_pass.cpp"
+truth = "correct"
+note = "Finds the maximum, then the largest value different from it."
+
+[[cases]]
+file = "sort_descending_second.cpp"
+truth = "counts_duplicates"
+note = "Sorts descending and takes the second element without removing duplicates."
+
+[[cases]]
+file = "forgets_old_top.cpp"
+truth = "no_demotion"
+note = "A new maximum replaces the old one with continue; the old maximum is lost."
+
+[[cases]]
+file = "while_from_one.cpp"
+truth = "skips_first"
+note = "While loop starting at index 1."
+
+[[cases]]
+file = "two_pass_zero.cpp"
+truth = "zero_when_none"
+note = "Two passes with the answer starting at 0."
+
+[[cases]]
+file = "smallest_distinct.cpp"
+truth = "unmodelled"
+note = "Returns the smallest distinct value."
+
+[[cases]]
+file = "after_max_only.cpp"
+truth = "unmodelled"
+note = "Only considers values after the maximum's position."

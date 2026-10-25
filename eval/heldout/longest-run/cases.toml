@@ -1,0 +1,47 @@
+# Held-out synthetic evaluation cases (ADR-008: data_class = synthetic).
+# `truth` is an error model key of the problem, "correct", or "unmodelled".
+# Written for the bank expansion (batch A1, 2026-10-25) by the models' author, in styles
+# different from the models, and committed before the method was run on them. See
+# docs/methodology.md §6.1 for what that does and does not allow us to claim.
+
+problem = "longest-run"
+
+[[cases]]
+file = "block_skip.cpp"
+truth = "correct"
+note = "Skips over each block with an inner while loop."
+
+[[cases]]
+file = "count_then_compare.cpp"
+truth = "correct"
+note = "Counter that restarts at 1 on a change, compared on every step."
+
+[[cases]]
+file = "restart_at_zero.cpp"
+truth = "reset_to_zero"
+note = "Counter reset to 0 on a change."
+
+[[cases]]
+file = "close_on_change.cpp"
+truth = "last_run_unchecked"
+note = "Compares a run only when the value changes, with continue."
+
+[[cases]]
+file = "block_value.cpp"
+truth = "returns_value"
+note = "Block skipping that returns the run's value."
+
+[[cases]]
+file = "anchor_first.cpp"
+truth = "compares_to_first"
+note = "Compares with a saved copy of the first element."
+
+[[cases]]
+file = "most_frequent.cpp"
+truth = "unmodelled"
+note = "Counts occurrences anywhere."
+
+[[cases]]
+file = "equal_pairs.cpp"
+truth = "unmodelled"
+note = "Counts equal neighbouring pairs."
