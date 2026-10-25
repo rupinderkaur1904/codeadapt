@@ -143,8 +143,7 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 ## Next three tasks
 
 1. **Confirm CI green** on the ADR-032 push (runs 98–101 green; 102–103 were running).
-2. **Remaining safe engineering, no policy content:** Playwright re-run on the integrated
-   branch; a full `compose.demo.yaml` run once Docker Hub access works. (The PracticePage chunk
+2. **Remaining safe engineering, no policy content:** a full `compose.demo.yaml` run once Docker Hub access works. (The PracticePage chunk
    is lazily loaded and within the configured 800 kB limit; no build warning.)
 3. **On owner decisions only:** L19 (rule C stays; no change authorised), review of the 8
    provisional problems. No bank or evidence-rule work before then.
@@ -186,6 +185,8 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 - min-capacity held-out re-run on the new version: byte-identical outcomes
   (docs/evaluation/adr032-2026-10-25/). Content report regenerated.
 - CI runs 98, 99 (includes the compose-overlay validation step), 100, 101: all green.
+- Finalisation re-check on b523b1d: Playwright 3/3 (2.3 min); fresh-clone setup per
+  docs/development.md works; web build has no warnings (docs/reviews/2026-10-25/validation.md).
 
 ### Iterations 7–8
 
