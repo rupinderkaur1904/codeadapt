@@ -30,6 +30,14 @@ from tests.unit.policy_cases import ORIGINAL, attempts_for, histories, recommend
 PROBLEMS: dict[str, ProblemSpec] = {p.spec.slug: p.spec for p in load_catalogue(DEMO_CONTENT)}
 T0 = datetime(2026, 1, 1, tzinfo=UTC)
 POLICY = PolicyV1()
+# The catalogue as it was until 2026-10-26, when only the three original problems were
+# recommendable (CE1 decision E2). The rule tests marked below pin policy 1.4 on it, as they
+# were written; policy 1.5 and the current eligibility have their own tests
+# (test_policy_1_5.py, test_recommendability.py).
+E2_PROBLEMS = {
+    s: p.model_copy(update={"recommendable": s in ORIGINAL}) for s, p in PROBLEMS.items()
+}
+POLICY_1_4 = PolicyV1(version="1.4")
 
 
 def attempt(
@@ -79,7 +87,8 @@ LB_EQUALITY = attempt(
 
 # ---------------------------------------------------------------------- policy rules
 def test_supported_hypothesis_targets_the_models_skill_on_the_densest_problem() -> None:
-    rec = POLICY.recommend(LB_EQUALITY, [LB_EQUALITY], PROBLEMS)
+    # Policy 1.4 on the E2 catalogue (see E2_PROBLEMS).
+    rec = POLICY_1_4.recommend(LB_EQUALITY, [LB_EQUALITY], E2_PROBLEMS)
     assert rec.rule is Rule.HYPOTHESIS_SUPPORTED
     assert rec.action is Action.NEW_PROBLEM
     # count-occurrences has 9 tests probing equality_handling, last-less-than 7.
@@ -93,6 +102,7 @@ def test_supported_hypothesis_targets_the_models_skill_on_the_densest_problem() 
 
 
 def test_recently_attempted_problems_are_avoided() -> None:
+    # Policy 1.4 on the E2 catalogue (see E2_PROBLEMS).
     history = [
         attempt("count-occurrences", Outcome.NO_FAILURE_OBSERVED, n=0),
         attempt(
@@ -103,7 +113,7 @@ def test_recently_attempted_problems_are_avoided() -> None:
             failing=("equal_first", "equal_last"),
         ),
     ]
-    rec = POLICY.recommend(history[-1], history, PROBLEMS)
+    rec = POLICY_1_4.recommend(history[-1], history, E2_PROBLEMS)
     assert rec.problem_slug == "last-less-than"
     assert rec.rationale["recent_problems"] == ["count-occurrences", "lower-bound"]
 
@@ -117,13 +127,14 @@ def test_single_problem_catalogue_recommends_a_retry_with_a_criterion() -> None:
 
 
 def test_ambiguity_across_skills_prefers_a_problem_modelling_both() -> None:
+    # Policy 1.4 on the E2 catalogue (see E2_PROBLEMS).
     index = attempt(
         "lower-bound",
         Outcome.AMBIGUOUS,
         candidates=("hi_init_last_index", "upper_bound_confusion"),
         failing=("equal_first",),
     )
-    rec = POLICY.recommend(index, [index], PROBLEMS)
+    rec = POLICY_1_4.recommend(index, [index], E2_PROBLEMS)
     assert rec.rule is Rule.AMBIGUOUS
     assert rec.target_skills == ("equality_handling", "search_space_boundaries")
     assert rec.problem_slug == "count-occurrences"  # not recent; both skills modelled
@@ -133,8 +144,9 @@ def test_ambiguity_across_skills_prefers_a_problem_modelling_both() -> None:
 
 
 def test_no_failure_moves_to_a_problem_not_yet_passed_then_stops() -> None:
+    # Policy 1.4 on the E2 catalogue (see E2_PROBLEMS).
     first = attempt("lower-bound", Outcome.NO_FAILURE_OBSERVED, n=0)
-    rec = POLICY.recommend(first, [first], PROBLEMS)
+    rec = POLICY_1_4.recommend(first, [first], E2_PROBLEMS)
     assert (rec.rule, rec.action, rec.problem_slug) == (
         Rule.NO_FAILURE_OBSERVED,
         Action.NEW_PROBLEM,
@@ -148,7 +160,7 @@ def test_no_failure_moves_to_a_problem_not_yet_passed_then_stops() -> None:
         attempt("count-occurrences", Outcome.NO_FAILURE_OBSERVED, n=1),
         attempt("last-less-than", Outcome.NO_FAILURE_OBSERVED, n=2),
     ]
-    done = POLICY.recommend(history[-1], history, PROBLEMS)
+    done = POLICY_1_4.recommend(history[-1], history, E2_PROBLEMS)
     assert (done.action, done.problem_slug, done.criterion) == (Action.NONE, None, None)
     assert "not evidence of complete understanding" in done.rationale["note"]
 
@@ -346,13 +358,14 @@ def test_failures_the_selected_model_does_not_own_are_never_reattributed() -> No
 
 
 def test_policy_ranking_counts_only_explained_failures() -> None:
+    # Policy 1.4 on the E2 catalogue (see E2_PROBLEMS).
     every_test = tuple(t.key for t in PROBLEMS["count-occurrences"].tests)
     history = [
         attempt("count-occurrences", Outcome.UNMODELLED_BEHAVIOUR, n=0, failing=every_test),
         attempt("last-less-than", Outcome.UNMODELLED_BEHAVIOUR, n=1, failing=("empty",)),
         attempt("lower-bound", Outcome.NO_FAILURE_OBSERVED, n=2),
     ]
-    rec = POLICY.recommend(history[-1], history, PROBLEMS)
+    rec = POLICY_1_4.recommend(history[-1], history, E2_PROBLEMS)
     assert rec.policy_version == "1.4"
     # Before C5 both problems counted 81 ledger entries: the 15 unexplained failures on
     # count-occurrences and the 1 on last-less-than were charged to every probed skill.
@@ -432,7 +445,9 @@ def test_policy_1_3_reproduces_policy_1_2_on_the_original_problems() -> None:
     assert len(golden) == 286
     expected, changed = with_s1_original(golden)
     assert changed == 12
-    assert recommendations(PROBLEMS) == expected
+    # Since 2026-10-26 more problems are recommendable; the fixture keeps pinning policy 1.4 on
+    # the catalogue it was made for.
+    assert recommendations(E2_PROBLEMS) == expected
     assert recommendations({s: PROBLEMS[s] for s in ORIGINAL}) == expected
 
 
@@ -476,4 +491,4 @@ def test_non_recommendable_problems_are_never_chosen_but_stay_in_the_catalogue()
         for history in histories(PROBLEMS):
             rec = POLICY.recommend(history[-1], history, PROBLEMS)
             assert rec.problem_slug not in hidden
-    assert POLICY.version == "1.4"
+    assert POLICY.version == "1.5"

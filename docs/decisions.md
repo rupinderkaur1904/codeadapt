@@ -801,3 +801,38 @@ docs/reviews/2026-10-26/l20-original-s1.md.
 - docs/evaluation/l20-original-s1-2026-10-26/ (held-out, recommendations, content reports);
 - tests/unit/test_l20_safeguards.py;
 - tests/sandbox/test_demo_content.py.
+
+## ADR-038 — Recommendation eligibility widened; policy 1.5 ranks follow-ups by evidence (2026-10-26)
+
+**Context:** only lower-bound, count-occurrences and last-less-than were recommendable (CE1
+decision E2). The owner asked that recommendations draw on more problems "according to the
+evidence". docs/reviews/2026-10-26/recommendability-review.md found that policy 1.4 ranks a
+follow-up by the number of tests probing the target skill, so enabling more problems moves
+almost every choice to the larger new problems; the owner chose option C (2026-10-26 09:10):
+enable the reviewed subset, then evaluate a ranking change.
+
+**Decision:**
+- Eligibility: `recommendable = true` for first-true, upper-bound, last-occurrence,
+  exact-search and the 13 problems of the other families. integer-sqrt, min-capacity,
+  peak-index, rotated-search and rotated-min stay `false` (reasons in the review, §3). The 17
+  problems have new content versions; earlier versions keep their snapshots.
+- Policy 1.5: after a supported or ambiguous diagnosis, candidates need at least 2 tests
+  probing the target skills, and are ranked by: modelled candidate skills (ambiguous only, as
+  in 1.4); not recently attempted; target skills that can also receive negative evidence there
+  (not declared positive-only); fewest of this learner's observations of those skills from that
+  problem; largest share of the problem's tests probing them; slug. The full ranking is stored
+  in the rationale. Rules, target skills, criteria, the no-failure ranking and all other rules
+  are unchanged.
+- 1.4 stays implemented and selectable (`PolicyV1(version="1.4")`,
+  `CODEADAPT_POLICY_VERSION=1.4` for the worker); stored recommendations keep their version.
+
+**Not used:** BKT estimates (researcher-only, assumed parameters), test counts as a
+preference, and any change to diagnosis, the evidence ledger, skill observations or mappings.
+
+**Evidence (synthetic only):** docs/evaluation/policy-1.5-2026-10-26/. It shows which problems
+each version picks on fixed synthetic histories; it does not show that any choice helps a
+learner.
+
+**Fixtures:** `policy_v1_golden.json` keeps pinning 1.4 on the E2 catalogue it was made for;
+`policy_v1_5_golden.json` records 1.5 on the 286 histories of tests/unit/policy_cases.py.
+

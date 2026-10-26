@@ -270,8 +270,13 @@ def test_no_policy_or_student_code_reads_the_learner_model() -> None:
 
 # ------------------------------------------------------------------- CE1.1 (decision E2)
 def test_a_non_recommendable_problem_still_feeds_the_learner_model() -> None:
-    # first-true is excluded from policy v1's candidates, not from skill evidence.
-    assert not PROBLEMS["first-true"].recommendable
+    # first-true was excluded from policy v1's candidates when this was written (E2); it is
+    # recommendable since 2026-10-26. Either way the flag never touches skill evidence: the
+    # estimate is the same with first-true switched off.
+    hidden = {
+        **PROBLEMS,
+        "first-true": PROBLEMS["first-true"].model_copy(update={"recommendable": False}),
+    }
     ft = at(
         attempt(
             "first-true",
@@ -290,3 +295,4 @@ def test_a_non_recommendable_problem_still_feeds_the_learner_model() -> None:
         True,
     )
     assert (b.counted, b.distinct_problems, b.state) == (3, 3, "estimated")
+    assert estimate(history, hidden) == estimate(history, PROBLEMS)

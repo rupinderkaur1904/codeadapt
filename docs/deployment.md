@@ -33,6 +33,7 @@ the M9 decisions (ethics determination, consent, cohort, data retention).
 | `CODEADAPT_SANDBOX_MAX_CONCURRENCY` | worker | at most the VM's cores |
 | `CODEADAPT_SESSION_HOURS` | API | default 12 |
 | `CODEADAPT_SUBMISSIONS_PER_MINUTE` | API | default 10 in production; `none` disables |
+| `CODEADAPT_POLICY_VERSION` | worker | recommendation policy, `1.5` (default) or `1.4` (ADR-038) |
 | `CODEADAPT_LOG_FORMAT`, `CODEADAPT_LOG_LEVEL` | API, worker | default `json` and `INFO` in production |
 
 ## 3. Runner VM

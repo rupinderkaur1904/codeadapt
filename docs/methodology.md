@@ -211,14 +211,25 @@ append-only `recommendations` and `followup_evaluations` tables.
   adds no failure evidence.
 * *Candidate problems* are those in the same `family` as the index problem. Skills are
   linked across problems by key, which is a content-authoring assumption. Since policy 1.3
-  (ADR-026) problems marked `recommendable = false` (first-true) are left out; their
-  attempts still enter the ledger.
+  (ADR-026) problems marked `recommendable = false` are left out (first-true until
+  2026-10-26; now the five held problems); their attempts still enter the ledger.
 * *Recently attempted* means among the learner's last 3 attempts.
-* `HYPOTHESIS_SUPPORTED(M)`: rank by (recently attempted, −tests probing `M.skill`, slug).
-  If no problem probes the skill, retry the index problem.
-* `AMBIGUOUS(C)`: rank by (−number of candidate skills the problem has error models for,
-  recently attempted, −tests probing those skills, slug). The criterion is that every
-  reliable follow-up test probing those skills passes.
+* Since 2026-10-26 (owner decision on docs/reviews/2026-10-26/recommendability-review.md)
+  22 of 25 problems are recommendable; integer-sqrt, min-capacity, peak-index,
+  rotated-search and rotated-min are held.
+* `HYPOTHESIS_SUPPORTED(M)`, policy 1.4: rank by (recently attempted, −tests probing
+  `M.skill`, slug). If no problem probes the skill, retry the index problem.
+* `AMBIGUOUS(C)`, policy 1.4: rank by (−number of candidate skills the problem has error
+  models for, recently attempted, −tests probing those skills, slug). The criterion is that
+  every reliable follow-up test probing those skills passes.
+* Policy 1.5 (ADR-038) changes only these two rankings. Candidates need at least 2 tests
+  probing the target skills (the support diagnosis rule 7 needs). They are ranked by
+  (−modelled candidate skills, ambiguous only; recently attempted; −target skills that are
+  not declared positive-only there; this learner's skill observations of the target skills
+  from that problem; −share of the problem's tests probing them; slug). The number of
+  probing tests is a threshold, not a preference. Fewer observations means less evidence
+  from that problem, not a weaker skill. The worker uses 1.5 unless
+  `CODEADAPT_POLICY_VERSION=1.4`.
 * `NO_FAILURE_OBSERVED`: among family problems without a no-failure attempt by this
   learner, rank by (recently attempted, reliable ledger entries for the problem's skills,
   slug). When none remain the action is `none`; this is explicitly not a claim of

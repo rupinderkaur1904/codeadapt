@@ -71,11 +71,12 @@ async def test_recommendation_and_followup_end_to_end(harness: Harness) -> None:
     )
     assert trace["diagnosis"]["outcome"] == "no_failure_observed"
     assert trace["followup_evaluation"]["verdict"] == "not_comparable"
-    assert trace["recommendation"]["problem_slug"] == "last-less-than"
+    # Policy 1.5 with the 2026-10-26 eligibility (last-less-than under 1.4 before it).
+    assert trace["recommendation"]["problem_slug"] == "exact-search"
 
-    # 4. A correct follow-up on last-less-than meets the recorded criterion.
+    # 4. A correct follow-up on exact-search meets the recorded criterion.
     correct_view, trace = await harness.submit(
-        source("last-less-than", "reference.cpp"), "last-less-than"
+        source("exact-search", "reference.cpp"), "exact-search"
     )
     assert trace["diagnosis"]["outcome"] == "no_failure_observed"
     ev = trace["followup_evaluation"]
@@ -83,10 +84,13 @@ async def test_recommendation_and_followup_end_to_end(harness: Harness) -> None:
     assert (ev["failed"], ev["excluded"]) == (0, 0)
     me = harness.client.get("/api/v1/me/recommendation", headers=STUDENT).json()
     assert me["last_followup"]["verdict"] == "criterion_met"
+    # A recommendable binary-search problem not yet passed.
     assert me["recommendation"]["problem_slug"] in {
-        "lower-bound",
-        "count-occurrences",
         "first-true",
+        "last-less-than",
+        "last-occurrence",
+        "lower-bound",
+        "upper-bound",
     }
 
     # 5. The learner model (LM1, researcher-only) sees exactly the eligible evidence.
