@@ -6,6 +6,10 @@
 `known_limitation`, content version or evidence rule was changed. Any change needs a separate
 owner decision.
 
+> **Update 2026-10-26 (ADR-037).** On the owner's later request the S1 safeguard was applied
+> to the four clear-cut cases O1–O4 (§2.1); see l20-original-s1.md. The contestable (§2.2)
+> and unsupported (§2.3) cases are unchanged. This record is otherwise kept as written.
+
 **Problems searched:** lower-bound, count-occurrences, last-less-than and first-true. These
 four were left out of docs/reviews/2026-10-25/l20-search.md (§4.5 there).
 

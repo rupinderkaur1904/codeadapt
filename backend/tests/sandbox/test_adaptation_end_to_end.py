@@ -25,9 +25,10 @@ async def test_recommendation_and_followup_end_to_end(harness: Harness) -> None:
     assert (rec["action"], rec["problem_slug"], rec["criterion"]) == ("retry", "lower-bound", None)
     assert rec["target_skills"] == []
 
-    # 1. A supported equality-handling error on lower-bound.
+    # 1. A supported equality-handling error on lower-bound. (Not upper_bound_confusion:
+    # since L20 S1 case O1, ADR-037, that diagnosis is qualified and adds no evidence.)
     named_view, trace = await harness.submit(
-        source("lower-bound", "error_models/upper_bound_confusion.cpp")
+        source("lower-bound", "error_models/stops_at_first_match.cpp")
     )
     assert trace["diagnosis"]["outcome"] == "hypothesis_supported"
     rec = trace["recommendation"]
@@ -41,7 +42,7 @@ async def test_recommendation_and_followup_end_to_end(harness: Harness) -> None:
     assert trace["followup_evaluation"]["verdict"] == "not_comparable"
     me = harness.client.get("/api/v1/me/recommendation", headers=STUDENT).json()
     assert me["recommendation"]["problem_slug"] == "count-occurrences"
-    assert "upper_bound_confusion" not in str(me)
+    assert "stops_at_first_match" not in str(me)
 
     # 2. The follow-up fails the same tests on count-occurrences. Its only equality model,
     # `upper_uses_strict`, prints 0 on every test, so since ADR-030 (rule 8a) it is not named:
@@ -117,7 +118,7 @@ async def test_recommendation_and_followup_end_to_end(harness: Harness) -> None:
         ("equality_handling", named_view["id"])
     ]
     assert incorrect[0][1]["counted"] is True
-    assert incorrect[0][1]["observation"]["basis"] == "supported diagnosis: upper_bound_confusion"
+    assert incorrect[0][1]["observation"]["basis"] == "supported diagnosis: stops_at_first_match"
     # The abstention (rule 8a) gives no negative evidence and nothing on the skill of its
     # consistent model. It still used up the counted attempt (feedback was delivered).
     abstained = by_submission.get(abstained_view["id"], [])

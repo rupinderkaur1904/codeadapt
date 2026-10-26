@@ -132,6 +132,7 @@ const learnerModel: LearnerModelView = {
     ],
   },
   retired_skills: {},
+  positive_only_skills: {},
 };
 
 // A learner with an observation recorded under a retired key (ADR-034).
@@ -166,6 +167,11 @@ const learnerModelRetired: LearnerModelView = {
       decision: "ADR-034",
       replaced_by: ["loop_bounds", "range_inclusion"],
     },
+  },
+  positive_only_skills: {
+    equality_handling: [
+      { problem: "last-less-than", reason: "Its only model, uses_le, carries a known_limitation." },
+    ],
   },
 };
 
@@ -284,6 +290,21 @@ describe("researcher pages", () => {
     expect(retired).toHaveTextContent("Visiting exactly the valid positions.");
     const current = screen.getByRole("region", { name: "equality_handling" });
     expect(current).not.toHaveTextContent("deprecated");
+  });
+
+  it("says where a skill can only gain correct observations", async () => {
+    renderAt(
+      "/research/learners/synthetic-b",
+      <LearnerModelPage />,
+      "/research/learners/:username",
+    );
+    const skill = await screen.findByRole("region", { name: "equality_handling" });
+    expect(skill).toHaveTextContent("Positive-only");
+    expect(skill).toHaveTextContent("last-less-than");
+    expect(skill).toHaveTextContent("Its only model, uses_le, carries a known_limitation.");
+    expect(screen.getByRole("region", { name: "index_range" })).not.toHaveTextContent(
+      "Positive-only",
+    );
   });
 
   it("marks problems with an attempt that had no failing tests", async () => {

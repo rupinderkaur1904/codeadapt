@@ -1,0 +1,602 @@
+{
+  "comparison": {
+    "case_set": "heldout",
+    "methods": [
+      "fingerprint_consistency v1.1",
+      "fingerprint_consistency v1.2",
+      "fingerprint_consistency v1.3"
+    ],
+    "counts": [
+      {
+        "method": "fingerprint_consistency v1.1",
+        "cases": 7,
+        "buggy_cases": 6,
+        "correct_diagnoses": 5,
+        "incorrect_diagnoses": 0,
+        "false_alarms": 0,
+        "false_positive_diagnoses": 0,
+        "abstentions": 1,
+        "abstentions_by_outcome": {
+          "unmodelled_behaviour": 1
+        },
+        "coverage": "5/6"
+      },
+      {
+        "method": "fingerprint_consistency v1.2",
+        "cases": 7,
+        "buggy_cases": 6,
+        "correct_diagnoses": 4,
+        "incorrect_diagnoses": 0,
+        "false_alarms": 0,
+        "false_positive_diagnoses": 0,
+        "abstentions": 2,
+        "abstentions_by_outcome": {
+          "non_termination_observed": 1,
+          "unmodelled_behaviour": 1
+        },
+        "coverage": "4/6"
+      },
+      {
+        "method": "fingerprint_consistency v1.3",
+        "cases": 7,
+        "buggy_cases": 6,
+        "correct_diagnoses": 4,
+        "incorrect_diagnoses": 0,
+        "false_alarms": 0,
+        "false_positive_diagnoses": 0,
+        "abstentions": 2,
+        "abstentions_by_outcome": {
+          "non_termination_observed": 1,
+          "unmodelled_behaviour": 1
+        },
+        "coverage": "4/6"
+      }
+    ],
+    "focus": {
+      "hi_init_last_index": [
+        {
+          "problem": "last-less-than",
+          "file": "closed_from_last_index.cpp",
+          "truth": "hi_init_last_index",
+          "outcomes": [
+            "hypothesis_supported (hi_init_last_index)",
+            "hypothesis_supported (hi_init_last_index)",
+            "hypothesis_supported (hi_init_last_index)"
+          ],
+          "classifications": [
+            "true_diagnosis",
+            "true_diagnosis",
+            "true_diagnosis"
+          ]
+        }
+      ],
+      "stops_at_first_match": []
+    },
+    "changed": [
+      {
+        "problem": "last-less-than",
+        "file": "while_true_stalls.cpp",
+        "truth": "no_progress_update",
+        "outcomes": [
+          "hypothesis_supported (no_progress_update)",
+          "non_termination_observed",
+          "non_termination_observed"
+        ],
+        "classifications": [
+          "true_diagnosis",
+          "symptom_reported",
+          "symptom_reported"
+        ]
+      }
+    ]
+  },
+  "reports": [
+    {
+      "data_class": "synthetic",
+      "case_set": "heldout",
+      "method": "fingerprint_consistency",
+      "method_version": "1.1",
+      "runs_per_case": 2,
+      "environment": {
+        "compiler_version": "g++ (GCC) 14.2.0",
+        "container_runtime": "runc",
+        "image": "codeadapt-sandbox:gcc14.2-1",
+        "image_id": "sha256:334e511812061ab867cc15a66dae59db41c13908608a77be501ac0193074c2ca"
+      },
+      "overall": {
+        "cases": 7,
+        "buggy_cases": 6,
+        "modelled_bug_cases": 5,
+        "correct_cases": 1,
+        "coverage": {
+          "numerator": 5,
+          "denominator": 6
+        },
+        "selective_accuracy": {
+          "numerator": 5,
+          "denominator": 5
+        },
+        "false_positive_diagnoses": 0,
+        "false_negatives": {
+          "numerator": 0,
+          "denominator": 5
+        },
+        "correct_code_passed": {
+          "numerator": 1,
+          "denominator": 1
+        },
+        "abstentions_by_outcome": {
+          "unmodelled_behaviour": 1
+        },
+        "reproducibility": {
+          "numerator": 7,
+          "denominator": 7
+        }
+      },
+      "problems": [
+        {
+          "problem": "last-less-than",
+          "version": "ecdcad684935715bd6c2e60b4f8d1aee95c39155558da5e0bcfda0fdba249a02",
+          "metrics": {
+            "cases": 7,
+            "buggy_cases": 6,
+            "modelled_bug_cases": 5,
+            "correct_cases": 1,
+            "coverage": {
+              "numerator": 5,
+              "denominator": 6
+            },
+            "selective_accuracy": {
+              "numerator": 5,
+              "denominator": 5
+            },
+            "false_positive_diagnoses": 0,
+            "false_negatives": {
+              "numerator": 0,
+              "denominator": 5
+            },
+            "correct_code_passed": {
+              "numerator": 1,
+              "denominator": 1
+            },
+            "abstentions_by_outcome": {
+              "unmodelled_behaviour": 1
+            },
+            "reproducibility": {
+              "numerator": 7,
+              "denominator": 7
+            }
+          },
+          "identical_model_pairs": [],
+          "detecting_tests": {
+            "uses_le": 7,
+            "returns_insertion_point": 15,
+            "clamps_to_zero": 6,
+            "hi_init_last_index": 3,
+            "no_progress_update": 9
+          },
+          "cases": [
+            {
+              "file": "closed_from_last_index.cpp",
+              "truth": "hi_init_last_index",
+              "outcome": "hypothesis_supported",
+              "selected_model": "hi_init_last_index",
+              "candidates": [
+                "hi_init_last_index"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "closed_interval_correct.cpp",
+              "truth": "correct",
+              "outcome": "no_failure_observed",
+              "selected_model": null,
+              "candidates": [],
+              "classification": "correct_pass",
+              "reproducible": true
+            },
+            {
+              "file": "closed_interval_le.cpp",
+              "truth": "uses_le",
+              "outcome": "hypothesis_supported",
+              "selected_model": "uses_le",
+              "candidates": [
+                "uses_le"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "le_and_clamped.cpp",
+              "truth": "unmodelled",
+              "outcome": "unmodelled_behaviour",
+              "selected_model": null,
+              "candidates": [],
+              "classification": "abstained",
+              "reproducible": true
+            },
+            {
+              "file": "never_negative.cpp",
+              "truth": "clamps_to_zero",
+              "outcome": "hypothesis_supported",
+              "selected_model": "clamps_to_zero",
+              "candidates": [
+                "clamps_to_zero"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "returns_count_below.cpp",
+              "truth": "returns_insertion_point",
+              "outcome": "hypothesis_supported",
+              "selected_model": "returns_insertion_point",
+              "candidates": [
+                "returns_insertion_point"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "while_true_stalls.cpp",
+              "truth": "no_progress_update",
+              "outcome": "hypothesis_supported",
+              "selected_model": "no_progress_update",
+              "candidates": [
+                "no_progress_update"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "Synthetic held-out cases were written by the same author as the error models, so they share that author's idea of each bug.",
+        "The held-out set is small and is not drawn from real student submissions; its distribution says nothing about how often each bug occurs in practice.",
+        "Selective accuracy here is an upper bound on what real students' code will show.",
+        "These results are about the diagnostic method, not about learning; they are not evidence that CodeAdapt helps anyone learn.",
+        "No test checks the O(log n) requirement: a linear scan passes every suite, so nothing here says anything about complexity."
+      ]
+    },
+    {
+      "data_class": "synthetic",
+      "case_set": "heldout",
+      "method": "fingerprint_consistency",
+      "method_version": "1.2",
+      "runs_per_case": 2,
+      "environment": {
+        "compiler_version": "g++ (GCC) 14.2.0",
+        "container_runtime": "runc",
+        "image": "codeadapt-sandbox:gcc14.2-1",
+        "image_id": "sha256:334e511812061ab867cc15a66dae59db41c13908608a77be501ac0193074c2ca"
+      },
+      "overall": {
+        "cases": 7,
+        "buggy_cases": 6,
+        "modelled_bug_cases": 5,
+        "correct_cases": 1,
+        "coverage": {
+          "numerator": 4,
+          "denominator": 6
+        },
+        "selective_accuracy": {
+          "numerator": 4,
+          "denominator": 4
+        },
+        "false_positive_diagnoses": 0,
+        "false_negatives": {
+          "numerator": 1,
+          "denominator": 5
+        },
+        "correct_code_passed": {
+          "numerator": 1,
+          "denominator": 1
+        },
+        "abstentions_by_outcome": {
+          "non_termination_observed": 1,
+          "unmodelled_behaviour": 1
+        },
+        "reproducibility": {
+          "numerator": 7,
+          "denominator": 7
+        }
+      },
+      "problems": [
+        {
+          "problem": "last-less-than",
+          "version": "ecdcad684935715bd6c2e60b4f8d1aee95c39155558da5e0bcfda0fdba249a02",
+          "metrics": {
+            "cases": 7,
+            "buggy_cases": 6,
+            "modelled_bug_cases": 5,
+            "correct_cases": 1,
+            "coverage": {
+              "numerator": 4,
+              "denominator": 6
+            },
+            "selective_accuracy": {
+              "numerator": 4,
+              "denominator": 4
+            },
+            "false_positive_diagnoses": 0,
+            "false_negatives": {
+              "numerator": 1,
+              "denominator": 5
+            },
+            "correct_code_passed": {
+              "numerator": 1,
+              "denominator": 1
+            },
+            "abstentions_by_outcome": {
+              "non_termination_observed": 1,
+              "unmodelled_behaviour": 1
+            },
+            "reproducibility": {
+              "numerator": 7,
+              "denominator": 7
+            }
+          },
+          "identical_model_pairs": [],
+          "detecting_tests": {
+            "uses_le": 7,
+            "returns_insertion_point": 15,
+            "clamps_to_zero": 6,
+            "hi_init_last_index": 3,
+            "no_progress_update": 9
+          },
+          "cases": [
+            {
+              "file": "closed_from_last_index.cpp",
+              "truth": "hi_init_last_index",
+              "outcome": "hypothesis_supported",
+              "selected_model": "hi_init_last_index",
+              "candidates": [
+                "hi_init_last_index"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "closed_interval_correct.cpp",
+              "truth": "correct",
+              "outcome": "no_failure_observed",
+              "selected_model": null,
+              "candidates": [],
+              "classification": "correct_pass",
+              "reproducible": true
+            },
+            {
+              "file": "closed_interval_le.cpp",
+              "truth": "uses_le",
+              "outcome": "hypothesis_supported",
+              "selected_model": "uses_le",
+              "candidates": [
+                "uses_le"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "le_and_clamped.cpp",
+              "truth": "unmodelled",
+              "outcome": "unmodelled_behaviour",
+              "selected_model": null,
+              "candidates": [],
+              "classification": "abstained",
+              "reproducible": true
+            },
+            {
+              "file": "never_negative.cpp",
+              "truth": "clamps_to_zero",
+              "outcome": "hypothesis_supported",
+              "selected_model": "clamps_to_zero",
+              "candidates": [
+                "clamps_to_zero"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "returns_count_below.cpp",
+              "truth": "returns_insertion_point",
+              "outcome": "hypothesis_supported",
+              "selected_model": "returns_insertion_point",
+              "candidates": [
+                "returns_insertion_point"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "while_true_stalls.cpp",
+              "truth": "no_progress_update",
+              "outcome": "non_termination_observed",
+              "selected_model": null,
+              "candidates": [],
+              "classification": "symptom_reported",
+              "reproducible": true
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "Synthetic held-out cases were written by the same author as the error models, so they share that author's idea of each bug.",
+        "The held-out set is small and is not drawn from real student submissions; its distribution says nothing about how often each bug occurs in practice.",
+        "Selective accuracy here is an upper bound on what real students' code will show.",
+        "These results are about the diagnostic method, not about learning; they are not evidence that CodeAdapt helps anyone learn.",
+        "No test checks the O(log n) requirement: a linear scan passes every suite, so nothing here says anything about complexity."
+      ]
+    },
+    {
+      "data_class": "synthetic",
+      "case_set": "heldout",
+      "method": "fingerprint_consistency",
+      "method_version": "1.3",
+      "runs_per_case": 2,
+      "environment": {
+        "compiler_version": "g++ (GCC) 14.2.0",
+        "container_runtime": "runc",
+        "image": "codeadapt-sandbox:gcc14.2-1",
+        "image_id": "sha256:334e511812061ab867cc15a66dae59db41c13908608a77be501ac0193074c2ca"
+      },
+      "overall": {
+        "cases": 7,
+        "buggy_cases": 6,
+        "modelled_bug_cases": 5,
+        "correct_cases": 1,
+        "coverage": {
+          "numerator": 4,
+          "denominator": 6
+        },
+        "selective_accuracy": {
+          "numerator": 4,
+          "denominator": 4
+        },
+        "false_positive_diagnoses": 0,
+        "false_negatives": {
+          "numerator": 1,
+          "denominator": 5
+        },
+        "correct_code_passed": {
+          "numerator": 1,
+          "denominator": 1
+        },
+        "abstentions_by_outcome": {
+          "non_termination_observed": 1,
+          "unmodelled_behaviour": 1
+        },
+        "reproducibility": {
+          "numerator": 7,
+          "denominator": 7
+        }
+      },
+      "problems": [
+        {
+          "problem": "last-less-than",
+          "version": "ecdcad684935715bd6c2e60b4f8d1aee95c39155558da5e0bcfda0fdba249a02",
+          "metrics": {
+            "cases": 7,
+            "buggy_cases": 6,
+            "modelled_bug_cases": 5,
+            "correct_cases": 1,
+            "coverage": {
+              "numerator": 4,
+              "denominator": 6
+            },
+            "selective_accuracy": {
+              "numerator": 4,
+              "denominator": 4
+            },
+            "false_positive_diagnoses": 0,
+            "false_negatives": {
+              "numerator": 1,
+              "denominator": 5
+            },
+            "correct_code_passed": {
+              "numerator": 1,
+              "denominator": 1
+            },
+            "abstentions_by_outcome": {
+              "non_termination_observed": 1,
+              "unmodelled_behaviour": 1
+            },
+            "reproducibility": {
+              "numerator": 7,
+              "denominator": 7
+            }
+          },
+          "identical_model_pairs": [],
+          "detecting_tests": {
+            "uses_le": 7,
+            "returns_insertion_point": 15,
+            "clamps_to_zero": 6,
+            "hi_init_last_index": 3,
+            "no_progress_update": 9
+          },
+          "cases": [
+            {
+              "file": "closed_from_last_index.cpp",
+              "truth": "hi_init_last_index",
+              "outcome": "hypothesis_supported",
+              "selected_model": "hi_init_last_index",
+              "candidates": [
+                "hi_init_last_index"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "closed_interval_correct.cpp",
+              "truth": "correct",
+              "outcome": "no_failure_observed",
+              "selected_model": null,
+              "candidates": [],
+              "classification": "correct_pass",
+              "reproducible": true
+            },
+            {
+              "file": "closed_interval_le.cpp",
+              "truth": "uses_le",
+              "outcome": "hypothesis_supported",
+              "selected_model": "uses_le",
+              "candidates": [
+                "uses_le"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "le_and_clamped.cpp",
+              "truth": "unmodelled",
+              "outcome": "unmodelled_behaviour",
+              "selected_model": null,
+              "candidates": [],
+              "classification": "abstained",
+              "reproducible": true
+            },
+            {
+              "file": "never_negative.cpp",
+              "truth": "clamps_to_zero",
+              "outcome": "hypothesis_supported",
+              "selected_model": "clamps_to_zero",
+              "candidates": [
+                "clamps_to_zero"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "returns_count_below.cpp",
+              "truth": "returns_insertion_point",
+              "outcome": "hypothesis_supported",
+              "selected_model": "returns_insertion_point",
+              "candidates": [
+                "returns_insertion_point"
+              ],
+              "classification": "true_diagnosis",
+              "reproducible": true
+            },
+            {
+              "file": "while_true_stalls.cpp",
+              "truth": "no_progress_update",
+              "outcome": "non_termination_observed",
+              "selected_model": null,
+              "candidates": [],
+              "classification": "symptom_reported",
+              "reproducible": true
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "Synthetic held-out cases were written by the same author as the error models, so they share that author's idea of each bug.",
+        "The held-out set is small and is not drawn from real student submissions; its distribution says nothing about how often each bug occurs in practice.",
+        "Selective accuracy here is an upper bound on what real students' code will show.",
+        "These results are about the diagnostic method, not about learning; they are not evidence that CodeAdapt helps anyone learn.",
+        "No test checks the O(log n) requirement: a linear scan passes every suite, so nothing here says anything about complexity."
+      ]
+    }
+  ]
+}

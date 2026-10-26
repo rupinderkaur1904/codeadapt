@@ -198,6 +198,7 @@ file = "error_models/upper_bound_confusion.cpp"
 skill = "equality_handling"
 description = "Uses a[mid] <= target where a[mid] < target is required, so the search returns the first element strictly greater than the target (upper bound)."
 student_hint = "Check which side of the boundary elements equal to the target end up on."
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1 for the original problems): a correct search for the first element > target (a misread task) gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate an equality error from a specification error. Diagnoses are reported as qualified and add no equality_handling evidence (docs/reviews/2026-10-26/l20-search-original.md, case O1)."
 
 [[error_models]]
 key = "hi_init_last_index"

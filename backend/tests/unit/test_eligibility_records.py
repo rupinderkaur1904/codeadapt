@@ -204,3 +204,30 @@ def test_an_older_snapshot_keeps_its_evidence_and_its_retired_skill_keys(
     assert retired["definition"] == RETIRED["index_range"].definition
     assert retired["replaced_by"] == ["loop_bounds", "range_inclusion"]
     assert retired["decision"] == "ADR-034"
+
+
+def test_positive_only_skills_are_shown_to_researchers(
+    client: TestClient, sessions: sessionmaker[Session]
+) -> None:
+    # 2026-10-26 audit: a researcher reading an estimate must be able to see where a skill can
+    # only gain `correct` observations (no evidence-capable error model in that problem).
+    uid = learner(sessions)
+    llt = CATALOGUE.by_slug["last-less-than"]
+    record(sessions, uid, llt.version, "last-less-than", HAND_WRITTEN, 1)
+    body = client.get(
+        "/api/v1/research/learner-model?username=dev-student", headers=RESEARCHER
+    ).json()
+    skills = {s["skill"] for s in body["estimate"]["skills"]}
+    assert "equality_handling" in skills
+    only = body["positive_only_skills"]
+    assert set(only) <= skills
+    shown = {o["problem"]: o["reason"] for o in only["equality_handling"]}
+    assert shown["last-less-than"] == llt.spec.positive_only_skills["equality_handling"]
+    expected = {
+        slug
+        for slug, p in CATALOGUE.by_slug.items()
+        if "equality_handling" in p.spec.positive_only_skills
+    }
+    assert set(shown) == expected
+    # problem_specification has an evidence-capable model in every problem that declares it.
+    assert "problem_specification" in skills and "problem_specification" not in only

@@ -6,15 +6,18 @@ import { ErrorMessage } from "../components/ErrorMessage";
 
 type SkillEstimate = LearnerModelView["estimate"]["skills"][number];
 type RetiredSkill = LearnerModelView["retired_skills"][string];
+type PositiveOnly = LearnerModelView["positive_only_skills"][string];
 
 function SkillCard({
   skill,
   label,
   retired,
+  positiveOnly,
 }: {
   skill: SkillEstimate;
   label: string;
   retired?: RetiredSkill;
+  positiveOnly?: PositiveOnly;
 }) {
   return (
     <section aria-label={skill.skill}>
@@ -29,6 +32,19 @@ function SkillCard({
           <em>{retired.definition}</em> They were recorded on older content versions and are not
           converted to the new keys.
         </p>
+      )}
+      {positiveOnly && (
+        <div className="muted">
+          <strong>Positive-only</strong> in the current content of these problems: no error model
+          there can give this skill an incorrect observation, so it can only gain correct ones.
+          <ul>
+            {positiveOnly.map((p) => (
+              <li key={p.problem}>
+                {p.problem}: {p.reason}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       <p>
         {skill.state === "estimated" && skill.p_known !== null && skill.p_known !== undefined ? (
@@ -115,6 +131,7 @@ export function LearnerModelPage() {
           skill={s}
           label={estimate.label}
           retired={model.data.retired_skills[s.skill]}
+          positiveOnly={model.data.positive_only_skills[s.skill]}
         />
       ))}
     </section>

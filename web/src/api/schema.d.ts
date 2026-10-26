@@ -368,6 +368,13 @@ export interface components {
             data_class: string;
             estimate: components["schemas"]["LearnerEstimate"];
             /**
+             * Positive Only Skills
+             * @default {}
+             */
+            positive_only_skills: {
+                [key: string]: components["schemas"]["PositiveOnlyView"][];
+            };
+            /**
              * Retired Skills
              * @default {}
              */
@@ -388,6 +395,13 @@ export interface components {
             password: string;
             /** Username */
             username: string;
+        };
+        /** PositiveOnlyView */
+        PositiveOnlyView: {
+            /** Problem */
+            problem: string;
+            /** Reason */
+            reason: string;
         };
         /** ProblemDetail */
         ProblemDetail: {
