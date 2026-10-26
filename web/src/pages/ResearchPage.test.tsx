@@ -81,6 +81,34 @@ const trace: TraceView = {
   },
 };
 
+// A qualified diagnosis: a named model with a documented limitation (ADR-037, O2).
+const qualifiedTrace: TraceView = {
+  ...trace,
+  submission: { ...trace.submission, id: "s2" },
+  diagnosis: {
+    method: "fingerprint_consistency",
+    outcome: "hypothesis_supported",
+    selected_model: "uses_le",
+    rationale: { rule: 8, evidence_strength: "multiple", supporting_tests: ["equal_first"] },
+  },
+  recommendation: {
+    rule: "hypothesis_supported",
+    problem_slug: "count-occurrences",
+    rationale: {
+      selected_model: "uses_le",
+      qualified_hypothesis: true,
+      known_limitation: "Output-identical to a correct program for a misread specification.",
+    },
+  },
+  technique_check: null,
+};
+
+/** The value shown for one field label on the trace page. */
+function field(label: string) {
+  const dt = screen.getByText(label, { selector: "dt" });
+  return dt.nextElementSibling?.textContent;
+}
+
 function observation(id: string, problem: string, value: "correct" | "incorrect") {
   return {
     skill: "equality_handling",
@@ -205,6 +233,7 @@ describe("researcher pages", () => {
       const url = String(input);
       requests.push({ url, role: new Headers(init?.headers).get("X-Dev-Role") });
       if (url.includes("/research/submissions/s1/trace")) return json(trace);
+      if (url.includes("/research/submissions/s2/trace")) return json(qualifiedTrace);
       if (url.includes("/research/submissions")) return json([row]);
       if (url.endsWith("/submissions?limit=50"))
         return json([supported, { ...supported, id: "s9", problem_slug: "lower-bound" }]);
@@ -263,6 +292,26 @@ describe("researcher pages", () => {
     expect(screen.getByText("count-occurrences")).toBeInTheDocument();
     expect(screen.getByText("withheld")).toBeInTheDocument();
     expect(screen.getByText("std::lower_bound, std::upper_bound")).toBeInTheDocument();
+  });
+
+  it("shows a qualified hypothesis, its limitation and the evidence strength", async () => {
+    renderAt("/research/submissions/s2", <TracePage />, "/research/submissions/:id");
+    expect(await screen.findByText("equal_first")).toBeInTheDocument();
+    expect(field("evidence_strength")).toBe("multiple");
+    expect(field("qualified_hypothesis")).toBe("true");
+    expect(field("known_limitation")).toBe(
+      "Output-identical to a correct program for a misread specification.",
+    );
+    expect(screen.getByText(/^Qualified hypothesis:/)).toBeInTheDocument();
+  });
+
+  it("shows a dash, not a qualification, when the optional fields are absent", async () => {
+    renderAt("/research/submissions/s1", <TracePage />, "/research/submissions/:id");
+    expect(await screen.findByText("equal_first")).toBeInTheDocument();
+    expect(field("evidence_strength")).toBe("—");
+    expect(field("qualified_hypothesis")).toBe("—");
+    expect(field("known_limitation")).toBe("—");
+    expect(screen.queryByText(/^Qualified hypothesis:/)).not.toBeInTheDocument();
   });
 
   it("shows learner-model estimates with their label and uncounted retries", async () => {
