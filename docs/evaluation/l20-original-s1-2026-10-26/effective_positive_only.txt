@@ -1,0 +1,21 @@
+problem | skill | declared positive-only | models and why none gives negative evidence
+container-water | pointer_movement | yes | moves_taller: known_limitation
+count-occurrences | equality_handling | NO (effective only) | upper_uses_strict: 8a constant
+count-occurrences | loop_termination | NO (effective only) | no_progress_update: 4b time limit
+count-occurrences | search_space_boundaries | yes | hi_init_last_index: single behaviour, known_limitation
+dedup-sorted | output_contract | yes | returns_last_index: known_limitation
+exact-search | search_space_boundaries | yes | swapped_direction: known_limitation; lo_init_one: known_limitation
+integer-sqrt | equality_handling | yes | strict_square_test: known_limitation
+last-less-than | equality_handling | yes | uses_le: known_limitation
+last-less-than | loop_termination | NO (effective only) | no_progress_update: 4b time limit
+last-less-than | search_space_boundaries | yes | hi_init_last_index: single behaviour, known_limitation
+last-occurrence | equality_handling | yes | returns_first_occurrence: known_limitation; stops_at_any_match: known_limitation
+last-occurrence | loop_termination | NO (effective only) | no_progress_update: 4b time limit
+last-occurrence | search_space_boundaries | yes | hi_init_last_index: known_limitation
+lower-bound | loop_termination | NO (effective only) | no_progress_update: 4b time limit; closed_loop_hi_mid: 4b time limit
+min-capacity | equality_handling | yes | strict_day_limit: known_limitation; full_day_overflows: known_limitation
+min-capacity | loop_termination | NO (effective only) | no_progress_update: 4b time limit
+rotated-min | loop_termination | NO (effective only) | no_progress_update: 4b time limit
+rotated-search | equality_handling | yes | left_half_test_strict: single behaviour, known_limitation; left_range_excludes_lo: known_limitation
+upper-bound | equality_handling | yes | lower_bound_confusion: known_limitation
+upper-bound | loop_termination | NO (effective only) | no_progress_update: 4b time limit; closed_loop_hi_mid: 4b time limit

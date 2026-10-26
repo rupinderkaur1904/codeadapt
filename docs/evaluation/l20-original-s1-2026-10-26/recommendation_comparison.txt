@@ -1,0 +1,7 @@
+cases: 442
+rule, action, problem, target skills, review flag or criterion differs: 0
+qualified_hypothesis differs: 4
+   first-true|named:none_sentinel: False -> True
+   last-less-than|named:clamps_to_zero: False -> True
+   last-less-than|named:uses_le: False -> True
+   lower-bound|named:upper_bound_confusion: False -> True

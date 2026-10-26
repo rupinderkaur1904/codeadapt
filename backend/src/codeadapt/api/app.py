@@ -29,6 +29,7 @@ from codeadapt.api.schemas import (
     LearnerModelView,
     LearnerNext,
     LoginRequest,
+    PositiveOnlyView,
     ProblemDetail,
     ProblemSummary,
     ResearchMetrics,
@@ -608,6 +609,17 @@ def create_app(
                 )
                 for s in est.skills
                 if (r := RETIRED.get(s.skill)) is not None
+            },
+            positive_only_skills={
+                s.skill: only
+                for s in est.skills
+                if (
+                    only := [
+                        PositiveOnlyView(problem=slug, reason=spec.positive_only_skills[s.skill])
+                        for slug, spec in sorted(problems.items())
+                        if s.skill in spec.positive_only_skills
+                    ]
+                )
             },
         )
 

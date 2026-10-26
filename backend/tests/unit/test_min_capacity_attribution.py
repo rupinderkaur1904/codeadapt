@@ -23,20 +23,21 @@ MC_LOADED = CATALOGUE.by_slug["min-capacity"]
 AMBIGUOUS_ATTRIBUTION = ("full_day_overflows", "strict_day_limit")
 # Documented collisions of every other problem, unchanged by this decision.
 # Updated 2026-10-26 for L20 safeguard S1 (owner-approved): the 11 clear-cut cross-skill twins
-# in the six searched problems now carry a known_limitation too (tests/unit/test_l20_safeguards.py).
+# in the six searched problems now carry a known_limitation too (tests/unit/test_l20_safeguards.py),
+# and so do the four clear-cut twins in the original problems (cases O1-O4, same day).
 OTHER_COLLISIONS = {
     "count-occurrences": ("hi_init_last_index",),
     "exact-search": ("lo_init_one", "swapped_direction"),
-    "first-true": ("hi_init_last_index",),
+    "first-true": ("hi_init_last_index", "none_sentinel"),
     "integer-sqrt": ("strict_square_test",),
-    "last-less-than": ("hi_init_last_index",),
+    "last-less-than": ("clamps_to_zero", "hi_init_last_index", "uses_le"),
     "last-occurrence": (
         "hi_init_last_index",
         "missing_equality_check",
         "returns_first_occurrence",
         "stops_at_any_match",
     ),
-    "lower-bound": ("hi_init_last_index",),
+    "lower-bound": ("hi_init_last_index", "upper_bound_confusion"),
     "peak-index": ("swapped_direction",),
     "rotated-min": ("hi_skips_candidate",),
     "rotated-search": ("left_half_test_strict", "left_range_excludes_lo"),

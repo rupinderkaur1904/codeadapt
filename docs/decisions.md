@@ -758,3 +758,46 @@ input modes for committed tests. A rerun that expands them leaves every equivale
 found four clear-cut twins there (O1–O4). Under the owner's instruction that investigation
 changes nothing. Those models still give `incorrect` evidence until a decision is taken.
 
+**Update:** the four original-problem cases were decided separately in ADR-037.
+
+## ADR-037 — L20 safeguard S1 for the original problems: cases O1–O4 (2026-10-26)
+**Context:** docs/reviews/2026-10-26/l20-search-original.md §2.1 found four models in the
+original problems that are output-identical to a program with an error of a different skill.
+The match holds on every committed test, on the exhaustive domain and on the seeded random
+domain, and a one-line argument makes each equivalence exact:
+- O1, lower-bound `upper_bound_confusion`;
+- O2, last-less-than `uses_le`;
+- O3, last-less-than `clamps_to_zero`;
+- O4, first-true `none_sentinel`.
+
+**Owner request (2026-10-26 05:22):** apply the same targeted S1 safeguard to these four if
+the repository confirms the evidence and the change follows the established process. Do not
+change the four contestable (O5–O8) or the two unsupported (O9–O10) cases.
+
+**Decision:** each of the four carries a `known_limitation` naming its twin and case. The
+effect is that of ADR-032 and ADR-036:
+- diagnosis and trace unchanged;
+- feedback qualified;
+- no `incorrect` observation and no BKT update;
+- recommendation rule, action, problem, target skills and criterion unchanged, with
+  `qualified_hypothesis` and `known_limitation` in the rationale.
+
+Mappings, fingerprints and behaviour groups are unchanged. lower-bound, last-less-than and
+first-true have new content versions; the earlier versions keep their snapshots.
+
+**Positive-only:** `equality_handling` in last-less-than, whose only model is `uses_le`.
+
+**Consequence:** the lower-bound demo program `upper_bound_closed.cpp` now gets qualified
+feedback.
+
+**Fixture:** the golden policy fixture (`tests/fixtures/policy_v1_golden.json`) is kept as
+policy 1.2 produced it. Its test applies exactly this change (two rationale fields in 12
+entries) and requires the rest to be identical.
+
+**Analysis:** per-case analysis, and the cases left unchanged with their recommendation, in
+docs/reviews/2026-10-26/l20-original-s1.md.
+
+**Evidence:**
+- docs/evaluation/l20-original-s1-2026-10-26/ (held-out, recommendations, content reports);
+- tests/unit/test_l20_safeguards.py;
+- tests/sandbox/test_demo_content.py.

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import copy
 import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 from codeadapt.adaptation import (
     Action,
@@ -63,11 +65,15 @@ def attempt(
     )
 
 
+# An unqualified equality diagnosis on lower-bound. Until 2026-10-26 this used
+# `upper_bound_confusion`, which is now a documented collision (L20 S1 for the original
+# problems, case O1) and so gives no equality evidence; `stops_at_first_match` is the other
+# equality model on lower-bound and is not.
 LB_EQUALITY = attempt(
     "lower-bound",
     Outcome.HYPOTHESIS_SUPPORTED,
-    model="upper_bound_confusion",
-    failing=("sample_present", "equal_first", "equal_last", "duplicates_middle"),
+    model="stops_at_first_match",
+    failing=("duplicates_middle", "duplicates_all"),
 )
 
 
@@ -211,7 +217,8 @@ def test_followup_meeting_the_criterion() -> None:
     table = {p.probe: (p.index, p.followup) for p in ev.probes}
     assert table == {
         "target_present_duplicates": (ProbeResult.FAILED, ProbeResult.PASSED),
-        "target_present_unique": (ProbeResult.FAILED, ProbeResult.PASSED),
+        # LB_EQUALITY (stops_at_first_match since 2026-10-26) fails only duplicate tests.
+        "target_present_unique": (ProbeResult.PASSED, ProbeResult.PASSED),
     }
     assert "mastered" not in ev.reason
 
@@ -417,10 +424,42 @@ def test_policy_1_3_reproduces_policy_1_2_on_the_original_problems() -> None:
     # non-recommendable problem existed (tests/unit/policy_cases.py says how).
     # 2026-10-25 (L21, owner-approved): the `none` note now says "every recommendable problem";
     # only that string changed in the fixture (6 occurrences), no decision.
+    # 2026-10-26 (L20 S1 for the original problems, cases O1-O4; ADR-037): four models gained
+    # a known_limitation, so recommendations indexed on them are now passed on as qualified.
+    # The fixture is kept as policy 1.2 produced it; `with_s1_original` applies exactly that
+    # change (two rationale fields, 12 entries) and nothing else may differ.
     golden = json.loads(GOLDEN.read_text())
     assert len(golden) == 286
-    assert recommendations(PROBLEMS) == golden
-    assert recommendations({s: PROBLEMS[s] for s in ORIGINAL}) == golden
+    expected, changed = with_s1_original(golden)
+    assert changed == 12
+    assert recommendations(PROBLEMS) == expected
+    assert recommendations({s: PROBLEMS[s] for s in ORIGINAL}) == expected
+
+
+S1_ORIGINAL = {
+    "upper_bound_confusion": "lower-bound",
+    "uses_le": "last-less-than",
+    "clamps_to_zero": "last-less-than",
+    "none_sentinel": "first-true",
+}
+
+
+def with_s1_original(golden: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
+    out = copy.deepcopy(golden)
+    changed = 0
+    for rec in out:
+        rationale = rec["rationale"]
+        model = rationale.get("selected_model")
+        if model not in S1_ORIGINAL:
+            continue
+        assert rationale["qualified_hypothesis"] is False and "known_limitation" not in rationale
+        spec = PROBLEMS[S1_ORIGINAL[model]]
+        rationale["qualified_hypothesis"] = True
+        rationale["known_limitation"] = next(
+            m.known_limitation for m in spec.error_models if m.key == model
+        )
+        changed += 1
+    return out, changed
 
 
 def test_non_recommendable_problems_are_never_chosen_but_stay_in_the_catalogue() -> None:
