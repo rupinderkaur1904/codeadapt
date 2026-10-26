@@ -30,6 +30,9 @@ class Settings:
     login_failure_window_minutes: float = 15.0
     # Submissions one user may create per minute; None = unlimited (dev and test default).
     submissions_per_minute: int | None = None
+    # Recommendation policy version the worker uses (ADR-038): "1.5", or "1.4" to keep the
+    # earlier ranking.
+    policy_version: str = "1.5"
 
     @property
     def secure_cookies(self) -> bool:
@@ -60,6 +63,7 @@ class Settings:
                 os.environ.get("CODEADAPT_SUBMISSIONS_PER_MINUTE"),
                 default=10 if env is Environment.PRODUCTION else None,
             ),
+            policy_version=os.environ.get("CODEADAPT_POLICY_VERSION", "1.5"),
         )
 
 

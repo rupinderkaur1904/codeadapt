@@ -14,6 +14,7 @@ import pytest
 from codeadapt.adaptation import (
     Action,
     AttemptRecord,
+    PolicyV1,
     Rule,
     Verdict,
     evaluate_followup,
@@ -48,7 +49,10 @@ def test_non_termination_retries_the_same_problem_without_a_skill_or_criterion()
     assert rec.criterion is None
     assert rec.review_flag
     assert "ADR-027" in rec.rationale["note"]
-    assert rec.policy_version == "1.4"
+    assert rec.policy_version == "1.5"
+    # Policy 1.5 changed only the follow-up ranking; this rule is the same in 1.4.
+    old = PolicyV1(version="1.4").recommend(index, [index], PROBLEMS)
+    assert old.model_dump(exclude={"policy_version"}) == rec.model_dump(exclude={"policy_version"})
 
 
 @pytest.mark.parametrize("outcome", list(Outcome))

@@ -1,0 +1,10 @@
+C1: siblings upper-bound,last-occurrence,exact-search,first-true + non-binary changed 385 dest {'exact-search': 118, 'first-true': 92, 'last-occurrence': 47, 'upper-bound': 25, 'container-water': 15, 'longest-run': 15, 'first-max-index': 11, 'closest-pair-sum': 10, 'dedup-sorted': 8, 'count-occurrences': 8, 'stock-profit': 8, 'second-largest': 7, 'range-sum-queries': 7, 'longest-sum-at-most': 5, 'plus-one': 5, 'max-window-sum': 4, 'distinct-in-windows': 4, 'pivot-index': 4}
+current  named:  n=74 {'count-occurrences': 32, 'lower-bound': 22, 'last-less-than': 20}
+current  amb:    n=204 {'count-occurrences': 86, 'lower-bound': 70, 'last-less-than': 48}
+current  nofail  n=12 {'count-occurrences': 11, 'last-less-than': 1}
+all 25   named:  n=74 {'rotated-search': 23, 'rotated-min': 20, 'integer-sqrt': 17, 'last-occurrence': 10, 'min-capacity': 2, 'peak-index': 2}
+all 25   amb:    n=204 {'rotated-search': 67, 'rotated-min': 46, 'exact-search': 34, 'integer-sqrt': 25, 'min-capacity': 16, 'last-occurrence': 7, 'first-true': 4, 'upper-bound': 4}
+all 25   nofail  n=12 {'exact-search': 8, 'rotated-search': 4}
+C1       named:  n=74 {'first-true': 38, 'exact-search': 21, 'last-occurrence': 10, 'upper-bound': 5}
+C1       amb:    n=204 {'exact-search': 89, 'first-true': 54, 'last-occurrence': 37, 'upper-bound': 20, 'count-occurrences': 4}
+C1       nofail  n=12 {'exact-search': 8, 'count-occurrences': 4}

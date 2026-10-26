@@ -12,6 +12,7 @@ import socket
 from sqlalchemy.orm import Session, sessionmaker
 
 from codeadapt import logs
+from codeadapt.adaptation import PolicyV1
 from codeadapt.config import Environment, Settings
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.db import queue
@@ -61,7 +62,13 @@ async def run(settings: Settings, *, once: bool = False) -> int:
     catalogue = Catalogue.load(settings.content_dir)
     with sessions() as session:
         catalogue.sync(session)
-    pipeline = Pipeline(sandbox, sessions, catalogue, FingerprintConsistencyV1())
+    pipeline = Pipeline(
+        sandbox,
+        sessions,
+        catalogue,
+        FingerprintConsistencyV1(),
+        PolicyV1(version=settings.policy_version),
+    )
     worker_id = f"{socket.gethostname()}:{os.getpid()}"
     processed = 0
     while True:

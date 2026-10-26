@@ -12,9 +12,10 @@ interface = "int remove_duplicates(std::vector<int>& a);"
 # Library calls the statement forbids (D1, ADR-035): an attempt naming one gives no skill
 # observations. Must match the statement's "Do not call" sentence.
 banned_names = ["std::unique"]
-# Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
-# every new problem). They stay in the problem list and their attempts produce skill evidence.
-recommendable = false
+# Recommendable from 2026-10-26 (owner decision, option C of
+# docs/reviews/2026-10-26/recommendability-review.md). Earlier content versions were not
+# (CE1 decision E2); their snapshots keep that.
+recommendable = true
 
 [skills]
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."

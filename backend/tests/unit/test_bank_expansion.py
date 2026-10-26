@@ -1,9 +1,11 @@
 """Bank expansion beyond binary search (owner 2026-10-25; ADR-033).
 
 The new families use their own skill keys, so their evidence never touches the four
-binary-search skills. Every new problem is non-recommendable. Recommendation policy 1.4 is
-unchanged: in a family without a recommendable problem it retries or stops (L21). These checks
-run over every non-binary-search problem, so each later batch is covered automatically.
+binary-search skills. Until 2026-10-26 every new problem was non-recommendable, so in these
+families a diagnosis retried and a pass stopped (L21). Since the owner's 2026-10-26 decision
+(docs/reviews/2026-10-26/recommendability-review.md, option C) all 13 are recommendable, and
+the policy moves within the family. These checks run over every non-binary-search problem, so
+each later batch is covered automatically.
 """
 
 from __future__ import annotations
@@ -72,7 +74,6 @@ def test_new_problems_use_only_the_new_skill_keys_with_one_definition(slug: str)
     spec = PROBLEMS[slug]
     assert set(spec.skills) <= set(NEW_SKILLS), set(spec.skills) - set(NEW_SKILLS)
     assert dict(spec.skills) == {k: NEW_SKILLS[k] for k in spec.skills}
-    assert not spec.recommendable
 
 
 @pytest.mark.parametrize("slug", BINARY)
@@ -80,12 +81,18 @@ def test_binary_search_problems_keep_their_four_skills(slug: str) -> None:
     assert set(PROBLEMS[slug].skills) <= BINARY_SEARCH_SKILLS
 
 
+def family_of(slug: str) -> set[str]:
+    return {s for s, p in PROBLEMS.items() if p.family == PROBLEMS[slug].family}
+
+
 @pytest.mark.parametrize("slug", NEW)
-def test_a_supported_diagnosis_retries_the_same_problem(slug: str) -> None:
+def test_a_supported_diagnosis_stays_in_its_family(slug: str) -> None:
     model, a = named_attempt(PROBLEMS[slug])
     rec = POLICY.recommend(a, [a], PROBLEMS)
     assert rec.rule is Rule.HYPOTHESIS_SUPPORTED
-    assert rec.action is Action.RETRY and rec.problem_slug == slug
+    assert rec.problem_slug in family_of(slug)
+    # A retry only when no other problem of the family probes the skill often enough.
+    assert rec.action is (Action.RETRY if rec.problem_slug == slug else Action.NEW_PROBLEM)
     assert rec.target_skills == (model.skill,)
     # The evidence lands on the model's new skill only.
     obs = skill_observations([a], PROBLEMS)
@@ -94,11 +101,12 @@ def test_a_supported_diagnosis_retries_the_same_problem(slug: str) -> None:
 
 
 @pytest.mark.parametrize("slug", NEW)
-def test_a_pass_stops_with_action_none_l21(slug: str) -> None:
+def test_a_pass_moves_to_another_problem_of_the_family(slug: str) -> None:
     a = attempt(slug, Outcome.NO_FAILURE_OBSERVED)
     rec = POLICY.recommend(a, [a], PROBLEMS)
     assert rec.rule is Rule.NO_FAILURE_OBSERVED
-    assert rec.action is Action.NONE and rec.problem_slug is None
+    assert rec.action is Action.NEW_PROBLEM
+    assert rec.problem_slug in family_of(slug) - {slug}
 
 
 def test_binary_search_recommendations_never_choose_a_new_problem() -> None:
@@ -152,9 +160,18 @@ ALL_PASSED_CLAIM = re.compile(r"every problem in (the|this) family", re.IGNORECA
 @pytest.mark.parametrize(
     "history",
     [
-        ["first-max-index"],
-        ["pivot-index"],
-        ["lower-bound", "count-occurrences", "last-less-than", "integer-sqrt"],
+        ["first-max-index", "longest-run", "plus-one", "second-largest", "stock-profit"],
+        ["pivot-index", "range-sum-queries"],
+        [
+            "lower-bound",
+            "count-occurrences",
+            "last-less-than",
+            "first-true",
+            "upper-bound",
+            "last-occurrence",
+            "exact-search",
+            "integer-sqrt",  # held: never recommended, so it does not need a pass
+        ],
     ],
 )
 def test_nothing_to_recommend_never_claims_every_problem_was_passed(history: list[str]) -> None:

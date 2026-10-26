@@ -27,9 +27,10 @@ test("student submits, sees diagnosis feedback, fixes the bug and passes", async
   await expect(feedback).toContainText("The target is larger than every element.");
   // Internal labels never reach the student.
   await expect(page.locator("body")).not.toContainText("hi_init_last_index");
-  // The adaptive policy recommends another problem that probes the same skill.
+  // The adaptive policy recommends another problem that probes the same skill (policy 1.5:
+  // First true, where search-space boundaries can also get negative evidence).
   const next = page.getByRole("complementary", { name: "Recommended next" });
-  await expect(next.getByRole("link", { name: "Go to Count occurrences" })).toBeVisible();
+  await expect(next.getByRole("link", { name: "Go to First true" })).toBeVisible();
 
   await replaceCode(page, read("reference.cpp"));
   await page.getByRole("button", { name: "Submit" }).click();
@@ -37,6 +38,7 @@ test("student submits, sees diagnosis feedback, fixes the bug and passes", async
   await expect(page.getByText("17/17 tests passed")).toBeVisible();
   await expect(next).toContainText("Your last attempt passed every test.");
 
-  await next.getByRole("link", { name: "Go to Count occurrences" }).click();
-  await expect(page.getByRole("heading", { name: "Count occurrences", level: 1 })).toBeVisible();
+  // After a pass, the least-evidenced problem not yet passed (rule unchanged since 1.4).
+  await next.getByRole("link", { name: "Go to Exact search" }).click();
+  await expect(page.getByRole("heading", { name: "Exact search", level: 1 })).toBeVisible();
 });

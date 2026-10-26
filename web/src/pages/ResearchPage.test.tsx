@@ -303,6 +303,8 @@ describe("researcher pages", () => {
       "Output-identical to a correct program for a misread specification.",
     );
     expect(screen.getByText(/^Qualified hypothesis:/)).toBeInTheDocument();
+    // The stored rationale, with the policy's ranking, is available as raw data.
+    expect(screen.getByText("Recommendation rationale and ranking")).toBeInTheDocument();
   });
 
   it("shows a dash, not a qualification, when the optional fields are absent", async () => {

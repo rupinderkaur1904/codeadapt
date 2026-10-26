@@ -157,15 +157,23 @@ def test_targeted_practice_then_progression_through_the_family(
         model="upper_bound_confusion",
         failing=("sample_present", "equal_first", "equal_last"),
     )
-    a.submit("count-occurrences", Outcome.NO_FAILURE_OBSERVED)
-    a.submit("last-less-than", Outcome.NO_FAILURE_OBSERVED)
-    a.submit("lower-bound", Outcome.NO_FAILURE_OBSERVED)
-    assert a.steps == [
-        ("hypothesis_supported", "new_problem", "count-occurrences", None),
-        ("no_failure_observed", "new_problem", "last-less-than", "criterion_met"),
-        ("no_failure_observed", "new_problem", "lower-bound", "criterion_met"),
-        ("no_failure_observed", "none", None, "criterion_met"),
-    ]
+    # The learner follows every recommendation and passes it.
+    while a.steps[-1][1] != "none":
+        nxt = a.steps[-1][2]
+        assert nxt is not None
+        a.submit(nxt, Outcome.NO_FAILURE_OBSERVED)
+    recommendable = {
+        p.spec.slug
+        for p in CATALOGUE.problems
+        if p.spec.family == "binary-search" and p.spec.recommendable
+    }
+    visited = [str(step[2]) for step in a.steps[:-1]]
+    # Every recommendable binary-search problem once (lower-bound too: its first attempt
+    # failed), then nothing is left; each follow-up met its criterion.
+    assert sorted(visited) == sorted(recommendable)
+    assert [step[3] for step in a.steps[1:]] == ["criterion_met"] * (len(a.steps) - 1)
+    assert a.steps[0] == ("hypothesis_supported", "new_problem", "count-occurrences", None)
+    assert a.steps[-1] == ("no_failure_observed", "none", None, "criterion_met")
 
 
 def test_persistent_error_is_not_reported_as_improvement(
@@ -184,17 +192,21 @@ def test_persistent_error_is_not_reported_as_improvement(
         model="upper_uses_strict",
         failing=("sample_run", "unique_middle", "run_at_start", "all_equal"),
     )
+    lo = CATALOGUE.by_slug["last-occurrence"].spec
     b.submit(
-        "last-less-than",
+        "last-occurrence",
         Outcome.HYPOTHESIS_SUPPORTED,
-        model="uses_le",
-        failing=("sample_present", "equal_first"),
+        model="returns_first_occurrence",
+        failing=tuple(
+            t.key for t in lo.tests if "returns_first_occurrence" in (t.distinguishes or ())
+        ),
     )
     assert b.steps == [
         ("hypothesis_supported", "new_problem", "count-occurrences", None),
-        ("hypothesis_supported", "new_problem", "last-less-than", "criterion_not_met"),
-        # Everything is recent now, so the densest equality problem comes back.
-        ("hypothesis_supported", "new_problem", "count-occurrences", "criterion_not_met"),
+        ("hypothesis_supported", "new_problem", "last-occurrence", "criterion_not_met"),
+        # Every problem where equality can also get negative evidence is recent now, so policy
+        # 1.5 picks among the rest by the share of tests probing equality (ADR-038).
+        ("hypothesis_supported", "new_problem", "upper-bound", "criterion_not_met"),
     ]
 
 
@@ -206,13 +218,15 @@ def test_compile_errors_keep_the_open_recommendation(sessions: sessionmaker[Sess
         model="hi_init_last_index",
         failing=("above_all", "single_above", "large_above_all"),
     )
-    assert c.submit("count-occurrences", Outcome.COMPILE_ERROR) is None
-    assert c.submit("count-occurrences", Outcome.EXECUTION_ERROR) is None
-    step = c.submit("count-occurrences", Outcome.NO_FAILURE_OBSERVED)
+    assert c.steps[0][2] == "first-true"  # policy 1.5; count-occurrences under 1.4 (E2)
+    assert c.submit("first-true", Outcome.COMPILE_ERROR) is None
+    assert c.submit("first-true", Outcome.EXECUTION_ERROR) is None
+    step = c.submit("first-true", Outcome.NO_FAILURE_OBSERVED)
     assert step is not None
     assert step[3] == "criterion_met"
     with sessions() as s:
-        assert s.scalar(select(FollowupEvaluationRow.passed)) == 7  # search-space tests
+        # first-true's search-space tests (policy 1.5); 7 on count-occurrences under 1.4 (E2).
+        assert s.scalar(select(FollowupEvaluationRow.passed)) == 13
         assert s.scalar(select(FollowupEvaluationRow.relation)) == "equivalent_practice"
 
 
@@ -241,7 +255,7 @@ def test_abstention_then_retry_is_not_comparable(sessions: sessionmaker[Session]
     e.submit("last-less-than", Outcome.NO_FAILURE_OBSERVED)
     assert e.steps == [
         ("abstained", "retry", "last-less-than", None),
-        ("no_failure_observed", "new_problem", "count-occurrences", "not_comparable"),
+        ("no_failure_observed", "new_problem", "exact-search", "not_comparable"),
     ]
     with sessions() as s:
         first = s.scalars(select(RecommendationRow).order_by(RecommendationRow.id)).first()
@@ -327,7 +341,7 @@ def test_qualified_diagnosis_and_followup_wording_stay_within_the_evidence(
     assert "more than one possible cause" in rec["message"]
     assert "the specific error" not in rec["message"]
 
-    me.submit("count-occurrences", Outcome.NO_FAILURE_OBSERVED)
+    me.submit(rec["problem_slug"], Outcome.NO_FAILURE_OBSERVED)
     follow = client.get("/api/v1/me/recommendation", headers=STUDENT).json()["last_followup"]
     assert follow["verdict"] == "criterion_met"
     assert "does not show the idea is fully learned" in follow["message"]

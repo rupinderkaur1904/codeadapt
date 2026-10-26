@@ -12,9 +12,10 @@ interface = "int last_occurrence(const std::vector<int>& a, int target);"
 # Library calls the statement forbids (D1, ADR-035): an attempt naming one gives no skill
 # observations. Must match the statement's "Do not call" sentence.
 banned_names = ["std::equal_range", "std::find", "std::lower_bound", "std::partition_point", "std::upper_bound"]
-# CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
-# problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
-recommendable = false
+# Recommendable from 2026-10-26 (owner decision, option C of
+# docs/reviews/2026-10-26/recommendability-review.md). Earlier content versions were not
+# (CE1 decision E2); their snapshots keep that.
+recommendable = true
 
 [skills]
 search_space_boundaries = "Initialising and updating the bounds of the search space so every candidate answer stays reachable."

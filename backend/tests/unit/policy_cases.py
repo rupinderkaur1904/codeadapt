@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import itertools
 import json
+import sys
 from collections.abc import Iterator, Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -74,8 +75,11 @@ def histories(problems: Mapping[str, ProblemSpec]) -> Iterator[list[AttemptRecor
         yield [record(problems[s], i, Outcome.NO_FAILURE_OBSERVED, {}) for i, s in enumerate(order)]
 
 
-def recommendations(problems: Mapping[str, ProblemSpec]) -> list[dict[str, Any]]:
-    policy = PolicyV1()
+def recommendations(
+    problems: Mapping[str, ProblemSpec], version: str = "1.4"
+) -> list[dict[str, Any]]:
+    # The golden file pins policy 1.2-1.4 behaviour; policy 1.5 has its own fixture.
+    policy = PolicyV1(version=version)
     out = []
     for history in histories(problems):
         rec = policy.recommend(history[-1], history, problems)
@@ -88,4 +92,5 @@ if __name__ == "__main__":
     from tests.paths import DEMO_CONTENT
 
     specs = {p.spec.slug: p.spec for p in load_catalogue(DEMO_CONTENT)}
-    print(json.dumps(recommendations(specs), indent=1, sort_keys=True))
+    version = sys.argv[1] if len(sys.argv) > 1 else "1.4"
+    print(json.dumps(recommendations(specs, version), indent=1, sort_keys=True))
