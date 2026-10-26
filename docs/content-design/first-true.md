@@ -1,5 +1,7 @@
 # Content design record: `first-true` (CE1.1, gap G1)
 
+> **Update 2026-10-26 (L20 S1 for the original problems, ADR-037).** New content version `c5285489e34a…` (was `485c974b4928…`). `none_sentinel` now carries a `known_limitation` (case O4): a search of [0, n - 1] whose answer variable starts at -1 is output-identical to it, so its diagnoses are qualified and add no `problem_specification` evidence. `problem_specification` keeps negative evidence through `returns_last_false` and `returns_any_true`. Fingerprints and behaviour groups are unchanged; see docs/reviews/2026-10-26/l20-original-s1.md.
+>
 > **Update 2026-10-26.** New content version `485c974b4928…` (was `b69c5efa3b39…`). The record below describes the problem as designed and is unchanged.
 >
 > **Banned names (ADR-035).** `banned_names` lists `std::equal_range`, `std::find`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.

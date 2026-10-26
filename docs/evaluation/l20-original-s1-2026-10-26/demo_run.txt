@@ -1,0 +1,21 @@
+== correct (correct_iterative.cpp; author's intent: correct)
+   job status:       completed
+   outcome:          no_failure_observed
+   selected model:   None
+   student feedback: all_tests_passed: Your solution passed all 17 tests. Tests can show mistakes but cannot prove a solution correct for every input.
+== modelled bug (upper_bound_closed.cpp; author's intent: upper_bound_confusion)
+   job status:       completed
+   outcome:          hypothesis_supported
+   selected model:   upper_bound_confusion
+   student feedback: recognised_pattern: Your code fails a group of cases in a pattern that a common mistake produces, but other mistakes can produce the same pattern. Treat the hint as one possible cause to check, not as the answer.
+   student hint:     Check which side of the boundary elements equal to the target end up on.
+== two bugs at once (double_bug.cpp; author's intent: unmodelled)
+   job status:       completed
+   outcome:          unmodelled_behaviour
+   selected model:   None
+   student feedback: failing_cases: Your code fails some cases. Compare what these cases have in common.
+== loop that never ends (size_t_stuck_left.cpp; author's intent: no_progress_update)
+   job status:       completed
+   outcome:          non_termination_observed
+   selected model:   None
+   student feedback: failing_cases: Your program did not finish within the time limit on some cases (marked "time limit" below). This usually means a loop or a recursive call stops making progress for some inputs, or the approach is far too slow. Look at how your search range changes on those cases. Other failing cases are listed too.

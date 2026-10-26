@@ -42,9 +42,12 @@ FAMILIES = [
         "last-less-than",
         [
             ("closed_interval_correct.cpp", "correct"),
-            ("closed_interval_le.cpp", "named"),
+            ("returns_count_below.cpp", "named"),
             # hi_init_last_index: one behaviour group, so the method itself qualifies it.
             ("closed_from_last_index.cpp", "qualified"),
+            # uses_le: a documented known_limitation since L20 S1 case O2 (ADR-037), so it is
+            # no longer this family's unqualified named case.
+            ("closed_interval_le.cpp", "qualified"),
             ("le_and_clamped.cpp", "unmodelled"),
         ],
     ),

@@ -41,7 +41,7 @@ def test_documented_collision_adds_no_failure_evidence_even_if_unqualified() -> 
 
 def test_unqualified_diagnosis_still_counts_for_its_models_skill_only() -> None:
     assert failures(build_ledger([LB_EQUALITY], PROBLEMS)) == {
-        "equality_handling": ["sample_present", "equal_first", "equal_last", "duplicates_middle"]
+        "equality_handling": ["duplicates_middle", "duplicates_all"]
     }
 
 
@@ -54,10 +54,10 @@ def test_one_observation_per_attempt_and_skill() -> None:
         ("loop_termination", "correct"),
         ("problem_specification", "correct"),
     }
-    # Four failing tests, one behaviour pattern: a single incorrect observation.
+    # Two failing tests, one behaviour pattern: a single incorrect observation.
     wrong = next(o for o in obs if o.value == "incorrect")
-    assert wrong.test_keys == ("duplicates_middle", "equal_first", "equal_last", "sample_present")
-    assert wrong.basis == "supported diagnosis: upper_bound_confusion"
+    assert wrong.test_keys == ("duplicates_all", "duplicates_middle")
+    assert wrong.basis == "supported diagnosis: stops_at_first_match"
     assert all(o.attempt_ordinal == 1 for o in obs)
 
 
@@ -119,7 +119,8 @@ def test_stored_snapshot_round_trips_and_rejects_unknown_formats() -> None:
     assert SkillMap.from_stored(smap.model_dump(mode="json")) == smap
     assert SkillMap.from_stored({**smap.model_dump(mode="json"), "format": 99}) is None
     assert SkillMap.from_stored(None) is None
-    assert smap.documented_collisions == ("hi_init_last_index",)
+    # upper_bound_confusion since L20 S1 for the original problems (case O1, 2026-10-26).
+    assert smap.documented_collisions == ("hi_init_last_index", "upper_bound_confusion")
 
 
 def test_catalogue_sync_writes_and_backfills_snapshots(sessions) -> None:  # type: ignore[no-untyped-def]

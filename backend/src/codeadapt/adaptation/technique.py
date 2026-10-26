@@ -9,7 +9,11 @@ This is a static token match after removing comments and string and character li
 shows that a banned name appears in the source as a call or a qualified name. It does not show
 which algorithm the program uses, that the call is reached, or anything about complexity. A
 macro, a function pointer obtained some other way, or a hand-written linear scan is not
-detected.
+detected. A program's own function, lambda or variable of the banned name is not counted as the
+library call; such a program that also calls the library function unqualified is missed.
+
+The result is recomputed from the stored source whenever evidence is read, so a change to this
+detector applies to earlier attempts too (docs/limitations.md L23).
 """
 
 from __future__ import annotations
@@ -48,9 +52,12 @@ def _detected(code: str, name: str) -> bool:
     call = rf"(?:(?<![\w.:>])|(?<=ranges::)){word}\s*(?:<[^;(){{}}]*>)?\s*\("
     if not re.search(call, code):
         return False
-    # A program that defines its own function of that name calls its own function.
+    # A program that defines its own function of that name calls its own function. So does
+    # one that declares a variable of that name with an initialiser (a lambda or a
+    # std::function: `auto pow = [](long long v) { ... };`).
     own = rf"[\w>&*]\s+{word}\s*\([^;{{}}]*\)\s*(?:const\s*)?\{{"
-    return re.search(own, code) is None
+    variable = rf"[\w>&*]\s+{word}\s*=(?!=)"
+    return re.search(own, code) is None and re.search(variable, code) is None
 
 
 def banned_names_found(source: str, banned: Iterable[str]) -> tuple[str, ...]:

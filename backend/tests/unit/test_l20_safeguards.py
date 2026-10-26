@@ -9,6 +9,10 @@ observation and no BKT update. Mappings, fingerprints and the recommendation pol
 
 The two contestable cases (#3 and #13) are not changed (docs/reviews/2026-10-26/
 l20-contestable-cases.md); their models still give negative evidence.
+
+The same safeguard covers the four clear-cut twins O1-O4 that docs/reviews/2026-10-26/
+l20-search-original.md found in the original problems (owner request 2026-10-26; ADR-037).
+The four contestable (O5-O8) and two unsupported (O9-O10) cases there are not changed.
 """
 
 from __future__ import annotations
@@ -37,9 +41,25 @@ S1 = [
     ("peak-index", "swapped_direction", "search_space_boundaries"),
     ("integer-sqrt", "strict_square_test", "equality_handling"),
 ]
+# The original-problem cases O1-O4 (l20-search-original.md §2.1; ADR-037).
+S1_ORIGINAL = [
+    ("lower-bound", "upper_bound_confusion", "equality_handling"),
+    ("last-less-than", "uses_le", "equality_handling"),
+    ("last-less-than", "clamps_to_zero", "problem_specification"),
+    ("first-true", "none_sentinel", "problem_specification"),
+]
+ALL = S1 + S1_ORIGINAL
 CONTESTABLE = [
     ("upper-bound", "returns_last_not_greater", "problem_specification"),
     ("integer-sqrt", "returns_lo_closed", "problem_specification"),
+    # Original problems: contestable O5-O8 and unsupported O9-O10 (l20-search-original.md
+    # §2.2-2.3), kept unchanged without a separate decision.
+    ("lower-bound", "returns_wrong_pointer", "problem_specification"),
+    ("last-less-than", "returns_insertion_point", "problem_specification"),
+    ("first-true", "returns_last_false", "problem_specification"),
+    ("lower-bound", "stops_at_first_match", "equality_handling"),
+    ("first-true", "lo_init_one", "search_space_boundaries"),
+    ("first-true", "hi_skips_candidate", "search_space_boundaries"),
 ]
 
 
@@ -65,18 +85,26 @@ def test_exactly_eleven_models_in_six_problems() -> None:
     }
 
 
-@pytest.mark.parametrize(("slug", "model", "skill"), S1)
+def test_four_original_problem_models_in_three_problems() -> None:
+    assert len(S1_ORIGINAL) == 4 and not {(s, m) for s, m, _ in S1_ORIGINAL} & {
+        (s, m) for s, m, _ in S1
+    }
+    assert {s for s, _, _ in S1_ORIGINAL} == {"lower-bound", "last-less-than", "first-true"}
+
+
+@pytest.mark.parametrize(("slug", "model", "skill"), ALL)
 def test_the_limitation_is_recorded_and_the_mapping_kept(slug: str, model: str, skill: str) -> None:
     spec = next(m for m in PROBLEMS[slug].error_models if m.key == model)
     assert spec.known_limitation is not None
     assert "L20 safeguard S1" in spec.known_limitation
-    assert "l20-search.md" in spec.known_limitation
+    source = "l20-search.md" if (slug, model, skill) in S1 else "l20-search-original.md"
+    assert source in spec.known_limitation
     smap = SkillMap.from_spec(PROBLEMS[slug], "v")
     assert model in smap.documented_collisions
     assert smap.model_skills[model] == skill
 
 
-@pytest.mark.parametrize(("slug", "model", "skill"), S1)
+@pytest.mark.parametrize(("slug", "model", "skill"), ALL)
 def test_a_qualified_diagnosis_gives_no_negative_evidence(
     slug: str, model: str, skill: str
 ) -> None:
@@ -87,7 +115,7 @@ def test_a_qualified_diagnosis_gives_no_negative_evidence(
     assert skill not in {o.skill for o in obs}, (slug, model)
 
 
-@pytest.mark.parametrize(("slug", "model", "skill"), S1)
+@pytest.mark.parametrize(("slug", "model", "skill"), ALL)
 def test_rule_c_still_credits_the_fully_passed_skills(slug: str, model: str, skill: str) -> None:
     spec = PROBLEMS[slug]
     smap = SkillMap.from_spec(spec, "")
@@ -101,12 +129,12 @@ def test_rule_c_still_credits_the_fully_passed_skills(slug: str, model: str, ski
     assert got == expected
 
 
-@pytest.mark.parametrize(("slug", "model", "skill"), S1)
+@pytest.mark.parametrize(("slug", "model", "skill"), ALL)
 def test_no_bkt_update_for_the_models_skill(slug: str, model: str, skill: str) -> None:
     assert skill not in {s.skill for s in estimate([named(slug, model)], PROBLEMS).skills}
 
 
-@pytest.mark.parametrize(("slug", "model", "skill"), S1)
+@pytest.mark.parametrize(("slug", "model", "skill"), ALL)
 def test_the_diagnosis_is_shown_as_one_possible_cause(slug: str, model: str, skill: str) -> None:
     problem = CATALOGUE.by_slug[slug]
     view = feedback_view(problem, supported(model, list(detecting(slug, model)), "multiple"), [])
@@ -114,7 +142,7 @@ def test_the_diagnosis_is_shown_as_one_possible_cause(slug: str, model: str, ski
     assert "other mistakes can produce the same pattern" in view.message
 
 
-@pytest.mark.parametrize(("slug", "model", "skill"), S1)
+@pytest.mark.parametrize(("slug", "model", "skill"), ALL)
 def test_the_recommendation_is_unchanged_and_marked_qualified(
     slug: str, model: str, skill: str
 ) -> None:
@@ -142,5 +170,15 @@ def test_an_earlier_snapshot_keeps_its_own_attribution() -> None:
         update={"documented_collisions": ()}
     )
     a = named("upper-bound", "lower_bound_confusion").model_copy(update={"problem_version": "old"})
+    obs = skill_observations([a], PROBLEMS, {"old": old})
+    assert ("equality_handling", "incorrect") in {(o.skill, o.value) for o in obs}
+
+
+def test_an_earlier_original_problem_snapshot_keeps_its_own_attribution() -> None:
+    # The same for O1: an attempt on the lower-bound version before ADR-037 keeps its evidence.
+    old = SkillMap.from_spec(PROBLEMS["lower-bound"], "old").model_copy(
+        update={"documented_collisions": ("hi_init_last_index",)}
+    )
+    a = named("lower-bound", "upper_bound_confusion").model_copy(update={"problem_version": "old"})
     obs = skill_observations([a], PROBLEMS, {"old": old})
     assert ("equality_handling", "incorrect") in {(o.skill, o.value) for o in obs}

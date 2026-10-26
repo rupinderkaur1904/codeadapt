@@ -80,6 +80,9 @@ def test_banned_lower_bound_names_are_found(source: str, found: tuple[str, ...])
         "int lower_bound(const std::vector<int>& a, int t) { return 0; }\n"
         "int f(const std::vector<int>& a) { return lower_bound(a, 3); }",  # the student's own
         "int my_lower_bound(int x); int lower_boundary = 2;",
+        # The student's own lambda or function object of that name (2026-10-26 audit).
+        "auto lower_bound = [&](int t) { return 0; }; return lower_bound(3);",
+        "std::function<int(int)> lower_bound = f; return lower_bound(3);",
     ],
 )
 def test_names_that_are_not_a_banned_call_are_not_found(source: str) -> None:
@@ -100,6 +103,11 @@ def test_c_library_bans_cover_qualified_and_unqualified_calls() -> None:
         banned_names_found("long long r = 0; while ((r + 1) * (r + 1) <= x) ++r;", SQRT_BANNED)
         == ()
     )
+    # A lambda named after a banned function is the student's own (2026-10-26 audit).
+    square = "auto pow = [](long long v) { return v * v; }; while (pow(r + 1) <= x) ++r;"
+    assert banned_names_found(square, SQRT_BANNED) == ()
+    # A comparison is not an initialiser: the qualified name is still found.
+    assert banned_names_found("bool b = std::pow == nullptr;", SQRT_BANNED) == ("pow",)
 
 
 def test_stripping_keeps_code_and_removes_comments_and_literals() -> None:
@@ -180,8 +188,11 @@ def test_a_failing_attempt_with_a_banned_call_gives_no_observations() -> None:
 
 def test_an_attempt_without_a_banned_call_keeps_its_evidence() -> None:
     # A submission that fails for an unrelated reason (a named equality error) is unaffected.
-    failing = ("sample_present", "equal_first", "equal_last", "duplicates_middle")
-    a = lb(Outcome.HYPOTHESIS_SUPPORTED, model="upper_bound_confusion", failing=failing)
+    a = lb(
+        Outcome.HYPOTHESIS_SUPPORTED,
+        model="stops_at_first_match",
+        failing=("duplicates_middle", "duplicates_all"),
+    )
     assert ("equality_handling", "incorrect") in {
         (o.skill, o.value) for o in skill_observations([a], PROBLEMS)
     }

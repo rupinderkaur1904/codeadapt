@@ -414,11 +414,13 @@ def test_learner_model_is_researcher_only_and_leaves_student_responses_unchanged
     client: TestClient, sessions: sessionmaker[Session]
 ) -> None:
     me = Learner.create(sessions, "dev-student", data_class=DataClass.DEV.value)
+    # stops_at_first_match: upper_bound_confusion is qualified since L20 S1 case O1 and gives
+    # no equality_handling evidence.
     me.submit(
         "lower-bound",
         Outcome.HYPOTHESIS_SUPPORTED,
-        model="upper_bound_confusion",
-        failing=("sample_present", "equal_first"),
+        model="stops_at_first_match",
+        failing=("duplicates_middle", "duplicates_all"),
     )
     before = client.get("/api/v1/me/recommendation", headers=STUDENT).json()
     me.submit("lower-bound", Outcome.NO_FAILURE_OBSERVED)  # a retry: not counted

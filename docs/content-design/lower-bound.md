@@ -1,5 +1,7 @@
 # Content design, worked example: `lower-bound`
 
+> **Update 2026-10-26 (L20 S1 for the original problems, ADR-037).** New content version `8ca53699ef0d…` (was `9aade9e1396e…`). `upper_bound_confusion` now carries a `known_limitation` (case O1): a correct search for the first element > target, a misread task, is output-identical to it, so its diagnoses are qualified and add no `equality_handling` evidence. `equality_handling` keeps negative evidence through `stops_at_first_match`. Fingerprints and behaviour groups are unchanged; see docs/reviews/2026-10-26/l20-original-s1.md.
+>
 > **Update 2026-10-26.** New content version `9aade9e1396e…` (was `871602bc2bba…`). The record below describes the problem as designed and is unchanged.
 >
 > **Banned names (ADR-035).** `banned_names` lists `std::equal_range`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.

@@ -180,6 +180,7 @@ file = "error_models/uses_le.cpp"
 skill = "equality_handling"
 description = "Uses a[mid] <= target where a[mid] < target is required, so it returns the last element less than or equal to the target."
 student_hint = "Check whether an element equal to the target should count as less than it."
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1 for the original problems): a correct search for the last element <= target (a misread task) gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate an equality error from a specification error. Diagnoses are reported as qualified and add no equality_handling evidence (docs/reviews/2026-10-26/l20-search-original.md, case O2)."
 
 [[error_models]]
 key = "returns_insertion_point"
@@ -194,6 +195,7 @@ file = "error_models/clamps_to_zero.cpp"
 skill = "problem_specification"
 description = "Returns 0 instead of -1 when no element is less than the target."
 student_hint = "Re-read what should be returned when no element is less than the target."
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1 for the original problems): a closed-interval search whose answer variable starts at 0 instead of -1 gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate a specification error from a search-range error. Diagnoses are reported as qualified and add no problem_specification evidence (docs/reviews/2026-10-26/l20-search-original.md, case O3)."
 
 [[error_models]]
 key = "hi_init_last_index"
@@ -213,3 +215,4 @@ student_hint = "Make sure every iteration of your loop strictly shrinks the sear
 # Declared skills that no error model can give negative evidence for (ADR-034).
 [positive_only_skills]
 search_space_boundaries = "Its only model, hi_init_last_index, rests on one behaviour group and carries a known_limitation, so this skill can only receive correct observations through rule C (L19). Recorded explicitly when this check was introduced (ADR-034); no mapping was changed."
+equality_handling = "Its only model, uses_le, carries a known_limitation after L20 safeguard S1 for the original problems (owner request 2026-10-26, case O2), so this skill can only receive correct observations through rule C (L19). The mapping itself was not changed."

@@ -1,5 +1,7 @@
 # Content design record: `last-less-than`
 
+> **Update 2026-10-26 (L20 S1 for the original problems, ADR-037).** New content version `ecdcad684935…` (was `4208517a8d24…`). `uses_le` (case O2) and `clamps_to_zero` (case O3) now carry a `known_limitation`: each is output-identical to a program whose cause is a different skill, so their diagnoses are qualified and add no evidence. `equality_handling` becomes positive-only here; `problem_specification` keeps negative evidence through `returns_insertion_point`. Fingerprints and behaviour groups are unchanged; see docs/reviews/2026-10-26/l20-original-s1.md.
+>
 > **Update 2026-10-26.** New content version `4208517a8d24…` (was `3d52811ae14b…`). The record below describes the problem as designed and is unchanged.
 >
 > **Banned names (ADR-035).** `banned_names` lists `std::equal_range`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.

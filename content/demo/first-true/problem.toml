@@ -260,6 +260,7 @@ file = "error_models/none_sentinel.cpp"
 skill = "problem_specification"
 description = "Returns -1 instead of flags.size() when there is no 1."
 student_hint = "Re-read what the function must return when the array contains no 1."
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1 for the original problems): searching only the indices [0, n - 1] with an answer variable that starts at -1 gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate a specification error from a search-range error. Diagnoses are reported as qualified and add no problem_specification evidence (docs/reviews/2026-10-26/l20-search-original.md, case O4)."
 
 [[error_models]]
 key = "returns_last_false"

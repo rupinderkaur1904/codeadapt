@@ -29,6 +29,11 @@ NON_UNIQUE_ATTRIBUTION = {
     "rotated-search": {"left_range_excludes_lo"},
     "peak-index": {"swapped_direction"},
     "integer-sqrt": {"strict_square_test"},
+    # The same for the original problems, cases O1-O4 (owner request 2026-10-26, ADR-037;
+    # docs/reviews/2026-10-26/l20-search-original.md).
+    "lower-bound": {"upper_bound_confusion"},
+    "last-less-than": {"uses_le", "clamps_to_zero"},
+    "first-true": {"none_sentinel"},
 }
 
 

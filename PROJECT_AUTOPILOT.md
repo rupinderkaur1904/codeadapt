@@ -146,7 +146,8 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
    min-capacity: **resolved** by ADR-032 (owner approved option (b) at 08:01). Six provisional
    problems: S1 **applied** 2026-10-26 to the 11 clear-cut models (ADR-036); contestable #3
    and #13 unchanged with a written analysis. Four original problems searched 2026-10-26
-   (investigation only): 4 clear-cut twins (O1–O4) **not changed, pending owner decision**.
+   (investigation only): 4 clear-cut twins (O1–O4); S1 **applied** to them on the owner's
+   2026-10-26 05:22 request (ADR-037); contestable O5–O8 and unsupported O9–O10 unchanged.
    rotated-min mapping left as is (documented).
 4. PC1 Phase E: deferred (permission basis P, then D1–D12). Gate closed.
 5. Hosting/deployment (M8).
@@ -164,6 +165,19 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 `git fetch origin && git checkout claude/project-thread-dyivyy`, reread this file, run
 `cd backend && uv sync && uv run pytest tests/unit -q`, then continue with "Next three tasks".
+
+### Iteration 15 (2026-10-26, final engineering-hardening stage)
+
+- Verification of A–D (S1, D1, L22, history, Unreviewed labels, no rule/policy/BKT/sandbox
+  drift): docs/release-2026-10-26.md §8.
+- S1 for O1–O4 (ADR-037; docs/reviews/2026-10-26/l20-original-s1.md): lower-bound,
+  last-less-than and first-true have new content versions; held-out and recommendation
+  regression in docs/evaluation/l20-original-s1-2026-10-26/.
+- D1 audit: lambda/function-object false positive fixed; the detector being unversioned is
+  recorded in L23; positive-only skills are shown in the researcher learner-model view, and
+  the effective positive-only skills (rules 4b/7/8a) are listed in the evaluation record.
+- 25-problem status matrix: docs/reviews/2026-10-26/bank-status/.
+- Final engineering release report: docs/release-2026-10-26.md.
 
 ### Iteration 14 (2026-10-26, owner-approved A–D)
 

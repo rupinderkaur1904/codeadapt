@@ -245,6 +245,17 @@
           "estimate": {
             "$ref": "#/components/schemas/LearnerEstimate"
           },
+          "positive_only_skills": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PositiveOnlyView"
+              },
+              "type": "array"
+            },
+            "default": {},
+            "title": "Positive Only Skills",
+            "type": "object"
+          },
           "retired_skills": {
             "additionalProperties": {
               "$ref": "#/components/schemas/RetiredSkillView"
@@ -319,6 +330,25 @@
           "password"
         ],
         "title": "LoginRequest",
+        "type": "object"
+      },
+      "PositiveOnlyView": {
+        "additionalProperties": false,
+        "properties": {
+          "problem": {
+            "title": "Problem",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "problem",
+          "reason"
+        ],
+        "title": "PositiveOnlyView",
         "type": "object"
       },
       "ProblemDetail": {

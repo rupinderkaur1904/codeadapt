@@ -237,6 +237,15 @@ class LearnerModelView(_Out):
     # Skill keys in the estimate that the taxonomy has retired (ADR-034), with the meaning they
     # had. Their observations are historical and are not converted to the replacing keys.
     retired_skills: dict[str, RetiredSkillView] = {}
+    # Skills in the estimate that, in the current content of a problem, no error model can give
+    # negative evidence for (`positive_only_skills`): there they can only gain `correct`
+    # observations. Read from the current catalogue, not from each attempt's snapshot.
+    positive_only_skills: dict[str, list[PositiveOnlyView]] = {}
+
+
+class PositiveOnlyView(_Out):
+    problem: str
+    reason: str
 
 
 class RetiredSkillView(_Out):

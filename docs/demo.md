@@ -40,6 +40,14 @@ integration, with identical outcomes, feedback and recommendation, in 2 min 29 s
 | `double_bug.cpp` | two bugs at once | `unmodelled_behaviour` | the failing cases, with no hint |
 | `size_t_stuck_left.cpp` | `no_progress_update` | `non_termination_observed` (no model named, ADR-027) | "did not finish within the time limit on some cases… Look at how your search range changes on those cases." |
 
+> **Update 2026-10-26 (ADR-037).** `upper_bound_confusion` now carries a `known_limitation`
+> (L20 S1 case O1), so `upper_bound_closed.cpp` is still diagnosed as `upper_bound_confusion`
+> with the same hint, but the student message is the qualified one ("other mistakes can produce
+> the same pattern… one possible cause to check") and the attempt adds no skill observation for
+> `equality_handling`. The table above is the 2026-10-24/25 record. The re-run on 2026-10-26
+> (2 min 29 s; output in docs/evaluation/l20-original-s1-2026-10-26/demo_run.txt) matched it
+> in every other row, and in the final recommendation.
+
 Then `GET /api/v1/me/recommendation` (header `X-Dev-Role: student`) returned a `retry` of Lower
 bound ("We could not draw a confident conclusion from your last attempt"), with a follow-up
 verdict of `not_comparable`.
