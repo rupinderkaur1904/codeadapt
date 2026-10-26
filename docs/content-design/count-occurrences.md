@@ -1,5 +1,11 @@
 # Content design record: `count-occurrences`
 
+> **Update 2026-10-26.** New content version `4666e07e237c…` (was `d1b043c04574…`). The record below describes the problem as designed and is unchanged.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::count`, `std::equal_range`, `std::lower_bound`, `std::upper_bound`; an attempt that names one gives no skill observations.
+>
+> **Positive-only skills (ADR-034).** `search_space_boundaries` has no model that can give negative evidence; the reason is recorded under `positive_only_skills`.
+
 This record was written retrospectively, in CE1.0 (2026-10-17), for content that already
 existed. It follows the method in [README.md](README.md). Where the method says a record
 comes before the content, that was not possible here; everything below is measured on the

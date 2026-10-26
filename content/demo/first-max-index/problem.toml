@@ -9,25 +9,28 @@ harness = "harness.cpp"
 reference = "reference.cpp"
 solution_file = "solution.cpp" # name the student's code is compiled under
 interface = "int first_max_index(const std::vector<int>& a);"
+# Library calls the statement forbids (D1, ADR-035): an attempt naming one gives no skill
+# observations. Must match the statement's "Do not call" sentence.
+banned_names = ["std::max_element"]
 # Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
 # every new problem). They stay in the problem list and their attempts produce skill evidence.
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
 accumulator_init = "Initialising (and re-initialising) a running best, minimum, maximum, count or sum to the value the first real element requires."
 tie_resolution = "Handling equal values as the specification says: which of several equal candidates wins, and whether duplicates count separately."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+loop_bounds = "Visiting exactly the positions the task needs: a loop starts and ends at the right index and runs from the right end."
 
 [probes]
-max_first = ["index_range"]
-max_last = ["index_range"]
+max_first = ["loop_bounds"]
+max_last = ["loop_bounds"]
 all_negative = ["accumulator_init"]
 zero_max_later = ["accumulator_init"]
 tied_max = ["tie_resolution"]
 index_not_value = ["output_contract"]
-single = ["index_range", "accumulator_init"]
-large_input = ["index_range"]
+single = ["loop_bounds", "accumulator_init"]
+large_input = ["loop_bounds"]
 
 [curriculum]
 assumes = ["iterating over a std::vector by index"]
@@ -177,7 +180,7 @@ student_hint = "When the maximum appears more than once, which position should y
 [[error_models]]
 key = "skips_last"
 file = "error_models/skips_last.cpp"
-skill = "index_range"
+skill = "loop_bounds"
 description = "The loop stops one element early, so a maximum in the last position is missed."
 student_hint = "Does your loop look at the last element? Try an array whose largest value is at the end."
 

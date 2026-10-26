@@ -15,16 +15,16 @@ recommendable = false
 
 [skills]
 accumulator_init = "Initialising (and re-initialising) a running best, minimum, maximum, count or sum to the value the first real element requires."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+running_state = "Keeping a tracked value current on every step and after the loop: a runner-up, the current run, a carry, a running prefix sum."
 
 [probes]
 longest_not_first = ["accumulator_init"]
-longest_last = ["update_rule"]
-run_not_first_value = ["update_rule"]
+longest_last = ["running_state"]
+run_not_first_value = ["running_state"]
 length_not_value = ["output_contract"]
-single = ["accumulator_init", "update_rule"]
-large_input = ["update_rule"]
+single = ["accumulator_init", "running_state"]
+large_input = ["running_state"]
 
 [curriculum]
 assumes = ["comparing neighbouring elements of a std::vector"]
@@ -159,7 +159,7 @@ student_hint = "When a new run starts, how long is it already? Check the value y
 [[error_models]]
 key = "last_run_unchecked"
 file = "error_models/last_run_unchecked.cpp"
-skill = "update_rule"
+skill = "running_state"
 description = "Updates the best length only when a run ends, so the final run is never compared."
 student_hint = "What happens to the run that is still going when the loop ends? Try an array whose longest run is at the end."
 
@@ -173,6 +173,6 @@ student_hint = "Re-read what the function must return: the length of a run, or t
 [[error_models]]
 key = "compares_to_first"
 file = "error_models/compares_to_first.cpp"
-skill = "update_rule"
+skill = "running_state"
 description = "Compares each element with a[0] instead of with its neighbour, so only runs of a[0]'s value are extended."
 student_hint = "Which element should each element be compared with to decide whether the run continues?"

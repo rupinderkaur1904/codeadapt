@@ -1,0 +1,741 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 6 | 6 | 6 |
+| Buggy cases | 5 | 5 | 5 |
+| Coverage (diagnosed buggy cases) | 4/5 | 3/5 | 2/5 |
+| Correct diagnoses | 4 | 3 | 2 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 1 | 2 | 3 |
+| Abstentions by outcome | unmodelled_behaviour 1 | non_termination_observed 1, unmodelled_behaviour 1 | insufficient_evidence 1, non_termination_observed 1, unmodelled_behaviour 1 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+| Problem | Case | Truth | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- | --- | --- |
+| count-occurrences | bounded_by_last_index.cpp | hi_init_last_index | hypothesis_supported (hi_init_last_index) → true_diagnosis | hypothesis_supported (hi_init_last_index) → true_diagnosis | hypothesis_supported (hi_init_last_index) → true_diagnosis |
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+| Problem | Case | Truth | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- | --- | --- |
+| count-occurrences | same_comparison_twice.cpp | upper_uses_strict | hypothesis_supported (upper_uses_strict) → true_diagnosis | hypothesis_supported (upper_uses_strict) → true_diagnosis | insufficient_evidence → abstained |
+| count-occurrences | two_searches_stalled_left.cpp | no_progress_update | hypothesis_supported (no_progress_update) → true_diagnosis | non_termination_observed → symptom_reported | non_termination_observed → symptom_reported |
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 7 | 7 | 7 |
+| Buggy cases | 5 | 5 | 5 |
+| Coverage (diagnosed buggy cases) | 3/5 | 3/5 | 3/5 |
+| Correct diagnoses | 3 | 3 | 3 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 7 | 7 | 7 |
+| Buggy cases | 5 | 5 | 5 |
+| Coverage (diagnosed buggy cases) | 3/5 | 3/5 | 3/5 |
+| Correct diagnoses | 3 | 3 | 3 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 7 | 7 | 7 |
+| Buggy cases | 5 | 5 | 5 |
+| Coverage (diagnosed buggy cases) | 2/5 | 2/5 | 2/5 |
+| Correct diagnoses | 2 | 2 | 2 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 3 | 3 | 3 |
+| Abstentions by outcome | unmodelled_behaviour 3 | unmodelled_behaviour 3 | unmodelled_behaviour 3 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 7 | 7 | 7 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 5/6 | 4/6 | 4/6 |
+| Correct diagnoses | 5 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 1 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 1 | non_termination_observed 1, unmodelled_behaviour 1 | non_termination_observed 1, unmodelled_behaviour 1 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+| Problem | Case | Truth | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- | --- | --- |
+| last-less-than | closed_from_last_index.cpp | hi_init_last_index | hypothesis_supported (hi_init_last_index) → true_diagnosis | hypothesis_supported (hi_init_last_index) → true_diagnosis | hypothesis_supported (hi_init_last_index) → true_diagnosis |
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+| Problem | Case | Truth | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- | --- | --- |
+| last-less-than | while_true_stalls.cpp | no_progress_update | hypothesis_supported (no_progress_update) → true_diagnosis | non_termination_observed → symptom_reported | non_termination_observed → symptom_reported |
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 3/6 | 3/6 | 3/6 |
+| Correct diagnoses | 3 | 3 | 3 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 3 | 3 | 3 |
+| Abstentions by outcome | unmodelled_behaviour 3 | unmodelled_behaviour 3 | unmodelled_behaviour 3 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 7 | 7 | 7 |
+| Buggy cases | 5 | 5 | 5 |
+| Coverage (diagnosed buggy cases) | 3/5 | 3/5 | 3/5 |
+| Correct diagnoses | 3 | 3 | 3 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 12 | 12 | 12 |
+| Buggy cases | 10 | 10 | 10 |
+| Coverage (diagnosed buggy cases) | 8/10 | 6/10 | 6/10 |
+| Correct diagnoses | 8 | 6 | 6 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 4 | 4 |
+| Abstentions by outcome | unmodelled_behaviour 2 | non_termination_observed 2, unmodelled_behaviour 2 | non_termination_observed 2, unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+| Problem | Case | Truth | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- | --- | --- |
+| lower-bound | recursive_last_index.cpp | hi_init_last_index | hypothesis_supported (hi_init_last_index) → true_diagnosis | hypothesis_supported (hi_init_last_index) → true_diagnosis | hypothesis_supported (hi_init_last_index) → true_diagnosis |
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+| Problem | Case | Truth | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- | --- | --- |
+| lower-bound | recursive_early_equal.cpp | stops_at_first_match | hypothesis_supported (stops_at_first_match) → true_diagnosis | hypothesis_supported (stops_at_first_match) → true_diagnosis | hypothesis_supported (stops_at_first_match) → true_diagnosis |
+
+## Cases whose outcome differs between methods
+
+| Problem | Case | Truth | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- | --- | --- |
+| lower-bound | negated_closed_loop.cpp | closed_loop_hi_mid | hypothesis_supported (closed_loop_hi_mid) → true_diagnosis | non_termination_observed → symptom_reported | non_termination_observed → symptom_reported |
+| lower-bound | size_t_stuck_left.cpp | no_progress_update | hypothesis_supported (no_progress_update) → true_diagnosis | non_termination_observed → symptom_reported | non_termination_observed → symptom_reported |
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 7 | 7 | 7 |
+| Buggy cases | 5 | 5 | 5 |
+| Coverage (diagnosed buggy cases) | 3/5 | 3/5 | 3/5 |
+| Correct diagnoses | 3 | 3 | 3 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 8 | 8 | 8 |
+| Buggy cases | 6 | 6 | 6 |
+| Coverage (diagnosed buggy cases) | 4/6 | 4/6 | 4/6 |
+| Correct diagnoses | 4 | 4 | 4 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 7 | 7 | 7 |
+| Buggy cases | 5 | 5 | 5 |
+| Coverage (diagnosed buggy cases) | 3/5 | 3/5 | 3/5 |
+| Correct diagnoses | 3 | 3 | 3 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+# Method comparison (heldout cases)
+
+All methods diagnosed the same collected evidence for each case. Raw counts; the cases are synthetic and written by the error models' author, so this is not an accuracy estimate for real students.
+
+| | `fingerprint_consistency v1.1` | `fingerprint_consistency v1.2` | `fingerprint_consistency v1.3` |
+| --- | --- | --- | --- |
+| Cases | 7 | 7 | 7 |
+| Buggy cases | 5 | 5 | 5 |
+| Coverage (diagnosed buggy cases) | 3/5 | 3/5 | 3/5 |
+| Correct diagnoses | 3 | 3 | 3 |
+| Incorrect diagnoses (buggy case, wrong model) | 0 | 0 | 0 |
+| False alarms on correct programs | 0 | 0 | 0 |
+| False-positive diagnoses (model is not the truth) | 0 | 0 | 0 |
+| Abstentions on buggy cases | 2 | 2 | 2 |
+| Abstentions by outcome | unmodelled_behaviour 2 | unmodelled_behaviour 2 | unmodelled_behaviour 2 |
+
+## Cases involving `hi_init_last_index` (as truth or as diagnosis)
+
+None.
+
+## Cases involving `stops_at_first_match` (as truth or as diagnosis)
+
+None.
+
+## Cases whose outcome differs between methods
+
+None.
+

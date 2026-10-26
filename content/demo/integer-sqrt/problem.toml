@@ -9,6 +9,9 @@ harness = "harness.cpp"
 reference = "reference.cpp"
 solution_file = "solution.cpp" # name the student's code is compiled under
 interface = "int int_sqrt(int x);"
+# Library calls the statement forbids (D1, ADR-035): an attempt naming one gives no skill
+# observations. Must match the statement's "Do not call" sentence.
+banned_names = ["cbrt", "hypot", "pow", "sqrt", "sqrtf", "sqrtl"]
 # CE1 decision E2: recommendation policy v1 never chooses this problem as a follow-up. It
 # stays in the problem list and its attempts are diagnosed and produce skill evidence.
 recommendable = false
@@ -215,6 +218,7 @@ file = "error_models/strict_square_test.cpp"
 skill = "equality_handling"
 description = "Accepts mid only when mid * mid < x, so a perfect square's own root is rejected: r - 1 on every perfect square >= 1."
 student_hint = "When mid * mid equals x exactly, is mid a valid answer?"
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1): a correct search for the largest r with r * r < x, or for the floor square root of x - 1 (misread tasks), gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate an equality error from a specification error. Diagnoses are reported as qualified and add no equality_handling evidence (docs/reviews/2026-10-25/l20-search.md, case 12)."
 
 [[error_models]]
 key = "closed_loop_lt"
@@ -264,3 +268,7 @@ file = "error_models/returns_lo_closed.cpp"
 skill = "problem_specification"
 description = "Closed interval with no running answer, returning lo, which ends one past the answer on every input."
 student_hint = "When your loop ends, which variable holds the largest r with r * r <= x?"
+
+# Declared skills that no error model can give negative evidence for (ADR-034).
+[positive_only_skills]
+equality_handling = "Every model mapped to it carries a known_limitation after L20 safeguard S1 (owner approval 2026-10-26), so this skill can only receive correct observations through rule C (L19). The mapping itself was not changed."

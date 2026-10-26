@@ -86,6 +86,28 @@ export function TracePage() {
       ) : (
         <p className="muted">No diagnosis yet.</p>
       )}
+      {t.technique_check && (
+        <>
+          <h3>Banned library names</h3>
+          <dl className="fields">
+            <div>
+              <dt>banned</dt>
+              <dd>{t.technique_check.banned_names.join(", ")}</dd>
+            </div>
+            <div>
+              <dt>found</dt>
+              <dd>
+                {t.technique_check.found.length ? t.technique_check.found.join(", ") : "none"}
+              </dd>
+            </div>
+            <div>
+              <dt>skill evidence</dt>
+              <dd>{t.technique_check.skill_evidence}</dd>
+            </div>
+          </dl>
+          <p className="muted">{t.technique_check.note}</p>
+        </>
+      )}
       <h2>Adaptation</h2>
       {t.recommendation ? (
         <Fields

@@ -1,5 +1,9 @@
 # Content design record: `first-true` (CE1.1, gap G1)
 
+> **Update 2026-10-26.** New content version `485c974b4928…` (was `b69c5efa3b39…`). The record below describes the problem as designed and is unchanged.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::equal_range`, `std::find`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.
+
 **Status.** The design record was committed (`89a7803`) before the problem's content was
 measured and before any held-out case was run. §4.2 and §7 were completed after
 measurement. The matrix in §4 is a **design-time prediction**: a

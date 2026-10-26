@@ -1,5 +1,13 @@
 # Content design record: `rotated-search` (BSX, binary-search extension)
 
+> **Update 2026-10-26.** New content version `14e8af1098ad…` (was `8568f135e8ad…`). The record below describes the problem as designed and is unchanged.
+>
+> **L20 safeguard S1 (ADR-036).** `left_range_excludes_lo` now carries a `known_limitation` (a cross-skill twin, docs/reviews/2026-10-25/l20-search.md); diagnoses are qualified and add no negative evidence.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::binary_search`, `std::find`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.
+>
+> **Positive-only skills (ADR-034).** `equality_handling` has no model that can give negative evidence; the reason is recorded under `positive_only_skills`.
+
 **Label.** Files and commits call this "CE2". That was a working label; this is a binary-search family extension, not the planned CE2 stage (arrays).
 
 **Status and order.** This record was written on 2026-10-24 together with the content, during

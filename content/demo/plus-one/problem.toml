@@ -14,17 +14,17 @@ interface = "std::vector<int> plus_one(const std::vector<int>& digits);"
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+loop_bounds = "Visiting exactly the positions the task needs: a loop starts and ends at the right index and runs from the right end."
+running_state = "Keeping a tracked value current on every step and after the loop: a runner-up, the current run, a carry, a running prefix sum."
 
 [probes]
-no_carry = ["index_range"]
-one_carry = ["index_range", "update_rule"]
-carry_chain = ["update_rule"]
+no_carry = ["loop_bounds"]
+one_carry = ["loop_bounds", "running_state"]
+carry_chain = ["running_state"]
 all_nines = ["output_contract"]
-front_digit_small = ["index_range"]
-large_input = ["update_rule"]
+front_digit_small = ["loop_bounds"]
+large_input = ["running_state"]
 
 [curriculum]
 assumes = ["iterating over a std::vector from the back"]
@@ -152,7 +152,7 @@ distinguishes = ["adds_at_front", "carry_never_cleared"]
 [[error_models]]
 key = "single_carry"
 file = "error_models/single_carry.cpp"
-skill = "update_rule"
+skill = "running_state"
 description = "Propagates a carry into the next digit only once, so a second 9 becomes 10."
 student_hint = "What happens when the digit that receives the carry is also a 9? Try a number ending in 99."
 
@@ -166,13 +166,13 @@ student_hint = "What is 999 + 1? Check what you return when every digit is 9."
 [[error_models]]
 key = "adds_at_front"
 file = "error_models/adds_at_front.cpp"
-skill = "index_range"
+skill = "loop_bounds"
 description = "Adds at digits[0] and carries towards the end, treating the first digit as the least significant."
 student_hint = "Which digit is the least significant one? The first element is the most significant digit."
 
 [[error_models]]
 key = "carry_never_cleared"
 file = "error_models/carry_never_cleared.cpp"
-skill = "update_rule"
+skill = "running_state"
 description = "The carry starts at 1 but is never cleared, so 1 is added to every digit."
 student_hint = "After a digit absorbs the carry without overflowing, should later digits still receive it?"

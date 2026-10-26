@@ -1,5 +1,9 @@
 # Content design record: `plus-one` (bank expansion batch A2, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `a7518c266db6…` (was `53ce6c46a11b…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `single_carry` → `running_state`; `adds_at_front` → `loop_bounds`; `carry_never_cleared` → `running_state`. Declared skills are now `output_contract`, `loop_bounds`, `running_state`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/plus-one.md), which is authoritative.

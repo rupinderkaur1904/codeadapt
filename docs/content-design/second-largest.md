@@ -1,5 +1,9 @@
 # Content design record: `second-largest` (bank expansion batch A1, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `6f9032b8d8b8…` (was `15b0c500f154…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `no_demotion` → `running_state`; `skips_first` → `loop_bounds`. Declared skills are now `tie_resolution`, `output_contract`, `loop_bounds`, `running_state`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) for the process and the skill
 keys, and the [content report](../content-reports/second-largest.md) for the measurement.

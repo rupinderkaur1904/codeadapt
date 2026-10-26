@@ -1,5 +1,9 @@
 # Content design record: `range-sum-queries` (bank expansion batch A4, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `74d198449c3a…` (was `d47598c44246…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `excludes_right_end` → `range_inclusion`; `prefix_not_accumulated` → `running_state`. Declared skills are now `output_contract`, `range_inclusion`, `running_state`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/range-sum-queries.md), which is authoritative.

@@ -1,5 +1,9 @@
 # Content design record: `closest-pair-sum` (bank expansion batch A2, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `dfc45a07cd00…` (was `de254fa1d64b…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `allows_same_element` → `range_inclusion`; `moves_wrong_pointer` → `pointer_movement`; `skips_first` → `loop_bounds`. Declared skills are now `output_contract`, `loop_bounds`, `range_inclusion`, `pointer_movement`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/closest-pair-sum.md).

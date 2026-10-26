@@ -1,5 +1,9 @@
 # Content design record: `rotated-min` (BSX, binary-search extension)
 
+> **Update 2026-10-26.** New content version `6df29dcd99d7…` (was `c9f3b5c9fcac…`). The record below describes the problem as designed and is unchanged.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::lower_bound`, `std::min_element`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.
+
 **Label.** Files and commits call this "CE2". That was a working label; this is a binary-search family extension, not the planned CE2 stage (arrays).
 
 **Status and order.**

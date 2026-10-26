@@ -1,6 +1,10 @@
 # Proposal D1: skill evidence when the assessed technique is not verified
 
-**Status.** Design proposal for owner review (owner action 5, 2026-10-25). **Nothing here is
+**Status (2026-10-26).** P-D1a approved by the owner and implemented as ADR-035, with the
+owner's boundaries: no new student-facing sentence, and counting option 1 kept for review.
+P-D1b was not requested. The text below is the proposal as reviewed.
+
+**Original status.** Design proposal for owner review (owner action 5, 2026-10-25). **Nothing here is
 implemented.** Rule C, the skill mappings, the BKT parameters, the content and the
 recommendation policy are unchanged.
 

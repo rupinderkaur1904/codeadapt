@@ -14,17 +14,17 @@ interface = "std::vector<int> distinct_in_windows(const std::vector<int>& a, int
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
 tie_resolution = "Handling equal values as the specification says: which of several equal candidates wins, and whether duplicates count separately."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
+loop_bounds = "Visiting exactly the positions the task needs: a loop starts and ends at the right index and runs from the right end."
+window_maintenance = "Keeping a sliding window's state current: removing the element that leaves, and shrinking the window rather than restarting it."
 
 [probes]
-value_leaves = ["update_rule"]
-value_leaves_fully = ["update_rule"]
+value_leaves = ["window_maintenance"]
+value_leaves_fully = ["window_maintenance"]
 duplicates_in_window = ["tie_resolution"]
-last_window = ["index_range"]
-k_equals_n = ["index_range"]
-large_input = ["update_rule"]
+last_window = ["loop_bounds"]
+k_equals_n = ["loop_bounds"]
+large_input = ["window_maintenance"]
 
 [curriculum]
 assumes = ["std::unordered_map or std::map counts"]
@@ -143,14 +143,14 @@ distinguishes = ["keeps_zero_counts", "misses_last_window"]
 [[error_models]]
 key = "keeps_zero_counts"
 file = "error_models/keeps_zero_counts.cpp"
-skill = "update_rule"
+skill = "window_maintenance"
 description = "Counts values that have left the window: the count is decremented but the key is never erased at zero (never removing the leaving element at all, or a set that only grows, gives identical output)."
 student_hint = "When a value's count drops to 0, is it still in the window? Does your container still count it?"
 
 [[error_models]]
 key = "misses_last_window"
 file = "error_models/misses_last_window.cpp"
-skill = "index_range"
+skill = "loop_bounds"
 description = "The loop stops one element early, so the last window gets no count."
 student_hint = "How many windows of size k does an array of n elements have? Count yours."
 

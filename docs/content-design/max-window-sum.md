@@ -1,5 +1,9 @@
 # Content design record: `max-window-sum` (bank expansion batch A3, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `6a286840ec62…` (was `7e1c6d851a9c…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `misses_last_window` → `loop_bounds`; `never_subtracts` → `window_maintenance`; `subtracts_wrong_element` → `window_maintenance`. Declared skills are now `accumulator_init`, `loop_bounds`, `window_maintenance`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/max-window-sum.md), which is authoritative.

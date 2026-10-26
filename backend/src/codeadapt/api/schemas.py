@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -143,6 +143,16 @@ class TraceView(_Out):
     # recommendation this submission followed (if any).
     recommendation: dict[str, Any] | None = None
     followup_evaluation: dict[str, Any] | None = None
+    # D1 (ADR-035): banned library names found in the source, from the snapshot of the
+    # submission's content version. None when that version lists no banned names.
+    technique_check: TechniqueCheckView | None = None
+
+
+class TechniqueCheckView(_Out):
+    banned_names: list[str]
+    found: list[str]
+    skill_evidence: Literal["eligible", "withheld"]
+    note: str
 
 
 class RecommendationAction(StrEnum):
@@ -224,6 +234,16 @@ class LearnerModelView(_Out):
     data_class: str
     attempts: int
     estimate: LearnerEstimate
+    # Skill keys in the estimate that the taxonomy has retired (ADR-034), with the meaning they
+    # had. Their observations are historical and are not converted to the replacing keys.
+    retired_skills: dict[str, RetiredSkillView] = {}
+
+
+class RetiredSkillView(_Out):
+    definition: str
+    retired: str
+    decision: str
+    replaced_by: list[str]
 
 
 class LoginRequest(BaseModel):

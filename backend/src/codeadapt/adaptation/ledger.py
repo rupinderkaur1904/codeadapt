@@ -118,7 +118,9 @@ def skill_observations(
     * `correct` for any other skill when at least one test probes it, every test probing
       it passed, and none was failed or excluded (rule C).
     * Nothing otherwise, and nothing at all from compile errors, execution errors,
-      unreliable evidence, or attempts without a skill map.
+      unreliable evidence, attempts without a skill map, or attempts whose source names a
+      library call the statement forbids (D1, ADR-035). Such an attempt still exists, is
+      still diagnosed and still takes its place in the attempt order.
 
     Counting per attempt rather than per test keeps tests that exercise the same behaviour
     from becoming independent pieces of evidence.
@@ -129,6 +131,8 @@ def skill_observations(
         smap = skill_map_for(attempt, problems, skill_maps)
         ordinal[attempt.problem_slug] = ordinal.get(attempt.problem_slug, 0) + 1
         if smap is None or attempt.outcome in _NO_SKILL_EVIDENCE:
+            continue
+        if attempt.banned_names_found:
             continue
         explaining = explaining_model(attempt, smap)
         weak_skill = smap.model_skills[explaining] if explaining is not None else None

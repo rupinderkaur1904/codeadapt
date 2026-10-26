@@ -2,6 +2,16 @@
 
 **Status.** Review evidence for the owner (approved action 3, 2026-10-25 13:27).
 
+**Update 2026-10-26 (added; the record below is unchanged).**
+- **S1 approved and applied** to the 11 clear-cut models (ADR-036).
+- **Contestable cases #3 and #13** are analysed in docs/reviews/2026-10-26/l20-contestable-cases.md.
+  Both are unchanged.
+- **The four original problems** were searched in docs/reviews/2026-10-26/l20-search-original.md.
+- **Input-mode gap.** The script below did not expand the rotated-search R and peak-index M
+  input modes for committed tests. The rerun in that report's §4 leaves every equivalence
+  here unchanged. Only some failure and test-difference counts for already-separable pairs
+  differ.
+
 **No fingerprint, skill mapping, `known_limitation`, content file or rule was changed.** The
 safeguards in §5 are proposals.
 
