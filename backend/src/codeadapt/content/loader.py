@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
@@ -87,15 +88,36 @@ def load_problem(root: Path) -> LoadedProblem:
         except UnicodeDecodeError as exc:
             raise ContentError(f"{root}: {rel!r} is not UTF-8") from exc
 
+    statement = text(spec.statement)
+    stated = statement_bans(statement)
+    if set(spec.banned_names) != stated:
+        raise ContentError(
+            f"{root}: banned_names {sorted(spec.banned_names)} must match the statement's "
+            f"'Do not call' list {sorted(stated)}"
+        )
+
     return LoadedProblem(
         spec=spec,
         root=root,
         version=digest.hexdigest(),
-        statement=text(spec.statement),
+        statement=statement,
         harness=text(spec.harness),
         reference=text(spec.reference),
         error_model_sources={m.key: text(m.file) for m in spec.error_models},
     )
+
+
+_DO_NOT_CALL = re.compile(r"Do not call ([^.]*)\.")
+
+
+def statement_bans(statement: str) -> set[str]:
+    """The backticked names in the statement's "Do not call ..." sentences."""
+    flat = " ".join(statement.split())
+    return {
+        name
+        for sentence in _DO_NOT_CALL.findall(flat)
+        for name in re.findall(r"`([^`]+)`", sentence)
+    }
 
 
 def load_catalogue(content_dir: Path) -> list[LoadedProblem]:

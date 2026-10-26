@@ -1,5 +1,9 @@
 # Content design, worked example: `lower-bound`
 
+> **Update 2026-10-26.** New content version `9aade9e1396e…` (was `871602bc2bba…`). The record below describes the problem as designed and is unchanged.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::equal_range`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.
+
 This document applies the content-design method in [README.md](README.md) to one problem,
 starting from what is actually in the repository. It covers two things:
 

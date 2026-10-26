@@ -1,0 +1,5680 @@
+{
+"closest-pair-sum|amb:allows_same_element+moves_wrong_pointer": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"closest-pair-sum|amb:allows_same_element+signed_gap": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"closest-pair-sum|amb:allows_same_element+skips_first": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "ambiguous",
+"skills": [
+"index_range"
+]
+},
+"closest-pair-sum|amb:moves_wrong_pointer+signed_gap": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"closest-pair-sum|amb:moves_wrong_pointer+skips_first": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"closest-pair-sum|amb:skips_first+signed_gap": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"closest-pair-sum|named:allows_same_element": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"closest-pair-sum|named:moves_wrong_pointer": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"closest-pair-sum|named:signed_gap": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"closest-pair-sum|named:skips_first": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "closest-pair-sum",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"closest-pair-sum|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"closest-pair-sum|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "closest-pair-sum",
+"rule": "abstained",
+"skills": []
+},
+"container-water|amb:moves_taller+stops_before_adjacent": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"container-water|amb:moves_taller+uses_taller_height": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"container-water|amb:moves_taller+width_plus_one": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"container-water|amb:uses_taller_height+stops_before_adjacent": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"container-water|amb:width_plus_one+stops_before_adjacent": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "ambiguous",
+"skills": [
+"index_range"
+]
+},
+"container-water|amb:width_plus_one+uses_taller_height": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"container-water|named:moves_taller": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"container-water|named:stops_before_adjacent": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"container-water|named:uses_taller_height": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"container-water|named:width_plus_one": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "container-water",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"container-water|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"container-water|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "container-water",
+"rule": "abstained",
+"skills": []
+},
+"count-occurrences|amb:hi_init_last_index+inclusive_count": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"count-occurrences|amb:hi_init_last_index+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"count-occurrences|amb:no_progress_update+inclusive_count": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"count-occurrences|amb:upper_uses_strict+hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"count-occurrences|amb:upper_uses_strict+inclusive_count": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"count-occurrences|amb:upper_uses_strict+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"count-occurrences|named:hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"count-occurrences|named:inclusive_count": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"count-occurrences|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"count-occurrences|named:upper_uses_strict": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"count-occurrences|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"count-occurrences|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "count-occurrences",
+"rule": "abstained",
+"skills": []
+},
+"dedup-sorted|amb:compares_to_first+counts_without_writing": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "ambiguous",
+"skills": [
+"update_rule"
+]
+},
+"dedup-sorted|amb:returns_last_index+compares_to_first": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"dedup-sorted|amb:returns_last_index+counts_without_writing": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"dedup-sorted|amb:returns_last_index+skips_last": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"dedup-sorted|amb:skips_last+compares_to_first": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"dedup-sorted|amb:skips_last+counts_without_writing": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"dedup-sorted|named:compares_to_first": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"dedup-sorted|named:counts_without_writing": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"dedup-sorted|named:returns_last_index": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"dedup-sorted|named:skips_last": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "dedup-sorted",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"dedup-sorted|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"dedup-sorted|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "dedup-sorted",
+"rule": "abstained",
+"skills": []
+},
+"distinct-in-windows|amb:keeps_zero_counts+counts_unique_only": {
+"action": "retry",
+"crit": [
+"tie_resolution",
+"update_rule"
+],
+"flag": false,
+"problem": "distinct-in-windows",
+"rule": "ambiguous",
+"skills": [
+"tie_resolution",
+"update_rule"
+]
+},
+"distinct-in-windows|amb:keeps_zero_counts+misses_last_window": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "distinct-in-windows",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"distinct-in-windows|amb:misses_last_window+counts_unique_only": {
+"action": "retry",
+"crit": [
+"index_range",
+"tie_resolution"
+],
+"flag": false,
+"problem": "distinct-in-windows",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"tie_resolution"
+]
+},
+"distinct-in-windows|named:counts_unique_only": {
+"action": "retry",
+"crit": [
+"tie_resolution"
+],
+"flag": false,
+"problem": "distinct-in-windows",
+"rule": "hypothesis_supported",
+"skills": [
+"tie_resolution"
+]
+},
+"distinct-in-windows|named:keeps_zero_counts": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "distinct-in-windows",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"distinct-in-windows|named:misses_last_window": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "distinct-in-windows",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"distinct-in-windows|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"distinct-in-windows|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "distinct-in-windows",
+"rule": "abstained",
+"skills": []
+},
+"exact-search|amb:closed_loop_lt+lo_init_one": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"exact-search|amb:closed_loop_lt+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"exact-search|amb:closed_loop_lt+returns_insertion_point": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"exact-search|amb:closed_loop_lt+returns_value": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"exact-search|amb:closed_loop_lt+swapped_direction": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"exact-search|amb:lo_init_one+returns_insertion_point": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"exact-search|amb:lo_init_one+returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"exact-search|amb:no_progress_update+lo_init_one": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"exact-search|amb:no_progress_update+returns_insertion_point": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"exact-search|amb:no_progress_update+returns_value": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"exact-search|amb:no_progress_update+swapped_direction": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"exact-search|amb:returns_insertion_point+returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"exact-search|amb:swapped_direction+lo_init_one": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"exact-search|amb:swapped_direction+returns_insertion_point": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"exact-search|amb:swapped_direction+returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"exact-search|named:closed_loop_lt": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"exact-search|named:lo_init_one": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"exact-search|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"exact-search|named:returns_insertion_point": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"exact-search|named:returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"exact-search|named:swapped_direction": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"exact-search|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"exact-search|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "exact-search",
+"rule": "abstained",
+"skills": []
+},
+"first-max-index|amb:last_of_ties+returns_value": {
+"action": "retry",
+"crit": [
+"output_contract",
+"tie_resolution"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"tie_resolution"
+]
+},
+"first-max-index|amb:last_of_ties+skips_last": {
+"action": "retry",
+"crit": [
+"index_range",
+"tie_resolution"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"tie_resolution"
+]
+},
+"first-max-index|amb:max_starts_at_zero+last_of_ties": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"tie_resolution"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"tie_resolution"
+]
+},
+"first-max-index|amb:max_starts_at_zero+returns_value": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"output_contract"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"output_contract"
+]
+},
+"first-max-index|amb:max_starts_at_zero+skips_last": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"index_range"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"index_range"
+]
+},
+"first-max-index|amb:skips_last+returns_value": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"first-max-index|named:last_of_ties": {
+"action": "retry",
+"crit": [
+"tie_resolution"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "hypothesis_supported",
+"skills": [
+"tie_resolution"
+]
+},
+"first-max-index|named:max_starts_at_zero": {
+"action": "retry",
+"crit": [
+"accumulator_init"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "hypothesis_supported",
+"skills": [
+"accumulator_init"
+]
+},
+"first-max-index|named:returns_value": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"first-max-index|named:skips_last": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "first-max-index",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"first-max-index|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"first-max-index|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "first-max-index",
+"rule": "abstained",
+"skills": []
+},
+"first-true|amb:closed_loop_hi_mid+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|amb:closed_loop_hi_mid+returns_any_true": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|amb:closed_loop_hi_mid+returns_last_false": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|amb:closed_loop_hi_mid+stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"first-true|amb:hi_init_last_index+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_init_last_index+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_init_last_index+lo_init_one": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_init_last_index+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_init_last_index+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_init_last_index+returns_any_true": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_init_last_index+returns_last_false": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_init_last_index+stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_skips_candidate+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_skips_candidate+lo_init_one": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_skips_candidate+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_skips_candidate+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_skips_candidate+returns_any_true": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_skips_candidate+returns_last_false": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:hi_skips_candidate+stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:lo_init_one+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:lo_init_one+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:lo_init_one+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:lo_init_one+returns_any_true": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:lo_init_one+returns_last_false": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|amb:lo_init_one+stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"first-true|amb:no_progress_update+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"first-true|amb:no_progress_update+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|amb:no_progress_update+returns_any_true": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|amb:no_progress_update+returns_last_false": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|amb:no_progress_update+stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"first-true|amb:none_sentinel+returns_any_true": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"first-true|amb:none_sentinel+returns_last_false": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"first-true|amb:returns_last_false+returns_any_true": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"first-true|amb:stops_one_early+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|amb:stops_one_early+returns_any_true": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|amb:stops_one_early+returns_last_false": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"first-true|named:closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"first-true|named:hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"first-true|named:hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"first-true|named:lo_init_one": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"first-true|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"first-true|named:none_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"first-true|named:returns_any_true": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"first-true|named:returns_last_false": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"first-true|named:stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"first-true|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"first-true|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "first-true",
+"rule": "abstained",
+"skills": []
+},
+"integer-sqrt|amb:closed_loop_lt+fixed_iterations_16": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"integer-sqrt|amb:closed_loop_lt+floor_mid_no_progress": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"integer-sqrt|amb:closed_loop_lt+hi_cap_46340": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:closed_loop_lt+hi_excludes_x": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:closed_loop_lt+returns_ceiling": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"integer-sqrt|amb:closed_loop_lt+returns_lo_closed": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"integer-sqrt|amb:fixed_iterations_16+floor_mid_no_progress": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"integer-sqrt|amb:fixed_iterations_16+hi_cap_46340": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:fixed_iterations_16+hi_excludes_x": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:fixed_iterations_16+returns_ceiling": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"integer-sqrt|amb:fixed_iterations_16+returns_lo_closed": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"integer-sqrt|amb:floor_mid_no_progress+hi_cap_46340": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:floor_mid_no_progress+hi_excludes_x": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:floor_mid_no_progress+returns_ceiling": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"integer-sqrt|amb:floor_mid_no_progress+returns_lo_closed": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"integer-sqrt|amb:hi_cap_46340+returns_ceiling": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:hi_cap_46340+returns_lo_closed": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:hi_excludes_x+hi_cap_46340": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:hi_excludes_x+returns_ceiling": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:hi_excludes_x+returns_lo_closed": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:returns_ceiling+returns_lo_closed": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"integer-sqrt|amb:strict_square_test+closed_loop_lt": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"integer-sqrt|amb:strict_square_test+fixed_iterations_16": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"integer-sqrt|amb:strict_square_test+floor_mid_no_progress": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"integer-sqrt|amb:strict_square_test+hi_cap_46340": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:strict_square_test+hi_excludes_x": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|amb:strict_square_test+returns_ceiling": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"integer-sqrt|amb:strict_square_test+returns_lo_closed": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"integer-sqrt|named:closed_loop_lt": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"integer-sqrt|named:fixed_iterations_16": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"integer-sqrt|named:floor_mid_no_progress": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"integer-sqrt|named:hi_cap_46340": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"integer-sqrt|named:hi_excludes_x": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"integer-sqrt|named:returns_ceiling": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"integer-sqrt|named:returns_lo_closed": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"integer-sqrt|named:strict_square_test": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"integer-sqrt|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"integer-sqrt|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "integer-sqrt",
+"rule": "abstained",
+"skills": []
+},
+"last-less-than|amb:clamps_to_zero+hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"last-less-than|amb:clamps_to_zero+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"last-less-than|amb:hi_init_last_index+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"last-less-than|amb:returns_insertion_point+clamps_to_zero": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"last-less-than|amb:returns_insertion_point+hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"last-less-than|amb:returns_insertion_point+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"last-less-than|amb:uses_le+clamps_to_zero": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"last-less-than|amb:uses_le+hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"last-less-than|amb:uses_le+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"last-less-than|amb:uses_le+returns_insertion_point": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"last-less-than|named:clamps_to_zero": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"last-less-than|named:hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"last-less-than|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"last-less-than|named:returns_insertion_point": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"last-less-than|named:uses_le": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"last-less-than|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"last-less-than|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "last-less-than",
+"rule": "abstained",
+"skills": []
+},
+"last-occurrence|amb:hi_init_last_index+missing_equality_check": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"last-occurrence|amb:hi_init_last_index+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"last-occurrence|amb:hi_init_last_index+returns_one_past": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"last-occurrence|amb:missing_equality_check+returns_one_past": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"last-occurrence|amb:no_progress_update+missing_equality_check": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"last-occurrence|amb:no_progress_update+returns_one_past": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"last-occurrence|amb:returns_first_occurrence+hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"last-occurrence|amb:returns_first_occurrence+missing_equality_check": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"last-occurrence|amb:returns_first_occurrence+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"last-occurrence|amb:returns_first_occurrence+returns_one_past": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"last-occurrence|amb:returns_first_occurrence+stops_at_any_match": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling"
+]
+},
+"last-occurrence|amb:stops_at_any_match+hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"last-occurrence|amb:stops_at_any_match+missing_equality_check": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"last-occurrence|amb:stops_at_any_match+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"last-occurrence|amb:stops_at_any_match+returns_one_past": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"last-occurrence|named:hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"last-occurrence|named:missing_equality_check": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"last-occurrence|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"last-occurrence|named:returns_first_occurrence": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"last-occurrence|named:returns_one_past": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"last-occurrence|named:stops_at_any_match": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"last-occurrence|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"last-occurrence|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "last-occurrence",
+"rule": "abstained",
+"skills": []
+},
+"longest-run|amb:last_run_unchecked+compares_to_first": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "ambiguous",
+"skills": [
+"update_rule"
+]
+},
+"longest-run|amb:last_run_unchecked+returns_value": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"longest-run|amb:reset_to_zero+compares_to_first": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"update_rule"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"update_rule"
+]
+},
+"longest-run|amb:reset_to_zero+last_run_unchecked": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"update_rule"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"update_rule"
+]
+},
+"longest-run|amb:reset_to_zero+returns_value": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"output_contract"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"output_contract"
+]
+},
+"longest-run|amb:returns_value+compares_to_first": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"longest-run|named:compares_to_first": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"longest-run|named:last_run_unchecked": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"longest-run|named:reset_to_zero": {
+"action": "retry",
+"crit": [
+"accumulator_init"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "hypothesis_supported",
+"skills": [
+"accumulator_init"
+]
+},
+"longest-run|named:returns_value": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "longest-run",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"longest-run|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"longest-run|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "longest-run",
+"rule": "abstained",
+"skills": []
+},
+"longest-sum-at-most|amb:length_without_plus_one+restarts_window": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "longest-sum-at-most",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"longest-sum-at-most|amb:length_without_plus_one+strict_limit": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "longest-sum-at-most",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"longest-sum-at-most|amb:strict_limit+restarts_window": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "longest-sum-at-most",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"longest-sum-at-most|named:length_without_plus_one": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "longest-sum-at-most",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"longest-sum-at-most|named:restarts_window": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "longest-sum-at-most",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"longest-sum-at-most|named:strict_limit": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "longest-sum-at-most",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"longest-sum-at-most|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"longest-sum-at-most|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "longest-sum-at-most",
+"rule": "abstained",
+"skills": []
+},
+"lower-bound|amb:closed_loop_hi_mid+returns_wrong_pointer": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"lower-bound|amb:exact_match_sentinel+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"lower-bound|amb:exact_match_sentinel+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:exact_match_sentinel+returns_wrong_pointer": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"lower-bound|amb:exact_match_sentinel+stops_at_first_match": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"lower-bound|amb:hi_init_last_index+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:hi_init_last_index+exact_match_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:hi_init_last_index+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:hi_init_last_index+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:hi_init_last_index+returns_wrong_pointer": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:hi_init_last_index+stops_at_first_match": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:hi_skips_candidate+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:hi_skips_candidate+returns_wrong_pointer": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:no_progress_update+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"lower-bound|amb:no_progress_update+exact_match_sentinel": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"lower-bound|amb:no_progress_update+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:no_progress_update+returns_wrong_pointer": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"lower-bound|amb:no_progress_update+stops_at_first_match": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"lower-bound|amb:stops_at_first_match+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"lower-bound|amb:stops_at_first_match+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:stops_at_first_match+returns_wrong_pointer": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"lower-bound|amb:upper_bound_confusion+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"lower-bound|amb:upper_bound_confusion+exact_match_sentinel": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"lower-bound|amb:upper_bound_confusion+hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:upper_bound_confusion+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"lower-bound|amb:upper_bound_confusion+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"lower-bound|amb:upper_bound_confusion+returns_wrong_pointer": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"lower-bound|amb:upper_bound_confusion+stops_at_first_match": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling"
+]
+},
+"lower-bound|named:closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"lower-bound|named:exact_match_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"lower-bound|named:hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"lower-bound|named:hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"lower-bound|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"lower-bound|named:returns_wrong_pointer": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"lower-bound|named:stops_at_first_match": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"lower-bound|named:upper_bound_confusion": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"lower-bound|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"lower-bound|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "lower-bound",
+"rule": "abstained",
+"skills": []
+},
+"max-window-sum|amb:best_starts_zero+misses_last_window": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"index_range"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"index_range"
+]
+},
+"max-window-sum|amb:best_starts_zero+never_subtracts": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"update_rule"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"update_rule"
+]
+},
+"max-window-sum|amb:best_starts_zero+subtracts_wrong_element": {
+"action": "retry",
+"crit": [
+"accumulator_init",
+"update_rule"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "ambiguous",
+"skills": [
+"accumulator_init",
+"update_rule"
+]
+},
+"max-window-sum|amb:misses_last_window+never_subtracts": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"max-window-sum|amb:misses_last_window+subtracts_wrong_element": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"max-window-sum|amb:never_subtracts+subtracts_wrong_element": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "ambiguous",
+"skills": [
+"update_rule"
+]
+},
+"max-window-sum|named:best_starts_zero": {
+"action": "retry",
+"crit": [
+"accumulator_init"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "hypothesis_supported",
+"skills": [
+"accumulator_init"
+]
+},
+"max-window-sum|named:misses_last_window": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"max-window-sum|named:never_subtracts": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"max-window-sum|named:subtracts_wrong_element": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "max-window-sum",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"max-window-sum|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"max-window-sum|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "max-window-sum",
+"rule": "abstained",
+"skills": []
+},
+"min-capacity|amb:full_day_overflows+sorts_weights": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"min-capacity|amb:hi_skips_candidate+full_day_overflows": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:hi_skips_candidate+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:hi_skips_candidate+sorts_weights": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:hi_skips_candidate+strict_day_limit": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:lo_init_one+full_day_overflows": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:lo_init_one+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:lo_init_one+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:lo_init_one+sorts_weights": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:lo_init_one+strict_day_limit": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"min-capacity|amb:no_progress_update+full_day_overflows": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"min-capacity|amb:no_progress_update+sorts_weights": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"min-capacity|amb:no_progress_update+strict_day_limit": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"min-capacity|amb:strict_day_limit+full_day_overflows": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling"
+]
+},
+"min-capacity|amb:strict_day_limit+sorts_weights": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"min-capacity|named:full_day_overflows": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"min-capacity|named:hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"min-capacity|named:lo_init_one": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"min-capacity|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"min-capacity|named:sorts_weights": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"min-capacity|named:strict_day_limit": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"min-capacity|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"min-capacity|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "min-capacity",
+"rule": "abstained",
+"skills": []
+},
+"peak-index|amb:hi_skips_candidate+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"peak-index|amb:hi_skips_candidate+returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"peak-index|amb:hi_skips_candidate+stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"peak-index|amb:no_progress_update+returns_value": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"peak-index|amb:no_progress_update+stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"peak-index|amb:stops_one_early+returns_value": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"peak-index|amb:swapped_direction+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"peak-index|amb:swapped_direction+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"peak-index|amb:swapped_direction+returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"peak-index|amb:swapped_direction+stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"peak-index|named:hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"peak-index|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"peak-index|named:returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"peak-index|named:stops_one_early": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"peak-index|named:swapped_direction": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"peak-index|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"peak-index|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "peak-index",
+"rule": "abstained",
+"skills": []
+},
+"pivot-index|amb:last_pivot+size_when_none": {
+"action": "retry",
+"crit": [
+"output_contract",
+"tie_resolution"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"tie_resolution"
+]
+},
+"pivot-index|amb:pivot_counted_left+last_pivot": {
+"action": "retry",
+"crit": [
+"tie_resolution",
+"update_rule"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "ambiguous",
+"skills": [
+"tie_resolution",
+"update_rule"
+]
+},
+"pivot-index|amb:pivot_counted_left+pivot_counted_right": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "ambiguous",
+"skills": [
+"update_rule"
+]
+},
+"pivot-index|amb:pivot_counted_left+size_when_none": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"pivot-index|amb:pivot_counted_right+last_pivot": {
+"action": "retry",
+"crit": [
+"tie_resolution",
+"update_rule"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "ambiguous",
+"skills": [
+"tie_resolution",
+"update_rule"
+]
+},
+"pivot-index|amb:pivot_counted_right+size_when_none": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"pivot-index|named:last_pivot": {
+"action": "retry",
+"crit": [
+"tie_resolution"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "hypothesis_supported",
+"skills": [
+"tie_resolution"
+]
+},
+"pivot-index|named:pivot_counted_left": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"pivot-index|named:pivot_counted_right": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"pivot-index|named:size_when_none": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "pivot-index",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"pivot-index|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"pivot-index|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "pivot-index",
+"rule": "abstained",
+"skills": []
+},
+"plus-one|amb:adds_at_front+carry_never_cleared": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"plus-one|amb:no_new_digit+adds_at_front": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"plus-one|amb:no_new_digit+carry_never_cleared": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"plus-one|amb:single_carry+adds_at_front": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"plus-one|amb:single_carry+carry_never_cleared": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "ambiguous",
+"skills": [
+"update_rule"
+]
+},
+"plus-one|amb:single_carry+no_new_digit": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"plus-one|named:adds_at_front": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"plus-one|named:carry_never_cleared": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"plus-one|named:no_new_digit": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"plus-one|named:single_carry": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "plus-one",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"plus-one|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"plus-one|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "plus-one",
+"rule": "abstained",
+"skills": []
+},
+"range-sum-queries|amb:excludes_right_end+ignores_left_end": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "range-sum-queries",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"range-sum-queries|amb:excludes_right_end+prefix_not_accumulated": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "range-sum-queries",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"range-sum-queries|amb:prefix_not_accumulated+ignores_left_end": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "range-sum-queries",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"range-sum-queries|named:excludes_right_end": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "range-sum-queries",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"range-sum-queries|named:ignores_left_end": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "range-sum-queries",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"range-sum-queries|named:prefix_not_accumulated": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "range-sum-queries",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"range-sum-queries|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"range-sum-queries|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "range-sum-queries",
+"rule": "abstained",
+"skills": []
+},
+"rotated-min|amb:compares_with_lo+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"rotated-min|amb:compares_with_lo+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"rotated-min|amb:compares_with_lo+returns_pivot": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"rotated-min|amb:compares_with_lo+returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"rotated-min|amb:hi_skips_candidate+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"rotated-min|amb:hi_skips_candidate+returns_pivot": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"rotated-min|amb:hi_skips_candidate+returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"rotated-min|amb:no_progress_update+returns_pivot": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"rotated-min|amb:no_progress_update+returns_value": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"rotated-min|amb:returns_value+returns_pivot": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"rotated-min|named:compares_with_lo": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"rotated-min|named:hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"rotated-min|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"rotated-min|named:returns_pivot": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"rotated-min|named:returns_value": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"rotated-min|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"rotated-min|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "rotated-min",
+"rule": "abstained",
+"skills": []
+},
+"rotated-search|amb:closed_loop_lt+ignores_rotation": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"rotated-search|amb:closed_loop_lt+returns_sorted_position": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"rotated-search|amb:ignores_rotation+returns_sorted_position": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"rotated-search|amb:left_half_test_strict+closed_loop_lt": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"rotated-search|amb:left_half_test_strict+ignores_rotation": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"rotated-search|amb:left_half_test_strict+left_range_excludes_lo": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling"
+]
+},
+"rotated-search|amb:left_half_test_strict+returns_sorted_position": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"rotated-search|amb:left_range_excludes_lo+closed_loop_lt": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"rotated-search|amb:left_range_excludes_lo+ignores_rotation": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"rotated-search|amb:left_range_excludes_lo+returns_sorted_position": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"rotated-search|named:closed_loop_lt": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"rotated-search|named:ignores_rotation": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"rotated-search|named:left_half_test_strict": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"rotated-search|named:left_range_excludes_lo": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"rotated-search|named:returns_sorted_position": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"rotated-search|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"rotated-search|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "rotated-search",
+"rule": "abstained",
+"skills": []
+},
+"second-largest|amb:counts_duplicates+no_demotion": {
+"action": "retry",
+"crit": [
+"tie_resolution",
+"update_rule"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "ambiguous",
+"skills": [
+"tie_resolution",
+"update_rule"
+]
+},
+"second-largest|amb:counts_duplicates+skips_first": {
+"action": "retry",
+"crit": [
+"index_range",
+"tie_resolution"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"tie_resolution"
+]
+},
+"second-largest|amb:counts_duplicates+zero_when_none": {
+"action": "retry",
+"crit": [
+"output_contract",
+"tie_resolution"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"tie_resolution"
+]
+},
+"second-largest|amb:no_demotion+skips_first": {
+"action": "retry",
+"crit": [
+"index_range",
+"update_rule"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"update_rule"
+]
+},
+"second-largest|amb:no_demotion+zero_when_none": {
+"action": "retry",
+"crit": [
+"output_contract",
+"update_rule"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "ambiguous",
+"skills": [
+"output_contract",
+"update_rule"
+]
+},
+"second-largest|amb:skips_first+zero_when_none": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"second-largest|named:counts_duplicates": {
+"action": "retry",
+"crit": [
+"tie_resolution"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "hypothesis_supported",
+"skills": [
+"tie_resolution"
+]
+},
+"second-largest|named:no_demotion": {
+"action": "retry",
+"crit": [
+"update_rule"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "hypothesis_supported",
+"skills": [
+"update_rule"
+]
+},
+"second-largest|named:skips_first": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"second-largest|named:zero_when_none": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "second-largest",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"second-largest|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"second-largest|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "second-largest",
+"rule": "abstained",
+"skills": []
+},
+"stock-profit|amb:allows_loss+misses_last_day": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "stock-profit",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"stock-profit|amb:ignores_order+allows_loss": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "stock-profit",
+"rule": "ambiguous",
+"skills": [
+"output_contract"
+]
+},
+"stock-profit|amb:ignores_order+misses_last_day": {
+"action": "retry",
+"crit": [
+"index_range",
+"output_contract"
+],
+"flag": false,
+"problem": "stock-profit",
+"rule": "ambiguous",
+"skills": [
+"index_range",
+"output_contract"
+]
+},
+"stock-profit|named:allows_loss": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "stock-profit",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"stock-profit|named:ignores_order": {
+"action": "retry",
+"crit": [
+"output_contract"
+],
+"flag": false,
+"problem": "stock-profit",
+"rule": "hypothesis_supported",
+"skills": [
+"output_contract"
+]
+},
+"stock-profit|named:misses_last_day": {
+"action": "retry",
+"crit": [
+"index_range"
+],
+"flag": false,
+"problem": "stock-profit",
+"rule": "hypothesis_supported",
+"skills": [
+"index_range"
+]
+},
+"stock-profit|nofail": {
+"action": "none",
+"crit": null,
+"flag": false,
+"problem": null,
+"rule": "no_failure_observed",
+"skills": []
+},
+"stock-profit|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "stock-profit",
+"rule": "abstained",
+"skills": []
+},
+"upper-bound|amb:closed_loop_hi_mid+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"upper-bound|amb:closed_loop_hi_mid+returns_last_not_greater": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"upper-bound|amb:hi_init_last_index+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:hi_init_last_index+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:hi_init_last_index+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:hi_init_last_index+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:hi_init_last_index+returns_last_not_greater": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:hi_skips_candidate+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:hi_skips_candidate+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:hi_skips_candidate+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:hi_skips_candidate+returns_last_not_greater": {
+"action": "new_problem",
+"crit": [
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:lower_bound_confusion+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"upper-bound|amb:lower_bound_confusion+hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:lower_bound_confusion+hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"search_space_boundaries"
+]
+},
+"upper-bound|amb:lower_bound_confusion+no_progress_update": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"loop_termination"
+]
+},
+"upper-bound|amb:lower_bound_confusion+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"upper-bound|amb:lower_bound_confusion+returns_last_not_greater": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"problem_specification"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "ambiguous",
+"skills": [
+"equality_handling",
+"problem_specification"
+]
+},
+"upper-bound|amb:no_progress_update+closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "ambiguous",
+"skills": [
+"loop_termination"
+]
+},
+"upper-bound|amb:no_progress_update+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"upper-bound|amb:no_progress_update+returns_last_not_greater": {
+"action": "new_problem",
+"crit": [
+"loop_termination",
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"loop_termination",
+"problem_specification"
+]
+},
+"upper-bound|amb:returns_last_not_greater+none_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "ambiguous",
+"skills": [
+"problem_specification"
+]
+},
+"upper-bound|named:closed_loop_hi_mid": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"upper-bound|named:hi_init_last_index": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"upper-bound|named:hi_skips_candidate": {
+"action": "new_problem",
+"crit": [
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"search_space_boundaries"
+]
+},
+"upper-bound|named:lower_bound_confusion": {
+"action": "new_problem",
+"crit": [
+"equality_handling"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "hypothesis_supported",
+"skills": [
+"equality_handling"
+]
+},
+"upper-bound|named:no_progress_update": {
+"action": "new_problem",
+"crit": [
+"loop_termination"
+],
+"flag": false,
+"problem": "lower-bound",
+"rule": "hypothesis_supported",
+"skills": [
+"loop_termination"
+]
+},
+"upper-bound|named:none_sentinel": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"upper-bound|named:returns_last_not_greater": {
+"action": "new_problem",
+"crit": [
+"problem_specification"
+],
+"flag": false,
+"problem": "last-less-than",
+"rule": "hypothesis_supported",
+"skills": [
+"problem_specification"
+]
+},
+"upper-bound|nofail": {
+"action": "new_problem",
+"crit": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+],
+"flag": false,
+"problem": "count-occurrences",
+"rule": "no_failure_observed",
+"skills": [
+"equality_handling",
+"loop_termination",
+"problem_specification",
+"search_space_boundaries"
+]
+},
+"upper-bound|unmodelled": {
+"action": "retry",
+"crit": null,
+"flag": true,
+"problem": "upper-bound",
+"rule": "abstained",
+"skills": []
+}
+}

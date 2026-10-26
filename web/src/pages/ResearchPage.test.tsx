@@ -73,6 +73,12 @@ const trace: TraceView = {
   content_validation: { errors: [], warnings: [] },
   recommendation: { rule: "hypothesis_supported", problem_slug: "count-occurrences" },
   followup_evaluation: null,
+  technique_check: {
+    banned_names: ["std::lower_bound", "std::upper_bound"],
+    found: ["std::lower_bound"],
+    skill_evidence: "withheld",
+    note: "Static token match after removing comments and literals.",
+  },
 };
 
 function observation(id: string, problem: string, value: "correct" | "incorrect") {
@@ -125,6 +131,42 @@ const learnerModel: LearnerModelView = {
       },
     ],
   },
+  retired_skills: {},
+};
+
+// A learner with an observation recorded under a retired key (ADR-034).
+const learnerModelRetired: LearnerModelView = {
+  ...learnerModel,
+  username: "synthetic-b",
+  estimate: {
+    ...learnerModel.estimate,
+    skills: [
+      ...learnerModel.estimate.skills,
+      {
+        skill: "index_range",
+        state: "insufficient_data",
+        p_known: null,
+        counted: 1,
+        distinct_problems: 1,
+        observations: [
+          {
+            observation: { ...observation("s3", "stock-profit", "correct"), skill: "index_range" },
+            counted: true,
+            reason: null,
+            p_known_after: 0.31,
+          },
+        ],
+      },
+    ],
+  },
+  retired_skills: {
+    index_range: {
+      definition: "Visiting exactly the valid positions.",
+      retired: "2026-10-26",
+      decision: "ADR-034",
+      replaced_by: ["loop_bounds", "range_inclusion"],
+    },
+  },
 };
 
 function json(body: unknown, status = 200): Response {
@@ -162,6 +204,8 @@ describe("researcher pages", () => {
         return json([supported, { ...supported, id: "s9", problem_slug: "lower-bound" }]);
       if (url.includes("/research/metrics")) return json(metrics);
       if (url.includes("/research/learner-model?username=synthetic-a")) return json(learnerModel);
+      if (url.includes("/research/learner-model?username=synthetic-b"))
+        return json(learnerModelRetired);
       if (url.endsWith("/problems"))
         return json([
           {
@@ -211,6 +255,8 @@ describe("researcher pages", () => {
     expect(screen.getByText("output: 1")).toBeInTheDocument();
     expect(screen.getAllByText("upper_bound_confusion").length).toBeGreaterThan(0);
     expect(screen.getByText("count-occurrences")).toBeInTheDocument();
+    expect(screen.getByText("withheld")).toBeInTheDocument();
+    expect(screen.getByText("std::lower_bound, std::upper_bound")).toBeInTheDocument();
   });
 
   it("shows learner-model estimates with their label and uncounted retries", async () => {
@@ -224,6 +270,20 @@ describe("researcher pages", () => {
     expect(screen.getByText("0.146")).toBeInTheDocument();
     expect(screen.getByText(/no \(retry/)).toBeInTheDocument();
     expect(screen.queryByText(/master/i)).toBeNull();
+  });
+
+  it("marks retired skill keys as deprecated with their historical definition", async () => {
+    renderAt(
+      "/research/learners/synthetic-b",
+      <LearnerModelPage />,
+      "/research/learners/:username",
+    );
+    const retired = await screen.findByRole("region", { name: "index_range" });
+    expect(retired).toHaveTextContent("deprecated");
+    expect(retired).toHaveTextContent("replaced by loop_bounds, range_inclusion");
+    expect(retired).toHaveTextContent("Visiting exactly the valid positions.");
+    const current = screen.getByRole("region", { name: "equality_handling" });
+    expect(current).not.toHaveTextContent("deprecated");
   });
 
   it("marks problems with an attempt that had no failing tests", async () => {

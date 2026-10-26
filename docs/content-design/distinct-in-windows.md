@@ -1,5 +1,9 @@
 # Content design record: `distinct-in-windows` (bank expansion batch A3, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `7948c0fabbdf…` (was `e3bcaf715296…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `keeps_zero_counts` → `window_maintenance`; `misses_last_window` → `loop_bounds`. Declared skills are now `tie_resolution`, `loop_bounds`, `window_maintenance`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/distinct-in-windows.md), which is authoritative.

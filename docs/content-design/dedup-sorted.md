@@ -1,5 +1,13 @@
 # Content design record: `dedup-sorted` (bank expansion batch A2, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `89b894b4693d…` (was `bb981b9b5617…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `skips_last` → `loop_bounds`; `compares_to_first` → `pointer_movement`; `counts_without_writing` → `pointer_movement`. Declared skills are now `output_contract`, `loop_bounds`, `pointer_movement`.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::unique`; an attempt that names one gives no skill observations.
+>
+> **Positive-only skills (ADR-034).** `output_contract` has no model that can give negative evidence; the reason is recorded under `positive_only_skills`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/dedup-sorted.md).

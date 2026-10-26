@@ -21,6 +21,7 @@ from codeadapt.adaptation import (
 )
 from codeadapt.adaptation.models import Action, Rule
 from codeadapt.adaptation.skillmap import SkillMap
+from codeadapt.adaptation.technique import banned_names_found
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.db.models import (
     DiagnosisRow,
@@ -37,8 +38,17 @@ from codeadapt.diagnosis import Outcome
 _NO_EVIDENCE = {Outcome.COMPILE_ERROR, Outcome.EXECUTION_ERROR}
 
 
-def attempt_record(submission: Submission, slug: str, diagnosis: DiagnosisRow) -> AttemptRecord:
-    """Rebuild per-test pass/fail/excluded from the diagnosis rationale's test table."""
+def attempt_record(
+    submission: Submission,
+    slug: str,
+    diagnosis: DiagnosisRow,
+    skill_map: SkillMap | None = None,
+) -> AttemptRecord:
+    """Rebuild per-test pass/fail/excluded from the diagnosis rationale's test table.
+
+    `skill_map` is the snapshot of the submission's own content version; its banned names
+    (D1, ADR-035) are looked up in the stored source.
+    """
     tests: dict[str, TestStatus] = {}
     for row in diagnosis.rationale.get("tests", []):
         if not row["reliable"]:
@@ -57,6 +67,9 @@ def attempt_record(submission: Submission, slug: str, diagnosis: DiagnosisRow) -
         candidates=tuple(diagnosis.candidates),
         qualified=diagnosis.rationale.get("evidence_strength") == "single_behaviour",
         tests=tests,
+        banned_names_found=banned_names_found(submission.source, skill_map.banned_names)
+        if skill_map is not None
+        else (),
     )
 
 
@@ -65,7 +78,7 @@ def learner_attempts(
 ) -> dict[str, AttemptRecord]:
     """Every diagnosed submission by the learner, using its latest diagnosis."""
     query = (
-        select(Submission, DiagnosisRow, ProblemVersion.slug)
+        select(Submission, DiagnosisRow, ProblemVersion.slug, ProblemVersion.skill_map)
         .join(DiagnosisRow, DiagnosisRow.submission_id == Submission.id)
         .join(ProblemVersion, ProblemVersion.version == Submission.problem_version)
         .where(Submission.user_id == user_id)
@@ -73,7 +86,10 @@ def learner_attempts(
     if data_class is not None:
         query = query.where(Submission.data_class == data_class)
     rows = session.execute(query.order_by(Submission.created_at, DiagnosisRow.id))
-    return {sub.id: attempt_record(sub, slug, diag) for sub, diag, slug in rows}
+    return {
+        sub.id: attempt_record(sub, slug, diag, SkillMap.from_stored(smap))
+        for sub, diag, slug, smap in rows
+    }
 
 
 def skill_maps_for(session: Session, attempts: Iterable[AttemptRecord]) -> dict[str, SkillMap]:

@@ -14,16 +14,16 @@ interface = "std::vector<long long> range_sums(const std::vector<int>& a, const 
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+range_inclusion = "Counting or summing over exactly the right set of positions: interval lengths, inclusive or exclusive ends, and whether an element may pair with itself or belongs to a side."
+running_state = "Keeping a tracked value current on every step and after the loop: a runner-up, the current run, a carry, a running prefix sum."
 
 [probes]
-right_end_counts = ["index_range"]
-long_range = ["update_rule"]
+right_end_counts = ["range_inclusion"]
+long_range = ["running_state"]
 left_not_zero = ["output_contract"]
-single_element_range = ["index_range", "update_rule"]
-large_input = ["update_rule"]
+single_element_range = ["range_inclusion", "running_state"]
+large_input = ["running_state"]
 
 [curriculum]
 assumes = ["building an array of running totals"]
@@ -124,14 +124,14 @@ distinguishes = ["excludes_right_end", "ignores_left_end", "prefix_not_accumulat
 [[error_models]]
 key = "excludes_right_end"
 file = "error_models/excludes_right_end.cpp"
-skill = "index_range"
+skill = "range_inclusion"
 description = "Uses prefix[r] - prefix[l], so a[r] is left out of every range."
 student_hint = "Is a[r] part of the range from l to r? Check which prefix entries you subtract."
 
 [[error_models]]
 key = "prefix_not_accumulated"
 file = "error_models/prefix_not_accumulated.cpp"
-skill = "update_rule"
+skill = "running_state"
 description = "Stores each element instead of the running total, so the prefix array is just a shifted copy of a."
 student_hint = "What should prefix[i + 1] contain: a[i] alone, or everything up to a[i]?"
 

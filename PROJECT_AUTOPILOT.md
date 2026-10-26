@@ -143,9 +143,11 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
    independent labels; trade-off; tests B would need).
 3. **L20 (owner principle, 2026-10-25):** where two causes are observationally
    indistinguishable on the valid input domain, the system must not claim to distinguish them.
-   min-capacity: **resolved** by ADR-032 (owner approved option (b) at 08:01). Still open: no
-   systematic search for exact equivalences in the other problems; rotated-min mapping left as
-   is (documented).
+   min-capacity: **resolved** by ADR-032 (owner approved option (b) at 08:01). Six provisional
+   problems: S1 **applied** 2026-10-26 to the 11 clear-cut models (ADR-036); contestable #3
+   and #13 unchanged with a written analysis. Four original problems searched 2026-10-26
+   (investigation only): 4 clear-cut twins (O1–O4) **not changed, pending owner decision**.
+   rotated-min mapping left as is (documented).
 4. PC1 Phase E: deferred (permission basis P, then D1–D12). Gate closed.
 5. Hosting/deployment (M8).
 
@@ -162,6 +164,21 @@ force-push; never push to `ce2sv5`, `zyjfh1` or any other branch).
 
 `git fetch origin && git checkout claude/project-thread-dyivyy`, reread this file, run
 `cd backend && uv sync && uv run pytest tests/unit -q`, then continue with "Next three tasks".
+
+### Iteration 14 (2026-10-26, owner-approved A–D)
+
+- A: L20 S1 on 11 models (ADR-036); contestable-case analysis
+  (docs/reviews/2026-10-26/l20-contestable-cases.md).
+- B: D1 P-D1a (ADR-035): `banned_names` in 14 problems, validated against the statement;
+  banned-name attempts give no skill observations; records and counts kept; trace shows it.
+- C: L22 taxonomy (ADR-034): `index_range`/`update_rule` retired, five new keys, a taxonomy
+  module, `positive_only_skills` validation, deprecated keys in the learner-model view.
+- D: alternative-cause search of the four original problems (investigation only,
+  docs/reviews/2026-10-26/l20-search-original.md); found and rechecked an input-mode gap in
+  the 2026-10-25 search script (equivalences unchanged).
+- All 25 problems have new content versions (docs/evaluation/l20-d1-l22-2026-10-26/).
+- Open for owner review: O1–O4; #3/#13; banned-name counting option; plus-one
+  `adds_at_front` → `loop_bounds`; pivot-index probe mapping.
 
 ### Iteration 13 (2026-10-25)
 

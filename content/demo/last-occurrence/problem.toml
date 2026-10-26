@@ -9,6 +9,9 @@ harness = "harness.cpp"
 reference = "reference.cpp"
 solution_file = "solution.cpp" # name the student's code is compiled under
 interface = "int last_occurrence(const std::vector<int>& a, int target);"
+# Library calls the statement forbids (D1, ADR-035): an attempt naming one gives no skill
+# observations. Must match the statement's "Do not call" sentence.
+banned_names = ["std::equal_range", "std::find", "std::lower_bound", "std::partition_point", "std::upper_bound"]
 # CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
 # problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
 recommendable = false
@@ -214,6 +217,7 @@ file = "error_models/returns_first_occurrence.cpp"
 skill = "equality_handling"
 description = "Searches for the first element >= target and checks it, so it returns the first occurrence, not the last."
 student_hint = "Check which side of the boundary elements equal to the target end up on: you need the last one."
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1): a correct search for the first occurrence (a misread task) gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate an equality error from a specification error. Diagnoses are reported as qualified and add no equality_handling evidence (docs/reviews/2026-10-25/l20-search.md, case 7)."
 
 [[error_models]]
 key = "stops_at_any_match"
@@ -221,6 +225,7 @@ file = "error_models/stops_at_any_match.cpp"
 skill = "equality_handling"
 description = "Returns as soon as a[mid] == target: some occurrence, not necessarily the last."
 student_hint = "Finding the target is not the end: could there be a later occurrence?"
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1): a textbook exact search written to return any occurrence (a misread task) gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate an equality error from a specification error. Diagnoses are reported as qualified and add no equality_handling evidence (docs/reviews/2026-10-25/l20-search.md, case 8)."
 
 [[error_models]]
 key = "hi_init_last_index"
@@ -228,6 +233,7 @@ file = "error_models/hi_init_last_index.cpp"
 skill = "search_space_boundaries"
 description = "Initialises hi = n - 1 with a half-open loop, so an occurrence at the last index is missed."
 student_hint = "Can your search ever reach the last element? Check the initial bounds of the search space."
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1): a correct upper bound clamped to n - 1 before the equality check gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate a search-range error from a specification error. Diagnoses are reported as qualified and add no search_space_boundaries evidence (docs/reviews/2026-10-25/l20-search.md, case 9)."
 
 [[error_models]]
 key = "no_progress_update"
@@ -250,3 +256,8 @@ file = "error_models/returns_one_past.cpp"
 skill = "problem_specification"
 description = "Returns the index one past the last occurrence (the upper bound) when the target occurs."
 student_hint = "Re-read which index to return: the last occurrence itself, not the position after it."
+
+# Declared skills that no error model can give negative evidence for (ADR-034).
+[positive_only_skills]
+equality_handling = "Every model mapped to it carries a known_limitation after L20 safeguard S1 (owner approval 2026-10-26), so this skill can only receive correct observations through rule C (L19). The mapping itself was not changed."
+search_space_boundaries = "Every model mapped to it carries a known_limitation after L20 safeguard S1 (owner approval 2026-10-26), so this skill can only receive correct observations through rule C (L19). The mapping itself was not changed."

@@ -14,15 +14,15 @@ interface = "int max_profit(const std::vector<int>& prices);"
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+loop_bounds = "Visiting exactly the positions the task needs: a loop starts and ends at the right index and runs from the right end."
 
 [probes]
 min_after_max = ["output_contract"]
-best_sale_last = ["index_range"]
+best_sale_last = ["loop_bounds"]
 falling = ["output_contract"]
 single_day = ["output_contract"]
-large_input = ["index_range"]
+large_input = ["loop_bounds"]
 
 [curriculum]
 assumes = ["tracking a running minimum while scanning"]
@@ -165,6 +165,6 @@ student_hint = "What should you return when no trade makes money? Check the star
 [[error_models]]
 key = "misses_last_day"
 file = "error_models/misses_last_day.cpp"
-skill = "index_range"
+skill = "loop_bounds"
 description = "The loop stops one day early, so selling on the last day is never considered."
 student_hint = "Does your loop consider selling on the very last day?"

@@ -547,6 +547,8 @@ separated by 3 tests, so its attribution is not provably non-unique. Other probl
 searched for exact equivalences.
 
 ## ADR-033 — Skill keys for the non-binary-search families (2026-10-25)
+*Key list superseded by ADR-034 (2026-10-26): `index_range` and `update_rule` are retired.
+This record is kept as it was decided.*
 **Context:** On 2026-10-25 at 10:09 the owner asked to grow the bank to 25 problems with array,
 two-pointer, sliding-window and prefix-sum problems. The four existing skills are defined in
 binary-search terms, and skills are linked across problems by key. The CE1 rule was to keep the
@@ -577,3 +579,182 @@ changed. New problems are `recommendable = false`.
   original four, and it is unvalidated.
 - A pass in a family with no recommendable problem gives action `none`, with a note that is
   inaccurate there (L21).
+
+## ADR-034 — Skill-taxonomy migration for the new families (L22, 2026-10-26)
+**Context:** The audit and proposal L22 (docs/proposals/l22-skill-taxonomy.md) found two
+problems with ADR-033's keys:
+- `index_range` and `update_rule` pooled unrelated mechanisms;
+- pivot-index declared `index_range` with no model, so that skill could only gain `correct`
+  evidence.
+**Owner decision (2026-10-26):** split `update_rule` into `window_maintenance`,
+`pointer_movement` and `running_state`, and `index_range` into `loop_bounds` and
+`range_inclusion`. The decision also says:
+- give pivot-index a model for its mapped skill, or document a reason;
+- create new content versions, without rewriting historical observations or converting old
+  keys;
+- mark retired keys as deprecated in researcher displays;
+- validate unknown keys, retired keys and declared skills that no model can give evidence
+  for;
+- do not change BKT parameters, recommendation policy or recommendation outcomes;
+- do not add the optional splits.
+**Decision:**
+- **One taxonomy.** `backend/src/codeadapt/content/taxonomy.py` holds every key a problem
+  may declare (`ACTIVE`, with its definition). It also holds the retired keys (`RETIRED`),
+  each with its historical definition, retirement date, this ADR and its replacements.
+  Content validation rejects:
+  - a retired key, naming its replacements;
+  - an unknown key;
+  - a definition that differs from the taxonomy's.
+- **Model mapping.** The 13 new-family problems were remapped model by model, as proposed in
+  L22 §2.1–2.2. Each probe was remapped to match its tests' models.
+  - **pivot-index:** `pivot_counted_left` and `pivot_counted_right` move to
+    `range_inclusion`. pivot-index now declares `tie_resolution`, `output_contract` and
+    `range_inclusion`, and every declared skill has a model that can give negative evidence.
+    Its former `update_rule` and `index_range` probes (`pivot_excluded`, `pivot_at_edge`,
+    `negatives`, `large_input`) all map to `range_inclusion`. The tests that carry them are
+    measured to separate the two `range_inclusion` models. Declaring `running_state` instead
+    would add a skill with no model. *This is a judgement for review.*
+  - **plus-one `adds_at_front`:** L22 suggested `output_contract`, renamed `io_contract`.
+    That rename is one of the optional changes, which the owner did not ask for, so the
+    model maps to `loop_bounds` instead. Its definition includes "runs from the right end".
+    *This is a judgement for review.*
+- **Optional splits not made:** `tie_resolution` is not split, and `output_contract` is not
+  renamed.
+- **Positive-only skills are explicit.** A declared skill with no model that can give
+  negative evidence must carry a written reason under `positive_only_skills` in its
+  problem.toml. That means no model maps to it, or every model that does carries a
+  `known_limitation`. Validation rejects a missing reason, a stale reason (the skill does
+  have a model) and a reason for an undeclared skill. 11 skills in 10 problems carry a reason
+  (see ADR-036 and the evaluation record).
+- **Historical observations are not converted.** An attempt keeps the skill-map snapshot of
+  its own content version (ADR-023 D4). Observations made under `index_range` or
+  `update_rule` stay under those keys. The researcher learner-model view shows them with a
+  "deprecated" badge, the historical definition and the replacements (`retired_skills` in
+  the API). Only dev and test databases hold attempts.
+**Unchanged:**
+- the four binary-search keys and their definitions;
+- `accumulator_init`, `tie_resolution` and `output_contract`;
+- the ledger, rule C, BKT parameters (`bkt-params-assumed-1`) and policy 1.4.
+
+**Check against the previous HEAD (57b46d1).** 442 one-attempt synthetic histories covering
+every problem: no-failure, unmodelled, every model named, and every model pair ambiguous.
+
+- Rule, action, chosen problem and review flag are identical in all 442 cases.
+- In 88 cases only the target and criterion skill names differ, because they are the new
+  keys (docs/evaluation/l20-d1-l22-2026-10-26/).
+**Consequences:**
+- BKT pools by the new keys, with the same assumed parameters. More keys means fewer
+  observations each.
+- The student-facing focus text is built from skill definitions, so new recommendations name
+  the new definitions for those problems. A recommendation stored before this change that
+  targets a retired key still shows that key's historical definition
+  (`api/recommendation.py`), rather than losing its focus text.
+- Whether learners' errors cluster this way is as untested as before (L22).
+
+## ADR-035 — No skill evidence from an attempt that names a banned library call (D1, 2026-10-26)
+**Context:** 14 statements forbid named library calls, but a banned call passes every test, and
+rule C then gives `correct` observations (L23; docs/proposals/d1-technique-evidence.md).
+**Owner decision (2026-10-26):** implement P-D1a with these boundaries:
+- detection from versioned problem metadata;
+- no skill observations when a banned name is detected;
+- submission, execution and diagnosis records preserved, and the attempt still counted in
+  attempt and execution statistics;
+- global rule C, the diagnosis rules and the recommendation policy unchanged;
+- no claim that detection proves the algorithm or complexity;
+- no new student-facing sentence;
+- historical observations not rewritten.
+**Decision:**
+- **Versioned list.** `banned_names` in each problem.toml lists the statement's
+  "Do not call" names exactly as written (for example `std::lower_bound`, `sqrt`). The
+  loader rejects a list that differs from the statement's sentence, and the spec rejects
+  invalid or duplicate names. The list is part of the content version and of the skill-map
+  snapshot (`SkillMap.banned_names`).
+- **Detection.** `adaptation/technique.py` uses a token match after removing comments and
+  string, character and raw-string literals. It counts:
+  - a qualified use (`std::name`, `std::ranges::name`, `using std::name`);
+  - an unqualified call, as after `using namespace std` or for a C function such as `sqrt`.
+
+  It ignores member calls, other namespaces and a function the program defines itself.
+- **Where it applies.** When attempts are rebuilt from stored records (`attempt_record`),
+  the stored source is checked against the banned names of the submission's own version
+  snapshot. An attempt with a found name gives no skill observations. The check sits in
+  `skill_observations`, before rule C; `build_ledger`, which the policy reads, is unchanged.
+- **Researcher trace.** It shows `technique_check`: the banned names, the names found,
+  whether skill evidence was withheld or eligible, and the limits of the check.
+
+**What still happens to such an attempt.** It still runs, is still diagnosed, still produces
+feedback and a recommendation, and still appears in metrics and attempt counts. For LM1 it
+consumes the counted opportunity on its problem version, like an abstaining attempt with
+reliable execution. That is option 1 of the proposal and needs no change to the counting
+code. *This is a decision for review:* option 2 (not consuming the opportunity) would need a
+BKT counting change.
+**Before and after:**
+- **Before:** an attempt that called a banned function and passed gave rule C `correct`
+  observations for every probed skill. One that failed could give an `incorrect` observation
+  from a named diagnosis.
+- **After:** both give none. Attempts without a detected name are unaffected.
+**Historical records:**
+- Versions registered before this change have snapshots without `banned_names`, which parse
+  as an empty list. Attempts on those versions therefore keep the observations they had.
+- The new rule applies only to attempts on the new content versions. Nothing stored is
+  rewritten.
+- Only dev and test databases hold attempts.
+- Replay: none of the 845 stored evaluation programs (held-out, calibration, mutation) names
+  a banned call of its problem, so no evaluation result changes
+  (docs/evaluation/l20-d1-l22-2026-10-26/banned_name_replay.txt).
+
+**Limits.** Detection is static. It does not show which algorithm a program uses, that the
+call is reached, or its complexity, and a program with no name found is not verified to use
+the intended technique. A macro or a hand-written linear scan is not detected, so a `correct`
+observation still means "no failure on the probing tests" (L23 stays).
+
+## ADR-036 — L20 safeguard S1: no skill evidence from 11 clear-cut cross-skill twins (2026-10-26)
+**Context:** docs/reviews/2026-10-25/l20-search.md found that 11 models in six binary-search
+problems are output-identical to a program with an error of a different skill. The match
+holds on every committed test and on exhaustive and seeded random domains, and the search
+gives an argument that makes each equivalence exact (cases #1, #2, #4–#12).
+**Owner decision (2026-10-26):** apply S1 by the ADR-032 process. Leave the two contestable
+cases (#3, #13) unchanged, with a written analysis. Preserve everything else.
+**Decision:** each of the 11 models carries a `known_limitation` naming the twin and the
+case. The models are:
+- **upper-bound:** `lower_bound_confusion`, `hi_init_last_index`, `none_sentinel`;
+- **exact-search:** `swapped_direction`, `lo_init_one`;
+- **last-occurrence:** `returns_first_occurrence`, `stops_at_any_match`,
+  `hi_init_last_index`;
+- **rotated-search:** `left_range_excludes_lo`;
+- **peak-index:** `swapped_direction`;
+- **integer-sqrt:** `strict_square_test`.
+
+The result is the same as ADR-032's:
+- the diagnosis and trace are unchanged;
+- feedback is qualified;
+- no `incorrect` observation and no BKT update;
+- the recommendation is unchanged, with `qualified_hypothesis` in its rationale.
+
+The mapping stays. Each of the six problems has a new content version.
+
+**Positive-only skills.** Several skills are left with no evidence-capable model, and their
+`positive_only_skills` reason says so:
+- `equality_handling` in upper-bound, last-occurrence, rotated-search and integer-sqrt;
+- `search_space_boundaries` in exact-search and last-occurrence.
+
+These skills can now only gain `correct` observations through rule C (L19).
+
+**Contestable cases:** unchanged. The analysis is in
+docs/reviews/2026-10-26/l20-contestable-cases.md, which recommends keeping both as they are.
+
+**Recheck.** The 2026-10-25 search script did not expand the rotated-search and peak-index
+input modes for committed tests. A rerun that expands them leaves every equivalence unchanged
+(docs/reviews/2026-10-26/l20-search-original.md §4).
+
+**Tests:**
+- `tests/unit/test_l20_safeguards.py` has one test per model for: the limitation, no negative
+  evidence, rule C unchanged, no BKT update, qualified feedback, and the recommendation. It
+  also covers the contestable cases (still evidence) and an old snapshot (keeps its
+  evidence).
+- `tests/sandbox/test_demo_content.py` lists the 11 models in `NON_UNIQUE_ATTRIBUTION`.
+
+**Not covered:** the four original problems. docs/reviews/2026-10-26/l20-search-original.md
+found four clear-cut twins there (O1–O4). Under the owner's instruction that investigation
+changes nothing. Those models still give `incorrect` evidence until a decision is taken.
+

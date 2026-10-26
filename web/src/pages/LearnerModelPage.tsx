@@ -5,11 +5,31 @@ import { api, type LearnerModelView } from "../api/client";
 import { ErrorMessage } from "../components/ErrorMessage";
 
 type SkillEstimate = LearnerModelView["estimate"]["skills"][number];
+type RetiredSkill = LearnerModelView["retired_skills"][string];
 
-function SkillCard({ skill, label }: { skill: SkillEstimate; label: string }) {
+function SkillCard({
+  skill,
+  label,
+  retired,
+}: {
+  skill: SkillEstimate;
+  label: string;
+  retired?: RetiredSkill;
+}) {
   return (
     <section aria-label={skill.skill}>
-      <h2>{skill.skill}</h2>
+      <h2>
+        {skill.skill}
+        {retired && <span className="badge">deprecated</span>}
+      </h2>
+      {retired && (
+        <p className="muted">
+          Retired on {retired.retired} ({retired.decision}); replaced by{" "}
+          {retired.replaced_by.join(", ")}. These observations keep the key's historical meaning:{" "}
+          <em>{retired.definition}</em> They were recorded on older content versions and are not
+          converted to the new keys.
+        </p>
+      )}
       <p>
         {skill.state === "estimated" && skill.p_known !== null && skill.p_known !== undefined ? (
           <>
@@ -90,7 +110,12 @@ export function LearnerModelPage() {
       </details>
       {estimate.skills.length === 0 && <p className="muted">No skill observations yet.</p>}
       {estimate.skills.map((s) => (
-        <SkillCard key={s.skill} skill={s} label={estimate.label} />
+        <SkillCard
+          key={s.skill}
+          skill={s}
+          label={estimate.label}
+          retired={model.data.retired_skills[s.skill]}
+        />
       ))}
     </section>
   );

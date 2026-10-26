@@ -1,5 +1,11 @@
 # Content design record: `min-capacity` (G3, CE1.3, built during CE2)
 
+> **Update 2026-10-26.** New content version `e7f55817f3b0…` (was `63287d727b7b…`). The record below describes the problem as designed and is unchanged.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::equal_range`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.
+>
+> **Positive-only skills (ADR-034).** `equality_handling` has no model that can give negative evidence; the reason is recorded under `positive_only_skills`.
+
 **Status and order.**
 
 - This is the G3 transfer problem approved in the CE1 proposal (E3). CE1.3 was paused on

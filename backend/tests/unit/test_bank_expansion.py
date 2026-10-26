@@ -18,6 +18,7 @@ from codeadapt.adaptation.models import Action, Rule
 from codeadapt.api.recommendation import recommendation_view
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.content.models import ProblemSpec
+from codeadapt.content.taxonomy import ACTIVE
 from codeadapt.db.models import RecommendationRow
 from codeadapt.diagnosis import Outcome
 from codeadapt.learner.bkt import estimate
@@ -30,18 +31,20 @@ BINARY_SEARCH_SKILLS = {
     "equality_handling",
     "problem_specification",
 }
-# ADR-033: one definition per key, identical in every problem that declares it.
+# ADR-033, revised by ADR-034 (2026-10-26): `index_range` and `update_rule` were split. One
+# definition per key, identical in every problem that declares it (the taxonomy enforces it).
 NEW_SKILLS = {
-    "index_range": "Visiting exactly the valid positions: the loop's start and end cover every "
-    "element once.",
-    "accumulator_init": "Initialising (and re-initialising) a running best, minimum, maximum, "
-    "count or sum to the value the first real element requires.",
-    "tie_resolution": "Handling equal values as the specification says: which of several equal "
-    "candidates wins, and whether duplicates count separately.",
-    "update_rule": "Updating every piece of tracked state on each step (running candidates, "
-    "pointers, window edges) so no candidate is lost.",
-    "output_contract": "Returning exactly what the specification asks for: an index or a value, "
-    "a sentinel when there is no answer.",
+    k: ACTIVE[k]
+    for k in (
+        "accumulator_init",
+        "tie_resolution",
+        "output_contract",
+        "loop_bounds",
+        "range_inclusion",
+        "window_maintenance",
+        "pointer_movement",
+        "running_state",
+    )
 }
 NEW = sorted(s for s, p in PROBLEMS.items() if p.family != "binary-search")
 BINARY = sorted(s for s, p in PROBLEMS.items() if p.family == "binary-search")

@@ -1,5 +1,11 @@
 # Content design record: `peak-index` (BSX, binary-search extension)
 
+> **Update 2026-10-26.** New content version `5963188f0a4a…` (was `5e3ced93c8c1…`). The record below describes the problem as designed and is unchanged.
+>
+> **L20 safeguard S1 (ADR-036).** `swapped_direction` now carries a `known_limitation` (a cross-skill twin, docs/reviews/2026-10-25/l20-search.md); diagnoses are qualified and add no negative evidence.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::lower_bound`, `std::max_element`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.
+
 **Label.** Files and commits call this "CE2". That was a working label; this is a binary-search family extension, not the planned CE2 stage (arrays).
 
 **Status and order.**

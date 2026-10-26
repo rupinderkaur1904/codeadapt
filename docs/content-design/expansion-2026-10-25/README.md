@@ -21,6 +21,17 @@ Every new problem is `recommendable = false`.
 
 ## Skills for the new families (owner decision 2026-10-25 10:21)
 
+> **Migration note (2026-10-26, ADR-034).** `index_range` and `update_rule` are retired. They
+> are replaced by:
+> - `loop_bounds` and `range_inclusion`;
+> - `window_maintenance`, `pointer_movement` and `running_state`.
+>
+> The current definitions are in `backend/src/codeadapt/content/taxonomy.py`, and the
+> model-by-model mapping is in ADR-034 and docs/proposals/l22-skill-taxonomy.md §2.1–2.2.
+> Each problem has a new content version. This section and the per-problem design records
+> describe the keys as they were when the problems were added. Observations recorded under
+> the old keys keep them.
+
 The four existing skills are defined in binary-search terms. Reusing them would pool new
 evidence with binary-search evidence and change what those estimates mean. The new families
 therefore use their **own** skill keys. The four existing skills, their mappings and their

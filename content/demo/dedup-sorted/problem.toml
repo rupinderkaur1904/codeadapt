@@ -9,22 +9,25 @@ harness = "harness.cpp"
 reference = "reference.cpp"
 solution_file = "solution.cpp" # name the student's code is compiled under
 interface = "int remove_duplicates(std::vector<int>& a);"
+# Library calls the statement forbids (D1, ADR-035): an attempt naming one gives no skill
+# observations. Must match the statement's "Do not call" sentence.
+banned_names = ["std::unique"]
 # Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
 # every new problem). They stay in the problem list and their attempts produce skill evidence.
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+loop_bounds = "Visiting exactly the positions the task needs: a loop starts and ends at the right index and runs from the right end."
+pointer_movement = "Moving the right pointer at each step of a two-pointer scan, and doing the comparison or write that each move depends on."
 
 [probes]
-new_value_last = ["index_range"]
-repeat_after_change = ["update_rule"]
-values_must_move = ["update_rule"]
+new_value_last = ["loop_bounds"]
+repeat_after_change = ["pointer_movement"]
+values_must_move = ["pointer_movement"]
 count_returned = ["output_contract"]
-single = ["output_contract", "index_range"]
-large_input = ["update_rule"]
+single = ["output_contract", "loop_bounds"]
+large_input = ["pointer_movement"]
 
 [curriculum]
 assumes = ["a sorted array", "a read index and a write index"]
@@ -150,20 +153,24 @@ known_limitation = "Attribution not unique (L20): keeping a value when it differ
 [[error_models]]
 key = "skips_last"
 file = "error_models/skips_last.cpp"
-skill = "index_range"
+skill = "loop_bounds"
 description = "The read loop stops one element early, so a new value in the last position is lost."
 student_hint = "Does your read pointer reach the last element? Try an array whose last value appears only once."
 
 [[error_models]]
 key = "compares_to_first"
 file = "error_models/compares_to_first.cpp"
-skill = "update_rule"
+skill = "pointer_movement"
 description = "Compares each element with a[0] instead of the last kept value, so duplicates of later values are kept."
 student_hint = "Which value should each element be compared with to know whether it is new?"
 
 [[error_models]]
 key = "counts_without_writing"
 file = "error_models/counts_without_writing.cpp"
-skill = "update_rule"
+skill = "pointer_movement"
 description = "Counts the distinct values correctly but never moves them, so the first k elements are not the distinct values."
 student_hint = "After your function returns k, do the first k elements of the array hold the distinct values?"
+
+# Declared skills that no error model can give negative evidence for (ADR-034).
+[positive_only_skills]
+output_contract = "Its only model, returns_last_index, carries a known_limitation (L20, ADR-032 route), so this skill can only receive correct observations through rule C (L19). Recorded when this check was introduced (ADR-034)."

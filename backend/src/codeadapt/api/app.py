@@ -21,6 +21,8 @@ from sqlalchemy.orm import Session, sessionmaker
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from codeadapt import auth, logs
+from codeadapt.adaptation.skillmap import SkillMap
+from codeadapt.adaptation.technique import TECHNIQUE_NOTE, banned_names_found
 from codeadapt.api import feedback, recommendation
 from codeadapt.api.schemas import (
     AuthUser,
@@ -31,17 +33,20 @@ from codeadapt.api.schemas import (
     ProblemSummary,
     ResearchMetrics,
     ResearchSubmissionRow,
+    RetiredSkillView,
     SampleTest,
     SubmissionAccepted,
     SubmissionCreate,
     SubmissionStatus,
     SubmissionView,
+    TechniqueCheckView,
     TraceView,
 )
 from codeadapt.config import Environment as Env
 from codeadapt.config import Settings
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.content.models import Visibility
+from codeadapt.content.taxonomy import RETIRED
 from codeadapt.db.models import (
     DataClass,
     DiagnosisRow,
@@ -577,6 +582,7 @@ def create_app(
             followup_evaluation=(
                 _row(ev) if (ev := _by_submission(session, FollowupEvaluationRow, sub.id)) else None
             ),
+            technique_check=_technique_check(session, sub),
         )
 
     @app.get("/api/v1/research/learner-model", response_model=LearnerModelView)
@@ -587,11 +593,22 @@ def create_app(
             raise ApiError(404, "not-found", "User not found")
         attempts = list(learner_attempts(session, learner.id, learner.data_class).values())
         problems = {p.spec.slug: p.spec for p in catalogue.problems}
+        est = estimate(attempts, problems, skill_maps_for(session, attempts))
         return LearnerModelView(
             username=learner.username,
             data_class=learner.data_class,
             attempts=len(attempts),
-            estimate=estimate(attempts, problems, skill_maps_for(session, attempts)),
+            estimate=est,
+            retired_skills={
+                s.skill: RetiredSkillView(
+                    definition=r.definition,
+                    retired=r.retired,
+                    decision=r.decision,
+                    replaced_by=list(r.replaced_by),
+                )
+                for s in est.skills
+                if (r := RETIRED.get(s.skill)) is not None
+            },
         )
 
     @app.get("/api/v1/health")
@@ -608,6 +625,20 @@ def _status(job: Job) -> SubmissionStatus:
         JobState.DONE.value: SubmissionStatus.COMPLETED,
         JobState.FAILED.value: SubmissionStatus.FAILED,
     }[job.state]
+
+
+def _technique_check(session: Session, sub: Submission) -> TechniqueCheckView | None:
+    version = session.get(ProblemVersion, sub.problem_version)
+    smap = SkillMap.from_stored(version.skill_map) if version else None
+    if smap is None or not smap.banned_names:
+        return None
+    found = banned_names_found(sub.source, smap.banned_names)
+    return TechniqueCheckView(
+        banned_names=list(smap.banned_names),
+        found=list(found),
+        skill_evidence="withheld" if found else "eligible",
+        note=TECHNIQUE_NOTE,
+    )
 
 
 def _latest(session: Session, submission_id: str) -> DiagnosisRow | None:

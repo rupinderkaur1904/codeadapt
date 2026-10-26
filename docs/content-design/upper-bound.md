@@ -1,5 +1,13 @@
 # Content design record: `upper-bound` (BSX, binary-search extension)
 
+> **Update 2026-10-26.** New content version `b429912d241e…` (was `38082888c308…`). The record below describes the problem as designed and is unchanged.
+>
+> **L20 safeguard S1 (ADR-036).** `lower_bound_confusion`, `hi_init_last_index`, `none_sentinel` now carry a `known_limitation` (a cross-skill twin, docs/reviews/2026-10-25/l20-search.md); diagnoses are qualified and add no negative evidence.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::equal_range`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.
+>
+> **Positive-only skills (ADR-034).** `equality_handling` has no model that can give negative evidence; the reason is recorded under `positive_only_skills`.
+
 **Label.** Files and commits call this "CE2". That was a working label; this is a binary-search family extension, not the planned CE2 stage (arrays).
 
 **Status and order.**

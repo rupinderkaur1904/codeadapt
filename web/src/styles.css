@@ -803,3 +803,15 @@ table.research-matrix th:not(:first-child) {
   font-size: 1.1rem;
   margin: 24px 0 8px;
 }
+/* A retired skill key on the researcher learner-model page (ADR-034). */
+.badge {
+  margin-left: 0.5em;
+  padding: 0 0.4em;
+  border: 1px solid var(--muted);
+  border-radius: 4px;
+  font-size: 0.6em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  vertical-align: middle;
+}

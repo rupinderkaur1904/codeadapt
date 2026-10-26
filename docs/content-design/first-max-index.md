@@ -1,5 +1,11 @@
 # Content design record: `first-max-index` (bank expansion batch A1, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `50798634a3ef…` (was `cb56cfeafe27…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `skips_last` → `loop_bounds`. Declared skills are now `accumulator_init`, `tie_resolution`, `output_contract`, `loop_bounds`.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::max_element`; an attempt that names one gives no skill observations.
+
 **Status.** Provisional, not research-validated. Built under the owner's instruction of
 2026-10-25 10:09 to expand the bank beyond binary search. The design process and the skill keys
 are described in [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md). The matrix was

@@ -9,6 +9,9 @@ harness = "harness.cpp"
 reference = "reference.cpp"
 solution_file = "solution.cpp" # name the student's code is compiled under
 interface = "int search_index(const std::vector<int>& a, int target);"
+# Library calls the statement forbids (D1, ADR-035): an attempt naming one gives no skill
+# observations. Must match the statement's "Do not call" sentence.
+banned_names = ["std::binary_search", "std::equal_range", "std::find", "std::lower_bound", "std::partition_point", "std::upper_bound"]
 # CE1 decision E2 (applied to every new problem): recommendation policy v1 never chooses this
 # problem as a follow-up. It stays in the problem list and its attempts produce skill evidence.
 recommendable = false
@@ -226,6 +229,7 @@ file = "error_models/swapped_direction.cpp"
 skill = "search_space_boundaries"
 description = "Moves the wrong way: a smaller element at mid discards the right half, so the target is found only if a midpoint lands on it directly."
 student_hint = "If a[mid] is smaller than the target, which half can still contain it? Check which bound you move."
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1): a correct search written for an array sorted in decreasing order (a misread task) gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate a search-range error from a specification error. Diagnoses are reported as qualified and add no search_space_boundaries evidence (docs/reviews/2026-10-25/l20-search.md, case 5)."
 
 [[error_models]]
 key = "lo_init_one"
@@ -233,6 +237,7 @@ file = "error_models/lo_init_one.cpp"
 skill = "search_space_boundaries"
 description = "Initialises lo = 1, so index 0 is never a candidate."
 student_hint = "Can your search ever return 0? Check the initial bounds of the search space."
+known_limitation = "Attribution not unique (owner approval 2026-10-26, L20 safeguard S1): a correct search whose result is used as a truth value, so index 0 is reported as not found gives identical output on every committed test and on every input of the exhaustive and random search domains, so no test can separate a search-range error from an output-contract error. Diagnoses are reported as qualified and add no search_space_boundaries evidence (docs/reviews/2026-10-25/l20-search.md, case 6)."
 
 [[error_models]]
 key = "returns_insertion_point"
@@ -247,3 +252,7 @@ file = "error_models/returns_value.cpp"
 skill = "problem_specification"
 description = "Returns the element a[mid] instead of its index when the target is found."
 student_hint = "Re-read what the function must return: the position of the target, not the target itself."
+
+# Declared skills that no error model can give negative evidence for (ADR-034).
+[positive_only_skills]
+search_space_boundaries = "Every model mapped to it carries a known_limitation after L20 safeguard S1 (owner approval 2026-10-26), so this skill can only receive correct observations through rule C (L19). The mapping itself was not changed."

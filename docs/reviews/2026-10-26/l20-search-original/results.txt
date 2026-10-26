@@ -1,0 +1,68 @@
+## lower-bound: 17 committed tests; exhaustive domain 1260 inputs; random domain 3000 inputs
+- closed_updates_stops_early  [cause-skill: loop_termination]
+    fails 0/17 tests; wrong on exhaustive 0/1260; random 0/3000; identical on all tests to: none
+    vs hi_skips_candidate [search_space_boundaries; would be named unqualified; CROSS-SKILL]: tests 5 differ; exhaustive 210/1260; random 952/3000 differ
+- first_gt_by_spec  [cause-skill: problem_specification]
+    fails 8/17 tests; wrong on exhaustive 504/1260; random 677/3000; identical on all tests to: ['upper_bound_confusion']
+    vs upper_bound_confusion [equality_handling; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+- first_match_or_sentinel_by_spec  [cause-skill: problem_specification]
+    fails 9/17 tests; wrong on exhaustive 756/1260; random 2323/3000; identical on all tests to: none
+    vs exact_match_sentinel [problem_specification; would be named unqualified; same skill]: tests 3 differ; exhaustive 142/1260; random 76/3000 differ
+- half_open_returns_lo_minus_one  [cause-skill: loop_termination (contestable: the bank maps "returns the wrong end of the]
+    fails 17/17 tests; wrong on exhaustive 1260/1260; random 3000/3000; identical on all tests to: ['returns_wrong_pointer']
+    vs returns_wrong_pointer [problem_specification; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+- last_below_by_spec  [cause-skill: problem_specification]
+    fails 17/17 tests; wrong on exhaustive 1260/1260; random 3000/3000; identical on all tests to: ['returns_wrong_pointer']
+    vs returns_wrong_pointer [problem_specification; would be named unqualified; same skill]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+- match_or_insertion_closed  [cause-skill: problem_specification]
+    fails 3/17 tests; wrong on exhaustive 142/1260; random 76/3000; identical on all tests to: none
+    vs stops_at_first_match [equality_handling; would be named unqualified; CROSS-SKILL]: tests 3 differ; exhaustive 194/1260; random 97/3000 differ
+- match_or_insertion_half_open  [cause-skill: problem_specification]
+    fails 4/17 tests; wrong on exhaustive 222/1260; random 92/3000; identical on all tests to: ['stops_at_first_match']
+    vs stops_at_first_match [equality_handling; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+
+## count-occurrences: 15 committed tests; exhaustive domain 1260 inputs; random domain 3000 inputs
+- closed_interval_length  [cause-skill: problem_specification]
+    fails 15/15 tests; wrong on exhaustive 1260/1260; random 3000/3000; identical on all tests to: ['inclusive_count']
+    vs inclusive_count [problem_specification; would be named unqualified; same skill]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+- open_lower_returns_lo  [cause-skill: problem_specification (the wrong end of the final interval; the bank maps that]
+    fails 15/15 tests; wrong on exhaustive 1260/1260; random 3000/3000; identical on all tests to: ['inclusive_count']
+    vs inclusive_count [problem_specification; would be named unqualified; same skill]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+
+## last-less-than: 15 committed tests; exhaustive domain 1260 inputs; random domain 3000 inputs
+- answer_records_next  [cause-skill: loop_termination / update rule (contestable, as integer-sqrt]
+    fails 15/15 tests; wrong on exhaustive 1260/1260; random 3000/3000; identical on all tests to: ['returns_insertion_point']
+    vs returns_insertion_point [problem_specification; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+- answer_starts_zero  [cause-skill: search_space_boundaries]
+    fails 6/15 tests; wrong on exhaustive 540/1260; random 482/3000; identical on all tests to: ['clamps_to_zero']
+    vs clamps_to_zero [problem_specification; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+- first_ge_by_spec  [cause-skill: problem_specification]
+    fails 15/15 tests; wrong on exhaustive 1260/1260; random 3000/3000; identical on all tests to: ['returns_insertion_point']
+    vs returns_insertion_point [problem_specification; would be named unqualified; same skill]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+- last_le_by_spec  [cause-skill: problem_specification]
+    fails 7/15 tests; wrong on exhaustive 504/1260; random 677/3000; identical on all tests to: ['uses_le']
+    vs uses_le [equality_handling; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/1260; random 0/3000 differ
+
+## first-true: 19 committed tests; exhaustive domain 91 inputs; random domain 3000 inputs
+- answer_var_starts_minus_one  [cause-skill: search_space_boundaries]
+    fails 5/19 tests; wrong on exhaustive 13/91; random 82/3000; identical on all tests to: ['none_sentinel']
+    vs none_sentinel [problem_specification; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/91; random 0/3000 differ
+- any_one_closed_by_spec  [cause-skill: problem_specification]
+    fails 5/19 tests; wrong on exhaustive 41/91; random 2562/3000; identical on all tests to: none
+    vs returns_any_true [problem_specification; would be named unqualified; same skill]: tests 6 differ; exhaustive 37/91; random 1846/3000 differ
+- closed_returns_hi  [cause-skill: loop_termination (contestable: l20-search.md case 3)]
+    fails 19/19 tests; wrong on exhaustive 91/91; random 3000/3000; identical on all tests to: ['returns_last_false']
+    vs returns_last_false [problem_specification; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/91; random 0/3000 differ
+- half_open_hi_minus_one_closed_exit  [cause-skill: loop_termination]
+    fails 7/19 tests; wrong on exhaustive 29/91; random 1192/3000; identical on all tests to: ['hi_skips_candidate']
+    vs hi_skips_candidate [search_space_boundaries; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/91; random 0/3000 differ
+- last_zero_by_spec  [cause-skill: problem_specification]
+    fails 19/19 tests; wrong on exhaustive 91/91; random 3000/3000; identical on all tests to: ['returns_last_false']
+    vs returns_last_false [problem_specification; would be named unqualified; same skill]: tests 0 differ; exhaustive 0/91; random 0/3000 differ
+- open_template_lo_zero  [cause-skill: search_space_boundaries]
+    fails 4/19 tests; wrong on exhaustive 12/91; random 71/3000; identical on all tests to: none
+    vs stops_one_early [loop_termination; would be named unqualified; CROSS-SKILL]: tests 18 differ; exhaustive 90/91; random 2980/3000 differ
+- zero_read_as_absent  [cause-skill: problem_specification (unsupported: no plausible cause)]
+    fails 5/19 tests; wrong on exhaustive 13/91; random 91/3000; identical on all tests to: ['lo_init_one']
+    vs lo_init_one [search_space_boundaries; would be named unqualified; CROSS-SKILL]: tests 0 differ; exhaustive 0/91; random 0/3000 differ
+

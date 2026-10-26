@@ -40,6 +40,9 @@ class AttemptRecord(_Frozen):
     qualified: bool = False
     # Empty when nothing ran (compile or execution error).
     tests: dict[str, TestStatus] = Field(default_factory=dict)
+    # Names the statement forbids that appear in the source (D1, ADR-035). Such an attempt
+    # gives no skill observations; the policy does not read this field.
+    banned_names_found: tuple[str, ...] = ()
 
 
 class ProbeEvidence(_Frozen):

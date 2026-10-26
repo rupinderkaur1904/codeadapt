@@ -1,5 +1,13 @@
 # Content design record: `integer-sqrt` (CE1.2, gap G2)
 
+> **Update 2026-10-26.** New content version `01edbe01d8a8…` (was `e6f66ab25569…`). The record below describes the problem as designed and is unchanged.
+>
+> **L20 safeguard S1 (ADR-036).** `strict_square_test` now carries a `known_limitation` (a cross-skill twin, docs/reviews/2026-10-25/l20-search.md); diagnoses are qualified and add no negative evidence.
+>
+> **Banned names (ADR-035).** `banned_names` lists `cbrt`, `hypot`, `pow`, `sqrt`, `sqrtf`, `sqrtl`; an attempt that names one gives no skill observations.
+>
+> **Positive-only skills (ADR-034).** `equality_handling` has no model that can give negative evidence; the reason is recorded under `positive_only_skills`.
+
 **Status.** This record was committed before the problem's content was written or measured
 and before any held-out case was run. The matrix in §4.1 is a **design-time prediction**:
 a Python re-implementation of each planned model, used to choose tests. It is not the

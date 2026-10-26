@@ -1,5 +1,9 @@
 # Content design record: `pivot-index` (bank expansion batch A4, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `28eef0379d7c…` (was `28c6008e1984…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `pivot_counted_left` → `range_inclusion`; `pivot_counted_right` → `range_inclusion`. Declared skills are now `tie_resolution`, `output_contract`, `range_inclusion`. The former `index_range` skill, which no model could give negative evidence for, is gone: its probes now name `range_inclusion`, so every declared skill has a model (the L22 pivot-index requirement).
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/pivot-index.md), which is authoritative.

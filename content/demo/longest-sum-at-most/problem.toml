@@ -14,17 +14,17 @@ interface = "int longest_at_most(const std::vector<int>& a, int s);"
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+range_inclusion = "Counting or summing over exactly the right set of positions: interval lengths, inclusive or exclusive ends, and whether an element may pair with itself or belongs to a side."
+window_maintenance = "Keeping a sliding window's state current: removing the element that leaves, and shrinking the window rather than restarting it."
 
 [probes]
-multi_shrink = ["update_rule"]
-partial_overlap = ["update_rule"]
+multi_shrink = ["window_maintenance"]
+partial_overlap = ["window_maintenance"]
 exact_budget = ["output_contract"]
-length_counted = ["index_range"]
-nothing_fits = ["output_contract", "update_rule"]
-large_input = ["update_rule"]
+length_counted = ["range_inclusion"]
+nothing_fits = ["output_contract", "window_maintenance"]
+large_input = ["window_maintenance"]
 
 [curriculum]
 assumes = ["a window with a left and a right edge"]
@@ -161,7 +161,7 @@ distinguishes = ["length_without_plus_one", "strict_limit"]
 [[error_models]]
 key = "length_without_plus_one"
 file = "error_models/length_without_plus_one.cpp"
-skill = "index_range"
+skill = "range_inclusion"
 description = "Measures the window as right - left, one less than its number of elements."
 student_hint = "How many elements are there between positions left and right, both included?"
 
@@ -175,6 +175,6 @@ student_hint = "Is a stretch whose sum is exactly the budget allowed?"
 [[error_models]]
 key = "restarts_window"
 file = "error_models/restarts_window.cpp"
-skill = "update_rule"
+skill = "window_maintenance"
 description = "When the sum goes over s, starts a new window at the current element instead of shrinking from the left."
 student_hint = "When the sum goes over the budget, do you need to drop the whole window, or only some elements from its left end?"

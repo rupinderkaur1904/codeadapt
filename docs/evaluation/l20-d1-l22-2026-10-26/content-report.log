@@ -1,0 +1,1055 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+== closest-pair-sum  version dfc45a07cd00  (g++ (GCC) 14.2.0, runc)
+                   reference  allows_same_element  moves_wrong_pointer  skips_first  signed_gap
+sample_typical     output:1   =                    =                    =            output:-1 
+sample_exact       output:0   =                    output:2             =            =         
+self_pair_middle   output:6   output:0             output:21            =            output:-6 
+self_pair_two      output:4   output:0             =                    output:21474  =         
+first_needed       output:0   =                    output:3             output:12    =         
+two_elements       output:3   output:2             =                    output:21474  output:-3 
+all_above          output:25  output:15            output:45            output:45    =         
+all_below          output:93  output:92            output:95            =            output:-93
+negatives          output:1   =                    output:13            =            output:-1 
+duplicates         output:0   =                    output:4             =            =         
+direction_matters  output:0   =                    output:19            =            =         
+large_steps        output:70001  output:700007        output:1000004       =            output:-7000
+large_exact        output:0   =                    output:2             =            =         
+  model allows_same_element [range_inclusion] detected by 6: self_pair_middle, self_pair_two, two_elements, all_above, all_below, large_steps
+  model moves_wrong_pointer [pointer_movement] detected by 10: sample_exact, self_pair_middle, first_needed, all_above, all_below, negatives, duplicates, direction_matters, large_steps, large_exact
+  model skips_first [loop_bounds] detected by 4: self_pair_two, first_needed, two_elements, all_above
+  model signed_gap [output_contract] detected by 6: sample_typical, self_pair_middle, two_elements, all_below, negatives, large_steps
+  pair allows_same_element / moves_wrong_pointer: 12 distinguishing test(s)
+  pair allows_same_element / signed_gap: 8 distinguishing test(s)
+  pair allows_same_element / skips_first: 7 distinguishing test(s)
+  pair moves_wrong_pointer / signed_gap: 12 distinguishing test(s)
+  pair moves_wrong_pointer / skips_first: 11 distinguishing test(s)
+  pair signed_gap / skips_first: 9 distinguishing test(s)
+  group sample_typical: detects signed_gap
+  group sample_exact, duplicates, direction_matters, large_exact: detects moves_wrong_pointer
+  group self_pair_middle, all_below, large_steps: detects allows_same_element, moves_wrong_pointer, signed_gap
+  group self_pair_two: detects allows_same_element, skips_first
+  group first_needed: detects moves_wrong_pointer, skips_first
+  group two_elements: detects allows_same_element, signed_gap, skips_first
+  group all_above: detects allows_same_element, moves_wrong_pointer, skips_first
+  group negatives: detects moves_wrong_pointer, signed_gap
+  RESULT ok
+== container-water  version e9fc3901bd29  (g++ (GCC) 14.2.0, runc)
+                  reference  moves_taller  width_plus_one  uses_taller_height  stops_before_adjacent
+sample_classic    output:49  output:8      output:56       output:56           =                    
+sample_two        output:1   =             output:2        =                   output:0             
+outer_best        output:24  =             output:30       =                   =                    
+inner_tall_pair   output:27  output:5      output:36       output:36           =                    
+adjacent_tallest  output:9   output:4      output:18       output:36           output:4             
+neighbours_last   output:5   output:2      output:10       output:10           output:2             
+uneven_ends       output:6   =             output:9        output:30           =                    
+with_zeros        output:10  output:0      output:15       output:15           =                    
+increasing        output:9   output:5      output:12       output:30           =                    
+decreasing        output:10  output:4      output:15       output:36           =                    
+equal_heights     output:9   =             output:12       =                   =                    
+large_sawtooth    output:99370  output:10999  output:9937196  output:997390026    =                    
+large_blocks      output:90000  output:99999  output:9000100  output:999990000    =                    
+  model moves_taller [pointer_movement] detected by 9: sample_classic, inner_tall_pair, adjacent_tallest, neighbours_last, with_zeros, increasing, decreasing, large_sawtooth, large_blocks
+  model width_plus_one [range_inclusion] detected by 13: sample_classic, sample_two, outer_best, inner_tall_pair, adjacent_tallest, neighbours_last, uneven_ends, with_zeros, increasing, decreasing, equal_heights, large_sawtooth, large_blocks
+  model uses_taller_height [output_contract] detected by 10: sample_classic, inner_tall_pair, adjacent_tallest, neighbours_last, uneven_ends, with_zeros, increasing, decreasing, large_sawtooth, large_blocks
+  model stops_before_adjacent [loop_bounds] detected by 3: sample_two, adjacent_tallest, neighbours_last
+  pair moves_taller / stops_before_adjacent: 8 distinguishing test(s)
+  pair moves_taller / uses_taller_height: 10 distinguishing test(s)
+  pair moves_taller / width_plus_one: 13 distinguishing test(s)
+  pair stops_before_adjacent / uses_taller_height: 11 distinguishing test(s)
+  pair stops_before_adjacent / width_plus_one: 13 distinguishing test(s)
+  pair uses_taller_height / width_plus_one: 9 distinguishing test(s)
+  group sample_classic, inner_tall_pair, with_zeros, increasing, decreasing, large_sawtooth, large_blocks: detects moves_taller, uses_taller_height, width_plus_one
+  group sample_two: detects stops_before_adjacent, width_plus_one
+  group outer_best, equal_heights: detects width_plus_one
+  group adjacent_tallest, neighbours_last: detects moves_taller, stops_before_adjacent, uses_taller_height, width_plus_one
+  group uneven_ends: detects uses_taller_height, width_plus_one
+  RESULT ok
+== count-occurrences  version 4666e07e237c  (g++ (GCC) 14.2.0, runc)
+                 reference  upper_uses_strict  hi_init_last_index  no_progress_update  inclusive_count
+sample_run       output:3   output:0           =                   time_limit          output:4       
+sample_absent    output:0   =                  =                   time_limit          output:1       
+empty            output:0   =                  =                   =                   output:1       
+below_all        output:0   =                  =                   =                   output:1       
+above_all        output:0   =                  =                   time_limit          output:1       
+unique_middle    output:1   output:0           =                   time_limit          output:2       
+run_at_start     output:3   output:0           =                   time_limit          output:4       
+run_at_end       output:3   output:0           output:2            time_limit          output:4       
+all_equal        output:7   output:0           output:6            time_limit          output:8       
+single_equal     output:1   output:0           output:0            time_limit          output:2       
+single_other     output:0   =                  =                   time_limit          output:1       
+two_equal        output:2   output:0           output:1            time_limit          output:3       
+large_absent     output:0   =                  =                   time_limit          output:1       
+large_unique     output:1   output:0           =                   time_limit          output:2       
+large_all_equal  output:20000  output:0           output:199999       time_limit          output:200001  
+  model upper_uses_strict [equality_handling] detected by 9: sample_run, unique_middle, run_at_start, run_at_end, all_equal, single_equal, two_equal, large_unique, large_all_equal
+  model hi_init_last_index [search_space_boundaries] detected by 5: run_at_end, all_equal, single_equal, two_equal, large_all_equal
+  model no_progress_update [loop_termination] detected by 13: sample_run, sample_absent, above_all, unique_middle, run_at_start, run_at_end, all_equal, single_equal, single_other, two_equal, large_absent, large_unique, large_all_equal
+  model inclusive_count [problem_specification] detected by 15: sample_run, sample_absent, empty, below_all, above_all, unique_middle, run_at_start, run_at_end, all_equal, single_equal, single_other, two_equal, large_absent, large_unique, large_all_equal
+  pair hi_init_last_index / inclusive_count: 15 distinguishing test(s)
+  pair hi_init_last_index / no_progress_update: 13 distinguishing test(s)
+  pair hi_init_last_index / upper_uses_strict: 8 distinguishing test(s)
+  pair inclusive_count / no_progress_update: 15 distinguishing test(s)
+  pair inclusive_count / upper_uses_strict: 15 distinguishing test(s)
+  pair no_progress_update / upper_uses_strict: 13 distinguishing test(s)
+  group sample_run, unique_middle, run_at_start, large_unique: detects inclusive_count, no_progress_update, upper_uses_strict
+  group sample_absent, above_all, single_other, large_absent: detects inclusive_count, no_progress_update
+  group empty, below_all: detects inclusive_count
+  group run_at_end, all_equal, single_equal, two_equal, large_all_equal: detects hi_init_last_index, inclusive_count, no_progress_update, upper_uses_strict
+  LIMITATION error model 'hi_init_last_index' is detected by 5 test(s) but only 1 behaviour group(s) (< 2); other errors with that behaviour would be diagnosed as this model. Documented: Detected only by tests whose run of the target reaches the end of the array (one behaviour group). Any error that cannot place a boundary at n produces the same failures, so diagnoses are reported as qualified.
+  RESULT ok
+== dedup-sorted  version 89b894b4693d  (g++ (GCC) 14.2.0, runc)
+                    reference  returns_last_index  skips_last  compares_to_first  counts_without_writing
+sample_typical      output:4 1 2  output:3 1 2 3      output:3 1 2  output:6 1 2 3 3   output:4 1 1 2 3      
+sample_distinct     output:3 4 5  output:2 4 5        output:2 4 5  =                  =                     
+all_equal           output:1 7  output:0            =           =                  =                     
+single              output:1 -3  output:0            =           =                  =                     
+pair_new_last       output:2 1 2  output:1 1          output:1 1  =                  =                     
+dups_at_start       output:3 0 1  output:2 0 1        output:2 0 1  =                  output:3 0 0 0        
+dups_at_end         output:3 1 2  output:2 1 2        =           output:5 1 2 3 3   =                     
+negatives           output:4 -5   output:3 -5 -2 0    output:3 -5   output:5 -5 -2 -2  output:4 -5 -5 -2 -2  
+first_repeats_only  output:1 2  output:0            =           =                  =                     
+alternating_blocks  output:4 1 2  output:3 1 2 3      =           output:7 1 2 2 3   output:4 1 1 2 2      
+large_blocks        output:33334  output:33333 0 333  output:33333  output:99998 0 33  output:33334 0 11111 1
+large_distinct      output:10000  output:99999 0 999  output:99999  =                  =                     
+  model returns_last_index [output_contract] detected by 12: sample_typical, sample_distinct, all_equal, single, pair_new_last, dups_at_start, dups_at_end, negatives, first_repeats_only, alternating_blocks, large_blocks, large_distinct
+  model skips_last [loop_bounds] detected by 7: sample_typical, sample_distinct, pair_new_last, dups_at_start, negatives, large_blocks, large_distinct
+  model compares_to_first [pointer_movement] detected by 5: sample_typical, dups_at_end, negatives, alternating_blocks, large_blocks
+  model counts_without_writing [pointer_movement] detected by 5: sample_typical, dups_at_start, negatives, alternating_blocks, large_blocks
+  pair compares_to_first / counts_without_writing: 6 distinguishing test(s)
+  pair compares_to_first / returns_last_index: 12 distinguishing test(s)
+  pair compares_to_first / skips_last: 9 distinguishing test(s)
+  pair counts_without_writing / returns_last_index: 12 distinguishing test(s)
+  pair counts_without_writing / skips_last: 8 distinguishing test(s)
+  pair returns_last_index / skips_last: 5 distinguishing test(s)
+  group sample_typical, negatives, large_blocks: detects compares_to_first, counts_without_writing, returns_last_index, skips_last
+  group sample_distinct, pair_new_last, large_distinct: detects returns_last_index, skips_last
+  group all_equal, single, first_repeats_only: detects returns_last_index
+  group dups_at_start: detects counts_without_writing, returns_last_index, skips_last
+  group dups_at_end: detects compares_to_first, returns_last_index
+  group alternating_blocks: detects compares_to_first, counts_without_writing, returns_last_index
+  RESULT ok
+== distinct-in-windows  version 7948c0fabbdf  (g++ (GCC) 14.2.0, runc)
+                 reference  keeps_zero_counts  misses_last_window  counts_unique_only
+sample_typical   output:3 4 4  output:3 4 4 4     output:3 4 4        output:2 4 4 2    
+sample_all_same  output:1 1 1  =                  output:1 1 1        output:0 0 0 0    
+all_distinct     output:3 3 3  output:3 4 5 6     output:3 3 3        =                 
+value_returns    output:2 2 2  =                  output:2 2 2 2      =                 
+leaves_for_good  output:2 3 3  output:2 3 4 5     output:2 3 3        output:1 3 3 3    
+k_equals_n       output:3   =                  output:empty        output:2          
+k_one            output:1 1 1  output:1 1 2 2     output:1 1 1        =                 
+pairs_in_window  output:2 3 2  output:2 3 3       output:2 3          output:0 2 0      
+new_at_end       output:1 1 1  =                  output:1 1 1        output:0 0 0 2    
+single           output:1   =                  output:empty        =                 
+large_cycle      output:len=9  =                  output:len=99900 f  output:len=99901 f
+large_distinct   output:len=9  output:len=99001   output:len=99000 f  =                 
+  model keeps_zero_counts [window_maintenance] detected by 6: sample_typical, all_distinct, leaves_for_good, k_one, pairs_in_window, large_distinct
+  model misses_last_window [loop_bounds] detected by 12: sample_typical, sample_all_same, all_distinct, value_returns, leaves_for_good, k_equals_n, k_one, pairs_in_window, new_at_end, single, large_cycle, large_distinct
+  model counts_unique_only [tie_resolution] detected by 7: sample_typical, sample_all_same, leaves_for_good, k_equals_n, pairs_in_window, new_at_end, large_cycle
+  pair counts_unique_only / keeps_zero_counts: 10 distinguishing test(s)
+  pair counts_unique_only / misses_last_window: 12 distinguishing test(s)
+  pair keeps_zero_counts / misses_last_window: 12 distinguishing test(s)
+  group sample_typical, leaves_for_good, pairs_in_window: detects counts_unique_only, keeps_zero_counts, misses_last_window
+  group sample_all_same, k_equals_n, new_at_end, large_cycle: detects counts_unique_only, misses_last_window
+  group all_distinct, k_one, large_distinct: detects keeps_zero_counts, misses_last_window
+  group value_returns, single: detects misses_last_window
+  RESULT ok
+== exact-search  version 94bfc112e9e7  (g++ (GCC) 14.2.0, runc)
+                 reference  closed_loop_lt  no_progress_update  swapped_direction  lo_init_one  returns_insertion_point  returns_value
+sample_present   output:2   =               =                   output:-1          =            =                        output:6     
+sample_absent    output:-1  =               time_limit          =                  =            output:2                 =            
+empty            output:-1  =               =                   =                  =            output:0                 =            
+first            output:0   =               =                   output:-1          output:-1    =                        output:1     
+last             output:4   output:-1       time_limit          output:-1          =            =                        output:9     
+second           output:1   output:-1       time_limit          output:-1          =            =                        output:3     
+fourth           output:3   =               =                   output:-1          =            =                        output:7     
+below_all        output:-1  =               =                   =                  =            output:0                 =            
+above_all        output:-1  =               time_limit          =                  =            output:3                 =            
+absent_between   output:-1  =               time_limit          =                  =            output:3                 =            
+single_present   output:0   output:-1       =                   =                  output:-1    =                        output:4     
+single_absent    output:-1  =               time_limit          =                  =            output:1                 =            
+two_first        output:0   =               =                   =                  output:-1    =                        output:1     
+two_second       output:1   output:-1       time_limit          output:-1          =            =                        output:9     
+negative_values  output:1   output:-1       time_limit          output:-1          =            =                        output:-5    
+large_first      output:0   =               =                   output:-1          output:-1    =                        =            
+large_last       output:19999  output:-1       time_limit          output:-1          =            =                        output:399998
+large_interior   output:61728  output:-1       =                   output:-1          =            =                        output:123456
+large_absent     output:-1  =               time_limit          =                  =            output:61729             =            
+  model closed_loop_lt [loop_termination] detected by 7: last, second, single_present, two_second, negative_values, large_last, large_interior
+  model no_progress_update [loop_termination] detected by 10: sample_absent, last, second, above_all, absent_between, single_absent, two_second, negative_values, large_last, large_absent
+  model swapped_direction [search_space_boundaries] detected by 10: sample_present, first, last, second, fourth, two_second, negative_values, large_first, large_last, large_interior
+  model lo_init_one [search_space_boundaries] detected by 4: first, single_present, two_first, large_first
+  model returns_insertion_point [problem_specification] detected by 7: sample_absent, empty, below_all, above_all, absent_between, single_absent, large_absent
+  model returns_value [problem_specification] detected by 11: sample_present, first, last, second, fourth, single_present, two_first, two_second, negative_values, large_last, large_interior
+  pair closed_loop_lt / lo_init_one: 9 distinguishing test(s)
+  pair closed_loop_lt / no_progress_update: 12 distinguishing test(s)
+  pair closed_loop_lt / returns_insertion_point: 14 distinguishing test(s)
+  pair closed_loop_lt / returns_value: 11 distinguishing test(s)
+  pair closed_loop_lt / swapped_direction: 5 distinguishing test(s)
+  pair lo_init_one / no_progress_update: 14 distinguishing test(s)
+  pair lo_init_one / returns_insertion_point: 11 distinguishing test(s)
+  pair lo_init_one / returns_value: 12 distinguishing test(s)
+  pair lo_init_one / swapped_direction: 10 distinguishing test(s)
+  pair no_progress_update / returns_insertion_point: 12 distinguishing test(s)
+  pair no_progress_update / returns_value: 16 distinguishing test(s)
+  pair no_progress_update / swapped_direction: 15 distinguishing test(s)
+  pair returns_insertion_point / returns_value: 18 distinguishing test(s)
+  pair returns_insertion_point / swapped_direction: 17 distinguishing test(s)
+  pair returns_value / swapped_direction: 12 distinguishing test(s)
+  group sample_present, fourth: detects returns_value, swapped_direction
+  group sample_absent, above_all, absent_between, single_absent, large_absent: detects no_progress_update, returns_insertion_point
+  group empty, below_all: detects returns_insertion_point
+  group first: detects lo_init_one, returns_value, swapped_direction
+  group last, second, two_second, negative_values, large_last: detects closed_loop_lt, no_progress_update, returns_value, swapped_direction
+  group single_present: detects closed_loop_lt, lo_init_one, returns_value
+  group two_first: detects lo_init_one, returns_value
+  group large_first: detects lo_init_one, swapped_direction
+  group large_interior: detects closed_loop_lt, returns_value, swapped_direction
+  RESULT ok
+== first-max-index  version 50798634a3ef  (g++ (GCC) 14.2.0, runc)
+                  reference  max_starts_at_zero  last_of_ties  skips_last  returns_value
+sample_mixed      output:1   =                   output:3      =           output:9     
+sample_last       output:3   =                   =             output:2    output:7     
+max_at_start      output:0   =                   =             =           output:8     
+max_at_end_neg    output:3   output:0            =             output:2    output:-3    
+all_negative_mid  output:2   output:0            =             =           output:-1    
+all_negative_tie  output:1   output:0            output:3      =           output:-2    
+zero_max_later    output:1   output:0            output:3      =           output:0     
+all_equal         output:0   =                   output:4      =           output:4     
+tie_at_ends       output:0   =                   output:4      =           output:6     
+small_values      output:3   =                   =             =           output:2     
+single            output:0   =                   =             =           output:-5    
+two_elements      output:0   =                   output:1      =           output:-1    
+large_last        output:99999  =                   =             output:99998  output:49999 
+large_periodic    output:428  output:0            output:99428  =           output:-1001 
+  model max_starts_at_zero [accumulator_init] detected by 5: max_at_end_neg, all_negative_mid, all_negative_tie, zero_max_later, large_periodic
+  model last_of_ties [tie_resolution] detected by 7: sample_mixed, all_negative_tie, zero_max_later, all_equal, tie_at_ends, two_elements, large_periodic
+  model skips_last [loop_bounds] detected by 3: sample_last, max_at_end_neg, large_last
+  model returns_value [output_contract] detected by 14: sample_mixed, sample_last, max_at_start, max_at_end_neg, all_negative_mid, all_negative_tie, zero_max_later, all_equal, tie_at_ends, small_values, single, two_elements, large_last, large_periodic
+  pair last_of_ties / max_starts_at_zero: 9 distinguishing test(s)
+  pair last_of_ties / returns_value: 13 distinguishing test(s)
+  pair last_of_ties / skips_last: 10 distinguishing test(s)
+  pair max_starts_at_zero / returns_value: 13 distinguishing test(s)
+  pair max_starts_at_zero / skips_last: 7 distinguishing test(s)
+  pair returns_value / skips_last: 14 distinguishing test(s)
+  group sample_mixed, all_equal, tie_at_ends, two_elements: detects last_of_ties, returns_value
+  group sample_last, large_last: detects returns_value, skips_last
+  group max_at_start, small_values, single: detects returns_value
+  group max_at_end_neg: detects max_starts_at_zero, returns_value, skips_last
+  group all_negative_mid: detects max_starts_at_zero, returns_value
+  group all_negative_tie, zero_max_later, large_periodic: detects last_of_ties, max_starts_at_zero, returns_value
+  RESULT ok
+== first-true  version 485c974b4928  (g++ (GCC) 14.2.0, runc)
+                  reference  hi_init_last_index  hi_skips_candidate  lo_init_one  no_progress_update  closed_loop_hi_mid  stops_one_early  none_sentinel  returns_last_false  returns_any_true
+sample_interior   output:2   =                   output:1            =            time_limit          time_limit          output:1         =              output:1            =               
+sample_none       output:3   output:2            =                   =            time_limit          =                   output:2         output:-1      output:2            =               
+empty             output:0   =                   =                   output:1     =                   =                   =                output:-1      output:-1           =               
+all_true          output:0   =                   =                   output:1     =                   time_limit          =                =              output:-1           output:2        
+single_true       output:0   =                   =                   output:1     =                   time_limit          =                =              output:-1           =               
+single_false      output:1   output:0            =                   =            time_limit          =                   output:0         output:-1      output:0            =               
+two_false_true    output:1   =                   output:0            =            time_limit          time_limit          output:0         =              output:0            =               
+two_true          output:0   =                   =                   output:1     =                   time_limit          =                =              output:-1           output:1        
+two_false         output:2   output:1            =                   =            time_limit          =                   output:1         output:-1      output:1            =               
+three_last        output:2   =                   =                   =            time_limit          time_limit          output:1         =              output:1            =               
+three_middle      output:1   =                   output:0            =            time_limit          time_limit          output:0         =              output:0            =               
+second_index      output:1   =                   output:0            =            time_limit          time_limit          output:0         =              output:0            output:3        
+last_index        output:4   =                   output:3            =            time_limit          time_limit          output:3         =              output:3            =               
+interior_odd      output:3   =                   output:2            =            time_limit          time_limit          output:2         =              output:2            =               
+ten_answer_three  output:3   =                   =                   =            time_limit          time_limit          output:2         =              output:2            output:5        
+large_interior    output:12345  =                   =                   =            time_limit          time_limit          output:123456    =              output:123456       output:150000   
+large_none        output:20000  output:199999       =                   =            time_limit          =                   output:199999    output:-1      output:199999       =               
+large_all_true    output:0   =                   =                   output:1     =                   time_limit          =                =              output:-1           output:100000   
+large_last        output:19999  =                   output:199998       =            time_limit          time_limit          output:199998    =              output:199998       =               
+  model hi_init_last_index [search_space_boundaries] detected by 4: sample_none, single_false, two_false, large_none
+  model hi_skips_candidate [search_space_boundaries] detected by 7: sample_interior, two_false_true, three_middle, second_index, last_index, interior_odd, large_last
+  model lo_init_one [search_space_boundaries] detected by 5: empty, all_true, single_true, two_true, large_all_true
+  model no_progress_update [loop_termination] detected by 14: sample_interior, sample_none, single_false, two_false_true, two_false, three_last, three_middle, second_index, last_index, interior_odd, ten_answer_three, large_interior, large_none, large_last
+  model closed_loop_hi_mid [loop_termination] detected by 14: sample_interior, all_true, single_true, two_false_true, two_true, three_last, three_middle, second_index, last_index, interior_odd, ten_answer_three, large_interior, large_all_true, large_last
+  model stops_one_early [loop_termination] detected by 14: sample_interior, sample_none, single_false, two_false_true, two_false, three_last, three_middle, second_index, last_index, interior_odd, ten_answer_three, large_interior, large_none, large_last
+  model none_sentinel [problem_specification] detected by 5: sample_none, empty, single_false, two_false, large_none
+  model returns_last_false [problem_specification] detected by 19: sample_interior, sample_none, empty, all_true, single_true, single_false, two_false_true, two_true, two_false, three_last, three_middle, second_index, last_index, interior_odd, ten_answer_three, large_interior, large_none, large_all_true, large_last
+  model returns_any_true [problem_specification] detected by 6: all_true, two_true, second_index, ten_answer_three, large_interior, large_all_true
+  pair closed_loop_hi_mid / hi_init_last_index: 18 distinguishing test(s)
+  pair closed_loop_hi_mid / hi_skips_candidate: 14 distinguishing test(s)
+  pair closed_loop_hi_mid / lo_init_one: 15 distinguishing test(s)
+  pair closed_loop_hi_mid / no_progress_update: 8 distinguishing test(s)
+  pair closed_loop_hi_mid / none_sentinel: 19 distinguishing test(s)
+  pair closed_loop_hi_mid / returns_any_true: 14 distinguishing test(s)
+  pair closed_loop_hi_mid / returns_last_false: 19 distinguishing test(s)
+  pair closed_loop_hi_mid / stops_one_early: 18 distinguishing test(s)
+  pair hi_init_last_index / hi_skips_candidate: 11 distinguishing test(s)
+  pair hi_init_last_index / lo_init_one: 9 distinguishing test(s)
+  pair hi_init_last_index / no_progress_update: 14 distinguishing test(s)
+  pair hi_init_last_index / none_sentinel: 5 distinguishing test(s)
+  pair hi_init_last_index / returns_any_true: 10 distinguishing test(s)
+  pair hi_init_last_index / returns_last_false: 15 distinguishing test(s)
+  pair hi_init_last_index / stops_one_early: 10 distinguishing test(s)
+  pair hi_skips_candidate / lo_init_one: 12 distinguishing test(s)
+  pair hi_skips_candidate / no_progress_update: 14 distinguishing test(s)
+  pair hi_skips_candidate / none_sentinel: 12 distinguishing test(s)
+  pair hi_skips_candidate / returns_any_true: 12 distinguishing test(s)
+  pair hi_skips_candidate / returns_last_false: 12 distinguishing test(s)
+  pair hi_skips_candidate / stops_one_early: 7 distinguishing test(s)
+  pair lo_init_one / no_progress_update: 19 distinguishing test(s)
+  pair lo_init_one / none_sentinel: 9 distinguishing test(s)
+  pair lo_init_one / returns_any_true: 7 distinguishing test(s)
+  pair lo_init_one / returns_last_false: 19 distinguishing test(s)
+  pair lo_init_one / stops_one_early: 19 distinguishing test(s)
+  pair no_progress_update / none_sentinel: 15 distinguishing test(s)
+  pair no_progress_update / returns_any_true: 17 distinguishing test(s)
+  pair no_progress_update / returns_last_false: 19 distinguishing test(s)
+  pair no_progress_update / stops_one_early: 14 distinguishing test(s)
+  pair none_sentinel / returns_any_true: 11 distinguishing test(s)
+  pair none_sentinel / returns_last_false: 18 distinguishing test(s)
+  pair none_sentinel / stops_one_early: 15 distinguishing test(s)
+  pair returns_any_true / returns_last_false: 19 distinguishing test(s)
+  pair returns_any_true / stops_one_early: 17 distinguishing test(s)
+  pair returns_last_false / stops_one_early: 5 distinguishing test(s)
+  group sample_interior, two_false_true, three_middle, last_index, interior_odd, large_last: detects closed_loop_hi_mid, hi_skips_candidate, no_progress_update, returns_last_false, stops_one_early
+  group sample_none, single_false, two_false, large_none: detects hi_init_last_index, no_progress_update, none_sentinel, returns_last_false, stops_one_early
+  group empty: detects lo_init_one, none_sentinel, returns_last_false
+  group all_true, two_true, large_all_true: detects closed_loop_hi_mid, lo_init_one, returns_any_true, returns_last_false
+  group single_true: detects closed_loop_hi_mid, lo_init_one, returns_last_false
+  group three_last: detects closed_loop_hi_mid, no_progress_update, returns_last_false, stops_one_early
+  group second_index: detects closed_loop_hi_mid, hi_skips_candidate, no_progress_update, returns_any_true, returns_last_false, stops_one_early
+  group ten_answer_three, large_interior: detects closed_loop_hi_mid, no_progress_update, returns_any_true, returns_last_false, stops_one_early
+  LIMITATION error model 'hi_init_last_index' is detected by 4 test(s) but only 1 behaviour group(s) (< 2); other errors with that behaviour would be diagnosed as this model. Documented: Detected only by tests whose answer is n. Any error that cannot return n, such as clamping the result to n - 1, produces identical outputs, so diagnoses are reported as qualified (docs/content-design/first-true.md section 4.3).
+  RESULT ok
+== integer-sqrt  version 01edbe01d8a8  (g++ (GCC) 14.2.0, runc)
+                   reference  strict_square_test  closed_loop_lt  fixed_iterations_16  floor_mid_no_progress  hi_excludes_x  hi_cap_46340  returns_ceiling  returns_lo_closed
+zero               output:0   =                   =               =                    =                      output:-1      =             =                output:1         
+one                output:1   output:0            output:0        =                    time_limit             output:0       =             =                output:2         
+two                output:1   =                   =               =                    time_limit             =              =             output:2         output:2         
+three              output:1   =                   =               =                    =                      =              =             output:2         output:2         
+four               output:2   output:1            =               =                    =                      =              =             =                output:3         
+eight              output:2   =                   =               =                    time_limit             =              =             output:3         output:3         
+nine               output:3   output:2            output:2        =                    time_limit             =              =             =                output:4         
+ten                output:3   =                   =               =                    time_limit             =              =             output:4         output:4         
+fifteen            output:3   =                   =               =                    =                      =              =             output:4         output:4         
+sixteen            output:4   output:3            output:3        =                    time_limit             =              =             =                output:5         
+ninety_nine        output:9   =                   =               =                    time_limit             =              =             output:10        output:10        
+hundred            output:10  output:9            output:9        =                    time_limit             =              =             =                output:11        
+million            output:1000  output:999          output:999      output:990           time_limit             =              =             =                output:1001      
+million_minus_one  output:999  =                   =               output:990           time_limit             =              =             output:1000      output:1000      
+big_non_square     output:11111  =                   output:11110    output:9417          time_limit             =              =             output:11112     output:11112     
+square_46339       output:46339  output:46338        output:46338    output:32764         =                      =              =             =                output:46340     
+below_top_square   output:46339  =                   output:46338    output:32765         time_limit             =              =             output:46340     output:46340     
+top_square         output:46340  output:46339        =               output:32765         time_limit             =              output:46339  =                output:46341     
+int_max            output:46340  =                   output:46339    output:32767         time_limit             =              output:46339  output:46341     output:46341     
+  model strict_square_test [equality_handling] detected by 8: one, four, nine, sixteen, hundred, million, square_46339, top_square
+  model closed_loop_lt [loop_termination] detected by 9: one, nine, sixteen, hundred, million, big_non_square, square_46339, below_top_square, int_max
+  model fixed_iterations_16 [loop_termination] detected by 7: million, million_minus_one, big_non_square, square_46339, below_top_square, top_square, int_max
+  model floor_mid_no_progress [loop_termination] detected by 14: one, two, eight, nine, ten, sixteen, ninety_nine, hundred, million, million_minus_one, big_non_square, below_top_square, top_square, int_max
+  model hi_excludes_x [search_space_boundaries] detected by 2: zero, one
+  model hi_cap_46340 [search_space_boundaries] detected by 2: top_square, int_max
+  model returns_ceiling [problem_specification] detected by 10: two, three, eight, ten, fifteen, ninety_nine, million_minus_one, big_non_square, below_top_square, int_max
+  model returns_lo_closed [problem_specification] detected by 19: zero, one, two, three, four, eight, nine, ten, fifteen, sixteen, ninety_nine, hundred, million, million_minus_one, big_non_square, square_46339, below_top_square, top_square, int_max
+  pair closed_loop_lt / fixed_iterations_16: 11 distinguishing test(s)
+  pair closed_loop_lt / floor_mid_no_progress: 15 distinguishing test(s)
+  pair closed_loop_lt / hi_cap_46340: 9 distinguishing test(s)
+  pair closed_loop_lt / hi_excludes_x: 9 distinguishing test(s)
+  pair closed_loop_lt / returns_ceiling: 16 distinguishing test(s)
+  pair closed_loop_lt / returns_lo_closed: 19 distinguishing test(s)
+  pair closed_loop_lt / strict_square_test: 5 distinguishing test(s)
+  pair fixed_iterations_16 / floor_mid_no_progress: 15 distinguishing test(s)
+  pair fixed_iterations_16 / hi_cap_46340: 7 distinguishing test(s)
+  pair fixed_iterations_16 / hi_excludes_x: 9 distinguishing test(s)
+  pair fixed_iterations_16 / returns_ceiling: 13 distinguishing test(s)
+  pair fixed_iterations_16 / returns_lo_closed: 19 distinguishing test(s)
+  pair fixed_iterations_16 / strict_square_test: 12 distinguishing test(s)
+  pair floor_mid_no_progress / hi_cap_46340: 14 distinguishing test(s)
+  pair floor_mid_no_progress / hi_excludes_x: 15 distinguishing test(s)
+  pair floor_mid_no_progress / returns_ceiling: 16 distinguishing test(s)
+  pair floor_mid_no_progress / returns_lo_closed: 19 distinguishing test(s)
+  pair floor_mid_no_progress / strict_square_test: 16 distinguishing test(s)
+  pair hi_cap_46340 / hi_excludes_x: 4 distinguishing test(s)
+  pair hi_cap_46340 / returns_ceiling: 11 distinguishing test(s)
+  pair hi_cap_46340 / returns_lo_closed: 19 distinguishing test(s)
+  pair hi_cap_46340 / strict_square_test: 8 distinguishing test(s)
+  pair hi_excludes_x / returns_ceiling: 12 distinguishing test(s)
+  pair hi_excludes_x / returns_lo_closed: 19 distinguishing test(s)
+  pair hi_excludes_x / strict_square_test: 8 distinguishing test(s)
+  pair returns_ceiling / returns_lo_closed: 9 distinguishing test(s)
+  pair returns_ceiling / strict_square_test: 18 distinguishing test(s)
+  pair returns_lo_closed / strict_square_test: 19 distinguishing test(s)
+  group zero: detects hi_excludes_x, returns_lo_closed
+  group one: detects closed_loop_lt, floor_mid_no_progress, hi_excludes_x, returns_lo_closed, strict_square_test
+  group two, eight, ten, ninety_nine: detects floor_mid_no_progress, returns_ceiling, returns_lo_closed
+  group three, fifteen: detects returns_ceiling, returns_lo_closed
+  group four: detects returns_lo_closed, strict_square_test
+  group nine, sixteen, hundred: detects closed_loop_lt, floor_mid_no_progress, returns_lo_closed, strict_square_test
+  group million: detects closed_loop_lt, fixed_iterations_16, floor_mid_no_progress, returns_lo_closed, strict_square_test
+  group million_minus_one: detects fixed_iterations_16, floor_mid_no_progress, returns_ceiling, returns_lo_closed
+  group big_non_square, below_top_square: detects closed_loop_lt, fixed_iterations_16, floor_mid_no_progress, returns_ceiling, returns_lo_closed
+  group square_46339: detects closed_loop_lt, fixed_iterations_16, returns_lo_closed, strict_square_test
+  group top_square: detects fixed_iterations_16, floor_mid_no_progress, hi_cap_46340, returns_lo_closed, strict_square_test
+  group int_max: detects closed_loop_lt, fixed_iterations_16, floor_mid_no_progress, hi_cap_46340, returns_ceiling, returns_lo_closed
+  RESULT ok
+== last-less-than  version 4208517a8d24  (g++ (GCC) 14.2.0, runc)
+                   reference  uses_le  returns_insertion_point  clamps_to_zero  hi_init_last_index  no_progress_update
+sample_present     output:0   output:2  output:1                 =               =                   time_limit        
+sample_between     output:2   =        output:3                 =               =                   time_limit        
+empty              output:-1  =        output:0                 output:0        =                   =                 
+below_all          output:-1  =        output:0                 output:0        =                   =                 
+equal_first        output:-1  output:0  output:0                 output:0        =                   =                 
+above_all          output:2   =        output:3                 =               output:1            time_limit        
+equal_last         output:1   output:2  output:2                 =               =                   time_limit        
+duplicates_middle  output:0   output:4  output:1                 =               =                   time_limit        
+duplicates_all     output:-1  output:6  output:0                 output:0        =                   =                 
+single_below       output:0   =        output:1                 =               output:-1           time_limit        
+single_equal       output:-1  output:0  output:0                 output:0        =                   =                 
+two_between        output:0   =        output:1                 =               =                   time_limit        
+large_between      output:49999  =        output:50000             =               =                   time_limit        
+large_above_all    output:19999  =        output:200000            =               output:199998       time_limit        
+large_duplicates   output:-1  output:19999  output:0                 output:0        =                   =                 
+  model uses_le [equality_handling] detected by 7: sample_present, equal_first, equal_last, duplicates_middle, duplicates_all, single_equal, large_duplicates
+  model returns_insertion_point [problem_specification] detected by 15: sample_present, sample_between, empty, below_all, equal_first, above_all, equal_last, duplicates_middle, duplicates_all, single_below, single_equal, two_between, large_between, large_above_all, large_duplicates
+  model clamps_to_zero [problem_specification] detected by 6: empty, below_all, equal_first, duplicates_all, single_equal, large_duplicates
+  model hi_init_last_index [search_space_boundaries] detected by 3: above_all, single_below, large_above_all
+  model no_progress_update [loop_termination] detected by 9: sample_present, sample_between, above_all, equal_last, duplicates_middle, single_below, two_between, large_between, large_above_all
+  pair clamps_to_zero / hi_init_last_index: 9 distinguishing test(s)
+  pair clamps_to_zero / no_progress_update: 15 distinguishing test(s)
+  pair clamps_to_zero / returns_insertion_point: 9 distinguishing test(s)
+  pair clamps_to_zero / uses_le: 7 distinguishing test(s)
+  pair hi_init_last_index / no_progress_update: 9 distinguishing test(s)
+  pair hi_init_last_index / returns_insertion_point: 15 distinguishing test(s)
+  pair hi_init_last_index / uses_le: 10 distinguishing test(s)
+  pair no_progress_update / returns_insertion_point: 15 distinguishing test(s)
+  pair no_progress_update / uses_le: 13 distinguishing test(s)
+  pair returns_insertion_point / uses_le: 12 distinguishing test(s)
+  group sample_present, equal_last, duplicates_middle: detects no_progress_update, returns_insertion_point, uses_le
+  group sample_between, two_between, large_between: detects no_progress_update, returns_insertion_point
+  group empty, below_all: detects clamps_to_zero, returns_insertion_point
+  group equal_first, duplicates_all, single_equal, large_duplicates: detects clamps_to_zero, returns_insertion_point, uses_le
+  group above_all, single_below, large_above_all: detects hi_init_last_index, no_progress_update, returns_insertion_point
+  LIMITATION error model 'hi_init_last_index' is detected by 3 test(s) but only 1 behaviour group(s) (< 2); other errors with that behaviour would be diagnosed as this model. Documented: Detected only by tests whose answer is the last index (one behaviour group). Any error that cannot return n - 1 produces the same failures, so diagnoses are reported as qualified.
+  RESULT ok
+== last-occurrence  version 441ef3b2b697  (g++ (GCC) 14.2.0, runc)
+                  reference  returns_first_occurrence  stops_at_any_match  hi_init_last_index  no_progress_update  missing_equality_check  returns_one_past
+sample_run        output:3   output:1                  output:2            =                   time_limit          =                       output:4        
+sample_absent     output:-1  =                         =                   =                   time_limit          output:3                =               
+empty             output:-1  =                         =                   =                   =                   =                       =               
+below_all         output:-1  =                         =                   =                   =                   =                       =               
+above_all         output:-1  =                         =                   =                   time_limit          output:2                =               
+absent_after_run  output:-1  =                         =                   =                   time_limit          output:3                =               
+unique_middle     output:2   =                         =                   =                   time_limit          =                       output:3        
+unique_last       output:3   =                         =                   output:-1           time_limit          =                       output:4        
+run_at_start      output:2   output:0                  =                   =                   time_limit          =                       output:3        
+run_at_end        output:5   output:3                  output:4            output:4            time_limit          =                       output:6        
+run_middle_long   output:7   output:1                  output:4            =                   time_limit          =                       output:8        
+all_equal         output:6   output:0                  output:3            output:5            time_limit          =                       output:7        
+single_equal      output:0   =                         =                   output:-1           time_limit          =                       output:1        
+single_other      output:-1  =                         =                   =                   time_limit          output:0                =               
+two_equal         output:1   output:0                  output:0            output:0            time_limit          =                       output:2        
+two_first         output:0   =                         =                   =                   time_limit          =                       output:1        
+large_all_equal   output:19999  output:0                  output:99999        output:199998       time_limit          =                       output:200000   
+large_unique      output:50000  =                         =                   =                   time_limit          =                       output:50001    
+large_absent      output:-1  =                         =                   =                   time_limit          output:49999            =               
+  model returns_first_occurrence [equality_handling] detected by 7: sample_run, run_at_start, run_at_end, run_middle_long, all_equal, two_equal, large_all_equal
+  model stops_at_any_match [equality_handling] detected by 6: sample_run, run_at_end, run_middle_long, all_equal, two_equal, large_all_equal
+  model hi_init_last_index [search_space_boundaries] detected by 6: unique_last, run_at_end, all_equal, single_equal, two_equal, large_all_equal
+  model no_progress_update [loop_termination] detected by 17: sample_run, sample_absent, above_all, absent_after_run, unique_middle, unique_last, run_at_start, run_at_end, run_middle_long, all_equal, single_equal, single_other, two_equal, two_first, large_all_equal, large_unique, large_absent
+  model missing_equality_check [problem_specification] detected by 5: sample_absent, above_all, absent_after_run, single_other, large_absent
+  model returns_one_past [problem_specification] detected by 12: sample_run, unique_middle, unique_last, run_at_start, run_at_end, run_middle_long, all_equal, single_equal, two_equal, two_first, large_all_equal, large_unique
+  pair hi_init_last_index / missing_equality_check: 11 distinguishing test(s)
+  pair hi_init_last_index / no_progress_update: 17 distinguishing test(s)
+  pair hi_init_last_index / returns_first_occurrence: 8 distinguishing test(s)
+  pair hi_init_last_index / returns_one_past: 12 distinguishing test(s)
+  pair hi_init_last_index / stops_at_any_match: 6 distinguishing test(s)
+  pair missing_equality_check / no_progress_update: 17 distinguishing test(s)
+  pair missing_equality_check / returns_first_occurrence: 12 distinguishing test(s)
+  pair missing_equality_check / returns_one_past: 17 distinguishing test(s)
+  pair missing_equality_check / stops_at_any_match: 11 distinguishing test(s)
+  pair no_progress_update / returns_first_occurrence: 17 distinguishing test(s)
+  pair no_progress_update / returns_one_past: 17 distinguishing test(s)
+  pair no_progress_update / stops_at_any_match: 17 distinguishing test(s)
+  pair returns_first_occurrence / returns_one_past: 12 distinguishing test(s)
+  pair returns_first_occurrence / stops_at_any_match: 6 distinguishing test(s)
+  pair returns_one_past / stops_at_any_match: 12 distinguishing test(s)
+  group sample_run, run_middle_long: detects no_progress_update, returns_first_occurrence, returns_one_past, stops_at_any_match
+  group sample_absent, above_all, absent_after_run, single_other, large_absent: detects missing_equality_check, no_progress_update
+  group empty, below_all: detects none
+  group unique_middle, two_first, large_unique: detects no_progress_update, returns_one_past
+  group unique_last, single_equal: detects hi_init_last_index, no_progress_update, returns_one_past
+  group run_at_start: detects no_progress_update, returns_first_occurrence, returns_one_past
+  group run_at_end, all_equal, two_equal, large_all_equal: detects hi_init_last_index, no_progress_update, returns_first_occurrence, returns_one_past, stops_at_any_match
+  LIMITATION error model 'missing_equality_check' is detected by 5 test(s) but only 1 behaviour group(s) (< 2); other errors with that behaviour would be diagnosed as this model. Documented: Detected only by tests whose target is absent (one behaviour group). Any error that returns something other than -1 for an absent target fails the same tests, so diagnoses are reported as qualified.
+  RESULT ok
+== longest-run  version 1a66ed58fae9  (g++ (GCC) 14.2.0, runc)
+                     reference  reset_to_zero  last_run_unchecked  returns_value  compares_to_first
+sample_middle        output:3   output:2       =                   output:2       =                
+sample_end           output:3   output:2       output:2            output:7       output:1         
+first_run_longest    output:3   =              =                   output:9       =                
+all_equal            output:5   =              output:0            output:6       =                
+all_distinct         output:1   =              =                   output:3       =                
+single               output:1   =              output:0            output:8       =                
+two_equal            output:2   =              output:0            output:-4      =                
+nonadjacent_repeat   output:3   output:2       output:2            output:5       =                
+first_value_returns  output:3   output:2       =                   output:0       output:4         
+two_longest          output:3   =              =                   output:1       =                
+negatives            output:3   output:2       =                   output:-2      output:2         
+large_one_run        output:10000  =              output:0            output:7       =                
+large_blocks         output:1   =              =                   output:0       =                
+  model reset_to_zero [accumulator_init] detected by 5: sample_middle, sample_end, nonadjacent_repeat, first_value_returns, negatives
+  model last_run_unchecked [running_state] detected by 6: sample_end, all_equal, single, two_equal, nonadjacent_repeat, large_one_run
+  model returns_value [output_contract] detected by 13: sample_middle, sample_end, first_run_longest, all_equal, all_distinct, single, two_equal, nonadjacent_repeat, first_value_returns, two_longest, negatives, large_one_run, large_blocks
+  model compares_to_first [running_state] detected by 3: sample_end, first_value_returns, negatives
+  pair compares_to_first / last_run_unchecked: 8 distinguishing test(s)
+  pair compares_to_first / reset_to_zero: 4 distinguishing test(s)
+  pair compares_to_first / returns_value: 13 distinguishing test(s)
+  pair last_run_unchecked / reset_to_zero: 7 distinguishing test(s)
+  pair last_run_unchecked / returns_value: 13 distinguishing test(s)
+  pair reset_to_zero / returns_value: 12 distinguishing test(s)
+  group sample_middle: detects reset_to_zero, returns_value
+  group sample_end: detects compares_to_first, last_run_unchecked, reset_to_zero, returns_value
+  group first_run_longest, all_distinct, two_longest, large_blocks: detects returns_value
+  group all_equal, single, two_equal, large_one_run: detects last_run_unchecked, returns_value
+  group nonadjacent_repeat: detects last_run_unchecked, reset_to_zero, returns_value
+  group first_value_returns, negatives: detects compares_to_first, reset_to_zero, returns_value
+  RESULT ok
+== longest-sum-at-most  version da1fb518004a  (g++ (GCC) 14.2.0, runc)
+                     reference  length_without_plus_one  strict_limit  restarts_window
+sample_typical       output:3   output:2                 =             output:2       
+sample_exact         output:3   output:2                 output:2      =              
+big_then_small       output:5   output:4                 output:4      =              
+many_to_drop         output:4   output:3                 =             =              
+keep_tail            output:3   output:2                 =             output:2       
+drop_one_keep_rest   output:4   output:3                 =             output:3       
+exact_after_overlap  output:5   output:4                 output:4      output:3       
+whole_array          output:4   output:3                 output:3      =              
+nothing_fits         output:0   =                        =             =              
+one_fits             output:1   output:0                 =             =              
+single_exact         output:1   output:0                 output:0      =              
+loose_budget         output:5   output:4                 =             =              
+large_ramp           output:99  output:98                =             =              
+large_exact          output:10000  output:9999              output:9999   =              
+  model length_without_plus_one [range_inclusion] detected by 13: sample_typical, sample_exact, big_then_small, many_to_drop, keep_tail, drop_one_keep_rest, exact_after_overlap, whole_array, one_fits, single_exact, loose_budget, large_ramp, large_exact
+  model strict_limit [output_contract] detected by 6: sample_exact, big_then_small, exact_after_overlap, whole_array, single_exact, large_exact
+  model restarts_window [window_maintenance] detected by 4: sample_typical, keep_tail, drop_one_keep_rest, exact_after_overlap
+  pair length_without_plus_one / restarts_window: 10 distinguishing test(s)
+  pair length_without_plus_one / strict_limit: 7 distinguishing test(s)
+  pair restarts_window / strict_limit: 9 distinguishing test(s)
+  group sample_typical, keep_tail, drop_one_keep_rest: detects length_without_plus_one, restarts_window
+  group sample_exact, big_then_small, whole_array, single_exact, large_exact: detects length_without_plus_one, strict_limit
+  group many_to_drop, one_fits, loose_budget, large_ramp: detects length_without_plus_one
+  group exact_after_overlap: detects length_without_plus_one, restarts_window, strict_limit
+  group nothing_fits: detects none
+  RESULT ok
+== lower-bound  version 9aade9e1396e  (g++ (GCC) 14.2.0, runc)
+                         reference  upper_bound_confusion  hi_init_last_index  no_progress_update  exact_match_sentinel  stops_at_first_match  hi_skips_candidate  closed_loop_hi_mid  returns_wrong_pointer
+sample_present           output:2   output:3               =                   time_limit          =                     =                     output:1            time_limit          output:1             
+sample_absent            output:2   =                      =                   time_limit          output:-1             =                     output:1            time_limit          output:1             
+empty                    output:0   =                      =                   =                   output:-1             =                     =                   =                   output:-1            
+below_all                output:0   =                      =                   =                   output:-1             =                     =                   time_limit          output:-1            
+above_all                output:3   =                      output:2            time_limit          output:-1             =                     =                   =                   output:2             
+equal_first              output:0   output:1               =                   =                   =                     =                     =                   time_limit          output:-1            
+equal_last               output:2   output:3               =                   time_limit          =                     =                     =                   time_limit          output:1             
+duplicates_middle        output:1   output:5               =                   time_limit          output:2              output:3              output:0            time_limit          output:0             
+duplicates_all           output:0   output:7               =                   =                   output:3              output:3              =                   time_limit          output:-1            
+single_equal             output:0   output:1               =                   =                   =                     =                     =                   time_limit          output:-1            
+single_above             output:1   =                      output:0            time_limit          output:-1             =                     =                   =                   output:0             
+two_between              output:1   =                      =                   time_limit          output:-1             =                     output:0            time_limit          output:0             
+large_absent             output:50000  =                      =                   time_limit          output:-1             =                     =                   time_limit          output:49999         
+large_above_all          output:20000  =                      output:199999       time_limit          output:-1             =                     =                   =                   output:199999        
+large_duplicates         output:0   output:200000          =                   =                   output:99999          output:100000         =                   time_limit          output:-1            
+pair_equal_target        output:0   output:2               =                   =                   =                     output:1              =                   time_limit          output:-1            
+absent_after_duplicates  output:3   =                      =                   time_limit          output:-1             =                     output:2            time_limit          output:2             
+  model upper_bound_confusion [equality_handling] detected by 8: sample_present, equal_first, equal_last, duplicates_middle, duplicates_all, single_equal, large_duplicates, pair_equal_target
+  model hi_init_last_index [search_space_boundaries] detected by 3: above_all, single_above, large_above_all
+  model no_progress_update [loop_termination] detected by 10: sample_present, sample_absent, above_all, equal_last, duplicates_middle, single_above, two_between, large_absent, large_above_all, absent_after_duplicates
+  model exact_match_sentinel [problem_specification] detected by 12: sample_absent, empty, below_all, above_all, duplicates_middle, duplicates_all, single_above, two_between, large_absent, large_above_all, large_duplicates, absent_after_duplicates
+  model stops_at_first_match [equality_handling] detected by 4: duplicates_middle, duplicates_all, large_duplicates, pair_equal_target
+  model hi_skips_candidate [search_space_boundaries] detected by 5: sample_present, sample_absent, duplicates_middle, two_between, absent_after_duplicates
+  model closed_loop_hi_mid [loop_termination] detected by 13: sample_present, sample_absent, below_all, equal_first, equal_last, duplicates_middle, duplicates_all, single_equal, two_between, large_absent, large_duplicates, pair_equal_target, absent_after_duplicates
+  model returns_wrong_pointer [problem_specification] detected by 17: sample_present, sample_absent, empty, below_all, above_all, equal_first, equal_last, duplicates_middle, duplicates_all, single_equal, single_above, two_between, large_absent, large_above_all, large_duplicates, pair_equal_target, absent_after_duplicates
+  pair closed_loop_hi_mid / exact_match_sentinel: 17 distinguishing test(s)
+  pair closed_loop_hi_mid / hi_init_last_index: 16 distinguishing test(s)
+  pair closed_loop_hi_mid / hi_skips_candidate: 13 distinguishing test(s)
+  pair closed_loop_hi_mid / no_progress_update: 9 distinguishing test(s)
+  pair closed_loop_hi_mid / returns_wrong_pointer: 17 distinguishing test(s)
+  pair closed_loop_hi_mid / stops_at_first_match: 13 distinguishing test(s)
+  pair closed_loop_hi_mid / upper_bound_confusion: 13 distinguishing test(s)
+  pair exact_match_sentinel / hi_init_last_index: 12 distinguishing test(s)
+  pair exact_match_sentinel / hi_skips_candidate: 13 distinguishing test(s)
+  pair exact_match_sentinel / no_progress_update: 14 distinguishing test(s)
+  pair exact_match_sentinel / returns_wrong_pointer: 15 distinguishing test(s)
+  pair exact_match_sentinel / stops_at_first_match: 12 distinguishing test(s)
+  pair exact_match_sentinel / upper_bound_confusion: 17 distinguishing test(s)
+  pair hi_init_last_index / hi_skips_candidate: 8 distinguishing test(s)
+  pair hi_init_last_index / no_progress_update: 10 distinguishing test(s)
+  pair hi_init_last_index / returns_wrong_pointer: 14 distinguishing test(s)
+  pair hi_init_last_index / stops_at_first_match: 7 distinguishing test(s)
+  pair hi_init_last_index / upper_bound_confusion: 11 distinguishing test(s)
+  pair hi_skips_candidate / no_progress_update: 10 distinguishing test(s)
+  pair hi_skips_candidate / returns_wrong_pointer: 12 distinguishing test(s)
+  pair hi_skips_candidate / stops_at_first_match: 8 distinguishing test(s)
+  pair hi_skips_candidate / upper_bound_confusion: 11 distinguishing test(s)
+  pair no_progress_update / returns_wrong_pointer: 17 distinguishing test(s)
+  pair no_progress_update / stops_at_first_match: 13 distinguishing test(s)
+  pair no_progress_update / upper_bound_confusion: 15 distinguishing test(s)
+  pair returns_wrong_pointer / stops_at_first_match: 17 distinguishing test(s)
+  pair returns_wrong_pointer / upper_bound_confusion: 17 distinguishing test(s)
+  pair stops_at_first_match / upper_bound_confusion: 8 distinguishing test(s)
+  group sample_present: detects closed_loop_hi_mid, hi_skips_candidate, no_progress_update, returns_wrong_pointer, upper_bound_confusion
+  group sample_absent, two_between, absent_after_duplicates: detects closed_loop_hi_mid, exact_match_sentinel, hi_skips_candidate, no_progress_update, returns_wrong_pointer
+  group empty: detects exact_match_sentinel, returns_wrong_pointer
+  group below_all: detects closed_loop_hi_mid, exact_match_sentinel, returns_wrong_pointer
+  group above_all, single_above, large_above_all: detects exact_match_sentinel, hi_init_last_index, no_progress_update, returns_wrong_pointer
+  group equal_first, single_equal: detects closed_loop_hi_mid, returns_wrong_pointer, upper_bound_confusion
+  group equal_last: detects closed_loop_hi_mid, no_progress_update, returns_wrong_pointer, upper_bound_confusion
+  group duplicates_middle: detects closed_loop_hi_mid, exact_match_sentinel, hi_skips_candidate, no_progress_update, returns_wrong_pointer, stops_at_first_match, upper_bound_confusion
+  group duplicates_all, large_duplicates: detects closed_loop_hi_mid, exact_match_sentinel, returns_wrong_pointer, stops_at_first_match, upper_bound_confusion
+  group large_absent: detects closed_loop_hi_mid, exact_match_sentinel, no_progress_update, returns_wrong_pointer
+  group pair_equal_target: detects closed_loop_hi_mid, returns_wrong_pointer, stops_at_first_match, upper_bound_confusion
+  LIMITATION error model 'hi_init_last_index' is detected by 3 test(s) but only 1 behaviour group(s) (< 2); other errors with that behaviour would be diagnosed as this model. Documented: Detected only by tests whose answer is n (one behaviour group). Any error that cannot return n, such as clamping the result to n - 1, produces identical outputs, so diagnoses are reported as qualified (docs/content-design/lower-bound.md section 4.3).
+  RESULT ok
+== max-window-sum  version 6a286840ec62  (g++ (GCC) 14.2.0, runc)
+                 reference  best_starts_zero  misses_last_window  never_subtracts  subtracts_wrong_element
+sample_typical   output:9   =                 =                   output:18        output:8               
+sample_negative  output:-4  output:0          output:-6           output:-6        output:-5              
+best_last        output:18  =                 output:11           output:24        output:10              
+best_first       output:18  =                 =                   output:22        =                      
+k_equals_n       output:7   =                 =                   =                =                      
+k_one            output:8   =                 =                   output:12        output:-3              
+negative_k_one   output:-2  output:0          =                   output:-5        output:-5              
+mixed_signs      output:6   =                 =                   output:7         output:10              
+dip_then_rise    output:12  =                 output:10           output:10        output:11              
+single           output:-7  output:0          =                   =                =                      
+large_negative   output:-2086  output:0          =                   output:-241275   output:-209278         
+large_ramp       output:49495  =                 =                   output:-5000     output:485050          
+  model best_starts_zero [accumulator_init] detected by 4: sample_negative, negative_k_one, single, large_negative
+  model misses_last_window [loop_bounds] detected by 3: sample_negative, best_last, dip_then_rise
+  model never_subtracts [window_maintenance] detected by 10: sample_typical, sample_negative, best_last, best_first, k_one, negative_k_one, mixed_signs, dip_then_rise, large_negative, large_ramp
+  model subtracts_wrong_element [window_maintenance] detected by 9: sample_typical, sample_negative, best_last, k_one, negative_k_one, mixed_signs, dip_then_rise, large_negative, large_ramp
+  pair best_starts_zero / misses_last_window: 6 distinguishing test(s)
+  pair best_starts_zero / never_subtracts: 11 distinguishing test(s)
+  pair best_starts_zero / subtracts_wrong_element: 10 distinguishing test(s)
+  pair misses_last_window / never_subtracts: 8 distinguishing test(s)
+  pair misses_last_window / subtracts_wrong_element: 9 distinguishing test(s)
+  pair never_subtracts / subtracts_wrong_element: 9 distinguishing test(s)
+  group sample_typical, k_one, mixed_signs, large_ramp: detects never_subtracts, subtracts_wrong_element
+  group sample_negative: detects best_starts_zero, misses_last_window, never_subtracts, subtracts_wrong_element
+  group best_last, dip_then_rise: detects misses_last_window, never_subtracts, subtracts_wrong_element
+  group best_first: detects never_subtracts
+  group k_equals_n: detects none
+  group negative_k_one, large_negative: detects best_starts_zero, never_subtracts, subtracts_wrong_element
+  group single: detects best_starts_zero
+  RESULT ok
+== min-capacity  version e7f55817f3b0  (g++ (GCC) 14.2.0, runc)
+                    reference  lo_init_one  hi_skips_candidate  no_progress_update  strict_day_limit  full_day_overflows  sorts_weights
+sample_ten          output:15  =            =                   time_limit          output:17         output:16           =            
+sample_six          output:6   =            output:5            time_limit          output:9          output:7            output:7     
+one_day             output:9   =            =                   time_limit          =                 =                   =            
+each_own_day        output:5   output:1     =                   =                   =                 =                   =            
+heavy_dominates     output:9   output:2     =                   =                   output:11         =                   =            
+spare_days          output:2   =            =                   =                   output:4          output:3            =            
+exact_fill_pairs    output:10  =            output:9            time_limit          output:20         output:11           =            
+uniform_three_days  output:8   =            output:7            time_limit          output:12         output:9            =            
+order_matters       output:10  =            =                   time_limit          output:20         output:11           output:11    
+decreasing          output:16  =            =                   time_limit          output:25         output:17           =            
+mirrored_halves     output:10  =            output:9            time_limit          output:20         output:11           output:12    
+uneven_runs         output:13  =            output:12           time_limit          output:25         output:14           output:15    
+single_package      output:7   =            =                   =                   =                 =                   =            
+two_one_day         output:11  =            =                   time_limit          =                 =                   =            
+two_two_days        output:8   output:3     =                   =                   output:11         =                   =            
+large_one_day       output:10000  =            =                   time_limit          =                 =                   =            
+large_each_day      output:10000  =            =                   =                   output:20000      output:10001        =            
+large_periodic      output:5050  =            =                   time_limit          output:5150       output:5051         output:5085  
+large_periodic_odd  output:6335  =            =                   time_limit          output:6340       output:6336         output:6336  
+  model lo_init_one [search_space_boundaries] detected by 3: each_own_day, heavy_dominates, two_two_days
+  model hi_skips_candidate [search_space_boundaries] detected by 5: sample_six, exact_fill_pairs, uniform_three_days, mirrored_halves, uneven_runs
+  model no_progress_update [loop_termination] detected by 13: sample_ten, sample_six, one_day, exact_fill_pairs, uniform_three_days, order_matters, decreasing, mirrored_halves, uneven_runs, two_one_day, large_one_day, large_periodic, large_periodic_odd
+  model strict_day_limit [equality_handling] detected by 14: sample_ten, sample_six, heavy_dominates, spare_days, exact_fill_pairs, uniform_three_days, order_matters, decreasing, mirrored_halves, uneven_runs, two_two_days, large_each_day, large_periodic, large_periodic_odd
+  model full_day_overflows [equality_handling] detected by 12: sample_ten, sample_six, spare_days, exact_fill_pairs, uniform_three_days, order_matters, decreasing, mirrored_halves, uneven_runs, large_each_day, large_periodic, large_periodic_odd
+  model sorts_weights [problem_specification] detected by 6: sample_six, order_matters, mirrored_halves, uneven_runs, large_periodic, large_periodic_odd
+  pair full_day_overflows / hi_skips_candidate: 12 distinguishing test(s)
+  pair full_day_overflows / lo_init_one: 15 distinguishing test(s)
+  pair full_day_overflows / no_progress_update: 15 distinguishing test(s)
+  pair full_day_overflows / sorts_weights: 9 distinguishing test(s)
+  pair full_day_overflows / strict_day_limit: 14 distinguishing test(s)
+  pair hi_skips_candidate / lo_init_one: 8 distinguishing test(s)
+  pair hi_skips_candidate / no_progress_update: 13 distinguishing test(s)
+  pair hi_skips_candidate / sorts_weights: 8 distinguishing test(s)
+  pair hi_skips_candidate / strict_day_limit: 14 distinguishing test(s)
+  pair lo_init_one / no_progress_update: 16 distinguishing test(s)
+  pair lo_init_one / sorts_weights: 9 distinguishing test(s)
+  pair lo_init_one / strict_day_limit: 15 distinguishing test(s)
+  pair no_progress_update / sorts_weights: 13 distinguishing test(s)
+  pair no_progress_update / strict_day_limit: 17 distinguishing test(s)
+  pair sorts_weights / strict_day_limit: 14 distinguishing test(s)
+  group sample_ten, decreasing: detects full_day_overflows, no_progress_update, strict_day_limit
+  group sample_six, mirrored_halves, uneven_runs: detects full_day_overflows, hi_skips_candidate, no_progress_update, sorts_weights, strict_day_limit
+  group one_day, two_one_day, large_one_day: detects no_progress_update
+  group each_own_day: detects lo_init_one
+  group heavy_dominates, two_two_days: detects lo_init_one, strict_day_limit
+  group spare_days, large_each_day: detects full_day_overflows, strict_day_limit
+  group exact_fill_pairs, uniform_three_days: detects full_day_overflows, hi_skips_candidate, no_progress_update, strict_day_limit
+  group order_matters, large_periodic, large_periodic_odd: detects full_day_overflows, no_progress_update, sorts_weights, strict_day_limit
+  group single_package: detects none
+  RESULT ok
+== peak-index  version 5963188f0a4a  (g++ (GCC) 14.2.0, runc)
+                     reference  swapped_direction  hi_skips_candidate  no_progress_update  stops_one_early  returns_value
+sample_middle        output:2   output:4           output:1            time_limit          =                output:19    
+sample_increasing    output:2   output:0           =                   time_limit          =                output:18    
+single               output:0   =                  =                   =                   =                output:7     
+two_up               output:1   output:0           =                   time_limit          output:0         output:9     
+two_down             output:0   output:1           =                   =                   =                output:9     
+decreasing           output:0   output:4           =                   =                   =                output:30    
+peak_second          output:1   output:5           =                   time_limit          output:0         output:40    
+peak_second_last     output:4   output:0           output:3            time_limit          output:3         output:40    
+three_peak_middle    output:1   output:2           output:0            time_limit          output:0         output:19    
+four_peak_third      output:2   output:0           =                   time_limit          =                output:19    
+long_peak_left       output:1   output:8           output:0            time_limit          output:0         output:31    
+negatives            output:2   output:5           output:1            time_limit          =                output:-1    
+large_peak_first     output:0   output:199999      =                   =                   =                =            
+large_peak_last      output:19999  output:0           =                   time_limit          =                output:399998
+large_peak_middle    output:12345  output:0           =                   time_limit          =                output:246912
+large_peak_near_end  output:19999  output:0           output:199997       time_limit          output:199997    output:399996
+  model swapped_direction [search_space_boundaries] detected by 15: sample_middle, sample_increasing, two_up, two_down, decreasing, peak_second, peak_second_last, three_peak_middle, four_peak_third, long_peak_left, negatives, large_peak_first, large_peak_last, large_peak_middle, large_peak_near_end
+  model hi_skips_candidate [search_space_boundaries] detected by 6: sample_middle, peak_second_last, three_peak_middle, long_peak_left, negatives, large_peak_near_end
+  model no_progress_update [loop_termination] detected by 12: sample_middle, sample_increasing, two_up, peak_second, peak_second_last, three_peak_middle, four_peak_third, long_peak_left, negatives, large_peak_last, large_peak_middle, large_peak_near_end
+  model stops_one_early [loop_termination] detected by 6: two_up, peak_second, peak_second_last, three_peak_middle, long_peak_left, large_peak_near_end
+  model returns_value [problem_specification] detected by 15: sample_middle, sample_increasing, single, two_up, two_down, decreasing, peak_second, peak_second_last, three_peak_middle, four_peak_third, long_peak_left, negatives, large_peak_last, large_peak_middle, large_peak_near_end
+  pair hi_skips_candidate / no_progress_update: 12 distinguishing test(s)
+  pair hi_skips_candidate / returns_value: 15 distinguishing test(s)
+  pair hi_skips_candidate / stops_one_early: 4 distinguishing test(s)
+  pair hi_skips_candidate / swapped_direction: 15 distinguishing test(s)
+  pair no_progress_update / returns_value: 15 distinguishing test(s)
+  pair no_progress_update / stops_one_early: 12 distinguishing test(s)
+  pair no_progress_update / swapped_direction: 15 distinguishing test(s)
+  pair returns_value / stops_one_early: 15 distinguishing test(s)
+  pair returns_value / swapped_direction: 16 distinguishing test(s)
+  pair stops_one_early / swapped_direction: 14 distinguishing test(s)
+  group sample_middle, negatives: detects hi_skips_candidate, no_progress_update, returns_value, swapped_direction
+  group sample_increasing, four_peak_third, large_peak_last, large_peak_middle: detects no_progress_update, returns_value, swapped_direction
+  group single: detects returns_value
+  group two_up, peak_second: detects no_progress_update, returns_value, stops_one_early, swapped_direction
+  group two_down, decreasing: detects returns_value, swapped_direction
+  group peak_second_last, three_peak_middle, long_peak_left, large_peak_near_end: detects hi_skips_candidate, no_progress_update, returns_value, stops_one_early, swapped_direction
+  group large_peak_first: detects swapped_direction
+  RESULT ok
+== pivot-index  version 28eef0379d7c  (g++ (GCC) 14.2.0, runc)
+                     reference  pivot_counted_left  pivot_counted_right  last_pivot  size_when_none
+sample_typical       output:3   output:-1           output:-1            =           =             
+sample_none          output:-1  output:1            output:2             =           output:3      
+pivot_first          output:0   output:-1           output:-1            =           =             
+pivot_last           output:2   output:-1           output:-1            =           =             
+zeros                output:0   =                   =                    output:3    =             
+two_pivots           output:2   output:1            output:0             =           =             
+two_pivots_mixed     output:1   output:0            =                    output:3    =             
+single               output:0   output:-1           output:-1            =           =             
+pivot_value_matters  output:2   output:-1           output:-1            =           =             
+left_heavy_trap      output:-1  output:1            output:2             =           output:4      
+right_heavy_trap     output:-1  output:1            output:2             =           output:4      
+negative_sum         output:-1  =                   =                    =           output:6      
+large_symmetric      output:49999  output:-1           output:-1            =           =             
+large_zeros          output:0   =                   =                    output:99999  =             
+large_none           output:-1  =                   =                    =           output:100000 
+  model pivot_counted_left [range_inclusion] detected by 11: sample_typical, sample_none, pivot_first, pivot_last, two_pivots, two_pivots_mixed, single, pivot_value_matters, left_heavy_trap, right_heavy_trap, large_symmetric
+  model pivot_counted_right [range_inclusion] detected by 10: sample_typical, sample_none, pivot_first, pivot_last, two_pivots, single, pivot_value_matters, left_heavy_trap, right_heavy_trap, large_symmetric
+  model last_pivot [tie_resolution] detected by 3: zeros, two_pivots_mixed, large_zeros
+  model size_when_none [output_contract] detected by 5: sample_none, left_heavy_trap, right_heavy_trap, negative_sum, large_none
+  pair last_pivot / pivot_counted_left: 13 distinguishing test(s)
+  pair last_pivot / pivot_counted_right: 13 distinguishing test(s)
+  pair last_pivot / size_when_none: 8 distinguishing test(s)
+  pair pivot_counted_left / pivot_counted_right: 5 distinguishing test(s)
+  pair pivot_counted_left / size_when_none: 13 distinguishing test(s)
+  pair pivot_counted_right / size_when_none: 12 distinguishing test(s)
+  group sample_typical, pivot_first, pivot_last, two_pivots, single, pivot_value_matters, large_symmetric: detects pivot_counted_left, pivot_counted_right
+  group sample_none, left_heavy_trap, right_heavy_trap: detects pivot_counted_left, pivot_counted_right, size_when_none
+  group zeros, large_zeros: detects last_pivot
+  group two_pivots_mixed: detects last_pivot, pivot_counted_left
+  group negative_sum, large_none: detects size_when_none
+  RESULT ok
+== plus-one  version a7518c266db6  (g++ (GCC) 14.2.0, runc)
+                       reference  single_carry  no_new_digit  adds_at_front  carry_never_cleared
+sample_simple          output:1 2 4  =             =             output:2 2 3   output:2 3 4       
+sample_chain           output:1 3 0  output:1 2 1  =             output:2 2 9   output:2 3 0 0     
+one_carry              output:4 6 0  =             =             output:5 5 9   output:5 6 0       
+long_chain             output:4 0 0  output:3 9 9  =             output:4 9 9   =                  
+all_nines              output:1 0 0  output:9 10   output:0 0 0  output:0 0 0   =                  
+single_nine            output:1 0  =             output:0      output:0 1     =                  
+single_zero            output:1   =             =             =              =                  
+nine_front             output:9 0 1  =             =             output:0 1 0   output:1 0 1 1     
+nines_front_eight_end  output:9 9 9  =             =             output:0 0 0   output:1 0 0 0 9   
+middle_zero            output:2 1 0  output:2 0 1  =             output:3 0 9   output:3 1 0 0     
+ten                    output:2 0  =             =             output:2 9     =                  
+large_all_nines        output:len=1  output:len=1  output:len=1  output:len=10  =                  
+large_pattern          output:len=9  =             =             output:len=99  output:len=99999 fi
+  model single_carry [running_state] detected by 5: sample_chain, long_chain, all_nines, middle_zero, large_all_nines
+  model no_new_digit [output_contract] detected by 3: all_nines, single_nine, large_all_nines
+  model adds_at_front [loop_bounds] detected by 12: sample_simple, sample_chain, one_carry, long_chain, all_nines, single_nine, nine_front, nines_front_eight_end, middle_zero, ten, large_all_nines, large_pattern
+  model carry_never_cleared [running_state] detected by 7: sample_simple, sample_chain, one_carry, nine_front, nines_front_eight_end, middle_zero, large_pattern
+  pair adds_at_front / carry_never_cleared: 12 distinguishing test(s)
+  pair adds_at_front / no_new_digit: 12 distinguishing test(s)
+  pair adds_at_front / single_carry: 12 distinguishing test(s)
+  pair carry_never_cleared / no_new_digit: 10 distinguishing test(s)
+  pair carry_never_cleared / single_carry: 10 distinguishing test(s)
+  pair no_new_digit / single_carry: 6 distinguishing test(s)
+  group sample_simple, one_carry, nine_front, nines_front_eight_end, large_pattern: detects adds_at_front, carry_never_cleared
+  group sample_chain, middle_zero: detects adds_at_front, carry_never_cleared, single_carry
+  group long_chain: detects adds_at_front, single_carry
+  group all_nines, large_all_nines: detects adds_at_front, no_new_digit, single_carry
+  group single_nine: detects adds_at_front, no_new_digit
+  group single_zero: detects none
+  group ten: detects adds_at_front
+  RESULT ok
+== range-sum-queries  version 74d198449c3a  (g++ (GCC) 14.2.0, runc)
+                    reference  excludes_right_end  prefix_not_accumulated  ignores_left_end
+sample_typical      output:6 9 1  output:2 4 10       output:4 2 -8           output:6 12 3   
+sample_whole        output:10  output:6            output:4                =               
+single_elements     output:7 9 4  output:0 0 0        output:7 11 4           output:7 14 18  
+from_start          output:6 30  output:2 20         output:4 10             =               
+middle_ranges       output:0 9 9  output:-2 1 10      output:-3 7 -3          output:5 15 14  
+zero_right_end      output:8 12  =                   output:-4 0             output:12 12    
+negatives           output:-15 -  output:-7 -19       output:-4 -2            output:-19 -21  
+single_value_array  output:-7  output:0            =                       =               
+repeated_query      output:2 2 2  output:1 1 1        output:0 0 0            output:3 3 3    
+large_many_queries  output:len=1  output:len=100000   output:len=100000 firs  output:len=10000
+  model excludes_right_end [range_inclusion] detected by 9: sample_typical, sample_whole, single_elements, from_start, middle_ranges, negatives, single_value_array, repeated_query, large_many_queries
+  model prefix_not_accumulated [running_state] detected by 9: sample_typical, sample_whole, single_elements, from_start, middle_ranges, zero_right_end, negatives, repeated_query, large_many_queries
+  model ignores_left_end [output_contract] detected by 7: sample_typical, single_elements, middle_ranges, zero_right_end, negatives, repeated_query, large_many_queries
+  pair excludes_right_end / ignores_left_end: 10 distinguishing test(s)
+  pair excludes_right_end / prefix_not_accumulated: 10 distinguishing test(s)
+  pair ignores_left_end / prefix_not_accumulated: 9 distinguishing test(s)
+  group sample_typical, single_elements, middle_ranges, negatives, repeated_query, large_many_queries: detects excludes_right_end, ignores_left_end, prefix_not_accumulated
+  group sample_whole, from_start: detects excludes_right_end, prefix_not_accumulated
+  group zero_right_end: detects ignores_left_end, prefix_not_accumulated
+  group single_value_array: detects excludes_right_end
+  RESULT ok
+== rotated-min  version 6df29dcd99d7  (g++ (GCC) 14.2.0, runc)
+                     reference  compares_with_lo  hi_skips_candidate  no_progress_update  returns_value  returns_pivot
+sample_rotated       output:2   =                 output:0            time_limit          output:1       output:1     
+sample_sorted        output:0   output:3          =                   =                   output:11      output:3     
+single               output:0   =                 =                   =                   output:7       =            
+two_rotated          output:1   =                 =                   time_limit          output:3       output:0     
+two_sorted           output:0   output:1          =                   =                   output:3       output:1     
+min_last             output:4   =                 =                   time_limit          output:11      output:3     
+min_second           output:1   =                 =                   time_limit          output:11      output:0     
+min_middle_even      output:3   output:5          =                   time_limit          output:11      output:2     
+sorted_long          output:0   output:6          =                   =                   output:21      output:6     
+three_min_last       output:2   =                 =                   time_limit          output:12      output:1     
+three_min_middle     output:1   =                 output:0            time_limit          output:12      output:0     
+min_fifth_of_six     output:4   =                 output:3            time_limit          output:11      output:3     
+min_fourth_of_seven  output:3   =                 output:0            time_limit          output:11      output:2     
+negatives            output:3   output:4          =                   time_limit          output:-10     output:2     
+large_sorted         output:0   output:199999     =                   =                   output:100     output:199999
+large_half           output:10000  output:199999     =                   time_limit          output:100     output:99999 
+large_min_last       output:19999  =                 =                   time_limit          output:100     output:199998
+large_min_second     output:1   =                 =                   time_limit          output:100     output:0     
+  model compares_with_lo [search_space_boundaries] detected by 7: sample_sorted, two_sorted, min_middle_even, sorted_long, negatives, large_sorted, large_half
+  model hi_skips_candidate [search_space_boundaries] detected by 4: sample_rotated, three_min_middle, min_fifth_of_six, min_fourth_of_seven
+  model no_progress_update [loop_termination] detected by 13: sample_rotated, two_rotated, min_last, min_second, min_middle_even, three_min_last, three_min_middle, min_fifth_of_six, min_fourth_of_seven, negatives, large_half, large_min_last, large_min_second
+  model returns_value [problem_specification] detected by 18: sample_rotated, sample_sorted, single, two_rotated, two_sorted, min_last, min_second, min_middle_even, sorted_long, three_min_last, three_min_middle, min_fifth_of_six, min_fourth_of_seven, negatives, large_sorted, large_half, large_min_last, large_min_second
+  model returns_pivot [problem_specification] detected by 17: sample_rotated, sample_sorted, two_rotated, two_sorted, min_last, min_second, min_middle_even, sorted_long, three_min_last, three_min_middle, min_fifth_of_six, min_fourth_of_seven, negatives, large_sorted, large_half, large_min_last, large_min_second
+  pair compares_with_lo / hi_skips_candidate: 11 distinguishing test(s)
+  pair compares_with_lo / no_progress_update: 17 distinguishing test(s)
+  pair compares_with_lo / returns_pivot: 13 distinguishing test(s)
+  pair compares_with_lo / returns_value: 18 distinguishing test(s)
+  pair hi_skips_candidate / no_progress_update: 13 distinguishing test(s)
+  pair hi_skips_candidate / returns_pivot: 15 distinguishing test(s)
+  pair hi_skips_candidate / returns_value: 18 distinguishing test(s)
+  pair no_progress_update / returns_pivot: 17 distinguishing test(s)
+  pair no_progress_update / returns_value: 18 distinguishing test(s)
+  pair returns_pivot / returns_value: 17 distinguishing test(s)
+  group sample_rotated, three_min_middle, min_fifth_of_six, min_fourth_of_seven: detects hi_skips_candidate, no_progress_update, returns_pivot, returns_value
+  group sample_sorted, two_sorted, sorted_long, large_sorted: detects compares_with_lo, returns_pivot, returns_value
+  group single: detects returns_value
+  group two_rotated, min_last, min_second, three_min_last, large_min_last, large_min_second: detects no_progress_update, returns_pivot, returns_value
+  group min_middle_even, negatives, large_half: detects compares_with_lo, no_progress_update, returns_pivot, returns_value
+  LIMITATION error model 'hi_skips_candidate' is detected by 4 test(s) but only 1 behaviour group(s) (< 2); other errors with that behaviour would be diagnosed as this model. Documented: Detected only by rotated arrays whose minimum becomes a midpoint (one behaviour group). Any error that fails exactly those tests produces the same failures, so diagnoses are reported as qualified.
+  RESULT ok
+== rotated-search  version 14e8af1098ad  (g++ (GCC) 14.2.0, runc)
+                    reference  left_half_test_strict  left_range_excludes_lo  closed_loop_lt  ignores_rotation  returns_sorted_position
+sample_right        output:4   =                      =                       =               output:-1         output:1               
+sample_absent       output:-1  =                      =                       =               =                 =                      
+left_run_first      output:0   =                      output:-1               =               =                 output:3               
+left_run_middle     output:1   =                      =                       output:-1       =                 output:4               
+right_run_last      output:5   =                      =                       output:-1       output:-1         output:2               
+right_run_first     output:3   =                      output:-1               output:-1       output:-1         output:0               
+absent_in_gap       output:-1  =                      =                       =               =                 =                      
+sorted_first        output:0   =                      output:-1               =               =                 =                      
+sorted_last         output:4   =                      =                       output:-1       =                 =                      
+single_hit          output:0   =                      =                       output:-1       =                 =                      
+single_miss         output:-1  =                      =                       =               =                 =                      
+two_rotated_second  output:1   output:-1              =                       output:-1       output:-1         output:0               
+two_rotated_first   output:0   =                      =                       =               =                 output:1               
+two_sorted_second   output:1   =                      =                       output:-1       =                 =                      
+three_rotated_last  output:2   =                      =                       output:-1       output:-1         output:0               
+seven_left_start    output:0   =                      output:-1               output:-1       output:-1         output:4               
+four_min_last       output:3   output:-1              =                       output:-1       output:-1         output:0               
+large_min_last      output:19999  =                      =                       output:-1       output:-1         output:0               
+large_rotated_hit   output:70100  =                      =                       =               output:-1         output:100             
+large_rotated_miss  output:-1  =                      =                       =               =                 =                      
+large_sorted_hit    output:99999  =                      =                       =               =                 =                      
+  model left_half_test_strict [equality_handling] detected by 2: two_rotated_second, four_min_last
+  model left_range_excludes_lo [equality_handling] detected by 4: left_run_first, right_run_first, sorted_first, seven_left_start
+  model closed_loop_lt [loop_termination] detected by 11: left_run_middle, right_run_last, right_run_first, sorted_last, single_hit, two_rotated_second, two_sorted_second, three_rotated_last, seven_left_start, four_min_last, large_min_last
+  model ignores_rotation [problem_specification] detected by 9: sample_right, right_run_last, right_run_first, two_rotated_second, three_rotated_last, seven_left_start, four_min_last, large_min_last, large_rotated_hit
+  model returns_sorted_position [problem_specification] detected by 12: sample_right, left_run_first, left_run_middle, right_run_last, right_run_first, two_rotated_second, two_rotated_first, three_rotated_last, seven_left_start, four_min_last, large_min_last, large_rotated_hit
+  pair closed_loop_lt / ignores_rotation: 6 distinguishing test(s)
+  pair closed_loop_lt / left_half_test_strict: 9 distinguishing test(s)
+  pair closed_loop_lt / left_range_excludes_lo: 11 distinguishing test(s)
+  pair closed_loop_lt / returns_sorted_position: 15 distinguishing test(s)
+  pair ignores_rotation / left_half_test_strict: 7 distinguishing test(s)
+  pair ignores_rotation / left_range_excludes_lo: 9 distinguishing test(s)
+  pair ignores_rotation / returns_sorted_position: 12 distinguishing test(s)
+  pair left_half_test_strict / left_range_excludes_lo: 6 distinguishing test(s)
+  pair left_half_test_strict / returns_sorted_position: 12 distinguishing test(s)
+  pair left_range_excludes_lo / returns_sorted_position: 13 distinguishing test(s)
+  group sample_right, large_rotated_hit: detects ignores_rotation, returns_sorted_position
+  group sample_absent, absent_in_gap, single_miss, large_rotated_miss, large_sorted_hit: detects none
+  group left_run_first: detects left_range_excludes_lo, returns_sorted_position
+  group left_run_middle: detects closed_loop_lt, returns_sorted_position
+  group right_run_last, three_rotated_last, large_min_last: detects closed_loop_lt, ignores_rotation, returns_sorted_position
+  group right_run_first, seven_left_start: detects closed_loop_lt, ignores_rotation, left_range_excludes_lo, returns_sorted_position
+  group sorted_first: detects left_range_excludes_lo
+  group sorted_last, single_hit, two_sorted_second: detects closed_loop_lt
+  group two_rotated_second, four_min_last: detects closed_loop_lt, ignores_rotation, left_half_test_strict, returns_sorted_position
+  group two_rotated_first: detects returns_sorted_position
+  LIMITATION error model 'left_half_test_strict' is detected by 2 test(s) but only 1 behaviour group(s) (< 2); other errors with that behaviour would be diagnosed as this model. Documented: Detected only when the search ends on a rotated pair whose second element is the target (one behaviour group, 2 tests). Any error that fails exactly those tests produces the same failures, so diagnoses are reported as qualified.
+  RESULT ok
+== second-largest  version 6f9032b8d8b8  (g++ (GCC) 14.2.0, runc)
+                   reference  counts_duplicates  no_demotion  skips_first  zero_when_none
+sample_mixed       output:7   output:9           =            =            =             
+sample_none        output:-1  output:5           =            =            output:0      
+increasing         output:7   =                  output:-1    =            =             
+decreasing         output:7   =                  =            output:5     =             
+answer_first       output:8   =                  output:3     output:3     =             
+max_first_dups     output:6   output:10          =            =            =             
+answer_before_max  output:5   =                  output:3     output:3     =             
+two_distinct       output:3   =                  output:-1    output:-1    =             
+two_equal          output:-1  output:6           =            =            output:0      
+single             output:-1  =                  =            =            output:0      
+zero_is_answer     output:0   output:5           =            =            =             
+second_dups        output:7   output:9           output:1     =            =             
+large_increasing   output:99998  =                  output:-1    =            =             
+large_periodic     output:1003  output:1004        =            =            =             
+  model counts_duplicates [tie_resolution] detected by 7: sample_mixed, sample_none, max_first_dups, two_equal, zero_is_answer, second_dups, large_periodic
+  model no_demotion [running_state] detected by 6: increasing, answer_first, answer_before_max, two_distinct, second_dups, large_increasing
+  model skips_first [loop_bounds] detected by 4: decreasing, answer_first, answer_before_max, two_distinct
+  model zero_when_none [output_contract] detected by 3: sample_none, two_equal, single
+  pair counts_duplicates / no_demotion: 12 distinguishing test(s)
+  pair counts_duplicates / skips_first: 11 distinguishing test(s)
+  pair counts_duplicates / zero_when_none: 8 distinguishing test(s)
+  pair no_demotion / skips_first: 4 distinguishing test(s)
+  pair no_demotion / zero_when_none: 9 distinguishing test(s)
+  pair skips_first / zero_when_none: 7 distinguishing test(s)
+  group sample_mixed, max_first_dups, zero_is_answer, large_periodic: detects counts_duplicates
+  group sample_none, two_equal: detects counts_duplicates, zero_when_none
+  group increasing, large_increasing: detects no_demotion
+  group decreasing: detects skips_first
+  group answer_first, answer_before_max, two_distinct: detects no_demotion, skips_first
+  group single: detects zero_when_none
+  group second_dups: detects counts_duplicates, no_demotion
+  RESULT ok
+== stock-profit  version 25a63d1ddab3  (g++ (GCC) 14.2.0, runc)
+                    reference  ignores_order  allows_loss  misses_last_day
+sample_typical      output:5   output:6       =            =              
+sample_falling      output:0   output:6       output:-1    =              
+rise_last_day       output:7   =              =            output:3       
+peak_then_dip       output:7   output:8       =            =              
+min_after_max_flat  output:3   output:7       =            =              
+flat                output:0   =              =            =              
+single_day          output:0   =              output:-2147  =              
+two_days_up         output:9   =              =            output:0       
+two_days_down       output:0   output:9       output:-9    =              
+late_low_late_high  output:5   output:8       =            =              
+large_rising        output:9999  =              =            output:9998    
+dip_then_last_rise  output:6   output:7       =            output:2       
+large_sawtooth      output:9999  =              =            =              
+  model ignores_order [output_contract] detected by 7: sample_typical, sample_falling, peak_then_dip, min_after_max_flat, two_days_down, late_low_late_high, dip_then_last_rise
+  model allows_loss [output_contract] detected by 3: sample_falling, single_day, two_days_down
+  model misses_last_day [loop_bounds] detected by 4: rise_last_day, two_days_up, large_rising, dip_then_last_rise
+  pair allows_loss / ignores_order: 8 distinguishing test(s)
+  pair allows_loss / misses_last_day: 7 distinguishing test(s)
+  pair ignores_order / misses_last_day: 10 distinguishing test(s)
+  group sample_typical, peak_then_dip, min_after_max_flat, late_low_late_high: detects ignores_order
+  group sample_falling, two_days_down: detects allows_loss, ignores_order
+  group rise_last_day, two_days_up, large_rising: detects misses_last_day
+  group flat, large_sawtooth: detects none
+  group single_day: detects allows_loss
+  group dip_then_last_rise: detects ignores_order, misses_last_day
+  RESULT ok
+== upper-bound  version b429912d241e  (g++ (GCC) 14.2.0, runc)
+                      reference  lower_bound_confusion  hi_init_last_index  hi_skips_candidate  no_progress_update  closed_loop_hi_mid  returns_last_not_greater  none_sentinel
+sample_duplicates     output:3   output:1               =                   =                   time_limit          time_limit          output:2                  =            
+sample_absent         output:3   =                      =                   =                   time_limit          time_limit          output:2                  =            
+empty                 output:0   =                      =                   =                   =                   =                   output:-1                 output:-1    
+below_all             output:0   =                      =                   =                   =                   time_limit          output:-1                 =            
+above_all             output:3   =                      output:2            =                   time_limit          =                   output:2                  output:-1    
+equal_last            output:3   output:2               output:2            =                   time_limit          =                   output:2                  output:-1    
+equal_first           output:1   output:0               =                   output:0            time_limit          time_limit          output:0                  =            
+unique_middle         output:3   output:2               =                   =                   time_limit          time_limit          output:2                  =            
+duplicates_middle     output:5   output:1               =                   output:4            time_limit          time_limit          output:4                  =            
+duplicates_all        output:7   output:0               output:6            =                   time_limit          =                   output:6                  output:-1    
+duplicates_all_below  output:0   =                      =                   =                   =                   time_limit          output:-1                 =            
+single_equal          output:1   output:0               output:0            =                   time_limit          =                   output:0                  output:-1    
+single_greater        output:0   =                      =                   =                   =                   time_limit          output:-1                 =            
+two_between           output:1   =                      =                   output:0            time_limit          time_limit          output:0                  =            
+pair_equal_target     output:2   output:0               output:1            =                   time_limit          =                   output:1                  output:-1    
+large_absent          output:50000  =                      =                   =                   time_limit          time_limit          output:49999              =            
+large_present         output:50001  output:50000           =                   =                   time_limit          time_limit          output:50000              =            
+large_above_all       output:20000  =                      output:199999       =                   time_limit          =                   output:199999             output:-1    
+large_duplicates      output:20000  output:0               output:199999       =                   time_limit          =                   output:199999             output:-1    
+  model lower_bound_confusion [equality_handling] detected by 10: sample_duplicates, equal_last, equal_first, unique_middle, duplicates_middle, duplicates_all, single_equal, pair_equal_target, large_present, large_duplicates
+  model hi_init_last_index [search_space_boundaries] detected by 7: above_all, equal_last, duplicates_all, single_equal, pair_equal_target, large_above_all, large_duplicates
+  model hi_skips_candidate [search_space_boundaries] detected by 3: equal_first, duplicates_middle, two_between
+  model no_progress_update [loop_termination] detected by 15: sample_duplicates, sample_absent, above_all, equal_last, equal_first, unique_middle, duplicates_middle, duplicates_all, single_equal, two_between, pair_equal_target, large_absent, large_present, large_above_all, large_duplicates
+  model closed_loop_hi_mid [loop_termination] detected by 11: sample_duplicates, sample_absent, below_all, equal_first, unique_middle, duplicates_middle, duplicates_all_below, single_greater, two_between, large_absent, large_present
+  model returns_last_not_greater [problem_specification] detected by 19: sample_duplicates, sample_absent, empty, below_all, above_all, equal_last, equal_first, unique_middle, duplicates_middle, duplicates_all, duplicates_all_below, single_equal, single_greater, two_between, pair_equal_target, large_absent, large_present, large_above_all, large_duplicates
+  model none_sentinel [problem_specification] detected by 8: empty, above_all, equal_last, duplicates_all, single_equal, pair_equal_target, large_above_all, large_duplicates
+  pair closed_loop_hi_mid / hi_init_last_index: 18 distinguishing test(s)
+  pair closed_loop_hi_mid / hi_skips_candidate: 11 distinguishing test(s)
+  pair closed_loop_hi_mid / lower_bound_confusion: 16 distinguishing test(s)
+  pair closed_loop_hi_mid / no_progress_update: 10 distinguishing test(s)
+  pair closed_loop_hi_mid / none_sentinel: 19 distinguishing test(s)
+  pair closed_loop_hi_mid / returns_last_not_greater: 19 distinguishing test(s)
+  pair hi_init_last_index / hi_skips_candidate: 10 distinguishing test(s)
+  pair hi_init_last_index / lower_bound_confusion: 10 distinguishing test(s)
+  pair hi_init_last_index / no_progress_update: 15 distinguishing test(s)
+  pair hi_init_last_index / none_sentinel: 8 distinguishing test(s)
+  pair hi_init_last_index / returns_last_not_greater: 12 distinguishing test(s)
+  pair hi_skips_candidate / lower_bound_confusion: 10 distinguishing test(s)
+  pair hi_skips_candidate / no_progress_update: 15 distinguishing test(s)
+  pair hi_skips_candidate / none_sentinel: 11 distinguishing test(s)
+  pair hi_skips_candidate / returns_last_not_greater: 16 distinguishing test(s)
+  pair lower_bound_confusion / no_progress_update: 15 distinguishing test(s)
+  pair lower_bound_confusion / none_sentinel: 13 distinguishing test(s)
+  pair lower_bound_confusion / returns_last_not_greater: 14 distinguishing test(s)
+  pair no_progress_update / none_sentinel: 16 distinguishing test(s)
+  pair no_progress_update / returns_last_not_greater: 19 distinguishing test(s)
+  pair none_sentinel / returns_last_not_greater: 18 distinguishing test(s)
+  group sample_duplicates, unique_middle, large_present: detects closed_loop_hi_mid, lower_bound_confusion, no_progress_update, returns_last_not_greater
+  group sample_absent, large_absent: detects closed_loop_hi_mid, no_progress_update, returns_last_not_greater
+  group empty: detects none_sentinel, returns_last_not_greater
+  group below_all, duplicates_all_below, single_greater: detects closed_loop_hi_mid, returns_last_not_greater
+  group above_all, large_above_all: detects hi_init_last_index, no_progress_update, none_sentinel, returns_last_not_greater
+  group equal_last, duplicates_all, single_equal, pair_equal_target, large_duplicates: detects hi_init_last_index, lower_bound_confusion, no_progress_update, none_sentinel, returns_last_not_greater
+  group equal_first, duplicates_middle: detects closed_loop_hi_mid, hi_skips_candidate, lower_bound_confusion, no_progress_update, returns_last_not_greater
+  group two_between: detects closed_loop_hi_mid, hi_skips_candidate, no_progress_update, returns_last_not_greater
+  RESULT ok
+wrote ../docs/content-reports/closest-pair-sum.md
+wrote ../docs/content-reports/container-water.md
+wrote ../docs/content-reports/count-occurrences.md
+wrote ../docs/content-reports/dedup-sorted.md
+wrote ../docs/content-reports/distinct-in-windows.md
+wrote ../docs/content-reports/exact-search.md
+wrote ../docs/content-reports/first-max-index.md
+wrote ../docs/content-reports/first-true.md
+wrote ../docs/content-reports/integer-sqrt.md
+wrote ../docs/content-reports/last-less-than.md
+wrote ../docs/content-reports/last-occurrence.md
+wrote ../docs/content-reports/longest-run.md
+wrote ../docs/content-reports/longest-sum-at-most.md
+wrote ../docs/content-reports/lower-bound.md
+wrote ../docs/content-reports/max-window-sum.md
+wrote ../docs/content-reports/min-capacity.md
+wrote ../docs/content-reports/peak-index.md
+wrote ../docs/content-reports/pivot-index.md
+wrote ../docs/content-reports/plus-one.md
+wrote ../docs/content-reports/range-sum-queries.md
+wrote ../docs/content-reports/rotated-min.md
+wrote ../docs/content-reports/rotated-search.md
+wrote ../docs/content-reports/second-largest.md
+wrote ../docs/content-reports/stock-profit.md
+wrote ../docs/content-reports/upper-bound.md

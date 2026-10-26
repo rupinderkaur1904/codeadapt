@@ -14,17 +14,18 @@ interface = "int closest_pair_gap(const std::vector<int>& a, int target);"
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+loop_bounds = "Visiting exactly the positions the task needs: a loop starts and ends at the right index and runs from the right end."
+range_inclusion = "Counting or summing over exactly the right set of positions: interval lengths, inclusive or exclusive ends, and whether an element may pair with itself or belongs to a side."
+pointer_movement = "Moving the right pointer at each step of a two-pointer scan, and doing the comparison or write that each move depends on."
 
 [probes]
-self_pair_tempting = ["index_range"]
-first_element_needed = ["index_range"]
-pointer_direction = ["update_rule"]
+self_pair_tempting = ["range_inclusion"]
+first_element_needed = ["loop_bounds"]
+pointer_direction = ["pointer_movement"]
 gap_below_target = ["output_contract"]
-exact_hit = ["update_rule"]
-large_input = ["update_rule"]
+exact_hit = ["pointer_movement"]
+large_input = ["pointer_movement"]
 
 [curriculum]
 assumes = ["a sorted array", "two indices moving towards each other"]
@@ -151,21 +152,21 @@ distinguishes = ["moves_wrong_pointer"]
 [[error_models]]
 key = "allows_same_element"
 file = "error_models/allows_same_element.cpp"
-skill = "index_range"
+skill = "range_inclusion"
 description = "Loops while lo <= hi, so an element can be paired with itself."
 student_hint = "Can the two numbers of a pair be the same element of the array? Check when your loop stops."
 
 [[error_models]]
 key = "moves_wrong_pointer"
 file = "error_models/moves_wrong_pointer.cpp"
-skill = "update_rule"
+skill = "pointer_movement"
 description = "Moves hi when the sum is too small and lo when it is too large, so the sum moves away from the target."
 student_hint = "If the current sum is too small, which pointer must move to make it larger?"
 
 [[error_models]]
 key = "skips_first"
 file = "error_models/skips_first.cpp"
-skill = "index_range"
+skill = "loop_bounds"
 description = "The left pointer starts at index 1, so pairs using the first element are never considered."
 student_hint = "Where does your left pointer start? Can the first element be part of the best pair?"
 

@@ -367,6 +367,13 @@ export interface components {
             /** Data Class */
             data_class: string;
             estimate: components["schemas"]["LearnerEstimate"];
+            /**
+             * Retired Skills
+             * @default {}
+             */
+            retired_skills: {
+                [key: string]: components["schemas"]["RetiredSkillView"];
+            };
             /** Username */
             username: string;
         };
@@ -503,6 +510,17 @@ export interface components {
             /** Username */
             username: string;
         };
+        /** RetiredSkillView */
+        RetiredSkillView: {
+            /** Decision */
+            decision: string;
+            /** Definition */
+            definition: string;
+            /** Replaced By */
+            replaced_by: string[];
+            /** Retired */
+            retired: string;
+        };
         /** SampleTest */
         SampleTest: {
             /** Description */
@@ -602,6 +620,20 @@ export interface components {
              */
             tests: components["schemas"]["TestResultView"][];
         };
+        /** TechniqueCheckView */
+        TechniqueCheckView: {
+            /** Banned Names */
+            banned_names: string[];
+            /** Found */
+            found: string[];
+            /** Note */
+            note: string;
+            /**
+             * Skill Evidence
+             * @enum {string}
+             */
+            skill_evidence: "eligible" | "withheld";
+        };
         /** TestResultView */
         TestResultView: {
             /** Actual Output */
@@ -664,6 +696,7 @@ export interface components {
             submission: {
                 [key: string]: unknown;
             };
+            technique_check?: components["schemas"]["TechniqueCheckView"] | null;
         };
         /** TracedObservation */
         TracedObservation: {

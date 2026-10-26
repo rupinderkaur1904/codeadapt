@@ -22,6 +22,13 @@ NON_UNIQUE_ATTRIBUTION = {
     "stock-profit": {"ignores_order"},
     "container-water": {"moves_taller"},
     "dedup-sorted": {"returns_last_index"},
+    # L20 safeguard S1 (owner approval 2026-10-26; docs/reviews/2026-10-25/l20-search.md).
+    "upper-bound": {"lower_bound_confusion", "hi_init_last_index", "none_sentinel"},
+    "exact-search": {"swapped_direction", "lo_init_one"},
+    "last-occurrence": {"returns_first_occurrence", "stops_at_any_match", "hi_init_last_index"},
+    "rotated-search": {"left_range_excludes_lo"},
+    "peak-index": {"swapped_direction"},
+    "integer-sqrt": {"strict_square_test"},
 }
 
 

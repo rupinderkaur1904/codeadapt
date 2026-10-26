@@ -1,5 +1,9 @@
 # Content design record: `longest-run` (bank expansion batch A1, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `1a66ed58fae9…` (was `2f41017cdef4…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `last_run_unchecked` → `running_state`; `compares_to_first` → `running_state`. Declared skills are now `accumulator_init`, `output_contract`, `running_state`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/longest-run.md).
