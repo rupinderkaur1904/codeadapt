@@ -45,6 +45,7 @@ export function TracePage() {
   const rationale = (diagnosis?.rationale ?? {}) as Row;
   const runs = new Map(t.execution_runs.map((r) => [r.id, String(r.profile)]));
   const validation = t.content_validation as Row | null;
+  const recRationale = (t.recommendation?.rationale ?? {}) as Row;
   return (
     <section>
       <p>
@@ -70,6 +71,7 @@ export function TracePage() {
             row={rationale}
             keys={[
               "rule",
+              "evidence_strength",
               "excluded",
               "supporting_tests",
               "timed_out_tests",
@@ -110,10 +112,19 @@ export function TracePage() {
       )}
       <h2>Adaptation</h2>
       {t.recommendation ? (
-        <Fields
-          row={t.recommendation}
-          keys={["rule", "action", "problem_slug", "target_skills", "criterion", "review_flag"]}
-        />
+        <>
+          <Fields
+            row={t.recommendation}
+            keys={["rule", "action", "problem_slug", "target_skills", "criterion", "review_flag"]}
+          />
+          <Fields row={recRationale} keys={["qualified_hypothesis", "known_limitation"]} />
+          {recRationale.qualified_hypothesis === true && (
+            <p className="muted">
+              Qualified hypothesis: the evidence is weak (one behaviour group) or the model has a
+              documented limitation, so the specific error is not presented as established.
+            </p>
+          )}
+        </>
       ) : (
         <p className="muted">No recommendation was made after this submission.</p>
       )}
