@@ -124,6 +124,7 @@ export function TracePage() {
               documented limitation, so the specific error is not presented as established.
             </p>
           )}
+          <Raw label="Recommendation rationale and ranking" value={recRationale} />
         </>
       ) : (
         <p className="muted">No recommendation was made after this submission.</p>

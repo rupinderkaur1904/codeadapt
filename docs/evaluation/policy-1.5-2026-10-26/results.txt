@@ -1,0 +1,90 @@
+
+### policy 1.4, eligibility e2 — H1 (417 histories)
+- actions: {'new_problem': 290, 'none': 13, 'retry': 114}
+- retry because no other candidate (supported/ambiguous/pass): 114; action none: 13
+- new_problem destinations: {'count-occurrences': 129, 'lower-bound': 92, 'last-less-than': 69}
+- binary-search destinations: {'count-occurrences': 129, 'lower-bound': 92, 'last-less-than': 69}; largest share 44%
+- original three picked: 290 of 290
+- target skills (new_problem): {'problem_specification': 143, 'loop_termination': 136, 'search_space_boundaries': 134, 'equality_handling': 82}
+- distinct problems picked: 3; distinct skills targeted: 4
+- targeted follow-ups to a problem where a target skill is declared positive-only: 75 of 278
+- new_problem to a problem already in the history: 0
+- deterministic on a second call: True
+
+### policy 1.4, eligibility e2 — H2 (286 histories)
+- actions: {'new_problem': 256, 'none': 6, 'retry': 24}
+- retry because no other candidate (supported/ambiguous/pass): 0; action none: 6
+- new_problem destinations: {'count-occurrences': 131, 'last-less-than': 70, 'lower-bound': 55}
+- binary-search destinations: {'count-occurrences': 131, 'last-less-than': 70, 'lower-bound': 55}; largest share 51%
+- original three picked: 256 of 256
+- target skills (new_problem): {'problem_specification': 124, 'equality_handling': 108, 'loop_termination': 108, 'search_space_boundaries': 108}
+- distinct problems picked: 3; distinct skills targeted: 4
+- targeted follow-ups to a problem where a target skill is declared positive-only: 91 of 244
+- new_problem to a problem already in the history: 0
+- deterministic on a second call: True
+
+### policy 1.4, eligibility e2 — H3 (11 trajectories of 6 attempts)
+- first follow-up: {'lower-bound': 4, 'count-occurrences': 4, 'last-less-than': 3}
+- distinct problems visited per trajectory: mean 3.00, min 3, max 3
+- distinct problems giving a first-attempt observation of the targeted skill: mean 3.00
+- trajectories reaching >=3 first-attempt observations of the skill from >=2 problems: 11 of 11
+
+### policy 1.4, eligibility current — H1 (417 histories)
+- actions: {'new_problem': 393, 'retry': 24}
+- retry because no other candidate (supported/ambiguous/pass): 24; action none: 0
+- new_problem destinations: {'exact-search': 118, 'first-true': 92, 'last-occurrence': 47, 'upper-bound': 25, 'container-water': 15, 'longest-run': 15, 'first-max-index': 11, 'closest-pair-sum': 10, 'dedup-sorted': 8, 'count-occurrences': 8, 'stock-profit': 8, 'second-largest': 7, 'range-sum-queries': 7, 'longest-sum-at-most': 5, 'plus-one': 5, 'max-window-sum': 4, 'distinct-in-windows': 4, 'pivot-index': 4}
+- binary-search destinations: {'exact-search': 118, 'first-true': 92, 'last-occurrence': 47, 'upper-bound': 25, 'count-occurrences': 8}; largest share 41%
+- original three picked: 8 of 290
+- target skills (new_problem): {'problem_specification': 143, 'loop_termination': 136, 'search_space_boundaries': 134, 'equality_handling': 74, 'output_contract': 50, 'loop_bounds': 37, 'range_inclusion': 20, 'running_state': 19, 'pointer_movement': 18, 'window_maintenance': 11, 'tie_resolution': 9, 'accumulator_init': 8}
+- distinct problems picked: 18; distinct skills targeted: 12
+- targeted follow-ups to a problem where a target skill is declared positive-only: 174 of 368
+- new_problem to a problem already in the history: 0
+- deterministic on a second call: True
+
+### policy 1.4, eligibility current — H2 (286 histories)
+- actions: {'new_problem': 262, 'retry': 24}
+- retry because no other candidate (supported/ambiguous/pass): 0; action none: 0
+- new_problem destinations: {'exact-search': 90, 'first-true': 76, 'last-occurrence': 72, 'upper-bound': 24}
+- binary-search destinations: {'exact-search': 90, 'first-true': 76, 'last-occurrence': 72, 'upper-bound': 24}; largest share 34%
+- original three picked: 0 of 262
+- target skills (new_problem): {'problem_specification': 130, 'loop_termination': 114, 'search_space_boundaries': 114, 'equality_handling': 96}
+- distinct problems picked: 4; distinct skills targeted: 4
+- targeted follow-ups to a problem where a target skill is declared positive-only: 168 of 244
+- new_problem to a problem already in the history: 0
+- deterministic on a second call: True
+
+### policy 1.4, eligibility current — H3 (28 trajectories of 6 attempts)
+- first follow-up: {'first-true': 17, 'exact-search': 7, 'last-occurrence': 2, 'upper-bound': 2}
+- distinct problems visited per trajectory: mean 4.46, min 4, max 6
+- distinct problems giving a first-attempt observation of the targeted skill: mean 4.32
+- trajectories reaching >=3 first-attempt observations of the skill from >=2 problems: 27 of 28
+
+### policy 1.5, eligibility current — H1 (417 histories)
+- actions: {'new_problem': 393, 'retry': 24}
+- retry because no other candidate (supported/ambiguous/pass): 24; action none: 0
+- new_problem destinations: {'first-true': 163, 'count-occurrences': 55, 'upper-bound': 34, 'closest-pair-sum': 17, 'lower-bound': 15, 'longest-run': 15, 'exact-search': 14, 'plus-one': 9, 'last-less-than': 9, 'dedup-sorted': 8, 'container-water': 8, 'stock-profit': 8, 'second-largest': 7, 'first-max-index': 7, 'range-sum-queries': 7, 'longest-sum-at-most': 5, 'max-window-sum': 4, 'distinct-in-windows': 4, 'pivot-index': 4}
+- binary-search destinations: {'first-true': 163, 'count-occurrences': 55, 'upper-bound': 34, 'lower-bound': 15, 'exact-search': 14, 'last-less-than': 9}; largest share 56%
+- original three picked: 79 of 290
+- target skills (new_problem): {'problem_specification': 143, 'loop_termination': 136, 'search_space_boundaries': 134, 'equality_handling': 74, 'output_contract': 50, 'loop_bounds': 37, 'range_inclusion': 20, 'running_state': 19, 'pointer_movement': 18, 'window_maintenance': 11, 'tie_resolution': 9, 'accumulator_init': 8}
+- distinct problems picked: 19; distinct skills targeted: 12
+- targeted follow-ups to a problem where a target skill is declared positive-only: 6 of 368
+- new_problem to a problem already in the history: 0
+- deterministic on a second call: True
+
+### policy 1.5, eligibility current — H2 (286 histories)
+- actions: {'new_problem': 262, 'retry': 24}
+- retry because no other candidate (supported/ambiguous/pass): 0; action none: 0
+- new_problem destinations: {'first-true': 148, 'count-occurrences': 45, 'lower-bound': 19, 'exact-search': 18, 'upper-bound': 18, 'last-occurrence': 14}
+- binary-search destinations: {'first-true': 148, 'count-occurrences': 45, 'lower-bound': 19, 'exact-search': 18, 'upper-bound': 18, 'last-occurrence': 14}; largest share 56%
+- original three picked: 64 of 262
+- target skills (new_problem): {'problem_specification': 130, 'loop_termination': 114, 'search_space_boundaries': 114, 'equality_handling': 96}
+- distinct problems picked: 6; distinct skills targeted: 4
+- targeted follow-ups to a problem where a target skill is declared positive-only: 32 of 244
+- new_problem to a problem already in the history: 0
+- deterministic on a second call: True
+
+### policy 1.5, eligibility current — H3 (28 trajectories of 6 attempts)
+- first follow-up: {'first-true': 19, 'upper-bound': 4, 'exact-search': 3, 'lower-bound': 1, 'count-occurrences': 1}
+- distinct problems visited per trajectory: mean 5.71, min 4, max 6
+- distinct problems giving a first-attempt observation of the targeted skill: mean 5.57
+- trajectories reaching >=3 first-attempt observations of the skill from >=2 problems: 28 of 28

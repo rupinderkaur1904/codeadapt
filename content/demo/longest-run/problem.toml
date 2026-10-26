@@ -9,9 +9,10 @@ harness = "harness.cpp"
 reference = "reference.cpp"
 solution_file = "solution.cpp" # name the student's code is compiled under
 interface = "int longest_run(const std::vector<int>& a);"
-# Bank expansion (2026-10-25): new problems are not recommendable (CE1 decision E2 applied to
-# every new problem). They stay in the problem list and their attempts produce skill evidence.
-recommendable = false
+# Recommendable from 2026-10-26 (owner decision, option C of
+# docs/reviews/2026-10-26/recommendability-review.md). Earlier content versions were not
+# (CE1 decision E2); their snapshots keep that.
+recommendable = true
 
 [skills]
 accumulator_init = "Initialising (and re-initialising) a running best, minimum, maximum, count or sum to the value the first real element requires."

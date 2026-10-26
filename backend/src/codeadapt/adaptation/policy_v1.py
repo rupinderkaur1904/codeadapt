@@ -11,7 +11,13 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from codeadapt.adaptation.ledger import SkillMaps, build_ledger, reliable_count, tests_probing
+from codeadapt.adaptation.ledger import (
+    SkillMaps,
+    build_ledger,
+    reliable_count,
+    skill_observations,
+    tests_probing,
+)
 from codeadapt.adaptation.models import (
     Action,
     AttemptRecord,
@@ -21,6 +27,11 @@ from codeadapt.adaptation.models import (
 )
 from codeadapt.content.models import ProblemSpec
 from codeadapt.diagnosis.models import Outcome
+
+VERSIONS = ("1.4", "1.5")
+# Policy 1.5: a follow-up needs at least this many tests probing its target skills, the minimum
+# support a diagnosis needs to name a model (diagnosis rule 7).
+MIN_PROBING_TESTS = 2
 
 _ABSTAINED = {
     Outcome.UNMODELLED_BEHAVIOUR,
@@ -40,9 +51,20 @@ class PolicyV1:
     # 1.4 (ADR-027, option P1): `non_termination_observed` is a symptom; it gets a retry of
     # the same problem with a review flag, no target skill and no criterion. Every outcome
     # now has an explicit rule; none falls through to the no-failure branch.
-    version: str = "1.4"
+    # 1.5 (2026-10-26, ADR-038): after a supported or ambiguous diagnosis, the follow-up is no
+    # longer the problem with the most tests probing the target skills. Among candidates with
+    # at least MIN_PROBING_TESTS such tests it prefers, in order: problems not recently
+    # attempted; problems where the target skills can also receive negative evidence (not
+    # declared positive-only); problems that have given this learner the fewest observations of
+    # the target skills; the largest share of tests probing them; then the slug. Rules, target
+    # skills, criteria and the no-failure ranking are unchanged. 1.4 stays selectable.
+    version: str = "1.5"
     # A problem is "recently attempted" if it appears among the learner's last N attempts.
     recent_window: int = 3
+
+    def __post_init__(self) -> None:
+        if self.version not in VERSIONS:
+            raise ValueError(f"unknown policy version {self.version!r}; known: {VERSIONS}")
 
     def recommend(
         self,
@@ -125,7 +147,12 @@ class PolicyV1:
                 m.known_limitation for m in spec.error_models if m.key == index.selected_model
             )
             qualified = index.qualified or limitation is not None
-            chosen, ranking = self._densest(family, {skill}, recent, spec)
+            if self.version == "1.4":
+                chosen, ranking = self._densest(family, {skill}, recent, spec)
+            else:
+                chosen, ranking = self._by_evidence(
+                    family, {skill}, recent, spec, self._observed(attempts, problems, skill_maps)
+                )
             return make(
                 Rule.HYPOTHESIS_SUPPORTED,
                 _action(chosen, spec),
@@ -149,7 +176,17 @@ class PolicyV1:
 
         if index.outcome is Outcome.AMBIGUOUS:
             skills = {model_skill[c] for c in index.candidates}
-            chosen, ranking = self._discriminating(family, skills, recent, spec)
+            if self.version == "1.4":
+                chosen, ranking = self._discriminating(family, skills, recent, spec)
+            else:
+                chosen, ranking = self._by_evidence(
+                    family,
+                    skills,
+                    recent,
+                    spec,
+                    self._observed(attempts, problems, skill_maps),
+                    discriminate=True,
+                )
             return make(
                 Rule.AMBIGUOUS,
                 _action(chosen, spec),
@@ -204,6 +241,71 @@ class PolicyV1:
                 ]
             },
         )
+
+    @staticmethod
+    def _observed(
+        attempts: Sequence[AttemptRecord],
+        problems: Mapping[str, ProblemSpec],
+        skill_maps: SkillMaps | None,
+    ) -> dict[tuple[str, str], int]:
+        """Skill observations this learner already has, by (problem, skill) (policy 1.5)."""
+        counts: dict[tuple[str, str], int] = {}
+        for o in skill_observations(attempts, problems, skill_maps):
+            counts[(o.problem_slug, o.skill)] = counts.get((o.problem_slug, o.skill), 0) + 1
+        return counts
+
+    @staticmethod
+    def _by_evidence(
+        family: list[ProblemSpec],
+        skills: set[str],
+        recent: list[str],
+        fallback: ProblemSpec,
+        observed: Mapping[tuple[str, str], int],
+        *,
+        discriminate: bool = False,
+    ) -> tuple[ProblemSpec, list[dict[str, Any]]]:
+        """Policy 1.5 ranking; see the version note on PolicyV1.
+
+        The number of probing tests is only a threshold, so a larger problem is not preferred
+        for being larger. Fewer observations means less evidence from that problem, not a
+        weaker skill. After an ambiguous diagnosis, problems modelling more of the candidate
+        skills still come first, as in 1.4.
+        """
+        rows: list[dict[str, Any]] = []
+        for p in family:
+            probing = len(tests_probing(p, skills))
+            if probing < MIN_PROBING_TESTS:
+                continue
+            rows.append(
+                {
+                    "problem": p.slug,
+                    **(
+                        {"modelled_skills": len({m.skill for m in p.error_models} & skills)}
+                        if discriminate
+                        else {}
+                    ),
+                    "recent": p.slug in recent,
+                    "negative_evidence_possible": len(
+                        [s for s in skills if s in p.skills and s not in p.positive_only_skills]
+                    ),
+                    "prior_observations": sum(observed.get((p.slug, s), 0) for s in skills),
+                    "probing_tests": probing,
+                    "probing_share": round(probing / len(p.tests), 3),
+                }
+            )
+        rows.sort(
+            key=lambda r: (
+                -r.get("modelled_skills", 0),
+                r["recent"],
+                -r["negative_evidence_possible"],
+                r["prior_observations"],
+                -r["probing_share"],
+                r["problem"],
+            )
+        )
+        by_slug = {p.slug: p for p in family}
+        chosen = by_slug[rows[0]["problem"]] if rows else fallback  # no candidate: retry
+        return chosen, rows
 
     @staticmethod
     def _densest(
