@@ -30,6 +30,9 @@ class SkillMap(BaseModel):
     model_skills: dict[str, str]
     # Models whose diagnoses carry a documented collision (`known_limitation`).
     documented_collisions: tuple[str, ...] = ()
+    # Library names the statement forbids (D1, ADR-035). Snapshots written before 2026-10-26
+    # have none, so their attempts keep the evidence they had.
+    banned_names: tuple[str, ...] = ()
 
     @classmethod
     def from_spec(cls, spec: ProblemSpec, version: str) -> SkillMap:
@@ -41,6 +44,7 @@ class SkillMap(BaseModel):
             documented_collisions=tuple(
                 sorted(m.key for m in spec.error_models if m.known_limitation)
             ),
+            banned_names=tuple(sorted(spec.banned_names)),
         )
 
     @classmethod

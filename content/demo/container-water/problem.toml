@@ -14,16 +14,17 @@ interface = "int max_water(const std::vector<int>& height);"
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+loop_bounds = "Visiting exactly the positions the task needs: a loop starts and ends at the right index and runs from the right end."
+range_inclusion = "Counting or summing over exactly the right set of positions: interval lengths, inclusive or exclusive ends, and whether an element may pair with itself or belongs to a side."
+pointer_movement = "Moving the right pointer at each step of a two-pointer scan, and doing the comparison or write that each move depends on."
 
 [probes]
-inner_pair_best = ["update_rule"]
-adjacent_best = ["index_range"]
-width_counts = ["index_range"]
+inner_pair_best = ["pointer_movement"]
+adjacent_best = ["loop_bounds"]
+width_counts = ["range_inclusion"]
 shorter_limits = ["output_contract"]
-large_input = ["update_rule"]
+large_input = ["pointer_movement"]
 
 [curriculum]
 assumes = ["two indices moving towards each other"]
@@ -151,7 +152,7 @@ distinguishes = ["moves_taller", "uses_taller_height", "width_plus_one"]
 [[error_models]]
 key = "moves_taller"
 file = "error_models/moves_taller.cpp"
-skill = "update_rule"
+skill = "pointer_movement"
 description = "Moves the pointer at the taller line, discarding a line that could still form a larger container."
 student_hint = "Which of the two lines limits every container that uses it? That is the one you can safely discard."
 known_limitation = "Attribution not unique (L20): moving the taller line never finds a larger container than the outermost pair, so this model is output-identical on every valid input to a program that only measures the outermost pair (a misread specification). Diagnoses are reported as qualified and add no skill evidence (docs/content-design/container-water.md)."
@@ -159,7 +160,7 @@ known_limitation = "Attribution not unique (L20): moving the taller line never f
 [[error_models]]
 key = "width_plus_one"
 file = "error_models/width_plus_one.cpp"
-skill = "index_range"
+skill = "range_inclusion"
 description = "Counts the width as hi - lo + 1 (the number of lines) instead of the distance between them."
 student_hint = "How wide is a container between positions 2 and 5? Count the gaps, not the lines."
 
@@ -173,6 +174,10 @@ student_hint = "Which of the two lines decides how high the water can rise befor
 [[error_models]]
 key = "stops_before_adjacent"
 file = "error_models/stops_before_adjacent.cpp"
-skill = "index_range"
+skill = "loop_bounds"
 description = "Loops while lo + 1 < hi, so the last pair of neighbouring lines is never checked."
 student_hint = "Does your loop check a pair of neighbouring lines? Try two tall lines next to each other."
+
+# Declared skills that no error model can give negative evidence for (ADR-034).
+[positive_only_skills]
+pointer_movement = "Its only model, moves_taller, carries a known_limitation (L20, ADR-032 route), so this skill can only receive correct observations through rule C (L19). Recorded when this check was introduced (ADR-034)."

@@ -1,5 +1,11 @@
 # Content design record: `container-water` (bank expansion batch A2, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `e9fc3901bd29…` (was `bbac030fbe03…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `moves_taller` → `pointer_movement`; `width_plus_one` → `range_inclusion`; `stops_before_adjacent` → `loop_bounds`. Declared skills are now `output_contract`, `loop_bounds`, `range_inclusion`, `pointer_movement`.
+>
+> **Positive-only skills (ADR-034).** `pointer_movement` has no model that can give negative evidence; the reason is recorded under `positive_only_skills`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/container-water.md).

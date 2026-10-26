@@ -245,6 +245,14 @@
           "estimate": {
             "$ref": "#/components/schemas/LearnerEstimate"
           },
+          "retired_skills": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RetiredSkillView"
+            },
+            "default": {},
+            "title": "Retired Skills",
+            "type": "object"
+          },
           "username": {
             "title": "Username",
             "type": "string"
@@ -648,6 +656,38 @@
         "title": "ResearchSubmissionRow",
         "type": "object"
       },
+      "RetiredSkillView": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "replaced_by": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Replaced By",
+            "type": "array"
+          },
+          "retired": {
+            "title": "Retired",
+            "type": "string"
+          }
+        },
+        "required": [
+          "definition",
+          "retired",
+          "decision",
+          "replaced_by"
+        ],
+        "title": "RetiredSkillView",
+        "type": "object"
+      },
       "SampleTest": {
         "additionalProperties": false,
         "properties": {
@@ -902,6 +942,45 @@
         "title": "SubmissionView",
         "type": "object"
       },
+      "TechniqueCheckView": {
+        "additionalProperties": false,
+        "properties": {
+          "banned_names": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Banned Names",
+            "type": "array"
+          },
+          "found": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Found",
+            "type": "array"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "skill_evidence": {
+            "enum": [
+              "eligible",
+              "withheld"
+            ],
+            "title": "Skill Evidence",
+            "type": "string"
+          }
+        },
+        "required": [
+          "banned_names",
+          "found",
+          "skill_evidence",
+          "note"
+        ],
+        "title": "TechniqueCheckView",
+        "type": "object"
+      },
       "TestResultView": {
         "additionalProperties": false,
         "properties": {
@@ -1067,6 +1146,16 @@
             "additionalProperties": true,
             "title": "Submission",
             "type": "object"
+          },
+          "technique_check": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TechniqueCheckView"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [

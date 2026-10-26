@@ -1,5 +1,13 @@
 # Content design record: `last-occurrence` (BSX, binary-search extension)
 
+> **Update 2026-10-26.** New content version `441ef3b2b697…` (was `d6d9106ea7d6…`). The record below describes the problem as designed and is unchanged.
+>
+> **L20 safeguard S1 (ADR-036).** `returns_first_occurrence`, `stops_at_any_match`, `hi_init_last_index` now carry a `known_limitation` (a cross-skill twin, docs/reviews/2026-10-25/l20-search.md); diagnoses are qualified and add no negative evidence.
+>
+> **Banned names (ADR-035).** `banned_names` lists `std::equal_range`, `std::find`, `std::lower_bound`, `std::partition_point`, `std::upper_bound`; an attempt that names one gives no skill observations.
+>
+> **Positive-only skills (ADR-034).** `equality_handling`, `search_space_boundaries` have no model that can give negative evidence; the reason is recorded under `positive_only_skills`.
+
 **Label.** Files and commits call this "CE2". That was a working label; this is a binary-search family extension, not the planned CE2 stage (arrays).
 
 **Status and order.**

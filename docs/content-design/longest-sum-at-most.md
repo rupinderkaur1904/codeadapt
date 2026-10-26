@@ -1,5 +1,9 @@
 # Content design record: `longest-sum-at-most` (bank expansion batch A3, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `da1fb518004a…` (was `e0e0e4027d7b…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `length_without_plus_one` → `range_inclusion`; `restarts_window` → `window_maintenance`. Declared skills are now `output_contract`, `range_inclusion`, `window_maintenance`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/longest-sum-at-most.md), which is authoritative.

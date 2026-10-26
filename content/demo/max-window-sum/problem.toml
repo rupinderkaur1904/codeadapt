@@ -14,17 +14,17 @@ interface = "int max_window_sum(const std::vector<int>& a, int k);"
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
 accumulator_init = "Initialising (and re-initialising) a running best, minimum, maximum, count or sum to the value the first real element requires."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
+loop_bounds = "Visiting exactly the positions the task needs: a loop starts and ends at the right index and runs from the right end."
+window_maintenance = "Keeping a sliding window's state current: removing the element that leaves, and shrinking the window rather than restarting it."
 
 [probes]
-best_window_last = ["index_range"]
+best_window_last = ["loop_bounds"]
 all_negative = ["accumulator_init"]
-leaving_element_matters = ["update_rule"]
-k_equals_n = ["index_range", "update_rule"]
-k_one = ["update_rule"]
-large_input = ["update_rule"]
+leaving_element_matters = ["window_maintenance"]
+k_equals_n = ["loop_bounds", "window_maintenance"]
+k_one = ["window_maintenance"]
+large_input = ["window_maintenance"]
 
 [curriculum]
 assumes = ["summing a range of a std::vector"]
@@ -149,20 +149,20 @@ student_hint = "What should you return if every window has a negative sum? Check
 [[error_models]]
 key = "misses_last_window"
 file = "error_models/misses_last_window.cpp"
-skill = "index_range"
+skill = "loop_bounds"
 description = "The sliding loop stops one step early, so the last window is never summed."
 student_hint = "Does your loop reach the window that ends at the last element?"
 
 [[error_models]]
 key = "never_subtracts"
 file = "error_models/never_subtracts.cpp"
-skill = "update_rule"
+skill = "window_maintenance"
 description = "Adds each entering element but never subtracts the leaving one, so the window keeps growing."
 student_hint = "When the window moves one step right, which element leaves it?"
 
 [[error_models]]
 key = "subtracts_wrong_element"
 file = "error_models/subtracts_wrong_element.cpp"
-skill = "update_rule"
+skill = "window_maintenance"
 description = "Subtracts a[i - k + 1] instead of a[i - k], so the wrong element leaves the window."
 student_hint = "When element i enters a window of size k, which index leaves? Check it on a small example."

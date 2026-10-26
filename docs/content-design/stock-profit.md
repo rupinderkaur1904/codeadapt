@@ -1,5 +1,9 @@
 # Content design record: `stock-profit` (bank expansion batch A1, 2026-10-25)
 
+> **Update 2026-10-26.** New content version `25a63d1ddab3…` (was `0c509afe798c…`). The record below describes the problem as designed and is unchanged.
+>
+> **Skill keys (ADR-034).** `misses_last_day` → `loop_bounds`. Declared skills are now `output_contract`, `loop_bounds`.
+
 **Status.** Provisional, not research-validated. See
 [expansion-2026-10-25/README.md](expansion-2026-10-25/README.md) and the
 [content report](../content-reports/stock-profit.md).

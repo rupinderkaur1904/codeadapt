@@ -14,18 +14,17 @@ interface = "int pivot_index(const std::vector<int>& a);"
 recommendable = false
 
 [skills]
-index_range = "Visiting exactly the valid positions: the loop's start and end cover every element once."
 tie_resolution = "Handling equal values as the specification says: which of several equal candidates wins, and whether duplicates count separately."
-update_rule = "Updating every piece of tracked state on each step (running candidates, pointers, window edges) so no candidate is lost."
 output_contract = "Returning exactly what the specification asks for: an index or a value, a sentinel when there is no answer."
+range_inclusion = "Counting or summing over exactly the right set of positions: interval lengths, inclusive or exclusive ends, and whether an element may pair with itself or belongs to a side."
 
 [probes]
-pivot_excluded = ["index_range", "update_rule"]
+pivot_excluded = ["range_inclusion"]
 several_pivots = ["tie_resolution"]
 no_pivot = ["output_contract"]
-pivot_at_edge = ["index_range"]
-negatives = ["update_rule"]
-large_input = ["update_rule"]
+pivot_at_edge = ["range_inclusion"]
+negatives = ["range_inclusion"]
+large_input = ["range_inclusion"]
 
 [curriculum]
 assumes = ["a running sum while scanning"]
@@ -170,14 +169,14 @@ distinguishes = ["size_when_none"]
 [[error_models]]
 key = "pivot_counted_left"
 file = "error_models/pivot_counted_left.cpp"
-skill = "update_rule"
+skill = "range_inclusion"
 description = "Adds a[i] to the left sum before comparing, so the pivot itself is counted on the left side."
 student_hint = "Is the element at the balance point part of the left side, the right side, or neither? Check when you add it to your running sum."
 
 [[error_models]]
 key = "pivot_counted_right"
 file = "error_models/pivot_counted_right.cpp"
-skill = "update_rule"
+skill = "range_inclusion"
 description = "Computes the right side as total - left, so the pivot itself is counted on the right side."
 student_hint = "Does your right-hand sum leave out the element at the balance point?"
 

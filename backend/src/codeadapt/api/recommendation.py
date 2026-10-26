@@ -15,6 +15,7 @@ from codeadapt.api.schemas import (
     RecommendationView,
 )
 from codeadapt.content.catalogue import Catalogue
+from codeadapt.content.taxonomy import RETIRED
 from codeadapt.db.models import FollowupEvaluationRow, RecommendationRow
 from codeadapt.db.session import as_utc
 
@@ -27,8 +28,12 @@ def _title(catalogue: Catalogue, slug: str | None) -> str | None:
 def recommendation_view(catalogue: Catalogue, row: RecommendationRow) -> RecommendationView:
     title = _title(catalogue, row.problem_slug) or "this problem"
     problem = catalogue.by_slug.get(row.problem_slug) if row.problem_slug else None
+    # A recommendation stored before ADR-034 may target a retired key: it keeps the meaning
+    # it had then (the retired key's historical definition), not a converted one.
     focus = [
-        problem.spec.skills[s] for s in row.target_skills if problem and s in problem.spec.skills
+        problem.spec.skills[s] if s in problem.spec.skills else RETIRED[s].definition
+        for s in row.target_skills
+        if problem and (s in problem.spec.skills or s in RETIRED)
     ]
     rule = Rule(row.rule)
     action = RecommendationAction(row.action)

@@ -1,6 +1,11 @@
 # Proposal L22: a revised taxonomy for the new families' skill keys
 
-**Status.** Design proposal for owner review (owner action 5, 2026-10-25). **Nothing here is
+**Status (2026-10-26).** §2.1 and §2.2 approved by the owner and implemented as ADR-034. The
+optional changes (§2.3 and the §2.4 rename) were not made, so plus-one `adds_at_front` maps to
+`loop_bounds`, not `io_contract`. Retired keys are shown as deprecated with their historical
+definition (question 4). The text below is the proposal as reviewed.
+
+**Original status.** Design proposal for owner review (owner action 5, 2026-10-25). **Nothing here is
 implemented.** The skill keys (ADR-033), the mappings, the content versions and the BKT
 parameters are unchanged.
 
