@@ -7,7 +7,6 @@ import { Fragment } from "react";
 const INK = "var(--deck-ink)";
 const MUTED = "var(--deck-muted)";
 const PAPER = "var(--deck-paper)";
-const ACCENT = "var(--deck-accent)";
 const SOIL = "var(--deck-soil)";
 
 function Markers({ id }: { id: string }) {
@@ -430,9 +429,7 @@ export function SequenceDiagram({ spec }: { spec: SequenceSpec }) {
             fill={INK}
             textAnchor={left ? "end" : "start"}
           >
-            <tspan fontWeight="700" fill={ACCENT}>
-              {num}.{" "}
-            </tspan>
+            <tspan fontWeight="700">{num}. </tspan>
             {s.text}
           </text>
         </g>,
@@ -455,9 +452,7 @@ export function SequenceDiagram({ spec }: { spec: SequenceSpec }) {
           markerEnd={`url(#${spec.id}-${s.reply ? "open" : "solid"})`}
         />
         <text x={(x1 + x2) / 2} y={y - 6} fontSize="11.5" textAnchor="middle" fill={INK}>
-          <tspan fontWeight="700" fill={ACCENT}>
-            {num}.{" "}
-          </tspan>
+          <tspan fontWeight="700">{num}. </tspan>
           {s.text}
         </text>
       </g>,
@@ -513,7 +508,7 @@ export function SequenceDiagram({ spec }: { spec: SequenceSpec }) {
                 width="132"
                 height={headH - 8}
                 rx="4"
-                fill={p.kind === "actor" ? "var(--deck-flag)" : PAPER}
+                fill={PAPER}
                 stroke={INK}
                 strokeWidth="1.2"
               />
@@ -714,12 +709,7 @@ export function ClassDiagram({ spec }: { spec: ClassSpec }) {
         const head = c.stereotype ? 36 : 24;
         const attrTop = c.y + head;
         const opsTop = attrTop + c.attrs.length * LINE + 8;
-        const headFill =
-          c.tone === "logic"
-            ? "var(--deck-sprout-soft)"
-            : c.tone === "iface"
-              ? "var(--deck-flag)"
-              : "var(--deck-panel)";
+        const headFill = "var(--deck-uml-head)";
         return (
           <g key={c.id}>
             <rect
