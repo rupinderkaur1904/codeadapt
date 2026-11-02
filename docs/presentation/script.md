@@ -10,10 +10,10 @@ link can open on any slide.
 | Part | Presenter | Slides | Time |
 | --- | --- | --- | --- |
 | Problem, users, solution, journey | Rupinder | 1–5 | 4½ min |
-| Live demo and integration | Ashmeen | 6–10 | 6 min |
-| Use case and class diagrams | Gourav | 11–16 | 4½ min |
-| Sequence diagrams, status, evidence | Jasroop | 17–23 | 5 min |
-| Contributions and questions | everyone | 24–25 | 1 min + Q&A |
+| Live demo and integration | Ashmeen | 6–9 | 6 min |
+| Use case and class diagrams | Gourav | 10–14 | 4½ min |
+| Sequence diagrams, status, evidence | Jasroop | 15–21 | 5 min |
+| Contributions and questions | everyone | 22–23 | 1 min + Q&A |
 
 Speak to the room, not the screen. The lines below are a guide: say them in your own words.
 Words in *[brackets]* are actions, not speech.
@@ -28,11 +28,11 @@ Words in *[brackets]* are actions, not speech.
 2. **Warm up the sandbox.** Log in as the demo student and submit any program to Lower
    bound once. The first submission measures every error model's fingerprints, which took
    about 3 minutes in rehearsal. After that, a submission takes seconds.
-3. Keep the four demo programs ready: they are on slide 7 with a Copy button, and in
+3. Keep the four demo programs ready: they are on slide 6 with a Copy button, and in
    `eval/heldout/lower-bound/`.
 4. Each member opens, in a browser tab, the files they will be asked about (see the
    "Where your code is" list at the end of each part).
-5. Fill in the contribution slide (slide 24) with real links. See "Contribution slide" below.
+5. Fill in the contribution slide (slide 22) with real links. See "Contribution slide" below.
 
 ---
 
@@ -54,7 +54,7 @@ Words in *[brackets]* are actions, not speech.
 
 ### Slide 2 · The problem
 
-> Most of us have seen this screen. "Wrong answer on test 7." That's it.
+> Most of us have seen a judge say "Wrong answer on test 7", and nothing more.
 >
 > If you're a beginner and your binary search is off by one, that verdict doesn't tell you
 > what's wrong. So you do what everyone does: change a plus one to a minus one, resubmit, and
@@ -114,7 +114,7 @@ Words in *[brackets]* are actions, not speech.
 > hint only if one known mistake fits. Then a recommended next problem, and the system checks
 > the follow-up on your next attempt.
 >
-> Researchers get a second path *[point to the lower row]*: a list of submissions with
+> Researchers get a second path *[point to the right column]*: a list of submissions with
 > metrics, a full evidence trace for any one of them, and a learner model, which is always
 > labelled "estimated under assumed parameters". I'll hand over to Ashmeen.
 
@@ -130,29 +130,23 @@ Words in *[brackets]* are actions, not speech.
 - *Why C++ only?* One toolchain (GCC 14.2, pinned) keeps runs reproducible. The design does not
   depend on the language, but every problem would need new error models.
 - *Who are your users in practice?* Nobody yet. It has not been used with real students, and we
-  say so on slide 22.
+  say so on slide 20.
 
 ---
 
-## Part 2 · Ashmeen (slides 6–10)
+## Part 2 · Ashmeen (slides 6–9)
 
-### Slide 6 · Divider
+### Slide 6 · Live demo
 
-> Thanks, Rupinder. This part is live: real sandbox, real database, and four prepared
-> programs. Nothing is recorded.
-
-*[→]*
-
-### Slide 7 · Demo kit, then the live app
-
-> These are our four test programs. We wrote them ourselves to exercise the system; they are
+> Thanks, Rupinder. This part is live, on the real system, with four prepared programs.
+> Nothing is recorded. These are our four test programs. We wrote them ourselves to exercise the system; they are
 > not student submissions. Each should get a different answer.
 
-*[Click "Open the live app". Log in as the demo student. Open Lower bound.]*
+*[Click "Open CodeAdapt". Log in as the demo student. Open Lower bound.]*
 
 > This is the practice page: the statement on the left, the editor on the right.
 
-**Program 1: `correct_iterative.cpp`.** *[Copy from slide 7, paste, Submit.]*
+**Program 1: `correct_iterative.cpp`.** *[Copy from slide 6, paste, Submit.]*
 
 > It's a correct solution in an unusual style. *[wait for the result]* All seventeen tests
 > pass. Notice the wording: it says tests can show mistakes but can't prove a solution
@@ -187,7 +181,7 @@ submission's trace.]*
 **If the sandbox is slow or down:** say so plainly, show the trace of a submission made during
 the warm-up, and carry on. Do not show screenshots as if they were live.
 
-### Slide 8 · How the parts connect
+### Slide 7 · System architecture
 
 > Behind that demo are six components. The web app is React and TypeScript with a CodeMirror
 > editor. The API is FastAPI. The database is PostgreSQL in deployment, SQLite in development.
@@ -200,7 +194,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 9 · Where the parts meet
+### Slide 8 · Integration between components
 
 > Each joint has a contract that's checked. The web app's types are generated from the API's
 > OpenAPI schema, and CI fails if they drift. Logins use an HttpOnly cookie plus a CSRF token;
@@ -214,7 +208,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 10 · How a diagnosis is decided
+### Slide 9 · How the diagnosis works
 
 > The core is simple on purpose. Every known mistake is a real program. We run it on every
 > test and store its outputs: we call that its fingerprint. Then we compare the student's
@@ -246,18 +240,14 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 ---
 
-## Part 3 · Gourav (slides 11–16)
+## Part 3 · Gourav (slides 10–14)
 
-### Slide 11 · Divider
+### Slide 10 · Use case diagram 1: Student
 
 > Thanks, Ashmeen. I'll show who uses the system and what it's made of: four use case
 > diagrams and the class diagram. All of them were drawn from the code, so the names you see
 > are the names in the repository.
-
-*[→]*
-
-### Slide 12 · Use case 1: Student
-
+>
 > The student is the main actor. They log in, browse problems by family, open one, write C++,
 > submit, read feedback, follow the recommendation, and review past attempts.
 >
@@ -267,7 +257,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 13 · Use case 2: Researcher
+### Slide 11 · Use case diagram 2: Researcher
 
 > The researcher browses submissions, with optional filters by problem, outcome and data
 > class. They can view metrics, inspect an evidence trace, which always includes the
@@ -279,7 +269,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 14 · Use case 3: Administrator
+### Slide 12 · Use case diagram 3: Administrator
 
 > The administrator works from the command line, not the website. There is deliberately no
 > account-management endpoint in the API. Creating an account records an audit event. Setting
@@ -288,7 +278,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 15 · Use case 4: Runner worker
+### Slide 13 · Use case diagram 4: Runner worker
 
 > The fourth actor is a system: the worker. For every queued job it claims the job, compiles
 > the submission with the problem's harness, runs each test, and may re-run failing tests with
@@ -298,7 +288,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 16 · Class diagram
+### Slide 14 · Class diagram
 
 > This is the detailed class diagram. Read it left to right as one evidence chain.
 >
@@ -310,10 +300,11 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 > FingerprintSet for that ProblemVersion, and can lead to one Recommendation, which can be
 > evaluated by one FollowupEvaluation on the next attempt.
 >
-> The amber classes are protocols: DiagnosticMethod and SandboxBackend. The worker depends on
+> The two classes marked «protocol», DiagnosticMethod and SandboxBackend, are interfaces. The worker depends on
 > those, not on a concrete class, which is why we could add method versions and a gVisor
-> sandbox without touching the pipeline. Green classes are logic: FingerprintConsistency,
-> PolicyV1, and BktParams, which is labelled "assumed" because that's what its numbers are.
+> sandbox without touching the pipeline. On the right are the logic classes:
+> FingerprintConsistency, PolicyV1, and BktParams, which is marked «assumed» because that's
+> what its numbers are.
 > Jasroop will show how these objects talk to each other.
 
 *[→]*
@@ -335,9 +326,9 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 ---
 
-## Part 4 · Jasroop (slides 17–23)
+## Part 4 · Jasroop (slides 15–21)
 
-### Slide 17 · Sequence 1: Log in
+### Slide 15 · Sequence diagram 1: Login
 
 > Five sequence diagrams, starting with logging in. The browser posts the username and
 > password. The auth module first checks throttling, then loads the user and verifies the
@@ -348,7 +339,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 18 · Sequence 2: Submit a solution
+### Slide 16 · Sequence diagram 2: Submit a solution
 
 > Submitting. The page sends the source with the CSRF token. The API checks the session,
 > role, size limit of 64 KiB and the rate limit, records the submission and a queued job, and
@@ -358,7 +349,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 19 · Sequence 3: Run and diagnose
+### Slide 17 · Sequence diagram 3: Run and diagnose
 
 > This is the worker's side. It claims the job with a lease and loads the problem version. If
 > this version has never been measured in this environment, it first runs every error model to
@@ -369,7 +360,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 20 · Sequence 4: Recommend and follow up
+### Slide 18 · Sequence diagram 4: Recommendation
 
 > Then adaptation. If this attempt follows an open recommendation, it's evaluated against the
 > criterion we recorded: met, not met, or not comparable. Then the policy asks the evidence
@@ -380,7 +371,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 21 · Sequence 5: Researcher
+### Slide 19 · Sequence diagram 5: Researcher view
 
 > Last, the researcher. Every research endpoint checks the role first; a student gets a 403.
 > The trace returns the full evidence chain. For the learner model, the API passes the
@@ -391,7 +382,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 22 · Complete, limited, next
+### Slide 20 · Current status
 
 > Where it stands. Complete: the sandbox, the diagnosis method with abstention, the evidence
 > ledger, recommendations and follow-up checks, login with roles, both interfaces, and 25
@@ -408,14 +399,14 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 23 · What the numbers say
+### Slide 21 · Evaluation results
 
 > A word on numbers, because it's easy to overclaim. On 26 incorrect programs we wrote and
 > held back, the method named 14 and got none wrong. On 323 automatically generated incorrect
 > programs, it named 30 and got none of those wrong. It never flagged any of the 6 correct
 > programs.
 >
-> *[point to the box]* But none of this is accuracy on real students. We wrote or generated
+> *[point to the notes under the table]* But none of this is accuracy on real students. We wrote or generated
 > every program. Zero out of thirty still allows an error rate of several percent. And each
 > version got fewer names wrong by naming less often. We chose that trade deliberately: a
 > wrong hint does more harm than no hint.
@@ -438,7 +429,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 ---
 
-## Slide 24 · Contributions (everyone, ~15 seconds each)
+## Slide 22 · Team contributions (everyone, ~15 seconds each)
 
 Each member says one sentence about what they did and points at their own evidence.
 
@@ -451,9 +442,9 @@ Each member says one sentence about what they did and points at their own eviden
 replace each `did` list with what that person actually did and put real links in `evidence`
 (commits, issues, pull requests, tests or weekly journal entries). The brief says the examiner
 may ask any of us to find our code or make a small change, so list only work that person did
-and can explain. The placeholders on the slide are highlighted until they are filled.
+and can explain. Until then the Evidence column says "to add".
 
-## Slide 25 · Questions (Rupinder opens, everyone answers)
+## Slide 23 · Thank you and questions (Rupinder opens, everyone answers)
 
 > That's CodeAdapt. Thank you. We're happy to take questions, and to open the code behind
 > any slide.

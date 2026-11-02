@@ -47,14 +47,15 @@ describe("presentation", () => {
 
   it("moves between slides with the keyboard and keeps the number in the hash", () => {
     renderDeck();
-    expect(screen.getByText(`1 / ${SLIDES.length}`)).toBeInTheDocument();
+    const no = () => document.querySelector(".deck-foot-no")?.textContent;
+    expect(no()).toBe("1");
     fireEvent.keyDown(window, { key: "ArrowRight" });
-    expect(screen.getByText(`2 / ${SLIDES.length}`)).toBeInTheDocument();
+    expect(no()).toBe("2");
     expect(window.location.hash).toBe("#2");
     fireEvent.keyDown(window, { key: "End" });
-    expect(screen.getByText(`${SLIDES.length} / ${SLIDES.length}`)).toBeInTheDocument();
+    expect(no()).toBe(String(SLIDES.length));
     fireEvent.keyDown(window, { key: "ArrowRight" });
-    expect(screen.getByText(`${SLIDES.length} / ${SLIDES.length}`)).toBeInTheDocument();
+    expect(no()).toBe(String(SLIDES.length));
   });
 
   it("renders every slide, including all ten diagrams", () => {
