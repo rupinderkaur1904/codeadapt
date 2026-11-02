@@ -94,7 +94,7 @@ export function PresentationPage() {
                 }}
               >
                 <span className="deck-thumb-no">{i + 1}</span>
-                <span className="deck-thumb-part">{s.part}</span>
+                <span className="deck-thumb-part">{s.title}</span>
                 <span className="deck-thumb-who">{s.speaker}</span>
               </button>
             </li>
@@ -108,7 +108,7 @@ export function PresentationPage() {
     <div className="deck">
       <div className="deck-frame">
         <div
-          className={`deck-stage ${slide.tone === "soil" ? "on-soil" : "on-paper"}`}
+          className="deck-stage"
           style={{
             width: STAGE_W,
             height: STAGE_H,
@@ -124,14 +124,8 @@ export function PresentationPage() {
             {slide.body}
           </div>
           <footer className="deck-foot">
-            <span className="deck-foot-brand">CodeAdapt</span>
-            <span className="deck-foot-part">{slide.part}</span>
-            <span className="deck-foot-who">
-              {slide.speaker === "All" ? "Team" : slide.speaker}
-            </span>
-            <span className="deck-foot-no">
-              {index + 1} / {SLIDES.length}
-            </span>
+            <span>CodeAdapt</span>
+            <span className="deck-foot-no">{index + 1}</span>
           </footer>
         </div>
       </div>

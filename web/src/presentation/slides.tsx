@@ -24,98 +24,43 @@ export type Speaker = "Rupinder" | "Ashmeen" | "Gourav" | "Jasroop" | "All";
 export type Slide = {
   id: string;
   speaker: Speaker;
-  part: string;
-  tone?: "soil" | "paper";
+  title: string;
   body: ReactNode;
 };
 
-export const TEAM: { name: Exclude<Speaker, "All">; part: string }[] = [
-  { name: "Rupinder", part: "Problem, users, solution and journey" },
-  { name: "Ashmeen", part: "Live demo and system integration" },
-  { name: "Gourav", part: "Use case and class diagrams" },
-  { name: "Jasroop", part: "Sequence diagrams, status and next steps" },
-];
+export const TEAM: Exclude<Speaker, "All">[] = ["Rupinder", "Ashmeen", "Gourav", "Jasroop"];
 
 // Fill each `evidence` line with real links before presenting: commits, issues, tests,
 // documents or journal entries the member can open and explain. The brief says each member
 // will be asked to find their own code, so list only work that member did.
 const CONTRIBUTIONS: { name: string; did: string[]; evidence: string }[] = [
-  {
-    name: "Rupinder",
-    did: ["Problem framing and user research", "Landing page and user journey"],
-    evidence: "",
-  },
+  { name: "Rupinder", did: ["Problem definition", "landing page and user journey"], evidence: "" },
   {
     name: "Ashmeen",
-    did: ["Backend pipeline and sandbox", "Integration, demo set-up"],
+    did: ["Backend pipeline and sandbox", "integration and demo set-up"],
     evidence: "",
   },
-  { name: "Gourav", did: ["Use case and class diagrams", "Data model review"], evidence: "" },
-  { name: "Jasroop", did: ["Sequence diagrams", "Testing, limitations and roadmap"], evidence: "" },
+  { name: "Gourav", did: ["Use case and class diagrams", "data model"], evidence: "" },
+  { name: "Jasroop", did: ["Sequence diagrams", "testing and limitations"], evidence: "" },
 ];
 
 const REPO = "https://github.com/rupinderkaur1904/codeadapt";
 
-function Head({
-  kicker,
-  title,
-  children,
-}: {
-  kicker: string;
-  title: ReactNode;
-  children?: ReactNode;
-}) {
+function Page({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <header className="s-head">
-      <p className="s-kicker">{kicker}</p>
-      <h2>{title}</h2>
-      {children && <p className="s-sub">{children}</p>}
-    </header>
+    <div className="s-page">
+      <h2 className="s-title-bar">{title}</h2>
+      <div className="s-content">{children}</div>
+    </div>
   );
 }
 
-function Diagram({
-  kicker,
-  title,
-  note,
-  children,
-}: {
-  kicker: string;
-  title: string;
-  note: ReactNode;
-  children: ReactNode;
-}) {
+function Figure({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
-    <div className="s-diagram">
-      <header className="s-head compact">
-        <p className="s-kicker">{kicker}</p>
-        <h2>{title}</h2>
-      </header>
+    <Page title={title}>
       <div className="s-figure">{children}</div>
-      <p className="s-note">{note}</p>
-    </div>
-  );
-}
-
-function Divider({ n, title, who, line }: { n: string; title: string; who: string; line: string }) {
-  return (
-    <div className="s-divider">
-      <p className="s-part-no">{n}</p>
-      <h2>{title}</h2>
-      <p className="s-divider-line">{line}</p>
-      <p className="s-divider-who">{who}</p>
-      <svg className="s-divider-roots" viewBox="0 -70 600 290" aria-hidden="true">
-        <path className="stem" d="M300 0 V-44" />
-        <path className="leaf" d="M300 -32 C293 -52 270 -59 256 -54 C263 -39 283 -30 300 -32Z" />
-        <path className="leaf" d="M300 -37 C307 -59 332 -68 348 -63 C341 -45 318 -35 300 -37Z" />
-        <path d="M0 0 H600" className="ground" />
-        <path d="M300 0 C300 60 220 90 120 120 S20 190 0 210" />
-        <path d="M300 0 C310 70 360 110 430 150 S560 200 600 205" />
-        <path d="M300 0 C296 80 300 140 290 220" />
-        <path className="thin" d="M120 120 C110 150 80 170 60 200" />
-        <path className="thin" d="M430 150 C450 170 470 190 476 220" />
-      </svg>
-    </div>
+      {note && <p className="s-caption">{note}</p>}
+    </Page>
   );
 }
 
@@ -132,7 +77,7 @@ function CopyButton({ text }: { text: string }) {
         });
       }}
     >
-      {done ? "Copied" : "Copy code"}
+      {done ? "Copied" : "Copy"}
     </button>
   );
 }
@@ -143,42 +88,47 @@ function DemoKit() {
   if (!p) return null;
   return (
     <div className="s-demo">
-      <div className="s-demo-list">
-        <Head kicker="Part 2 · live demo" title="Four programs, four different answers" />
-        <ol>
-          {DEMO_PROGRAMS.map((d, i) => (
-            <li key={d.file}>
-              <button
-                type="button"
-                className={i === open ? "on" : undefined}
-                onClick={() => setOpen(i)}
-              >
-                <span className="mono">{d.file}</span>
-                <span className="s-demo-intent">{d.intent}</span>
-                <span className="s-demo-expect mono">{d.expect}</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-        <p className="s-fine">
-          Test data: author-written programs from{" "}
-          <span className="mono">eval/heldout/lower-bound/</span>. They are not student submissions.
+      <div>
+        <p className="s-text">
+          We submit four prepared lower-bound programs in the running system and compare the
+          feedback.
         </p>
-        <a className="s-launch" href="/problems" target="_blank" rel="noreferrer">
-          Open the live app → Lower bound
+        <table className="s-table s-demo-table">
+          <thead>
+            <tr>
+              <th>Program</th>
+              <th>Expected outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            {DEMO_PROGRAMS.map((d, i) => (
+              <tr key={d.file} className={i === open ? "on" : undefined} onClick={() => setOpen(i)}>
+                <td>
+                  {i + 1}. {d.intent}
+                  <br />
+                  <span className="s-small">{d.file}</span>
+                </td>
+                <td className="s-mono">{d.expect}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="s-small">
+          Test programs are taken from eval/heldout/lower-bound. We wrote them; they are not student
+          submissions.
+        </p>
+        <a className="s-button" href="/problems" target="_blank" rel="noreferrer">
+          Open CodeAdapt
         </a>
       </div>
-      <div className="s-demo-code">
-        <div className="s-demo-bar">
-          <span className="mono">{p.file}</span>
+      <div className="s-code">
+        <div className="s-code-bar">
+          <span>{p.file}</span>
           <CopyButton text={p.source} />
         </div>
         <pre>
           <code>{p.source}</code>
         </pre>
-        <p className="s-demo-shows">
-          <strong>Watch for:</strong> {p.shows}
-        </p>
       </div>
     </div>
   );
@@ -223,7 +173,7 @@ function Architecture() {
       </defs>
       <rect x="560" y="12" width="608" height="446" rx="14" className="arch-zone" />
       <text x="580" y="40" className="arch-zone-label">
-        runner side: the only part that touches Docker
+        Runner side (only part with Docker access)
       </text>
       {box(12, 40, 240, 150, "Web app", [
         "React 19 + TypeScript",
@@ -383,641 +333,489 @@ export const SLIDES: Slide[] = [
   {
     id: "title",
     speaker: "Rupinder",
-    part: "Opening",
-    tone: "soil",
+    title: "Title",
     body: (
-      <div className="s-title">
-        <p className="s-kicker on-soil">Project presentation</p>
+      <div className="s-cover">
         <h1>CodeAdapt</h1>
-        <p className="s-title-line">
-          A C++ practice platform that looks at <em>why</em> a solution fails, and names a mistake
-          only when the tests can tell it apart from the others.
-        </p>
-        <ul className="s-team">
-          {TEAM.map((m) => (
-            <li key={m.name}>
-              <strong>{m.name}</strong>
-              <span>{m.part}</span>
-            </li>
-          ))}
-        </ul>
+        <p className="s-cover-sub">An adaptive C++ practice platform with diagnostic feedback</p>
+        <div className="s-cover-rule" />
+        <p className="s-cover-team">Rupinder · Ashmeen · Gourav · Jasroop</p>
+        <p className="s-small">Project presentation, November 2026</p>
       </div>
     ),
   },
   {
     id: "problem",
     speaker: "Rupinder",
-    part: "1 · The problem",
+    title: "Problem statement",
     body: (
-      <div className="s-split">
-        <div>
-          <Head kicker="1 · The problem" title="“Wrong answer on test 7.” Now what?" />
-          <p className="s-body">
-            Most online judges stop at a verdict. A beginner whose binary search is off by one sees
-            a red cross and a test number, then changes things until it turns green. Nothing tells
-            them which idea was wrong.
-          </p>
-          <p className="s-body">
-            Guessing the cause is the other trap. A tool that says “you don’t understand boundaries”
-            when two different mistakes give the same output is confidently wrong, and the student
-            has no way to tell.
-          </p>
-        </div>
-        <div className="s-verdicts">
-          <div className="s-verdict judge">
-            <p className="s-verdict-label">a typical judge</p>
-            <p className="s-verdict-main">✗ Wrong Answer</p>
-            <p className="mono">test 7 / 17 · 3 ms</p>
-          </div>
-          <div className="s-verdict ours">
-            <p className="s-verdict-label">what the student needs</p>
-            <ol>
-              <li>Which case breaks my code, in words?</li>
-              <li>Is it one known mistake, or can’t you tell?</li>
-              <li>What should I practise next?</li>
+      <Page title="Problem statement">
+        <div className="s-two">
+          <ul className="s-list">
+            <li>Most online judges only report pass or fail for each test.</li>
+            <li>
+              A beginner sees <em>Wrong Answer on test 7</em> but not which idea in the code is
+              wrong.
+            </li>
+            <li>Students then change the code by trial and error until it passes.</li>
+            <li>
+              Tools that guess the cause can be wrong, because different mistakes can give the same
+              output.
+            </li>
+          </ul>
+          <div className="s-box">
+            <p className="s-box-title">What a student needs to know</p>
+            <ol className="s-list">
+              <li>Which input breaks the code</li>
+              <li>Whether it matches one known mistake</li>
+              <li>What to practise next</li>
             </ol>
           </div>
         </div>
-      </div>
+      </Page>
     ),
   },
   {
     id: "users",
     speaker: "Rupinder",
-    part: "1 · Users and why",
+    title: "Target users and motivation",
     body: (
-      <div>
-        <Head
-          kicker="1 · Who it is for, and why this problem"
-          title="Three users, one narrow topic on purpose"
-        />
-        <div className="s-cols three users">
-          <section>
-            <h3>Students</h3>
-            <p>
-              Learning algorithms in C++ in a first data-structures course. They practise, submit,
-              and read feedback.
-            </p>
-          </section>
-          <section>
-            <h3>Researchers / instructors</h3>
-            <p>
-              Want to see how errors actually show up: every diagnosis traced back to the test
-              results behind it.
-            </p>
-          </section>
-          <section>
-            <h3>Administrator</h3>
-            <p>
-              Creates accounts and roles, backs up the data and checks that problem content is valid
-              before use.
-            </p>
-          </section>
+      <Page title="Target users and motivation">
+        <div className="s-two">
+          <div>
+            <h3>Intended users</h3>
+            <ul className="s-list">
+              <li>
+                <strong>Students</strong> learning algorithms in C++ (first data-structures course)
+              </li>
+              <li>
+                <strong>Researchers and instructors</strong> who want to see how errors appear in
+                submissions
+              </li>
+              <li>
+                <strong>Administrator</strong> who manages accounts and problem content
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3>Why we chose this problem</h3>
+            <ul className="s-list">
+              <li>Binary search is short but easy to get wrong by one position.</li>
+              <li>
+                The lower-bound problem has 8 known mistakes and 17 tests designed to tell them
+                apart.
+              </li>
+              <li>The problem bank now has 25 problems in 5 topic families.</li>
+            </ul>
+          </div>
         </div>
-        <div className="s-why">
-          <p className="s-why-label">Why binary search first</p>
-          <p>
-            About ten lines of code, and many ways to be off by one. The{" "}
-            <span className="mono">lower-bound</span> problem alone has{" "}
-            <strong>8 modelled mistakes</strong> and <strong>17 tests</strong> chosen so that the
-            mistakes produce different outputs. The bank now has{" "}
-            <strong>25 problems in 5 families</strong>.
-          </p>
-        </div>
-      </div>
+      </Page>
     ),
   },
   {
     id: "solution",
     speaker: "Rupinder",
-    part: "2 · Proposed solution",
+    title: "Proposed solution",
     body: (
-      <div>
-        <Head kicker="2 · Proposed solution" title="Treat every submission as evidence">
-          The system keeps three things apart: what was observed, what it infers, and what happened
-          next.
-        </Head>
-        <ol className="s-loop">
+      <Page title="Proposed solution">
+        <ol className="s-flow">
           {[
-            ["Submission", "source + problem version"],
-            ["Execution evidence", "one sandboxed run per test"],
-            ["Diagnosis", "matched against known mistakes"],
-            ["Targeted practice", "a problem that probes the same skill"],
-            ["New evidence", "the next attempt"],
-            ["Adaptation", "was the criterion met?"],
-          ].map(([t, d], i) => (
-            <li key={t}>
-              <span className="s-loop-no">{i + 1}</span>
-              <strong>{t}</strong>
-              <span>{d}</span>
-            </li>
+            "Submit code",
+            "Run tests in a sandbox",
+            "Compare with known mistakes",
+            "Give feedback",
+            "Recommend next problem",
+            "Check next attempt",
+          ].map((t) => (
+            <li key={t}>{t}</li>
           ))}
         </ol>
-        <div className="s-cols three rules">
-          <section>
-            <h3>Observe before inferring</h3>
-            <p>Observations are stored once and never edited. Diagnoses point back to them.</p>
-          </section>
-          <section>
-            <h3>Abstain when unsure</h3>
-            <p>If no single known mistake fits, the student sees the failing cases and no guess.</p>
-          </section>
-          <section>
-            <h3>“Behaves as if”</h3>
-            <p>Feedback describes the program’s behaviour, never the student’s mind.</p>
-          </section>
-        </div>
-      </div>
+        <h3>Design decisions</h3>
+        <ul className="s-list">
+          <li>Test results are stored first and never changed; every diagnosis refers to them.</li>
+          <li>
+            A mistake is named only if exactly one known mistake matches. Otherwise the student just
+            sees the failing cases.
+          </li>
+          <li>Feedback describes the program (&ldquo;behaves as if&rdquo;), not the student.</li>
+        </ul>
+      </Page>
     ),
   },
   {
     id: "journey",
     speaker: "Rupinder",
-    part: "2 · User journey",
+    title: "Main user journey",
     body: (
-      <div>
-        <Head
-          kicker="2 · The main journey we implemented"
-          title="From a blank editor to the next problem"
-        />
-        <ol className="s-journey">
-          {[
-            ["/", "Landing page", "what the tool does and does not claim"],
-            ["login", "Log in", "operator-created account, session cookie"],
-            ["/problems", "Pick a problem", "25 problems grouped by family"],
-            ["/practice/lower-bound", "Write and submit", "statement, samples, C++ editor"],
-            ["feedback", "Read the result", "failing cases, a hint only if supported"],
-            ["recommended next", "Practise again", "follow-up checked on the next attempt"],
-          ].map(([route, t, d], i) => (
-            <li key={t}>
-              <span className="s-step">{String(i + 1).padStart(2, "0")}</span>
-              <span className="mono s-route">{route}</span>
-              <strong>{t}</strong>
-              <span>{d}</span>
-            </li>
-          ))}
-        </ol>
-        <p className="s-why-label s-journey-label">Researcher path</p>
-        <ol className="s-journey researcher">
-          {[
-            ["/research", "Submissions and metrics", "filter by problem, outcome, data class"],
-            [
-              "/research/submissions/:id",
-              "Evidence trace",
-              "every observation, candidate and reason",
-            ],
-            [
-              "/research/learners/:username",
-              "Learner model",
-              "labelled “estimated under assumed parameters”",
-            ],
-          ].map(([route, t, d], i) => (
-            <li key={t}>
-              <span className="s-step">{String.fromCharCode(65 + i)}</span>
-              <span className="mono s-route">{route}</span>
-              <strong>{t}</strong>
-              <span>{d}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
+      <Page title="Main user journey">
+        <div className="s-two">
+          <div>
+            <h3>Student</h3>
+            <ol className="s-list">
+              <li>Open the landing page and log in</li>
+              <li>Choose a problem from the problem list</li>
+              <li>Write C++ code in the editor and submit</li>
+              <li>Read the result: failing cases, and a hint if one mistake matches</li>
+              <li>Follow the recommended next problem</li>
+              <li>Review earlier attempts under My attempts</li>
+            </ol>
+          </div>
+          <div>
+            <h3>Researcher</h3>
+            <ol className="s-list">
+              <li>Browse submissions and outcome counts</li>
+              <li>Open the evidence trace of one submission</li>
+              <li>
+                View a learner&apos;s skill estimates, labelled &ldquo;estimated under assumed
+                parameters&rdquo;
+              </li>
+            </ol>
+          </div>
+        </div>
+      </Page>
     ),
   },
   {
-    id: "part-demo",
+    id: "demo",
     speaker: "Ashmeen",
-    part: "3 · Live demo",
-    tone: "soil",
+    title: "Live demo",
     body: (
-      <Divider
-        n="Part 2"
-        title="Live: one complete run"
-        who="Ashmeen"
-        line="Real sandbox, real database, prepared programs. No recorded screens."
-      />
+      <Page title="Live demo">
+        <DemoKit />
+      </Page>
     ),
   },
-  { id: "demo", speaker: "Ashmeen", part: "3 · Demo kit", body: <DemoKit /> },
   {
     id: "architecture",
     speaker: "Ashmeen",
-    part: "4 · Integration",
+    title: "System architecture",
     body: (
-      <Diagram
-        kicker="4 · How the parts connect"
-        title="Six components, one trust boundary"
-        note="The API never runs student code. It writes a job; a separate worker claims it and is the only process that talks to Docker."
+      <Figure
+        title="System architecture"
+        note="The API never runs student code. It stores a job, and a separate worker runs it in the sandbox."
       >
         <Architecture />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "contracts",
     speaker: "Ashmeen",
-    part: "4 · Integration",
+    title: "Integration between components",
     body: (
-      <div>
-        <Head kicker="4 · Where the parts meet" title="Each seam has a checked contract" />
+      <Page title="Integration between components">
         <table className="s-table">
           <thead>
             <tr>
-              <th>Seam</th>
-              <th>What crosses it</th>
-              <th>How it is held in place</th>
+              <th>Between</th>
+              <th>What is exchanged</th>
+              <th>How</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Web ↔ API</td>
-              <td>JSON under /api/v1, problem+json errors</td>
-              <td>TypeScript types generated from the OpenAPI schema; CI fails on drift</td>
+              <td>Web app and API</td>
+              <td>JSON requests under /api/v1</td>
+              <td>TypeScript types generated from the OpenAPI schema</td>
             </tr>
             <tr>
               <td>Authentication</td>
-              <td>Opaque token in an HttpOnly cookie, CSRF header</td>
-              <td>Argon2id hashes; only a SHA-256 of the token is stored; login throttling</td>
+              <td>Session cookie and CSRF token</td>
+              <td>Argon2id password hashes, login throttling, audit log</td>
             </tr>
             <tr>
-              <td>API ↔ Database</td>
-              <td>Submissions, jobs, evidence rows</td>
-              <td>SQLAlchemy 2, Alembic migrations, tested on PostgreSQL 16 in CI</td>
+              <td>API and database</td>
+              <td>Submissions, jobs, results</td>
+              <td>SQLAlchemy and Alembic migrations, PostgreSQL 16</td>
             </tr>
             <tr>
-              <td>Database ↔ Worker</td>
-              <td>Job claim with a lease</td>
-              <td>Conditional UPDATE, heartbeat renewal, completion fenced to the claim</td>
+              <td>Database and worker</td>
+              <td>Queued jobs</td>
+              <td>The worker claims a job with a lease so no two workers take it</td>
             </tr>
             <tr>
-              <td>Worker ↔ Sandbox</td>
-              <td>Source, test input → status, output, time</td>
-              <td>Fresh container per test, no network, limits, end-of-output marker</td>
-            </tr>
-            <tr>
-              <td>Worker ↔ Content</td>
-              <td>Tests, error models, skill map</td>
-              <td>Content version = hash of the files; old versions stay registered</td>
+              <td>Worker and sandbox</td>
+              <td>Code and test input, output and timing</td>
+              <td>New Docker container per test, no network, resource limits</td>
             </tr>
           </tbody>
         </table>
-        <p className="s-fine">
-          Backend: 609 unit tests + 39 sandbox tests · web: 37 component tests + 3 Playwright
-          end-to-end flows (release report, 26 Oct).
+        <p className="s-small">
+          Tests at the last release: 609 backend unit tests, 39 sandbox tests, 37 web component
+          tests, 3 browser end-to-end tests.
         </p>
-      </div>
+      </Page>
     ),
   },
   {
     id: "matrix",
     speaker: "Ashmeen",
-    part: "4 · The model",
+    title: "How the diagnosis works",
     body: (
-      <div className="s-split">
-        <div>
-          <Head
-            kicker="4 · How a diagnosis is decided"
-            title="Match behaviour, don’t guess intent"
-          />
-          <p className="s-body">
-            Each known mistake is a real program. We run it on every test and store its outputs: its{" "}
-            <strong>fingerprint</strong>. A submission’s outputs are compared with each fingerprint.
-          </p>
-          <ul className="s-rules">
-            <li>
-              <span className="mono">hypothesis_supported</span> exactly one model fits
-            </li>
-            <li>
-              <span className="mono">ambiguous</span> several fit; none is named
-            </li>
-            <li>
-              <span className="mono">unmodelled_behaviour</span> none fits
-            </li>
-            <li>
-              <span className="mono">non_termination_observed</span> a time limit; a symptom, never
-              a name
-            </li>
-          </ul>
-          <p className="s-fine">
-            No machine learning: the method is deterministic and can be replayed on stored evidence.
-          </p>
+      <Page title="How the diagnosis works">
+        <div className="s-two">
+          <div>
+            <ul className="s-list">
+              <li>Each known mistake is written as a real program.</li>
+              <li>We run it on every test and save its outputs. We call this its fingerprint.</li>
+              <li>The student&apos;s outputs are compared with every fingerprint.</li>
+            </ul>
+            <table className="s-table s-outcomes">
+              <tbody>
+                <tr>
+                  <td>One fingerprint matches</td>
+                  <td>the mistake is named, with a hint</td>
+                </tr>
+                <tr>
+                  <td>Several match</td>
+                  <td>ambiguous, nothing is named</td>
+                </tr>
+                <tr>
+                  <td>None match</td>
+                  <td>unmodelled, failing cases only</td>
+                </tr>
+                <tr>
+                  <td>Time limit reached</td>
+                  <td>reported as &ldquo;did not finish&rdquo;</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <figure className="s-matrix-fig">
+            <Matrix />
+            <figcaption className="s-small">
+              Simplified example: only model B matches the submission on every test.
+            </figcaption>
+          </figure>
         </div>
-        <figure className="s-matrix-fig">
-          <Matrix />
-          <figcaption>
-            Simplified illustration. Model B is the only fingerprint that matches every test.
-          </figcaption>
-        </figure>
-      </div>
-    ),
-  },
-  {
-    id: "part-design",
-    speaker: "Gourav",
-    part: "7 · Design",
-    tone: "soil",
-    body: (
-      <Divider
-        n="Part 3"
-        title="Design: who does what, and what it is made of"
-        who="Gourav"
-        line="Four use case diagrams and the class diagram, drawn from the code."
-      />
+      </Page>
     ),
   },
   {
     id: "uc1",
     speaker: "Gourav",
-    part: "7 · Use case 1 of 4",
+    title: "Use case diagram 1: Student",
     body: (
-      <Diagram
-        kicker="Use case diagram 1 of 4"
-        title="Student: practise and get feedback"
-        note="Submitting always runs the diagnostic tests; a hint is an extension that appears only when one known mistake fits."
-      >
+      <Figure title="Use case diagram 1: Student">
         <UseCaseDiagram spec={UC_STUDENT} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "uc2",
     speaker: "Gourav",
-    part: "7 · Use case 2 of 4",
+    title: "Use case diagram 2: Researcher",
     body: (
-      <Diagram
-        kicker="Use case diagram 2 of 4"
-        title="Researcher: inspect the evidence"
-        note="Researchers can also practise. The learner model is researcher-only and every estimate carries its assumption label."
-      >
+      <Figure title="Use case diagram 2: Researcher">
         <UseCaseDiagram spec={UC_RESEARCHER} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "uc3",
     speaker: "Gourav",
-    part: "7 · Use case 3 of 4",
+    title: "Use case diagram 3: Administrator",
     body: (
-      <Diagram
-        kicker="Use case diagram 3 of 4"
-        title="Administrator: accounts and content"
-        note="There is no account-management endpoint in the API. These run from the codeadapt-admin and codeadapt-content command lines."
-      >
+      <Figure title="Use case diagram 3: Administrator">
         <UseCaseDiagram spec={UC_ADMIN} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "uc4",
     speaker: "Gourav",
-    part: "7 · Use case 4 of 4",
+    title: "Use case diagram 4: Runner worker",
     body: (
-      <Diagram
-        kicker="Use case diagram 4 of 4"
-        title="Runner worker: evaluate a submission"
-        note="The worker is a system actor. Its use cases run in order for every queued job; the sandbox is the secondary actor."
-      >
+      <Figure title="Use case diagram 4: Runner worker">
         <UseCaseDiagram spec={UC_WORKER} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "classes",
     speaker: "Gourav",
-    part: "7 · Class diagram",
+    title: "Class diagram",
     body: (
-      <Diagram
-        kicker="Detailed class diagram"
-        title="The evidence chain, class by class"
-        note="White headers: persisted entities (db/models.py). Green: logic classes. Amber: protocols the worker depends on, so a method or sandbox can be swapped."
-      >
+      <Figure title="Class diagram">
         <ClassDiagram spec={CLASSES} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "sd1",
     speaker: "Jasroop",
-    part: "7 · Sequence 1 of 5",
+    title: "Sequence diagram 1: Login",
     body: (
-      <Diagram
-        kicker="Sequence diagram 1 of 5"
-        title="Log in"
-        note="Failed logins are throttled and audited. The cookie is HttpOnly, so page scripts never see the session token."
-      >
+      <Figure title="Sequence diagram 1: Login">
         <SequenceDiagram spec={SD_LOGIN} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "sd2",
     speaker: "Jasroop",
-    part: "7 · Sequence 2 of 5",
+    title: "Sequence diagram 2: Submit a solution",
     body: (
-      <Diagram
-        kicker="Sequence diagram 2 of 5"
-        title="Submit a solution"
-        note="The API answers 202 at once and never waits for the sandbox. The page polls until the worker has finished."
-      >
+      <Figure title="Sequence diagram 2: Submit a solution">
         <SequenceDiagram spec={SD_SUBMIT} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "sd3",
     speaker: "Jasroop",
-    part: "7 · Sequence 3 of 5",
+    title: "Sequence diagram 3: Run and diagnose",
     body: (
-      <Diagram
-        kicker="Sequence diagram 3 of 5"
-        title="Run and diagnose in the sandbox"
-        note="Fingerprints are measured by running each error model, once per content version and environment, then cached."
-      >
+      <Figure title="Sequence diagram 3: Run and diagnose">
         <SequenceDiagram spec={SD_EVALUATE} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "sd4",
     speaker: "Jasroop",
-    part: "7 · Sequence 4 of 5",
+    title: "Sequence diagram 4: Recommendation",
     body: (
-      <Diagram
-        kicker="Sequence diagram 4 of 5"
-        title="Recommend, then check the follow-up"
-        note="Every outcome has an explicit rule. Compile errors, infrastructure failures and timeouts never become evidence about a skill."
-      >
+      <Figure title="Sequence diagram 4: Recommendation">
         <SequenceDiagram spec={SD_ADAPT} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "sd5",
     speaker: "Jasroop",
-    part: "7 · Sequence 5 of 5",
+    title: "Sequence diagram 5: Researcher view",
     body: (
-      <Diagram
-        kicker="Sequence diagram 5 of 5"
-        title="Researcher: trace and learner model"
-        note="BKT runs with assumed parameters. It is infrastructure for research, not a validated measure of what anyone knows."
-      >
+      <Figure title="Sequence diagram 5: Researcher view">
         <SequenceDiagram spec={SD_RESEARCH} />
-      </Diagram>
+      </Figure>
     ),
   },
   {
     id: "status",
     speaker: "Jasroop",
-    part: "5 · Status",
+    title: "Current status",
     body: (
-      <div>
-        <Head kicker="5 · Where it stands" title="Complete, limited, next" />
-        <div className="s-cols three s-status">
-          <section className="s-done">
-            <h3>Complete</h3>
-            <ul>
-              <li>Sandboxed compile and run, per-test containers</li>
-              <li>Diagnosis v1.3 with abstention</li>
-              <li>Skill-evidence ledger, recommendation policy 1.5, follow-up checks</li>
-              <li>Login, roles, CSRF, audit log</li>
-              <li>Student workspace and researcher console</li>
-              <li>25 problems, all passing content validation</li>
+      <Page title="Current status">
+        <div className="s-three">
+          <div>
+            <h3>Completed</h3>
+            <ul className="s-list">
+              <li>Sandboxed compile and run</li>
+              <li>Diagnosis with abstention</li>
+              <li>Recommendations and follow-up checks</li>
+              <li>Login and roles</li>
+              <li>Student and researcher interfaces</li>
+              <li>25 validated problems</li>
             </ul>
-          </section>
-          <section className="s-limited">
-            <h3>Limited or missing</h3>
-            <ul>
-              <li>Not yet tried with real students</li>
-              <li>
-                A named mistake for about 9% of incorrect mutants; the rest get failing cases only
-              </li>
-              <li>BKT parameters are assumptions</li>
-              <li>Skill maps are our own, unvalidated</li>
-              <li>Complexity is not checked: a linear scan passes</li>
-              <li>gVisor isolation tested in CI only; not deployed</li>
+          </div>
+          <div>
+            <h3>Limitations</h3>
+            <ul className="s-list">
+              <li>Not yet used by real students</li>
+              <li>Names a mistake for about 9% of our incorrect test programs</li>
+              <li>Learner model uses assumed parameters</li>
+              <li>Time complexity is not checked</li>
+              <li>Not deployed yet</li>
             </ul>
-          </section>
-          <section className="s-next">
-            <h3>Next</h3>
-            <ul>
-              <li>Host it with the gVisor runner on its own VM</li>
-              <li>Test on programs we did not write (public corpus or a consented study)</li>
-              <li>Make failing-case feedback the main experience</li>
-              <li>Only then: fit BKT on real data</li>
+          </div>
+          <div>
+            <h3>Next steps</h3>
+            <ul className="s-list">
+              <li>Deploy with a separate, isolated runner</li>
+              <li>Test on programs written by other people</li>
+              <li>Improve the feedback for failing cases</li>
+              <li>Fit the learner model on real data</li>
             </ul>
-          </section>
+          </div>
         </div>
-      </div>
+      </Page>
     ),
   },
   {
     id: "numbers",
     speaker: "Jasroop",
-    part: "5 · Evidence",
+    title: "Evaluation results",
     body: (
-      <div className="s-split wide-left">
-        <div>
-          <Head
-            kicker="5 · What our numbers say, and what they don’t"
-            title="Measured on programs we wrote or generated"
-          />
-          <table className="s-table nums">
-            <thead>
-              <tr>
-                <th>Set</th>
-                <th>Incorrect programs</th>
-                <th>Named</th>
-                <th>Named wrongly</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Held-out, author-written</td>
-                <td>26</td>
-                <td>14</td>
-                <td>0</td>
-              </tr>
-              <tr>
-                <td>Single-edit mutants (3 problems)</td>
-                <td>323</td>
-                <td>30</td>
-                <td>0</td>
-              </tr>
-              <tr>
-                <td>Correct held-out programs</td>
-                <td className="small">6 correct</td>
-                <td colSpan={2} className="small">
-                  0 false alarms
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <p className="s-fine">Method v1.3. Source: docs/evaluation/summary.md.</p>
-        </div>
-        <div className="s-caveat">
-          <p className="s-why-label">Read with care</p>
-          <p>
-            None of this is accuracy on real students. Every program was written by us or produced
-            mechanically.
-          </p>
-          <p>
-            “0 wrong” rests on small numbers: 0 of 30 still allows an error rate of several percent.
-          </p>
-          <p>Each version removed wrong names by naming less. We chose that trade on purpose.</p>
-        </div>
-      </div>
+      <Page title="Evaluation results">
+        <table className="s-table">
+          <thead>
+            <tr>
+              <th>Test set</th>
+              <th>Incorrect programs</th>
+              <th>Mistake named</th>
+              <th>Named wrongly</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Held-out programs written by us</td>
+              <td>26</td>
+              <td>14</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td>Generated single-edit programs (3 problems)</td>
+              <td>323</td>
+              <td>30</td>
+              <td>0</td>
+            </tr>
+          </tbody>
+        </table>
+        <p className="s-text">All 6 correct held-out programs passed with no false alarm.</p>
+        <ul className="s-list s-note-list">
+          <li>
+            These programs were written or generated by us, so this is not accuracy on real
+            students.
+          </li>
+          <li>
+            The samples are small: 0 wrong out of 30 still allows a real error rate of a few
+            percent.
+          </li>
+        </ul>
+      </Page>
     ),
   },
   {
     id: "team",
     speaker: "All",
-    part: "6 · Contributions",
+    title: "Team contributions",
     body: (
-      <div>
-        <Head kicker="6 · Who did what" title="Each of us can open our own work" />
-        <div className="s-cols four">
-          {CONTRIBUTIONS.map((c) => (
-            <section key={c.name}>
-              <h3>{c.name}</h3>
-              <ul>
-                {c.did.map((d) => (
-                  <li key={d}>{d}</li>
-                ))}
-              </ul>
-              <p className={c.evidence ? "s-evidence" : "s-evidence todo"}>
-                {c.evidence || "Add links: commits, issues, tests or journal entries"}
-              </p>
-            </section>
-          ))}
-        </div>
-      </div>
+      <Page title="Team contributions">
+        <table className="s-table">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Work</th>
+              <th>Evidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CONTRIBUTIONS.map((c) => (
+              <tr key={c.name}>
+                <td>{c.name}</td>
+                <td>{c.did.join(", ")}</td>
+                <td className={c.evidence ? undefined : "s-todo"}>
+                  {c.evidence || "to add: commits, issues, journal"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Page>
     ),
   },
   {
     id: "end",
     speaker: "All",
-    part: "Questions",
-    tone: "soil",
+    title: "Thank you",
     body: (
-      <div className="s-title end">
-        <p className="s-kicker on-soil">Thank you</p>
-        <h1>Questions?</h1>
-        <p className="s-title-line">Ask any of us to open the code behind a slide.</p>
-        <ul className="s-links">
-          <li>
-            <span>Repository</span>
-            <a href={REPO}>{REPO.replace("https://", "")}</a>
-          </li>
-          <li>
-            <span>Try it</span>
-            <a href="/problems">/problems</a>
-          </li>
-          <li>
-            <span>Design docs</span>
-            <a href={`${REPO}/tree/claude/project-thread-jn9de7/docs`}>
-              docs/architecture.md · docs/limitations.md
-            </a>
-          </li>
-        </ul>
+      <div className="s-cover">
+        <h1>Thank you</h1>
+        <p className="s-cover-sub">Questions?</p>
+        <div className="s-cover-rule" />
+        <p className="s-text">Repository: {REPO.replace("https://", "")}</p>
+        <p className="s-text">Documentation: docs/architecture.md, docs/limitations.md</p>
       </div>
     ),
   },
