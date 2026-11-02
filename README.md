@@ -53,6 +53,7 @@ isolation tier) is complete. See [docs/security.md](docs/security.md).
 | [docs/limitations.md](docs/limitations.md) | limitations and future work |
 | [docs/research-report-draft.md](docs/research-report-draft.md) | research report draft (evidence-supported claims only) |
 | [docs/interview-prep.md](docs/interview-prep.md) | how to explain the design, algorithms, trade-offs and evaluation |
+| [docs/presentation/script.md](docs/presentation/script.md) | group presentation: the slides are served by the app at `/presentation`; four-person speaking script |
 | [PROJECT_AUTOPILOT.md](PROJECT_AUTOPILOT.md) | completion plan and progress log |
 
 ## Quick start
