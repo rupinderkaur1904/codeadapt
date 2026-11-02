@@ -26,6 +26,9 @@ const LearnersPage = lazy(() =>
 const AttemptsPage = lazy(() =>
   import("./pages/AttemptsPage").then((m) => ({ default: m.AttemptsPage })),
 );
+const PresentationPage = lazy(() =>
+  import("./presentation/PresentationPage").then((m) => ({ default: m.PresentationPage })),
+);
 const LearnerModelPage = lazy(() =>
   import("./pages/LearnerModelPage").then((m) => ({ default: m.LearnerModelPage })),
 );
@@ -50,6 +53,19 @@ function Brand() {
 }
 
 export function App() {
+  const location = useLocation();
+  // The group presentation is public and full screen: no login, no app header, no intro.
+  if (location.pathname === "/presentation") {
+    return (
+      <Suspense fallback={<p>Loading…</p>}>
+        <PresentationPage />
+      </Suspense>
+    );
+  }
+  return <Site />;
+}
+
+function Site() {
   const location = useLocation();
   // The intro opens the site only at the landing page, so deep links go straight through.
   const [intro, setIntro] = useState(() => location.pathname === "/" && !introSeen());
