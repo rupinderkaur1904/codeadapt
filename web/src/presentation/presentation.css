@@ -500,3 +500,35 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* Screenshots */
+.s-shots {
+  display: grid;
+  gap: 24px;
+  align-items: start;
+}
+.s-shots-2 {
+  grid-template-columns: 3fr 2fr;
+}
+.s-shots-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.s-shots-4 {
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 28px;
+}
+.s-shot {
+  margin: 0;
+}
+.s-shot img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+  object-position: top left;
+  border: 1px solid var(--deck-line);
+  border-radius: 4px;
+}
+.s-shot figcaption {
+  font-size: 16px;
+  margin-top: 8px;
+}

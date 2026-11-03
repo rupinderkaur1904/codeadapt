@@ -17,6 +17,15 @@ import {
   UC_WORKER,
 } from "./diagrams";
 import { DEMO_PROGRAMS } from "./demoKit";
+import fbCorrect from "./shots/fb-correct_iterative.png";
+import fbDouble from "./shots/fb-double_bug.png";
+import fbEarly from "./shots/fb-recursive_early_equal.png";
+import fbStuck from "./shots/fb-size_t_stuck_left.png";
+import shotLearner from "./shots/learner.png";
+import shotPractice from "./shots/practice.png";
+import shotProblems from "./shots/problems.png";
+import shotResearch from "./shots/research.png";
+import shotTrace from "./shots/trace.png";
 import { ClassDiagram, SequenceDiagram, UseCaseDiagram } from "./uml";
 
 export type Speaker = "Rupinder" | "Ashmeen" | "Gourav" | "Jasroop" | "All";
@@ -54,6 +63,18 @@ const CONTRIBUTIONS: { name: string; part: string; files: string }[] = [
     files: "auth/, adaptation/policy_v1.py, docs/limitations.md",
   },
 ];
+
+const SHOT_NOTE =
+  "Screenshots of the running system, taken on 3 November 2026 with test accounts and our own test programs.";
+
+function Shot({ src, label, maxHeight }: { src: string; label: string; maxHeight: number }) {
+  return (
+    <figure className="s-shot">
+      <img src={src} alt={label} style={{ maxHeight }} />
+      <figcaption>{label}</figcaption>
+    </figure>
+  );
+}
 
 const REPO = "https://github.com/rupinderkaur1904/codeadapt";
 
@@ -487,12 +508,46 @@ export const SLIDES: Slide[] = [
     ),
   },
   {
+    id: "student-screens",
+    speaker: "Rupinder",
+    title: "The student's screens",
+    body: (
+      <Page title="The student's screens">
+        <div className="s-shots s-shots-2">
+          <Shot src={shotPractice} label="Practice page after a submission" maxHeight={480} />
+          <Shot src={shotProblems} label="Problem list, grouped by family" maxHeight={480} />
+        </div>
+        <p className="s-caption">{SHOT_NOTE}</p>
+      </Page>
+    ),
+  },
+  {
     id: "demo",
     speaker: "Ashmeen",
     title: "Live demo",
     body: (
       <Page title="Live demo">
         <DemoKit />
+      </Page>
+    ),
+  },
+  {
+    id: "results",
+    speaker: "Ashmeen",
+    title: "The four demo results",
+    body: (
+      <Page title="The four demo results">
+        <div className="s-shots s-shots-4">
+          <Shot src={fbCorrect} label="1. Correct: all 17 tests pass" maxHeight={185} />
+          <Shot
+            src={fbEarly}
+            label="2. One known mistake fits: named, with a hint"
+            maxHeight={185}
+          />
+          <Shot src={fbDouble} label="3. Two mistakes: failing cases, no guess" maxHeight={185} />
+          <Shot src={fbStuck} label="4. Loop never ends: reported as a time-out" maxHeight={185} />
+        </div>
+        <p className="s-caption">{SHOT_NOTE}</p>
       </Page>
     ),
   },
@@ -700,6 +755,27 @@ export const SLIDES: Slide[] = [
       <Figure title="Sequence diagram 5: Researcher view">
         <SequenceDiagram spec={SD_RESEARCH} />
       </Figure>
+    ),
+  },
+  {
+    id: "research-screens",
+    speaker: "Jasroop",
+    title: "The researcher's screens",
+    body: (
+      <Page title="The researcher's screens">
+        <div className="s-shots s-shots-2">
+          <Shot src={shotResearch} label="Submissions and outcome counts" maxHeight={480} />
+          <div className="s-shots">
+            <Shot src={shotTrace} label="Evidence trace of one submission" maxHeight={170} />
+            <Shot
+              src={shotLearner}
+              label="Learner model, under assumed parameters"
+              maxHeight={170}
+            />
+          </div>
+        </div>
+        <p className="s-caption">{SHOT_NOTE}</p>
+      </Page>
     ),
   },
   {
