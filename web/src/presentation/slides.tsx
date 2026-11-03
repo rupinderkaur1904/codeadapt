@@ -4,19 +4,17 @@
 
 import { useState, type ReactNode } from "react";
 
-import {
-  CLASSES,
-  SD_ADAPT,
-  SD_EVALUATE,
-  SD_LOGIN,
-  SD_RESEARCH,
-  SD_SUBMIT,
-  UC_ADMIN,
-  UC_RESEARCHER,
-  UC_STUDENT,
-  UC_WORKER,
-} from "./diagrams";
 import { DEMO_PROGRAMS } from "./demoKit";
+import classDiagram from "./drawio/class.png";
+import sdLogin from "./drawio/sd1-login.png";
+import sdRecommend from "./drawio/sd4-recommend.png";
+import sdResearch from "./drawio/sd5-research.png";
+import sdRun from "./drawio/sd3-run-diagnose.png";
+import sdSubmit from "./drawio/sd2-submit.png";
+import ucAdmin from "./drawio/uc3-admin.png";
+import ucResearcher from "./drawio/uc2-researcher.png";
+import ucStudent from "./drawio/uc1-student.png";
+import ucWorker from "./drawio/uc4-worker.png";
 import fbCorrect from "./shots/fb-correct_iterative.png";
 import fbDouble from "./shots/fb-double_bug.png";
 import fbEarly from "./shots/fb-recursive_early_equal.png";
@@ -26,7 +24,6 @@ import shotPractice from "./shots/practice.png";
 import shotProblems from "./shots/problems.png";
 import shotResearch from "./shots/research.png";
 import shotTrace from "./shots/trace.png";
-import { ClassDiagram, SequenceDiagram, UseCaseDiagram } from "./uml";
 
 export type Speaker = "Rupinder" | "Ashmeen" | "Gourav" | "Jasroop" | "All";
 
@@ -663,7 +660,7 @@ export const SLIDES: Slide[] = [
     title: "Use case diagram 1: Student",
     body: (
       <Figure title="Use case diagram 1: Student">
-        <UseCaseDiagram spec={UC_STUDENT} />
+        <img className="s-drawio" src={ucStudent} alt="uc1-student (draw.io)" />
       </Figure>
     ),
   },
@@ -673,7 +670,7 @@ export const SLIDES: Slide[] = [
     title: "Use case diagram 2: Researcher",
     body: (
       <Figure title="Use case diagram 2: Researcher">
-        <UseCaseDiagram spec={UC_RESEARCHER} />
+        <img className="s-drawio" src={ucResearcher} alt="uc2-researcher (draw.io)" />
       </Figure>
     ),
   },
@@ -683,7 +680,7 @@ export const SLIDES: Slide[] = [
     title: "Use case diagram 3: Administrator",
     body: (
       <Figure title="Use case diagram 3: Administrator">
-        <UseCaseDiagram spec={UC_ADMIN} />
+        <img className="s-drawio" src={ucAdmin} alt="uc3-admin (draw.io)" />
       </Figure>
     ),
   },
@@ -693,7 +690,7 @@ export const SLIDES: Slide[] = [
     title: "Use case diagram 4: Runner worker",
     body: (
       <Figure title="Use case diagram 4: Runner worker">
-        <UseCaseDiagram spec={UC_WORKER} />
+        <img className="s-drawio" src={ucWorker} alt="uc4-worker (draw.io)" />
       </Figure>
     ),
   },
@@ -703,7 +700,7 @@ export const SLIDES: Slide[] = [
     title: "Class diagram",
     body: (
       <Figure title="Class diagram">
-        <ClassDiagram spec={CLASSES} />
+        <img className="s-drawio" src={classDiagram} alt="class (draw.io)" />
       </Figure>
     ),
   },
@@ -713,7 +710,7 @@ export const SLIDES: Slide[] = [
     title: "Sequence diagram 1: Login",
     body: (
       <Figure title="Sequence diagram 1: Login">
-        <SequenceDiagram spec={SD_LOGIN} />
+        <img className="s-drawio" src={sdLogin} alt="sd1-login (draw.io)" />
       </Figure>
     ),
   },
@@ -723,7 +720,7 @@ export const SLIDES: Slide[] = [
     title: "Sequence diagram 2: Submit a solution",
     body: (
       <Figure title="Sequence diagram 2: Submit a solution">
-        <SequenceDiagram spec={SD_SUBMIT} />
+        <img className="s-drawio" src={sdSubmit} alt="sd2-submit (draw.io)" />
       </Figure>
     ),
   },
@@ -733,7 +730,7 @@ export const SLIDES: Slide[] = [
     title: "Sequence diagram 3: Run and diagnose",
     body: (
       <Figure title="Sequence diagram 3: Run and diagnose">
-        <SequenceDiagram spec={SD_EVALUATE} />
+        <img className="s-drawio" src={sdRun} alt="sd3-run-diagnose (draw.io)" />
       </Figure>
     ),
   },
@@ -743,7 +740,7 @@ export const SLIDES: Slide[] = [
     title: "Sequence diagram 4: Recommendation",
     body: (
       <Figure title="Sequence diagram 4: Recommendation">
-        <SequenceDiagram spec={SD_ADAPT} />
+        <img className="s-drawio" src={sdRecommend} alt="sd4-recommend (draw.io)" />
       </Figure>
     ),
   },
@@ -753,7 +750,7 @@ export const SLIDES: Slide[] = [
     title: "Sequence diagram 5: Researcher view",
     body: (
       <Figure title="Sequence diagram 5: Researcher view">
-        <SequenceDiagram spec={SD_RESEARCH} />
+        <img className="s-drawio" src={sdResearch} alt="sd5-research (draw.io)" />
       </Figure>
     ),
   },
