@@ -2,7 +2,7 @@
 
 The slides are part of the website: open `/presentation` on the running app (for example
 `http://localhost:5173/presentation`). It needs no login. Keys: → or Space next, ← back,
-F full screen, G all slides. The slide number is in the address (`/presentation#7`), so a
+F full screen, G all slides. The slide number is in the address (`/presentation#9`), so a
 link can open on any slide.
 
 **Running time:** 21 minutes, plus questions. Each presenter has **5 minutes**, then the
@@ -10,11 +10,11 @@ team shares the last minute.
 
 | Part | Presenter | Slides | Time |
 | --- | --- | --- | --- |
-| Problem, users, solution, journey | Rupinder | 1–5 | 5 min |
-| Live demo and architecture | Ashmeen | 6–7 | 5 min |
-| Integration, diagnosis, use cases, class diagram | Gourav | 8–14 | 5 min |
-| Sequence diagrams, status, evaluation | Jasroop | 15–21 | 5 min |
-| Contributions and questions | everyone | 22–23 | 1 min + Q&A |
+| Problem, users, solution, journey, student screens | Rupinder | 1–6 | 5 min |
+| Live demo, results, architecture | Ashmeen | 7–9 | 5 min |
+| Integration, diagnosis, use cases, class diagram | Gourav | 10–16 | 5 min |
+| Sequence diagrams, researcher screens, status, evaluation | Jasroop | 17–24 | 5 min |
+| Contributions and questions | everyone | 25–26 | 1 min + Q&A |
 
 Each spoken part is about 600–650 words, which is 5 minutes at a calm pace. Ashmeen's part
 has fewer words because the demo needs time for pasting code and waiting for results. The
@@ -35,15 +35,15 @@ Words in *[brackets]* are actions, not speech.
 2. **Warm up the sandbox.** Log in as the demo student and submit any program to Lower
    bound once. The first submission measures every error model's fingerprints, which took
    about 3 minutes in rehearsal. After that, a submission takes seconds.
-3. Keep the four demo programs ready: they are on slide 6 with a Copy button, and in
+3. Keep the four demo programs ready: they are on slide 7 with a Copy button, and in
    `eval/heldout/lower-bound/`.
 4. Each member opens, in a browser tab, the files they will be asked about (see the
    "Where your code is" list at the end of each part).
-5. Fill in the contribution slide (slide 22) with real links. See "Contribution slide" below.
+5. Fill in the contribution slide (slide 25) with real links. See "Contribution slide" below.
 
 ---
 
-## Part 1 · Rupinder (slides 1–5, 5 minutes)
+## Part 1 · Rupinder (slides 1–6, 5 minutes)
 
 ### Slide 1 · Title (40 seconds)
 
@@ -111,19 +111,25 @@ Words in *[brackets]* are actions, not speech.
 
 *[→]*
 
-### Slide 5 · User journey (1 minute 10 seconds)
+### Slide 5 · User journey (45 seconds)
 
-> This is the journey we built, and Ashmeen will walk it live in a minute.
+> This is the journey we built. You log in with an account the administrator created, pick a
+> problem from twenty-five, write C++ in the editor and submit. You get the failing cases in
+> plain words, a hint only if one known mistake fits, and a recommended next problem.
 >
-> The landing page explains what the tool does and doesn't claim. You log in with an account
-> the administrator created. You pick a problem from twenty-five, grouped by family. You write
-> C++ in the editor and submit. You get the result: the failing cases in plain words, and a
-> hint only if one known mistake fits. Then a recommended next problem, and the system checks
-> the follow-up on your next attempt.
->
-> Researchers get a second path *[point to the right column]*: a list of submissions with
-> metrics, a full evidence trace for any one of them, and a learner model, which is always
-> labelled "estimated under assumed parameters".
+> Researchers get a second path *[point to the right column]*: submissions with metrics, the
+> full evidence trace of any one of them, and a learner model, always labelled "estimated
+> under assumed parameters".
+
+*[→]*
+
+### Slide 6 · The student's screens (40 seconds)
+
+> These are screenshots of the real pages, taken from the running system with our test
+> accounts. *[point left]* This is the practice page after a submission: the statement, the
+> code, and underneath, the feedback. It says the code "behaves as if" it has a mistake, gives
+> one hint, and lists the cases that show it. *[point right]* And this is the problem list,
+> grouped by family, with the recommendation at the top.
 >
 > That's the plan on paper. Ashmeen will now show you that it actually runs.
 
@@ -139,27 +145,26 @@ Words in *[brackets]* are actions, not speech.
 - *Why C++ only?* One toolchain (GCC 14.2, pinned) keeps runs reproducible. The design does not
   depend on the language, but every problem would need new error models.
 - *Who are your users in practice?* Nobody yet. It has not been used with real students, and we
-  say so on slide 20.
+  say so on slide 23.
 
 ---
 
-## Part 2 · Ashmeen (slides 6–7, 5 minutes)
+## Part 2 · Ashmeen (slides 7–9, 5 minutes)
 
 This part has fewer words than the others because about two minutes go on pasting code,
 waiting for results and switching accounts. Keep talking while a result loads: say what you
 expect to see.
 
-### Slide 6 · Live demo (4 minutes)
+### Slide 7 · Live demo (3 minutes 40 seconds)
 
-> Thanks, Rupinder. This part is live, on the real system, and nothing is recorded. These are
-> four test programs we wrote ourselves to exercise the system; they are not student
-> submissions. Each one should get a different answer.
+> Thanks, Rupinder. This part is live, on the real system. These are four test programs we
+> wrote ourselves, not student submissions, and each one should get a different answer.
 
 *[Click "Open CodeAdapt". Log in as the demo student. Open Lower bound.]*
 
 > This is the practice page: the statement on the left, the editor on the right.
 
-**Program 1: `correct_iterative.cpp`.** *[Copy from slide 6, paste, Submit.]*
+**Program 1: `correct_iterative.cpp`.** *[Copy from slide 7, paste, Submit.]*
 
 > It's a correct solution in an unusual style. *[wait for the result]* All seventeen tests
 > pass. Notice the wording: it says tests can show mistakes but can't prove a solution
@@ -193,9 +198,18 @@ submission's trace.]*
 *[Back to the presentation tab, →]*
 
 **If the sandbox is slow or down:** say so plainly, show the trace of a submission made during
-the warm-up, and carry on. Do not show screenshots as if they were live.
+the warm-up, or go to the next slide, which has screenshots of all four results. Say that they
+are screenshots, not live.
 
-### Slide 7 · System architecture (1 minute)
+### Slide 8 · The four demo results (20 seconds)
+
+> To sum up what you just saw, here are the four results side by side. A pass. One mistake
+> named, with a hint. Two mistakes, so no guess. And a loop that never ends, reported as a
+> time-out. Four programs, four different answers.
+
+*[→]*
+
+### Slide 9 · System architecture (1 minute)
 
 > Behind that demo are six components. The web app is React and TypeScript with a CodeMirror
 > editor. The API is FastAPI. The database is PostgreSQL in deployment, SQLite in development.
@@ -226,9 +240,9 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 ---
 
-## Part 3 · Gourav (slides 8–14, 5 minutes)
+## Part 3 · Gourav (slides 10–16, 5 minutes)
 
-### Slide 8 · Integration between components (50 seconds)
+### Slide 10 · Integration between components (50 seconds)
 
 > Thanks, Ashmeen. I'll cover how the parts connect, how the diagnosis works, and then the
 > design diagrams.
@@ -243,7 +257,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 9 · How the diagnosis works (50 seconds)
+### Slide 11 · How the diagnosis works (50 seconds)
 
 > The core is simple on purpose. Every known mistake is a real program. We run it on every
 > test and store its outputs: we call that its fingerprint. Then we compare the student's
@@ -258,7 +272,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 10 · Use case diagram 1: Student (40 seconds)
+### Slide 12 · Use case diagram 1: Student (40 seconds)
 
 > Now the four use case diagrams. They were drawn from the code, so the names match the
 > repository.
@@ -270,7 +284,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 11 · Use case diagram 2: Researcher (30 seconds)
+### Slide 13 · Use case diagram 2: Researcher (30 seconds)
 
 > The researcher browses submissions with filters, views metrics, inspects an evidence trace,
 > and views a learner model. Viewing the learner model includes estimating skills under
@@ -279,7 +293,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 12 · Use case diagram 3: Administrator (25 seconds)
+### Slide 14 · Use case diagram 3: Administrator (25 seconds)
 
 > The administrator works from the command line, not the website: there is deliberately no
 > account-management endpoint. Creating an account records an audit event. Setting a new
@@ -288,7 +302,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 13 · Use case diagram 4: Runner worker (30 seconds)
+### Slide 15 · Use case diagram 4: Runner worker (30 seconds)
 
 > The fourth actor is a system: the worker. For every job it compiles the submission, runs
 > each test, and may re-run failing tests with a sanitiser build to check the result is
@@ -299,7 +313,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 14 · Class diagram (1 minute 15 seconds)
+### Slide 16 · Class diagram (1 minute 15 seconds)
 
 > This is the detailed class diagram. Read it left to right as one evidence chain.
 >
@@ -338,9 +352,9 @@ diagram data in `web/src/presentation/diagrams.tsx`.
 
 ---
 
-## Part 4 · Jasroop (slides 15–21, 5 minutes)
+## Part 4 · Jasroop (slides 17–24, 5 minutes)
 
-### Slide 15 · Sequence diagram 1: Login (35 seconds)
+### Slide 17 · Sequence diagram 1: Login (35 seconds)
 
 > Thanks, Gourav. Five sequence diagrams, starting with logging in. The browser posts the
 > username and password. The auth module checks throttling, then verifies the Argon2id hash.
@@ -350,7 +364,7 @@ diagram data in `web/src/presentation/diagrams.tsx`.
 
 *[→]*
 
-### Slide 16 · Sequence diagram 2: Submit a solution (30 seconds)
+### Slide 18 · Sequence diagram 2: Submit a solution (30 seconds)
 
 > Submitting. The page sends the source with the CSRF token. The API checks the session,
 > role, a 64 KiB size limit and the rate limit, records the submission and a queued job, and
@@ -359,7 +373,7 @@ diagram data in `web/src/presentation/diagrams.tsx`.
 
 *[→]*
 
-### Slide 17 · Sequence diagram 3: Run and diagnose (45 seconds)
+### Slide 19 · Sequence diagram 3: Run and diagnose (45 seconds)
 
 > This is the worker's side. It claims the job with a lease and loads the problem version. If
 > this version has never been measured here, it first runs every error model to get the
@@ -370,7 +384,7 @@ diagram data in `web/src/presentation/diagrams.tsx`.
 
 *[→]*
 
-### Slide 18 · Sequence diagram 4: Recommendation (40 seconds)
+### Slide 20 · Sequence diagram 4: Recommendation (40 seconds)
 
 > Then adaptation. If this attempt follows an open recommendation, it's checked against the
 > goal we recorded: met, not met, or not comparable. Then the policy asks the evidence ledger
@@ -380,26 +394,34 @@ diagram data in `web/src/presentation/diagrams.tsx`.
 
 *[→]*
 
-### Slide 19 · Sequence diagram 5: Researcher view (35 seconds)
+### Slide 21 · Sequence diagram 5: Researcher view (30 seconds)
 
 > Last, the researcher. Every research endpoint checks the role first; a student gets a 403.
 > For the learner model, the API passes the learner's attempts to the BKT module with a named
-> set of assumed parameters. It counts only the first reliable attempt per problem version,
-> and returns an estimate or "insufficient data". Every estimate is labelled, and none of it is
-> shown to students or used for recommendations.
+> set of assumed parameters, counts only the first reliable attempt per problem version, and
+> returns an estimate or "insufficient data".
 
 *[→]*
 
-### Slide 20 · Current status (1 minute 15 seconds)
+### Slide 22 · The researcher's screens (30 seconds)
+
+> And this is what that looks like. *[point left]* The research page counts stored outcomes
+> and lists every submission with its outcome and the next step chosen. *[point right]* The
+> trace shows the full evidence for one of them, and the learner model page labels every
+> estimate "estimated under assumed parameters". None of it is shown to students.
+
+*[→]*
+
+### Slide 23 · Current status (1 minute 10 seconds)
 
 > So where does it stand? Complete: the sandbox, the diagnosis method with abstention, the
 > evidence ledger, recommendations and follow-up checks, login with roles, both interfaces,
 > and 25 problems that pass validation.
 >
 > Limited: we have not tried it with real students. It names a mistake for only about nine
-> percent of our incorrect test programs; the rest get failing cases only. The BKT numbers are
-> assumptions. The skill maps are our own judgement. It doesn't check complexity, so a linear
-> scan passes. And the production sandbox tier is tested in CI but not deployed.
+> percent of our incorrect test programs; the rest get failing cases only. The BKT numbers and
+> the skill maps are our own assumptions. It doesn't check complexity, so a linear scan passes.
+> And the production sandbox tier is tested in CI but not deployed.
 >
 > Next, in this order: host it properly with the gVisor runner on its own machine; test it on
 > programs we didn't write; make the failing-case feedback the main experience, since that's
@@ -407,7 +429,7 @@ diagram data in `web/src/presentation/diagrams.tsx`.
 
 *[→]*
 
-### Slide 21 · Evaluation results (1 minute)
+### Slide 24 · Evaluation results (1 minute)
 
 > A word on numbers, because it's easy to overclaim. On 26 incorrect programs we wrote and
 > held back, the method named 14 and got none wrong. On 323 automatically generated incorrect
@@ -438,7 +460,7 @@ diagram data in `web/src/presentation/diagrams.tsx`.
 
 ---
 
-## Slide 22 · Team contributions (everyone, 15 seconds each)
+## Slide 25 · Team contributions (everyone, 15 seconds each)
 
 Each member says one or two sentences about the part they are responsible for. Use the
 same shape so the four of you sound balanced:
@@ -459,7 +481,7 @@ The "Where to find it" column is there so that, if the examiner asks, each of yo
 your own files straight away. Before the session, open them and make sure you can explain
 them, and can make a small change in them.
 
-## Slide 23 · Thank you and questions (Rupinder opens, everyone answers)
+## Slide 26 · Thank you and questions (Rupinder opens, everyone answers)
 
 > That's CodeAdapt. Thank you. We're happy to take questions, and to open the code behind
 > any slide.
