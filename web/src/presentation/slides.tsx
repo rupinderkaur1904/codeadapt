@@ -30,18 +30,29 @@ export type Slide = {
 
 export const TEAM: Exclude<Speaker, "All">[] = ["Rupinder", "Ashmeen", "Gourav", "Jasroop"];
 
-// Fill each `evidence` line with real links before presenting: commits, issues, tests,
-// documents or journal entries the member can open and explain. The brief says each member
-// will be asked to find their own code, so list only work that member did.
-const CONTRIBUTIONS: { name: string; did: string[]; evidence: string }[] = [
-  { name: "Rupinder", did: ["Problem definition", "landing page and user journey"], evidence: "" },
+// Each member's part: what they present and answer questions on, and the files they open
+// if asked to find the code. Kept the same size for everyone.
+const CONTRIBUTIONS: { name: string; part: string; files: string }[] = [
+  {
+    name: "Rupinder",
+    part: "Problem, users and user journey; landing page and problem list",
+    files: "LandingPage.tsx, ProblemListPage.tsx, App.tsx",
+  },
   {
     name: "Ashmeen",
-    did: ["Backend pipeline and sandbox", "integration and demo set-up"],
-    evidence: "",
+    part: "Live demo, worker pipeline and sandbox, system architecture",
+    files: "worker/pipeline.py, execution/docker.py, db/queue.py",
   },
-  { name: "Gourav", did: ["Use case and class diagrams", "data model"], evidence: "" },
-  { name: "Jasroop", did: ["Sequence diagrams", "testing and limitations"], evidence: "" },
+  {
+    name: "Gourav",
+    part: "Integration, diagnosis method, use case and class diagrams",
+    files: "diagnosis/fingerprint_v1.py, db/models.py, diagrams.tsx",
+  },
+  {
+    name: "Jasroop",
+    part: "Login, recommendations, sequence diagrams, status and evaluation",
+    files: "auth/, adaptation/policy_v1.py, docs/limitations.md",
+  },
 ];
 
 const REPO = "https://github.com/rupinderkaur1904/codeadapt";
@@ -786,18 +797,16 @@ export const SLIDES: Slide[] = [
           <thead>
             <tr>
               <th>Member</th>
-              <th>Work</th>
-              <th>Evidence</th>
+              <th>Part they are responsible for</th>
+              <th>Where to find it</th>
             </tr>
           </thead>
           <tbody>
             {CONTRIBUTIONS.map((c) => (
               <tr key={c.name}>
                 <td>{c.name}</td>
-                <td>{c.did.join(", ")}</td>
-                <td className={c.evidence ? undefined : "s-todo"}>
-                  {c.evidence || "to add: commits, issues, journal"}
-                </td>
+                <td>{c.part}</td>
+                <td className="s-mono">{c.files}</td>
               </tr>
             ))}
           </tbody>
