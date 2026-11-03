@@ -5,15 +5,22 @@ The slides are part of the website: open `/presentation` on the running app (for
 F full screen, G all slides. The slide number is in the address (`/presentation#7`), so a
 link can open on any slide.
 
-**Running time:** about 21 minutes, plus questions.
+**Running time:** 21 minutes, plus questions. Each presenter has **5 minutes**, then the
+team shares the last minute.
 
 | Part | Presenter | Slides | Time |
 | --- | --- | --- | --- |
-| Problem, users, solution, journey | Rupinder | 1–5 | 4½ min |
-| Live demo and integration | Ashmeen | 6–9 | 6 min |
-| Use case and class diagrams | Gourav | 10–14 | 4½ min |
-| Sequence diagrams, status, evidence | Jasroop | 15–21 | 5 min |
+| Problem, users, solution, journey | Rupinder | 1–5 | 5 min |
+| Live demo and architecture | Ashmeen | 6–7 | 5 min |
+| Integration, diagnosis, use cases, class diagram | Gourav | 8–14 | 5 min |
+| Sequence diagrams, status, evaluation | Jasroop | 15–21 | 5 min |
 | Contributions and questions | everyone | 22–23 | 1 min + Q&A |
+
+Each spoken part is about 600–650 words, which is 5 minutes at a calm pace. Ashmeen's part
+has fewer words because the demo needs time for pasting code and waiting for results. The
+time next to each slide heading is a target, so you can tell during rehearsal whether you are
+running long. Time each other in rehearsal: if you finish a part in under 4½ minutes, you
+are going too fast.
 
 Speak to the room, not the screen. The lines below are a guide: say them in your own words.
 Words in *[brackets]* are actions, not speech.
@@ -36,23 +43,23 @@ Words in *[brackets]* are actions, not speech.
 
 ---
 
-## Part 1 · Rupinder (slides 1–5)
+## Part 1 · Rupinder (slides 1–5, 5 minutes)
 
-### Slide 1 · Title
+### Slide 1 · Title (40 seconds)
 
 > Good morning. We're Rupinder, Ashmeen, Gourav and Jasroop, and our project is CodeAdapt.
 >
-> One sentence on what it is: a C++ practice platform that tries to work out *why* a
-> solution fails, and only names a mistake when the tests can actually tell that mistake
-> apart from the others.
+> In one sentence: it's a C++ practice platform that tries to work out *why* a solution
+> fails, and only names a mistake when the tests can actually tell that mistake apart from the
+> others.
 >
-> I'll explain the problem and who it's for. Ashmeen will run the real system live. Gourav
-> and Jasroop will take you through the design, and Jasroop will finish with what works, what
-> doesn't yet, and what's next.
+> Each of us has about five minutes. I'll explain the problem and who it's for. Ashmeen will
+> run the real system live. Gourav will show how the parts fit together and the design, and
+> Jasroop will finish with how the system behaves inside, what works, and what doesn't yet.
 
 *[→]*
 
-### Slide 2 · The problem
+### Slide 2 · The problem (1 minute 10 seconds)
 
 > Most of us have seen a judge say "Wrong answer on test 7", and nothing more.
 >
@@ -69,7 +76,7 @@ Words in *[brackets]* are actions, not speech.
 
 *[→]*
 
-### Slide 3 · Users and why
+### Slide 3 · Users and why (1 minute)
 
 > We designed for three users.
 >
@@ -88,7 +95,7 @@ Words in *[brackets]* are actions, not speech.
 
 *[→]*
 
-### Slide 4 · Proposed solution
+### Slide 4 · Proposed solution (1 minute)
 
 > Our idea is to treat every submission as evidence.
 >
@@ -104,7 +111,7 @@ Words in *[brackets]* are actions, not speech.
 
 *[→]*
 
-### Slide 5 · User journey
+### Slide 5 · User journey (1 minute 10 seconds)
 
 > This is the journey we built, and Ashmeen will walk it live in a minute.
 >
@@ -116,7 +123,9 @@ Words in *[brackets]* are actions, not speech.
 >
 > Researchers get a second path *[point to the right column]*: a list of submissions with
 > metrics, a full evidence trace for any one of them, and a learner model, which is always
-> labelled "estimated under assumed parameters". I'll hand over to Ashmeen.
+> labelled "estimated under assumed parameters".
+>
+> That's the plan on paper. Ashmeen will now show you that it actually runs.
 
 *[→]*
 
@@ -134,13 +143,17 @@ Words in *[brackets]* are actions, not speech.
 
 ---
 
-## Part 2 · Ashmeen (slides 6–9)
+## Part 2 · Ashmeen (slides 6–7, 5 minutes)
 
-### Slide 6 · Live demo
+This part has fewer words than the others because about two minutes go on pasting code,
+waiting for results and switching accounts. Keep talking while a result loads: say what you
+expect to see.
 
-> Thanks, Rupinder. This part is live, on the real system, with four prepared programs.
-> Nothing is recorded. These are our four test programs. We wrote them ourselves to exercise the system; they are
-> not student submissions. Each should get a different answer.
+### Slide 6 · Live demo (4 minutes)
+
+> Thanks, Rupinder. This part is live, on the real system, and nothing is recorded. These are
+> four test programs we wrote ourselves to exercise the system; they are not student
+> submissions. Each one should get a different answer.
 
 *[Click "Open CodeAdapt". Log in as the demo student. Open Lower bound.]*
 
@@ -162,7 +175,8 @@ Words in *[brackets]* are actions, not speech.
 **Program 3: `double_bug.cpp`.** *[Paste, Submit.]*
 
 > This has two mistakes at once. *[result]* No single known mistake explains it, so the
-> system shows the failing cases and does not guess. That is the abstention we talked about.
+> system shows the failing cases and does not guess. That's the abstention Rupinder talked
+> about.
 
 **Program 4: `size_t_stuck_left.cpp`.** *[Paste, Submit.]*
 
@@ -172,16 +186,16 @@ Words in *[brackets]* are actions, not speech.
 *[Open "My attempts", then switch to the researcher account and open Research → the last
 submission's trace.]*
 
-> As a researcher I can open any of those submissions and see the whole chain: every test's
-> output, which tests were excluded and why, which mistakes were candidates, and the reasoning.
-> This is what the student's message was built from.
+> Now I'm logged in as a researcher. I can open any of those submissions and see the whole
+> chain: every test's output, which tests were excluded and why, which mistakes were
+> candidates, and the reasoning. This is exactly what the student's message was built from.
 
 *[Back to the presentation tab, →]*
 
 **If the sandbox is slow or down:** say so plainly, show the trace of a submission made during
 the warm-up, and carry on. Do not show screenshots as if they were live.
 
-### Slide 7 · System architecture
+### Slide 7 · System architecture (1 minute)
 
 > Behind that demo are six components. The web app is React and TypeScript with a CodeMirror
 > editor. The API is FastAPI. The database is PostgreSQL in deployment, SQLite in development.
@@ -191,42 +205,14 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 > the job and is the only process that talks to Docker. The sandbox runs every test in a fresh
 > container with no network and strict limits. The learner model sits on the worker side too,
 > but it is for researchers only.
-
-*[→]*
-
-### Slide 8 · Integration between components
-
-> Each joint has a contract that's checked. The web app's types are generated from the API's
-> OpenAPI schema, and CI fails if they drift. Logins use an HttpOnly cookie plus a CSRF token;
-> passwords are Argon2id hashes and we only store a hash of the session token. The worker
-> claims a job with a conditional update and a lease, so two workers can't take the same job.
-> And every problem's content version is a hash of its files, so old evidence always points at
-> the exact version it was produced on.
 >
-> At release, that was 609 backend unit tests, 39 sandbox tests, 37 web component tests and 3
-> end-to-end browser flows.
-
-*[→]*
-
-### Slide 9 · How the diagnosis works
-
-> The core is simple on purpose. Every known mistake is a real program. We run it on every
-> test and store its outputs: we call that its fingerprint. Then we compare the student's
-> outputs with each fingerprint.
->
-> *[point to the table]* This is a simplified picture. The student's column matches model B on
-> every test, and no other model, so model B is named. If several models fit, the answer is
-> "ambiguous" and nothing is named. If none fit, it's "unmodelled". A timeout is a symptom.
->
-> There's no machine learning here. It's deterministic, and we can replay it over stored
-> evidence when we change the method. Gourav will now show the design.
+> Gourav will now show how these parts talk to each other.
 
 *[→]*
 
 **Where your code is (Ashmeen):** `backend/src/codeadapt/worker/pipeline.py` (the job),
-`backend/src/codeadapt/execution/docker.py` (sandbox), `backend/src/codeadapt/diagnosis/fingerprint_v1.py`
-(diagnosis), `backend/src/codeadapt/api/app.py` (endpoints), `backend/src/codeadapt/db/queue.py`
-(job claim), `docs/demo.md`.
+`backend/src/codeadapt/execution/docker.py` (sandbox), `backend/src/codeadapt/api/app.py`
+(endpoints), `backend/src/codeadapt/db/queue.py` (job claim), `docs/demo.md`.
 
 **Likely questions**
 
@@ -235,88 +221,114 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
   runner machine; that tier is tested in CI but not deployed yet.
 - *Why a database queue instead of Redis?* One fewer service, and jobs are evidence we keep
   anyway. The claim is a conditional UPDATE with a lease and heartbeat.
-- *Why not an ML classifier?* We have no labelled real data to train or check it on, and we
-  need every diagnosis to be explainable from the tests.
+- *What happens if the worker crashes mid-job?* Its lease runs out and another worker can
+  claim the job again.
 
 ---
 
-## Part 3 · Gourav (slides 10–14)
+## Part 3 · Gourav (slides 8–14, 5 minutes)
 
-### Slide 10 · Use case diagram 1: Student
+### Slide 8 · Integration between components (50 seconds)
 
-> Thanks, Ashmeen. I'll show who uses the system and what it's made of: four use case
-> diagrams and the class diagram. All of them were drawn from the code, so the names you see
-> are the names in the repository.
+> Thanks, Ashmeen. I'll cover how the parts connect, how the diagnosis works, and then the
+> design diagrams.
 >
-> The student is the main actor. They log in, browse problems by family, open one, write C++,
-> submit, read feedback, follow the recommendation, and review past attempts.
+> Each joint has a contract that's checked. The web app's types are generated from the API's
+> schema, and CI fails if they drift. Logins use an HttpOnly cookie plus a CSRF token, and
+> passwords are Argon2id hashes. The worker claims a job with a lease, so two workers can't
+> take the same job. And every problem version is a hash of its files, so old evidence always
+> points at the exact version it came from.
 >
-> Two relationships matter. Submitting *includes* running the diagnostic tests: you can't
-> submit without that happening, and the runner worker is the secondary actor there. Showing a
-> hint *extends* reading feedback: it only happens when exactly one known mistake fits.
+> At release that was 609 backend tests, 39 sandbox tests, 37 web tests and 3 browser flows.
 
 *[→]*
 
-### Slide 11 · Use case diagram 2: Researcher
+### Slide 9 · How the diagnosis works (50 seconds)
 
-> The researcher browses submissions, with optional filters by problem, outcome and data
-> class. They can view metrics, inspect an evidence trace, which always includes the
-> observations, candidates and reasoning, see active learners, and view a learner model.
+> The core is simple on purpose. Every known mistake is a real program. We run it on every
+> test and store its outputs: we call that its fingerprint. Then we compare the student's
+> outputs with each fingerprint.
 >
-> Viewing the learner model includes estimating skills under assumed parameters; the BKT model
-> is the secondary actor. Offline evaluation can be extended to compare method versions 1.1,
-> 1.2 and 1.3 on the same evidence.
+> *[point to the table]* In this simplified picture, the student's column matches model B on
+> every test, and no other model, so model B is named. If several models fit, it's
+> "ambiguous" and nothing is named. If none fit, it's "unmodelled". A timeout is a symptom.
+>
+> There's no machine learning here. It's deterministic, so we can replay it over stored
+> evidence whenever we change the method.
 
 *[→]*
 
-### Slide 12 · Use case diagram 3: Administrator
+### Slide 10 · Use case diagram 1: Student (40 seconds)
 
-> The administrator works from the command line, not the website. There is deliberately no
-> account-management endpoint in the API. Creating an account records an audit event. Setting
-> a new password or disabling an account ends that account's sessions. And validating problem
-> content includes measuring every error model's fingerprint in the Docker sandbox.
-
-*[→]*
-
-### Slide 13 · Use case diagram 4: Runner worker
-
-> The fourth actor is a system: the worker. For every queued job it claims the job, compiles
-> the submission with the problem's harness, runs each test, and may re-run failing tests with
-> a sanitiser build to check the result is reliable. Then it diagnoses, updates the skill
-> evidence, evaluates a follow-up if there was one, and recommends the next activity. Compiling
-> and running both include the sandbox limits.
+> Now the four use case diagrams. They were drawn from the code, so the names match the
+> repository.
+>
+> The student is the main actor. They log in, browse problems by family, write C++, submit,
+> read feedback, follow the recommendation, and review past attempts. Submitting *includes*
+> running the tests, with the runner worker as a secondary actor. Showing a hint *extends*
+> reading feedback: it only happens when exactly one known mistake fits.
 
 *[→]*
 
-### Slide 14 · Class diagram
+### Slide 11 · Use case diagram 2: Researcher (30 seconds)
+
+> The researcher browses submissions with filters, views metrics, inspects an evidence trace,
+> and views a learner model. Viewing the learner model includes estimating skills under
+> assumed parameters, with the BKT model as the secondary actor. Offline evaluation extends
+> this to compare method versions 1.1, 1.2 and 1.3 on the same evidence.
+
+*[→]*
+
+### Slide 12 · Use case diagram 3: Administrator (25 seconds)
+
+> The administrator works from the command line, not the website: there is deliberately no
+> account-management endpoint. Creating an account records an audit event. Setting a new
+> password or disabling an account ends that account's sessions. And validating problem content includes measuring every fingerprint in the
+> sandbox.
+
+*[→]*
+
+### Slide 13 · Use case diagram 4: Runner worker (30 seconds)
+
+> The fourth actor is a system: the worker. For every job it compiles the submission, runs
+> each test, and may re-run failing tests with a sanitiser build to check the result is
+> reliable. Then it diagnoses, updates the skill evidence, checks any follow-up, and
+> recommends the next activity. Compiling and running both include the sandbox limits. If a
+> result can't be trusted, for example because the sandbox itself failed, the run is marked
+> unreliable and never counts as evidence against the student.
+
+*[→]*
+
+### Slide 14 · Class diagram (1 minute 15 seconds)
 
 > This is the detailed class diagram. Read it left to right as one evidence chain.
 >
-> A User makes Submissions and owns AuthSessions. Each Submission has exactly one Job in the
-> queue, and produces ExecutionRuns, each with many TestObservations. A run happened in one
-> Environment: the image digest and compiler, so it's reproducible.
+> A User makes Submissions and owns AuthSessions. Each Submission has exactly one Job, and
+> produces ExecutionRuns, each with many TestObservations. A run happened in one Environment,
+> the image and compiler, so it can be reproduced.
 >
-> *[move right]* A Submission is interpreted by Diagnoses. A Diagnosis is matched against a
-> FingerprintSet for that ProblemVersion, and can lead to one Recommendation, which can be
-> evaluated by one FollowupEvaluation on the next attempt.
+> *[move right]* A Diagnosis interprets a Submission by matching it against the FingerprintSet
+> for that ProblemVersion. It can lead to one Recommendation, which is checked by one
+> FollowupEvaluation on the next attempt.
 >
-> The two classes marked «protocol», DiagnosticMethod and SandboxBackend, are interfaces. The worker depends on
-> those, not on a concrete class, which is why we could add method versions and a gVisor
-> sandbox without touching the pipeline. On the right are the logic classes:
-> FingerprintConsistency, PolicyV1, and BktParams, which is marked «assumed» because that's
-> what its numbers are.
-> Jasroop will show how these objects talk to each other.
+> The two «protocol» classes, DiagnosticMethod and SandboxBackend, are interfaces. The worker
+> depends on those, which is why we could add method versions and a gVisor sandbox without
+> touching the pipeline. And BktParams is marked «assumed», because that's what its numbers
+> are. Jasroop will show how these objects talk to each other.
 
 *[→]*
 
-**Where your code is (Gourav):** `backend/src/codeadapt/db/models.py` (entities),
+**Where your code is (Gourav):** `backend/src/codeadapt/diagnosis/fingerprint_v1.py`
+(diagnosis), `backend/src/codeadapt/db/models.py` (entities),
 `backend/src/codeadapt/diagnosis/models.py` (`DiagnosticMethod`, `Outcome`),
 `backend/src/codeadapt/execution/backend.py` (`SandboxBackend`), `backend/src/codeadapt/learner/bkt.py`
-(`BktParams`), `backend/migrations/versions/`, and the diagram data in
-`web/src/presentation/diagrams.tsx`.
+(`BktParams`), `backend/migrations/versions/`, `web/src/api/` (generated types), and the
+diagram data in `web/src/presentation/diagrams.tsx`.
 
 **Likely questions**
 
+- *Why not an ML classifier?* We have no labelled real data to train or check it on, and we
+  need every diagnosis to be explainable from the tests.
 - *Why composition between Submission and Job?* A job exists only for its submission and is
   created with it.
 - *Why are evidence tables append-only?* So a diagnosis can always be traced back to the exact
@@ -326,67 +338,63 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 ---
 
-## Part 4 · Jasroop (slides 15–21)
+## Part 4 · Jasroop (slides 15–21, 5 minutes)
 
-### Slide 15 · Sequence diagram 1: Login
+### Slide 15 · Sequence diagram 1: Login (35 seconds)
 
-> Five sequence diagrams, starting with logging in. The browser posts the username and
-> password. The auth module first checks throttling, then loads the user and verifies the
-> Argon2id hash. There are three outcomes *[point to the alt frame]*: too many failures gives a
-> 429; a wrong password gives a 401 and an audit entry; a correct one creates a session,
-> stores only a hash of the token, and sets an HttpOnly cookie, so page scripts can never read
-> it.
+> Thanks, Gourav. Five sequence diagrams, starting with logging in. The browser posts the
+> username and password. The auth module checks throttling, then verifies the Argon2id hash.
+> There are three outcomes *[point to the alt frame]*: too many failures gives a 429; a wrong
+> password gives a 401 and an audit entry; a correct one creates a session, stores only a hash
+> of the token, and sets an HttpOnly cookie that page scripts can't read.
 
 *[→]*
 
-### Slide 16 · Sequence diagram 2: Submit a solution
+### Slide 16 · Sequence diagram 2: Submit a solution (30 seconds)
 
 > Submitting. The page sends the source with the CSRF token. The API checks the session,
-> role, size limit of 64 KiB and the rate limit, records the submission and a queued job, and
-> answers 202 immediately. It never waits for the sandbox. The page then polls until the job
-> is completed, and every response goes through a student-safe projection, so hidden tests
-> and internal labels can't leak.
+> role, a 64 KiB size limit and the rate limit, records the submission and a queued job, and
+> answers 202 straight away. It never waits for the sandbox. The page then polls, and every
+> response goes through a student-safe view, so hidden tests and internal labels can't leak.
 
 *[→]*
 
-### Slide 17 · Sequence diagram 3: Run and diagnose
+### Slide 17 · Sequence diagram 3: Run and diagnose (45 seconds)
 
 > This is the worker's side. It claims the job with a lease and loads the problem version. If
-> this version has never been measured in this environment, it first runs every error model to
-> get the fingerprints, which is why the first submission is slow. Then it compiles with no
-> network. If compiling fails, that's recorded and it is never used as evidence about a skill.
-> Otherwise every test runs in a fresh container, failing tests are re-run with a sanitiser,
-> unreliable results are excluded, and the diagnosis engine returns an outcome with its reasons.
+> this version has never been measured here, it first runs every error model to get the
+> fingerprints, which is why the very first submission is slow. Then it compiles with no
+> network. A compile error is recorded but never used as evidence about a skill. Otherwise
+> every test runs in a fresh container, failing tests are re-run with a sanitiser, unreliable
+> results are excluded, and the diagnosis returns an outcome with its reasons.
 
 *[→]*
 
-### Slide 18 · Sequence diagram 4: Recommendation
+### Slide 18 · Sequence diagram 4: Recommendation (40 seconds)
 
-> Then adaptation. If this attempt follows an open recommendation, it's evaluated against the
-> criterion we recorded: met, not met, or not comparable. Then the policy asks the evidence
-> ledger for skill observations. A qualified diagnosis adds no negative evidence. The policy has
-> an explicit rule for every outcome *[point to the alt]*: a supported or ambiguous diagnosis
-> leads to a problem that probes the same skill; a pass moves on in the family; a timeout or
-> unmodelled result gets a retry with a review flag.
+> Then adaptation. If this attempt follows an open recommendation, it's checked against the
+> goal we recorded: met, not met, or not comparable. Then the policy asks the evidence ledger
+> for skill observations. The policy has an explicit rule for every outcome *[point to the
+> alt]*: a named or ambiguous diagnosis leads to a problem on the same skill; a pass moves on
+> in the family; a timeout or unmodelled result gets a retry with a review flag.
 
 *[→]*
 
-### Slide 19 · Sequence diagram 5: Researcher view
+### Slide 19 · Sequence diagram 5: Researcher view (35 seconds)
 
 > Last, the researcher. Every research endpoint checks the role first; a student gets a 403.
-> The trace returns the full evidence chain. For the learner model, the API passes the
-> learner's attempts to the BKT module with a named set of assumed parameters. It counts only
-> the first reliable attempt per problem version, and returns either an estimate or
-> "insufficient data". Every estimate is labelled, and none of it is shown to students or used
-> for recommendations.
+> For the learner model, the API passes the learner's attempts to the BKT module with a named
+> set of assumed parameters. It counts only the first reliable attempt per problem version,
+> and returns an estimate or "insufficient data". Every estimate is labelled, and none of it is
+> shown to students or used for recommendations.
 
 *[→]*
 
-### Slide 20 · Current status
+### Slide 20 · Current status (1 minute 15 seconds)
 
-> Where it stands. Complete: the sandbox, the diagnosis method with abstention, the evidence
-> ledger, recommendations and follow-up checks, login with roles, both interfaces, and 25
-> problems that pass validation.
+> So where does it stand? Complete: the sandbox, the diagnosis method with abstention, the
+> evidence ledger, recommendations and follow-up checks, login with roles, both interfaces,
+> and 25 problems that pass validation.
 >
 > Limited: we have not tried it with real students. It names a mistake for only about nine
 > percent of our incorrect test programs; the rest get failing cases only. The BKT numbers are
@@ -399,21 +407,22 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 *[→]*
 
-### Slide 21 · Evaluation results
+### Slide 21 · Evaluation results (1 minute)
 
 > A word on numbers, because it's easy to overclaim. On 26 incorrect programs we wrote and
 > held back, the method named 14 and got none wrong. On 323 automatically generated incorrect
 > programs, it named 30 and got none of those wrong. It never flagged any of the 6 correct
 > programs.
 >
-> *[point to the notes under the table]* But none of this is accuracy on real students. We wrote or generated
-> every program. Zero out of thirty still allows an error rate of several percent. And each
-> version got fewer names wrong by naming less often. We chose that trade deliberately: a
-> wrong hint does more harm than no hint.
+> *[point to the notes under the table]* But none of this is accuracy on real students. We
+> wrote or generated every program. Zero out of thirty still allows an error rate of several
+> percent. And each version got fewer names wrong by naming less often. We chose that trade
+> deliberately: a wrong hint does more harm than no hint.
 
 *[→]*
 
-**Where your code is (Jasroop):** `backend/src/codeadapt/adaptation/policy_v1.py` (policy),
+**Where your code is (Jasroop):** `backend/src/codeadapt/auth/` and the login route in `backend/src/codeadapt/api/app.py`,
+`backend/src/codeadapt/adaptation/policy_v1.py` (policy),
 `backend/src/codeadapt/adaptation/ledger.py` (evidence), `backend/src/codeadapt/adaptation/followup.py`,
 `backend/src/codeadapt/worker/adapt.py`, `docs/limitations.md`, `docs/evaluation/summary.md`,
 `docs/release-2026-10-26.md`.
@@ -429,7 +438,7 @@ the warm-up, and carry on. Do not show screenshots as if they were live.
 
 ---
 
-## Slide 22 · Team contributions (everyone, ~15 seconds each)
+## Slide 22 · Team contributions (everyone, 15 seconds each)
 
 Each member says one sentence about what they did and points at their own evidence.
 

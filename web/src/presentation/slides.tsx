@@ -500,7 +500,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "contracts",
-    speaker: "Ashmeen",
+    speaker: "Gourav",
     title: "Integration between components",
     body: (
       <Page title="Integration between components">
@@ -549,7 +549,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "matrix",
-    speaker: "Ashmeen",
+    speaker: "Gourav",
     title: "How the diagnosis works",
     body: (
       <Page title="How the diagnosis works">
