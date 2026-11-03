@@ -337,7 +337,7 @@ are screenshots, not live.
 `backend/src/codeadapt/diagnosis/models.py` (`DiagnosticMethod`, `Outcome`),
 `backend/src/codeadapt/execution/backend.py` (`SandboxBackend`), `backend/src/codeadapt/learner/bkt.py`
 (`BktParams`), `backend/migrations/versions/`, `web/src/api/` (generated types), and the
-diagram data in `web/src/presentation/diagrams.tsx`.
+draw.io file with all the diagrams, `docs/presentation/drawio/CodeAdapt-UML.drawio`.
 
 **Likely questions**
 
