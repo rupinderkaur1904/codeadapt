@@ -440,18 +440,24 @@ diagram data in `web/src/presentation/diagrams.tsx`.
 
 ## Slide 22 · Team contributions (everyone, 15 seconds each)
 
-Each member says one sentence about what they did and points at their own evidence.
+Each member says one or two sentences about the part they are responsible for. Use the
+same shape so the four of you sound balanced:
 
-> *Rupinder:* I worked on ... — you can see it in ...
-> *Ashmeen:* ...
-> *Gourav:* ...
-> *Jasroop:* ...
+> *Rupinder:* I was responsible for the problem definition and the student journey: the
+> landing page and the problem list. That's what I presented in the first part.
+>
+> *Ashmeen:* I was responsible for the worker pipeline and the sandbox, and I set up and ran
+> the live demo.
+>
+> *Gourav:* I was responsible for how the components connect, the diagnosis method, and the
+> use case and class diagrams.
+>
+> *Jasroop:* I was responsible for login, the recommendation flow, the sequence diagrams, and
+> the status and evaluation results.
 
-**Contribution slide.** Edit `CONTRIBUTIONS` at the top of `web/src/presentation/slides.tsx`:
-replace each `did` list with what that person actually did and put real links in `evidence`
-(commits, issues, pull requests, tests or weekly journal entries). The brief says the examiner
-may ask any of us to find our code or make a small change, so list only work that person did
-and can explain. Until then the Evidence column says "to add".
+The "Where to find it" column is there so that, if the examiner asks, each of you can open
+your own files straight away. Before the session, open them and make sure you can explain
+them, and can make a small change in them.
 
 ## Slide 23 · Thank you and questions (Rupinder opens, everyone answers)
 
