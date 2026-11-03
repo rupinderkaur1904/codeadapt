@@ -65,7 +65,7 @@ describe("presentation", () => {
       act(() => {
         fireEvent.keyDown(window, { key: i === 0 ? "Home" : "ArrowRight" });
       });
-      diagrams += document.querySelectorAll("svg.uml").length;
+      diagrams += document.querySelectorAll("img.s-drawio").length;
     }
     expect(diagrams).toBe(10);
   });
