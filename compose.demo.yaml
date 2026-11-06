@@ -16,6 +16,12 @@
 x-demo-env: &demo-env
   CODEADAPT_ENV: production
   CODEADAPT_DATABASE_URL: sqlite:////data/codeadapt-demo.sqlite3
+  # ADR-040: production requires a Host allow-list. The browser reaches the API through the
+  # web container's proxy (Host: localhost), curl uses 127.0.0.1, containers use "api".
+  CODEADAPT_ALLOWED_HOSTS: localhost,127.0.0.1,api
+  # ADR-040: a production worker refuses runc. This explicit, logged override exists only for
+  # this local demo; a deployment students can reach must run gVisor (CODEADAPT_SANDBOX_RUNTIME=runsc).
+  CODEADAPT_SANDBOX_ALLOW_RUNC: local-demo-only
 
 services:
   migrate:
