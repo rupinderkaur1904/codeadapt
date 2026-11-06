@@ -28,7 +28,7 @@ test("a password login replaces the dev stub until logout", async ({ page }) => 
   await page.reload();
   await expect(page.getByText("e2e-researcher")).toBeVisible();
   await expect(page.getByText("Development role")).toHaveCount(0);
-  await page.getByRole("link", { name: "Research" }).click();
+  await page.getByRole("link", { name: "Research", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Research" })).toBeVisible();
 
   await page.getByRole("button", { name: "Log out" }).click();
