@@ -30,6 +30,7 @@ from codeadapt.api.schemas import (
     LearnerModelView,
     LearnerNext,
     LoginRequest,
+    PasswordChange,
     PositiveOnlyView,
     ProblemDetail,
     ProblemSummary,
@@ -273,9 +274,16 @@ def create_app(
             auth.audit(session, auth.AuditKind.LOGIN_FAILED, username=body.username, client=client)
             session.commit()
             raise ApiError(401, "login-failed", "Wrong username or password")
+        # Rotation (ADR-041): whatever session this browser held before, of this or any other
+        # account, ends here; the login always gets a fresh token and CSRF token.
+        auth.revoke_token(session, request.cookies.get(SESSION_COOKIE))
         token, row = auth.start_session(session, user, timedelta(hours=settings.session_hours))
         auth.audit(session, auth.AuditKind.LOGIN, username=user.username, user=user, client=client)
         session.commit()
+        set_session_cookie(response, token)
+        return AuthUser(username=user.username, role=user.role, csrf_token=row.csrf_token)
+
+    def set_session_cookie(response: Response, token: str) -> None:
         response.set_cookie(
             SESSION_COOKIE,
             token,
@@ -285,6 +293,52 @@ def create_app(
             secure=settings.secure_cookies,
             samesite="strict",
         )
+
+    @app.post("/api/v1/auth/password", response_model=AuthUser)
+    def change_password(
+        body: PasswordChange,
+        request: Request,
+        response: Response,
+        session: DB,
+        user: CurrentUser,
+    ) -> AuthUser:
+        """Self-service password change (ADR-041): needs a login session and the current
+        password; ends every session of the account and starts a new one for this browser."""
+        if getattr(request.state, "auth_session", None) is None:
+            # The development stub has no session and its accounts have no password.
+            raise ApiError(403, "forbidden", "Password change needs a login session")
+        client = client_of(request)
+        window = timedelta(minutes=settings.login_failure_window_minutes)
+        if (
+            auth.recent_failures(session, user.username, client, utcnow() - window)
+            >= settings.login_max_failures
+        ):
+            raise ApiError(429, "too-many-attempts", "Too many failed attempts; try again later")
+        if not auth.verify_password(user.password_hash, body.current_password):
+            auth.audit(
+                session,
+                auth.AuditKind.PASSWORD_CHANGE_FAILED,
+                username=user.username,
+                user=user,
+                client=client,
+            )
+            session.commit()
+            raise ApiError(403, "wrong-password", "Current password is wrong")
+        try:
+            user.password_hash = auth.hash_password(body.new_password)
+        except ValueError as exc:
+            raise ApiError(422, "weak-password", "Password too short", str(exc)) from None
+        auth.revoke_all(session, user)
+        token, row = auth.start_session(session, user, timedelta(hours=settings.session_hours))
+        auth.audit(
+            session,
+            auth.AuditKind.PASSWORD_CHANGED,
+            username=user.username,
+            user=user,
+            client=client,
+        )
+        session.commit()
+        set_session_cookie(response, token)
         return AuthUser(username=user.username, role=user.role, csrf_token=row.csrf_token)
 
     @app.post("/api/v1/auth/logout", status_code=204)
@@ -606,7 +660,7 @@ def create_app(
     @app.get("/api/v1/research/learner-model", response_model=LearnerModelView)
     def learner_model(username: str, session: DB, _: Researcher) -> LearnerModelView:
         """LM1 estimates for one learner, over the submissions of the learner's data class."""
-        learner = session.scalar(select(User).where(User.username == username))
+        learner = auth.find_user(session, username)
         if learner is None:
             raise ApiError(404, "not-found", "User not found")
         attempts = list(learner_attempts(session, learner.id, learner.data_class).values())

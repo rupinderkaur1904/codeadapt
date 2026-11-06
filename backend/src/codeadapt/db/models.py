@@ -18,11 +18,14 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     MetaData,
     String,
     Text,
     UniqueConstraint,
+    func,
+    text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -75,6 +78,9 @@ def _ts() -> Mapped[datetime]:
 
 class User(Base):
     __tablename__ = "users"
+    # Usernames are unique ignoring case (ADR-041, migration 0006): "Alice" and "alice" are
+    # one account. The name keeps the spelling it was created with, for display.
+    __table_args__ = (Index("ux_users_username_lower", func.lower(text("username")), unique=True),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String(64), unique=True)

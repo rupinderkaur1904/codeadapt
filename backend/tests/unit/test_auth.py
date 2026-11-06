@@ -241,7 +241,7 @@ def test_admin_backup_copies_a_consistent_sqlite_database(
     destination = tmp_path / "backup.sqlite3"
     assert admin(["backup", str(destination)]) == 0
     copy = sqlite3.connect(destination)
-    assert copy.execute("SELECT version_num FROM alembic_version").fetchone() == ("0005",)
+    assert copy.execute("SELECT version_num FROM alembic_version").fetchone() == ("0006",)
     copy.close()
     with pytest.raises(SystemExit, match="refusing"):
         admin(["backup", str(destination)])

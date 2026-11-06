@@ -262,6 +262,16 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=1024)
 
 
+class PasswordChange(BaseModel):
+    """Self-service password change (ADR-041). The new password's length (at least
+    ``auth.MIN_PASSWORD_LENGTH``) is checked by the server when it is hashed."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    current_password: str = Field(min_length=1, max_length=1024)
+    new_password: str = Field(min_length=1, max_length=1024)
+
+
 class AuthUser(_Out):
     username: str
     role: str
