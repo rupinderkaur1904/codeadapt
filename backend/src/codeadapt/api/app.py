@@ -19,6 +19,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from codeadapt import auth, logs
 from codeadapt.adaptation.skillmap import SkillMap
@@ -43,6 +44,7 @@ from codeadapt.api.schemas import (
     TechniqueCheckView,
     TraceView,
 )
+from codeadapt.api.security import ERROR_BASE, PROBLEM_JSON, BodyLimit, SecurityHeaders
 from codeadapt.config import Environment as Env
 from codeadapt.config import Settings
 from codeadapt.content.catalogue import Catalogue
@@ -70,11 +72,10 @@ from codeadapt.diagnosis import Outcome
 from codeadapt.learner import estimate
 from codeadapt.worker.adapt import learner_attempts, skill_maps_for
 
-ERROR_BASE = "https://codeadapt.dev/errors/"
-PROBLEM_JSON = "application/problem+json"
 SESSION_COOKIE = "codeadapt_session"
 CSRF_HEADER = "X-CSRF-Token"
 _SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+_KNOWN_ROLES = frozenset(r.value for r in Role)
 log = logging.getLogger("codeadapt.api")
 
 
@@ -106,6 +107,7 @@ def create_app(
     if settings is None:  # started by uvicorn's factory: this process owns its logging
         settings = Settings.from_env()
         logs.configure(production=settings.env is Env.PRODUCTION)
+    settings.require_api_config()  # ADR-040: refuse to start half-configured in production
     sessions = sessions or make_session_factory(make_engine(settings.database_url))
     catalogue = catalogue or Catalogue.load(settings.content_dir)
     with sessions() as s:
@@ -114,8 +116,10 @@ def create_app(
     app = FastAPI(
         title="CodeAdapt API",
         version="0.1.0",
-        docs_url="/api/docs",
-        openapi_url="/api/openapi.json",
+        # ADR-040: no interactive docs or schema in production.
+        docs_url="/api/docs" if settings.docs_enabled else None,
+        redoc_url="/api/redoc" if settings.docs_enabled else None,
+        openapi_url="/api/openapi.json" if settings.docs_enabled else None,
     )
 
     # ------------------------------------------------------------------ errors
@@ -163,6 +167,14 @@ def create_app(
         )
         return _problem(request, 500, "internal-error", "Internal server error")
 
+    # ------------------------------------------------------------------ HTTP hardening
+    # Added after the request-id middleware, so these wrap it: the last added is outermost.
+    # Order, outside in: security headers -> Host allow-list -> body limit -> app.
+    app.add_middleware(BodyLimit)
+    if settings.allowed_hosts:
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.allowed_hosts))
+    app.add_middleware(SecurityHeaders, hsts=settings.env is Env.PRODUCTION)
+
     # ------------------------------------------------------------------ dependencies
     def db() -> Iterator[Session]:
         with sessions() as session:
@@ -188,9 +200,14 @@ def create_app(
                 row, request.headers.get(CSRF_HEADER)
             ):
                 raise ApiError(403, "csrf-failed", "Missing or wrong CSRF token")
+            if user.role not in _KNOWN_ROLES:
+                # Deny by default (ADR-040): a role the code does not know gets nothing.
+                raise ApiError(403, "forbidden", "Account role not recognised")
             request.state.auth_session = row
             return user
         if not settings.dev_auth_enabled:
+            # Production: X-Dev-Role is never read (ADR-040). The web client sends it on every
+            # request, so it is ignored rather than refused; it cannot select an identity.
             raise ApiError(401, "not-authenticated", "Login required")
         role = Role(x_dev_role) if x_dev_role in {r.value for r in Role} else Role.STUDENT
         username = f"dev-{role.value}"
