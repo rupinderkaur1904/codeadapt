@@ -26,10 +26,12 @@ the M9 decisions (ethics determination, consent, cohort, data retention).
 
 | Variable | Where | Value |
 | --- | --- | --- |
-| `CODEADAPT_ENV` | API, worker | `production` (turns off the dev auth stub; Secure cookies; JSON logs) |
+| `CODEADAPT_ENV` | API, worker | `production` (turns off the dev auth stub; Secure cookies; JSON logs). Unset also means production; any value other than `dev`, `test`, `production` stops start-up (ADR-040) |
 | `CODEADAPT_DATABASE_URL` | API, worker | required in production |
+| `CODEADAPT_ALLOWED_HOSTS` | API | required in production: comma-separated host names the API is served under (no `*`); other `Host` headers get 400 (ADR-040) |
 | `CODEADAPT_CONTENT_DIR` | API, worker | the content checkout (the real study content lives in a private repo, ADR-009) |
-| `CODEADAPT_SANDBOX_RUNTIME` | worker | `runsc` (ADR-003, ADR-028) |
+| `CODEADAPT_SANDBOX_RUNTIME` | worker | `runsc` (ADR-003, ADR-028). In production the worker refuses to start unless this names a `runsc` runtime registered with Docker (ADR-040) |
+| `CODEADAPT_SANDBOX_ALLOW_RUNC` | worker | leave **unset**. `local-demo-only` lets a production-mode worker use runc, for compose.demo.yaml only |
 | `CODEADAPT_SANDBOX_MAX_CONCURRENCY` | worker | at most the VM's cores |
 | `CODEADAPT_SESSION_HOURS` | API | default 12 |
 | `CODEADAPT_SUBMISSIONS_PER_MINUTE` | API | default 10 in production; `none` disables |
@@ -85,7 +87,12 @@ audit rows are kept is an owner decision (M9).
 - [ ] Served over HTTPS only; the reverse proxy sets HSTS; `CODEADAPT_ENV=production`.
 - [ ] The reverse proxy passes the real client address, and uvicorn trusts only that
       proxy (`--proxy-headers --forwarded-allow-ips=<proxy>`), so login throttling sees
-      clients rather than the proxy.
+      clients rather than the proxy. Never `--forwarded-allow-ips='*'`: any client could then
+      choose its own address and escape the per-client throttle.
+- [ ] The reverse proxy forwards the original `Host`, and that name is in
+      `CODEADAPT_ALLOWED_HOSTS`. It serves the static web build with its own headers (at
+      least `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, a CSP that allows the
+      app's own scripts and styles); the API adds its own headers to `/api` responses (ADR-040).
 - [ ] Runner VM egress blocked; API host has no Docker.
 - [ ] A backup was taken and a restore tested.
 - [ ] Owner approval recorded for exposure (and, for real students, the M9 decisions).

@@ -14,7 +14,7 @@ import sqlite3
 import sys
 from pathlib import Path
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from codeadapt import auth
 from codeadapt.config import Settings
@@ -85,6 +85,14 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "create-user":
             if user is not None:
                 raise SystemExit(f"user {args.username!r} already exists")
+            # Names differing only in case look like one person in the researcher views and
+            # invite mistaken logins (ADR-040). Operator-side check only: the database does not
+            # yet enforce case-insensitive uniqueness (a migration is proposed, not applied).
+            twin = session.scalar(
+                select(User).where(func.lower(User.username) == args.username.lower())
+            )
+            if twin is not None:
+                raise SystemExit(f"user {twin.username!r} already exists (names ignore case)")
             user = User(
                 username=args.username,
                 role=args.role,
