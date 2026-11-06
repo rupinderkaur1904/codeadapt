@@ -877,3 +877,31 @@ recommendation policy 1.5, evidence, learner model and all content. No migration
 already set it or build settings in code. gVisor in production is enforced by the worker but
 still unverified on a real deployment host (docs/deployment.md §8).
 
+## ADR-041 — Case-insensitive usernames, session rotation at login, self-service password change (2026-11-06)
+
+**Context.** Three account features were on the unpushed M8 branch (`edygvs`) and were lost
+with it. The owner asked for them to be built again, from scratch, on GitHub (2026-11-06).
+
+**Decision.**
+1. Migration 0006 adds a unique index on `lower(username)`. It changes no rows. If existing
+   names collide ignoring case, the upgrade stops, lists them and stays at 0005; an operator
+   renames and re-runs. Downgrade drops the index. Names keep the spelling they were created
+   with (display); every lookup (login, `codeadapt-admin`, researcher learner-model) compares
+   the database's own `lower()` on both sides, the same function as the index, so lookup and
+   uniqueness cannot disagree (SQLite's `lower()` folds ASCII only; PostgreSQL's follows the
+   database locale).
+2. The login throttle counts failures by username ignoring case, and counts wrong current
+   passwords on the password-change endpoint too.
+3. Login revokes the session the browser already holds (of any account) before issuing a new
+   token and CSRF token. Sessions on other devices are unaffected.
+4. `POST /api/v1/auth/password` with `{current_password, new_password}` needs a login session
+   (not the dev stub), the CSRF token and the current password. A wrong current password is
+   audited (`password_change_failed`) and answered 403; a short new password 422. On success
+   every session of the account is revoked, the browser gets a new session and CSRF token,
+   and `password_changed` is audited. The web app has an Account page for it.
+
+**Not changed.** ADR-029 session design, ADR-040 hardening, research pipeline.
+
+**Consequences.** Deployment runs `alembic upgrade head` as before; a database with
+case-colliding names needs those resolved first (the error lists them).
+
