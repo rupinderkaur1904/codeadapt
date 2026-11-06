@@ -93,6 +93,12 @@ export const api = {
       body: JSON.stringify({ username, password }),
     }),
   logout: () => request<undefined>("/auth/logout", { method: "POST" }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<AuthUser>("/auth/password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+    }),
   listProblems: () => request<ProblemSummary[]>("/problems"),
   getProblem: (slug: string) => request<ProblemDetail>(`/problems/${encodeURIComponent(slug)}`),
   submit: (problemSlug: string, source: string) =>
