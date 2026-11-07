@@ -1,14 +1,34 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 import { api } from "../api/client";
 
 export const RECOMMENDATION_KEY = ["recommendation"] as const;
 
+/** Shown when adaptation failed after the latest attempt (D6, owner decision 2026-11-07). */
+export const ADAPTATION_FALLBACK =
+  "We couldn't prepare your next recommended problem right now. Please try again in a moment.";
+
 /** "Recommended next" from the adaptive policy, plus the verdict on the last follow-up. */
 export function RecommendationCard({ currentSlug }: { currentSlug?: string }) {
+  const queryClient = useQueryClient();
   const next = useQuery({ queryKey: RECOMMENDATION_KEY, queryFn: api.myRecommendation });
+  const retry = useMutation({
+    mutationFn: api.retryRecommendation,
+    onSuccess: (data) => queryClient.setQueryData(RECOMMENDATION_KEY, data),
+  });
   if (!next.data) return null;
+  if (next.data.adaptation_unavailable) {
+    // Never show a recommendation or verdict made before the latest attempt.
+    return (
+      <aside className="recommendation" aria-label="Recommended next">
+        <p role="status">{ADAPTATION_FALLBACK}</p>
+        <button type="button" onClick={() => retry.mutate()} disabled={retry.isPending}>
+          {retry.isPending ? "Trying again…" : "Try again"}
+        </button>
+      </aside>
+    );
+  }
   const { recommendation: rec, last_followup: followup } = next.data;
   if (!rec && !followup) return null;
   return (

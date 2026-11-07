@@ -190,6 +190,9 @@ class FollowupView(_Out):
 class LearnerNext(_Out):
     recommendation: RecommendationView | None
     last_followup: FollowupView | None
+    # D6 (ADR-042): adaptation failed after the learner's latest attempt. Recommendation
+    # and follow-up are then withheld, because they predate that attempt and may be stale.
+    adaptation_unavailable: bool = False
 
 
 class ResearchSubmissionRow(_Out):

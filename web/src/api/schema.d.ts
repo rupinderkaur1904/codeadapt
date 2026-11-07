@@ -116,6 +116,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/recommendation/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry My Recommendation
+         * @description Retry the adaptation step that failed after the user's latest attempt (D6).
+         *
+         *     Idempotent: it does nothing when there is no pending failure, when a newer attempt
+         *     exists, or when another retry already claimed it. The answer is always the current
+         *     state, so a failed retry still shows the neutral fallback message.
+         */
+        post: operations["retry_my_recommendation_api_v1_me_recommendation_retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/problems": {
         parameters: {
             query?: never;
@@ -432,6 +456,11 @@ export interface components {
         };
         /** LearnerNext */
         LearnerNext: {
+            /**
+             * Adaptation Unavailable
+             * @default false
+             */
+            adaptation_unavailable: boolean;
             last_followup: components["schemas"]["FollowupView"] | null;
             recommendation: components["schemas"]["RecommendationView"] | null;
         };
@@ -952,6 +981,37 @@ export interface operations {
         };
     };
     my_recommendation_api_v1_me_recommendation_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-dev-role"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearnerNext"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_my_recommendation_api_v1_me_recommendation_retry_post: {
         parameters: {
             query?: never;
             header?: {
