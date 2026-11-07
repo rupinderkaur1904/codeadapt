@@ -16,10 +16,15 @@ services:
     restart: unless-stopped
     environment:
       CODEADAPT_ENV: production
-      CODEADAPT_DATABASE_URL: postgresql+psycopg://${WORKER_DB_USER:?}:${WORKER_DB_PASSWORD:?}@${DB_HOST:?}:5432/${DB_NAME:?}
+      # R5: TLS to the App VM's database, verifying its certificate against the private CA
+      # and its name (DB_TLS_NAME, mapped to the App VM's private address below).
+      CODEADAPT_DATABASE_URL: postgresql+psycopg://${WORKER_DB_USER:?}:${WORKER_DB_PASSWORD:?}@${DB_TLS_NAME:?}:5432/${DB_NAME:?}?sslmode=verify-full&sslrootcert=/etc/codeadapt/db-ca.crt
       CODEADAPT_SANDBOX_RUNTIME: runsc
       CODEADAPT_SANDBOX_MAX_CONCURRENCY: ${SANDBOX_MAX_CONCURRENCY:-2}
-    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    extra_hosts: ["${DB_TLS_NAME:?}:${DB_HOST:?}"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DB_CA_FILE:?}:/etc/codeadapt/db-ca.crt:ro
     # The socket's group on this host (stat -c %g /var/run/docker.sock).
     group_add: ["${DOCKER_SOCKET_GID:?}"]
     # Finish the current job on `docker compose stop` (ADR-042); a killed worker's job is

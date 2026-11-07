@@ -50,13 +50,23 @@ part of the research freeze.
 3. Install the Docker Engine and Compose plugin from the vendor's repository.
 4. DNS: an A/AAAA record for `SITE_HOST` pointing at this VM. Caddy needs it in order to
    obtain the certificate.
-5. Create the settings file:
+5. Database TLS certificates (owner decision R5; mandatory before student enrollment):
+   - `sudo deploy/db-tls/make-db-certs.sh /etc/codeadapt/db-tls db.codeadapt.internal`.
+     It makes a private CA and a server certificate for `db.codeadapt.internal` (the
+     runner's name for the database) and `db` (the API's name for it).
+   - **Move `/etc/codeadapt/db-tls/ca.key` off the VM** to the owner's offline storage. It
+     is needed only to issue the next server certificate (before 397 days).
+   - Copy `ca.crt` (public) to the Runner VM: `/etc/codeadapt/db-tls/ca.crt`.
+   - PostgreSQL then accepts TCP connections only over TLS (`deploy/db/pg_hba.conf`), and
+     every client verifies the certificate and the name (`sslmode=verify-full`).
+6. Create the settings file:
    - `cp deploy/app.env.example deploy/app.env && chmod 600 deploy/app.env`;
    - fill in every value, generating each password with `openssl rand -base64 32`;
-   - set `DB_PRIVATE_BIND` to this VM's **private** address.
-6. Start: `app up -d --build`. This runs `migrate`, then `db-setup` (roles and grants),
+   - set `DB_PRIVATE_BIND` to this VM's **private** address and `DB_TLS_DIR` to
+     `/etc/codeadapt/db-tls`.
+7. Start: `app up -d --build`. This runs `migrate`, then `db-setup` (roles and grants),
    then `api` and `proxy`.
-7. Verify. Record each output in `docs/deployment/host-verification-<date>.md`.
+8. Verify. Record each output in `docs/deployment/host-verification-<date>.md`.
    - `curl -sI https://$SITE_HOST/` shows a valid certificate (no `-k`), and the headers
      include HSTS, CSP, `X-Frame-Options` and `X-Content-Type-Options`.
    - `curl -s https://$SITE_HOST/api/v1/ready` returns `{"status":"ready"}`.
@@ -77,7 +87,11 @@ part of the research freeze.
 5. Create the settings file: `cp deploy/runner.env.example deploy/runner.env`, then
    `chmod 600`, and fill it in:
    - the worker password from `app.env`;
+   - `DB_HOST` (the App VM's private address), `DB_TLS_NAME=db.codeadapt.internal` and
+     `DB_CA_FILE=/etc/codeadapt/db-tls/ca.crt`;
    - `DOCKER_SOCKET_GID=$(stat -c %g /var/run/docker.sock)`.
+   The worker refuses to start in production unless its database URL verifies TLS
+   (`sslmode=verify-full` with an existing CA file).
 6. Run the gVisor host verification, `docs/deployment/gvisor-verification.md` level L3,
    all steps. **Stop here if any step fails.**
 7. Start: `runner up -d --build`. The worker refuses to start without `runsc` (ADR-040).
@@ -85,6 +99,16 @@ part of the research freeze.
    content version as valid.
 9. End-to-end: submit the lower-bound reference solution with a test account
    (`--data-class dev`) and see "all tests passed".
+10. Database TLS on the host (R5). Record each output:
+    - from the Runner VM, the worker's connection is encrypted:
+      `app exec db psql -U codeadapt_owner -d codeadapt -c "SELECT usename, ssl, version FROM pg_stat_ssl JOIN pg_stat_activity USING (pid) WHERE usename = 'codeadapt_worker'"`
+      shows `ssl = t`;
+    - a plain-text attempt from the Runner VM is refused:
+      `psql "host=<App VM private address> dbname=codeadapt user=codeadapt_worker sslmode=disable"`
+      fails with "no encryption";
+    - a connection by address instead of name is refused:
+      `psql "host=<App VM private address> dbname=codeadapt user=codeadapt_worker sslmode=verify-full sslrootcert=/etc/codeadapt/db-tls/ca.crt"`
+      fails with "does not match host name".
 
 ## 3. Monitoring
 
@@ -111,7 +135,7 @@ part of the research freeze.
 
 ```
 # App VM, root crontab (docs/deployment/backup-and-restore.md)
-15 2 * * *  PGHOST=<private> PGUSER=codeadapt_owner PGDATABASE=codeadapt BACKUP_DIR=/var/backups/codeadapt BACKUP_RETENTION_DAYS=<n> /opt/codeadapt/deploy/backup/pg-backup.sh
+15 2 * * *  PGHOST=db.codeadapt.internal PGHOSTADDR=<private> PGSSLMODE=verify-full PGSSLROOTCERT=/etc/codeadapt/db-tls/ca.crt PGUSER=codeadapt_owner PGDATABASE=codeadapt BACKUP_DIR=/var/backups/codeadapt BACKUP_RETENTION_DAYS=<n> /opt/codeadapt/deploy/backup/pg-backup.sh
 ```
 
 On session days, also run it hourly, and once before and once after the session. Copy

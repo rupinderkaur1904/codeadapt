@@ -16,7 +16,10 @@ The PostgreSQL database holds everything:
 - content-version snapshots.
 
 The content files and the code live in Git and the images. The TLS certificates live in
-the proxy's `caddydata` volume; Caddy re-issues them on its own if they are lost.
+the proxy's `caddydata` volume; Caddy re-issues them on its own if they are lost. The
+database's private CA key is kept offline by the owner (runbook §1); if the server
+certificate is lost, issue a new one from it, or run `make-db-certs.sh` again and copy the
+new `ca.crt` to the runner.
 
 The runner VM holds no data. It can be rebuilt from the runbook.
 
@@ -47,7 +50,10 @@ Dumps contain personal data once real students take part. They follow
 
 ```
 # the database port is published on the private address only (compose.app.yaml)
-export PGHOST=<private address> PGUSER=codeadapt_owner PGDATABASE=codeadapt
+# TCP connections need verified TLS (R5): connect by the certificate's name.
+export PGHOST=db.codeadapt.internal PGHOSTADDR=<private address>
+export PGSSLMODE=verify-full PGSSLROOTCERT=/etc/codeadapt/db-tls/ca.crt
+export PGUSER=codeadapt_owner PGDATABASE=codeadapt
 export PGPASSWORD=...        # or a ~/.pgpass entry, mode 600
 BACKUP_DIR=/var/backups/codeadapt BACKUP_RETENTION_DAYS=<from data governance> \
   deploy/backup/pg-backup.sh

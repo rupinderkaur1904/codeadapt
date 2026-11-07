@@ -124,7 +124,7 @@ flowchart LR
 | Internet → proxy | HTTPS from anyone | TLS; only 443 (and 80 redirect) open; HSTS |
 | Proxy → API | HTTP with `X-Forwarded-For`, `Host` | API trusts forwarded headers from the proxy address only; Host allow-list (ADR-040); body limit; security headers |
 | API → database | SQL as `codeadapt_api` | password from env; no superuser; network-local |
-| Runner VM → database | SQL as `codeadapt_worker` | private network or TLS with IP allow-list; role cannot read `auth_sessions`, `audit_events` or password hashes (grant script, M3.4) |
+| Runner VM → database | SQL as `codeadapt_worker` | private network, firewall to the runner only, and TLS from a private CA with `sslmode=verify-full` (owner decision R5); role cannot read `auth_sessions`, `audit_events` or password hashes (grant script, M3.4) |
 | Worker → Docker | full Docker API | root-equivalent: see section 4 |
 | Sandbox → anything | nothing | `--network none`, gVisor user-space kernel, read-only root, dropped capabilities, `no-new-privileges`, pid, memory, file-size and CPU limits (security.md §3) |
 | Database → backups | dumps containing learner data | off-host, access-restricted, retention per data governance (M3.6) |

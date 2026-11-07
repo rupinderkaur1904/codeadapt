@@ -7,9 +7,13 @@
 # Nothing here has been deployed. Owner Gate B is required before any host runs it.
 name: codeadapt-app
 
+# Every database connection uses TLS and verifies the server's certificate and name
+# (owner decision R5): the CA certificate made by deploy/db-tls/make-db-certs.sh.
+x-db-ca: &db-ca "${DB_TLS_DIR:?}/ca.crt:/etc/codeadapt/db-ca.crt:ro"
+
 x-api-env: &api-env
   CODEADAPT_ENV: production
-  CODEADAPT_DATABASE_URL: postgresql+psycopg://${API_DB_USER:?}:${API_DB_PASSWORD:?}@db:5432/${DB_NAME:?}
+  CODEADAPT_DATABASE_URL: postgresql+psycopg://${API_DB_USER:?}:${API_DB_PASSWORD:?}@db:5432/${DB_NAME:?}?sslmode=verify-full&sslrootcert=/etc/codeadapt/db-ca.crt
   CODEADAPT_ALLOWED_HOSTS: ${SITE_HOST:?}
   # The proxy's fixed address on the internal network below: uvicorn trusts forwarded
   # headers from it only (never '*').
@@ -24,7 +28,24 @@ services:
       POSTGRES_USER: ${DB_OWNER_USER:?}  # owns the schema; used for migrations only
       POSTGRES_PASSWORD: ${DB_OWNER_PASSWORD:?}
       POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
-    volumes: ["pgdata:/var/lib/postgresql/data"]
+    # R5: TLS on, at least TLS 1.2, and pg_hba.conf refuses every TCP connection without it.
+    command:
+      - postgres
+      - -c
+      - ssl=on
+      - -c
+      - ssl_cert_file=/etc/postgresql/tls/server.crt
+      - -c
+      - ssl_key_file=/etc/postgresql/tls/server.key
+      - -c
+      - ssl_min_protocol_version=TLSv1.2
+      - -c
+      - hba_file=/etc/postgresql/pg_hba.conf
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ${DB_TLS_DIR:?}/server.crt:/etc/postgresql/tls/server.crt:ro
+      - ${DB_TLS_DIR:?}/server.key:/etc/postgresql/tls/server.key:ro
+      - ./db/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
     # Published on the App VM's PRIVATE address only, for the runner VM. Never 0.0.0.0 on
     # a public interface; the host firewall also allows 5432 from the runner only.
     ports: ["${DB_PRIVATE_BIND:?}:5432:5432"]
@@ -40,9 +61,10 @@ services:
     image: codeadapt-api:${IMAGE_TAG:-local}
     environment:
       CODEADAPT_ENV: production
-      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}
+      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}?sslmode=verify-full&sslrootcert=/etc/codeadapt/db-ca.crt
     command: ["alembic", "upgrade", "head"]
     depends_on: { db: { condition: service_healthy } }
+    volumes: [*db-ca]
     networks: [internal]
     restart: "no"
 
@@ -52,12 +74,13 @@ services:
     image: codeadapt-api:${IMAGE_TAG:-local}
     environment:
       CODEADAPT_ENV: production
-      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}
+      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}?sslmode=verify-full&sslrootcert=/etc/codeadapt/db-ca.crt
       CODEADAPT_API_DB_PASSWORD: ${API_DB_PASSWORD:?}
       CODEADAPT_WORKER_DB_PASSWORD: ${WORKER_DB_PASSWORD:?}
     command:
       ["codeadapt-admin", "db-setup", "--api-role", "${API_DB_USER:?}", "--worker-role", "${WORKER_DB_USER:?}"]
     depends_on: { migrate: { condition: service_completed_successfully } }
+    volumes: [*db-ca]
     networks: [internal]
     restart: "no"
 
@@ -70,9 +93,10 @@ services:
     image: codeadapt-api:${IMAGE_TAG:-local}
     environment:
       CODEADAPT_ENV: production
-      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}
+      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}?sslmode=verify-full&sslrootcert=/etc/codeadapt/db-ca.crt
     entrypoint: ["codeadapt-admin"]
     depends_on: { db: { condition: service_healthy } }
+    volumes: [*db-ca]
     networks: [internal]
     restart: "no"
     read_only: true
@@ -85,6 +109,7 @@ services:
     restart: unless-stopped
     environment: *api-env
     depends_on: { db-setup: { condition: service_completed_successfully } }
+    volumes: [*db-ca]
     networks: [internal]
     read_only: true
     tmpfs: ["/tmp"]
