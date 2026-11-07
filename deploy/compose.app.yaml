@@ -1,0 +1,99 @@
+# App VM (Option C, docs/deployment/milestone-3-architecture.md): reverse proxy with TLS,
+# API, PostgreSQL. NO Docker socket here. Run from the repository root:
+#
+#   cp deploy/app.env.example deploy/app.env   # fill in; never commit app.env
+#   docker compose -f deploy/compose.app.yaml --env-file deploy/app.env up -d --build
+#
+# Nothing here has been deployed. Owner Gate B is required before any host runs it.
+name: codeadapt-app
+
+x-api-env: &api-env
+  CODEADAPT_ENV: production
+  CODEADAPT_DATABASE_URL: postgresql+psycopg://${API_DB_USER:?}:${API_DB_PASSWORD:?}@db:5432/${DB_NAME:?}
+  CODEADAPT_ALLOWED_HOSTS: ${SITE_HOST:?}
+  # The proxy's fixed address on the internal network below: uvicorn trusts forwarded
+  # headers from it only (never '*').
+  FORWARDED_ALLOW_IPS: 172.30.0.10
+
+services:
+  db:
+    image: postgres:16.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?}
+      POSTGRES_USER: ${DB_OWNER_USER:?}  # owns the schema; used for migrations only
+      POSTGRES_PASSWORD: ${DB_OWNER_PASSWORD:?}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    # Published on the App VM's PRIVATE address only, for the runner VM. Never 0.0.0.0 on
+    # a public interface; the host firewall also allows 5432 from the runner only.
+    ports: ["${DB_PRIVATE_BIND:?}:5432:5432"]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build: { context: .., dockerfile: deploy/backend.Dockerfile, target: api }
+    image: codeadapt-api:${IMAGE_TAG:-local}
+    environment:
+      CODEADAPT_ENV: production
+      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}
+    command: ["alembic", "upgrade", "head"]
+    depends_on: { db: { condition: service_healthy } }
+    networks: [internal]
+    restart: "no"
+
+  db-setup:
+    # As the schema owner: create or update the API and worker login roles and apply the
+    # least-privilege grants (ADR-042). Idempotent; runs after every migration.
+    image: codeadapt-api:${IMAGE_TAG:-local}
+    environment:
+      CODEADAPT_ENV: production
+      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}
+      CODEADAPT_API_DB_PASSWORD: ${API_DB_PASSWORD:?}
+      CODEADAPT_WORKER_DB_PASSWORD: ${WORKER_DB_PASSWORD:?}
+    command:
+      ["codeadapt-admin", "db-setup", "--api-role", "${API_DB_USER:?}", "--worker-role", "${WORKER_DB_USER:?}"]
+    depends_on: { migrate: { condition: service_completed_successfully } }
+    networks: [internal]
+    restart: "no"
+
+  api:
+    image: codeadapt-api:${IMAGE_TAG:-local}
+    restart: unless-stopped
+    environment: *api-env
+    depends_on: { db-setup: { condition: service_completed_successfully } }
+    networks: [internal]
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+  proxy:
+    build: { context: .., dockerfile: deploy/web.Dockerfile }
+    image: codeadapt-proxy:${IMAGE_TAG:-local}
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_HOST:?}
+      API_UPSTREAM: api:8000
+    ports: ["80:80", "443:443"]
+    volumes: ["caddydata:/data", "caddyconfig:/config"]
+    depends_on: [api]
+    networks:
+      internal: { ipv4_address: 172.30.0.10 }
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  internal:
+    ipam:
+      config: [{ subnet: 172.30.0.0/24 }]
+
+volumes:
+  pgdata:
+  caddydata:  # TLS certificates and keys
+  caddyconfig:

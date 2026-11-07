@@ -115,8 +115,12 @@ audit rows are kept is an owner decision (M9).
 
 ## 8. Not yet verified
 
-- PostgreSQL: the driver (psycopg 3) is a dependency and the `backend-postgres` CI job runs
-  every non-sandbox test against PostgreSQL 16, each on a freshly migrated database
-  (`CODEADAPT_TEST_POSTGRES_URL`). The sandbox pipeline tests still run on SQLite.
-- The production container image (the current `backend/Dockerfile` is the dev image).
-- gVisor on the real runner VM (CI and the development container only, ADR-028).
+- PostgreSQL: the driver (psycopg 3) is a dependency; the `backend-postgres` CI job runs
+  every non-sandbox test against PostgreSQL 16, and `sandbox-postgres` runs the sandbox
+  pipeline against it, each on a freshly migrated database.
+- Production images, compose files, reverse proxy and database roles now exist in
+  `deploy/` (Milestone 3, ADR-042) and are built and smoke-tested in the
+  `production-images` CI job. That is CI-level evidence: TLS uses Caddy's internal CA for
+  `localhost` there. TLS with a real certificate is not verified until it runs on a host.
+- gVisor on the real runner VM: see `docs/deployment/gvisor-verification.md` (levels L1-L3;
+  L3, the host, is not verified).
