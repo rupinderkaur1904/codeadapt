@@ -10,9 +10,15 @@ from sqlalchemy.orm import Session, sessionmaker
 
 
 def make_engine(url: str) -> Engine:
-    kwargs: dict[str, Any] = {}
+    # hide_parameters: SQLAlchemy otherwise copies bound values (submission source,
+    # password and token hashes) into exception messages, which reach logs and
+    # `jobs.last_error` (ADR-042).
+    kwargs: dict[str, Any] = {"hide_parameters": True}
     if url.startswith("sqlite"):
         kwargs["connect_args"] = {"check_same_thread": False}
+    else:
+        # Managed PostgreSQL closes idle connections; test each one before use.
+        kwargs["pool_pre_ping"] = True
     engine = create_engine(url, **kwargs)
     if url.startswith("sqlite"):
 

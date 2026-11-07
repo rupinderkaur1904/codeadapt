@@ -41,6 +41,7 @@ from codeadapt.execution.models import (
     EnvironmentInfo,
     RunResult,
 )
+from codeadapt.logs import redact
 from codeadapt.worker.adapt import adapt
 
 log = logging.getLogger(__name__)
@@ -82,14 +83,14 @@ class Pipeline:
             except SandboxUnavailableError as exc:
                 log.warning("sandbox unavailable; requeueing job %s: %s", job.id, exc)
                 session.rollback()
-                if not queue.requeue(session, job, f"sandbox unavailable: {exc}"):
+                if not queue.requeue(session, job, f"sandbox unavailable: {_error_text(exc)}"):
                     log.warning("job %s was reclaimed by another worker", job.id)
                 return
             except Exception as exc:
                 log.exception("job %s failed", job.id)
                 session.rollback()
                 if not queue.finish(
-                    session, job, state=JobState.FAILED, error=f"{type(exc).__name__}: {exc}"
+                    session, job, state=JobState.FAILED, error=_error_text(exc, with_type=True)
                 ):
                     log.warning("job %s was reclaimed by another worker", job.id)
                 return
@@ -264,6 +265,15 @@ class Pipeline:
                 f"{row.report.get('errors')}"
             )
         return FingerprintSet.model_validate(row.data), row
+
+
+MAX_ERROR_CHARS = 2000
+
+
+def _error_text(exc: BaseException, *, with_type: bool = False) -> str:
+    """An exception as stored in `jobs.last_error`: redacted and bounded (ADR-042)."""
+    text = f"{type(exc).__name__}: {exc}" if with_type else str(exc)
+    return redact(text)[:MAX_ERROR_CHARS]
 
 
 def _predictions(fps: FingerprintSet, model: str | None) -> dict[str, Signature]:
