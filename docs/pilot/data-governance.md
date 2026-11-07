@@ -84,10 +84,13 @@ The points needing review:
 5. **Security safeguards and breach notice (s.8(5), 8(6)).**
    - The safeguards are ADR-029, ADR-040, ADR-041 and ADR-042: encryption in transit,
      least-privilege roles, access audit, backups.
-   - Encryption in transit covers browsers to the proxy (TLS). The worker's connection to
-     PostgreSQL crosses the private network between the two VMs and is **not yet
-     encrypted**. **[REVIEW, Gate B]** Enable TLS on PostgreSQL and `sslmode=verify-full`
-     on the worker before enrollment (milestone-3 PR review, finding R5).
+   - Encryption in transit covers browsers to the proxy (TLS) and every database
+     connection: PostgreSQL accepts TCP connections only over TLS (at least 1.2), and the
+     worker and API verify its certificate, issued by a private CA, and its name
+     (`sslmode=verify-full`). The production worker refuses to start otherwise. This was
+     the owner's Gate B decision R5, mandatory before enrollment. It is tested in CI
+     against the production Compose stack; it is **not yet verified on a real host**
+     (runbook §2, step 10).
    - Breaches are to be notified to the Data Protection Board and the affected
      participants, in the form and time set by the Rules. **[REVIEW]** The exact
      deadlines.

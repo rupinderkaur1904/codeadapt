@@ -48,3 +48,44 @@ def test_the_runbook_records_every_digest() -> None:
     runbook = (REPO_ROOT / "docs" / "deployment" / "production-runbook.md").read_text()
     for _, ref in _external_images():
         assert ref in runbook, f"{ref} is missing from the runbook's image table"
+
+
+# ---------------------------------------------------------------- R5: database TLS
+
+
+def test_every_database_url_in_the_compose_files_verifies_tls() -> None:
+    urls = [
+        m.group(0)
+        for path in DEPLOY.glob("compose.*.yaml")
+        for m in re.finditer(r"postgresql\+psycopg://\S+", path.read_text())
+    ]
+    assert len(urls) == 5  # api, migrate, db-setup, admin, worker
+    for url in urls:
+        assert "sslmode=verify-full" in url and "sslrootcert=/etc/codeadapt/db-ca.crt" in url
+
+
+def test_postgres_requires_tls_for_every_tcp_connection() -> None:
+    compose = (DEPLOY / "compose.app.yaml").read_text()
+    for setting in (
+        "ssl=on",
+        "ssl_min_protocol_version=TLSv1.2",
+        "hba_file=/etc/postgresql/pg_hba.conf",
+    ):
+        assert f"- {setting}" in compose
+    rules = [
+        line.split()
+        for line in (DEPLOY / "db" / "pg_hba.conf").read_text().splitlines()
+        if line.strip() and not line.startswith("#")
+    ]
+    # Only the container's own socket, TLS connections, and a refusal of everything else.
+    assert rules == [
+        ["local", "all", "all", "trust"],
+        ["hostssl", "all", "all", "all", "scram-sha-256"],
+        ["hostnossl", "all", "all", "all", "reject"],
+    ]
+
+
+def test_the_runner_reaches_the_database_by_its_certificate_name() -> None:
+    runner = (DEPLOY / "compose.runner.yaml").read_text()
+    assert '"${DB_TLS_NAME:?}:${DB_HOST:?}"' in runner  # extra_hosts
+    assert "${DB_CA_FILE:?}:/etc/codeadapt/db-ca.crt:ro" in runner

@@ -325,9 +325,16 @@ jobs:
           # (`! cmd` would not stop a bash -e step, so test explicitly.)
           if docker compose -f deploy/compose.app.yaml config -q 2>/dev/null; then exit 1; fi
           if docker compose -f deploy/compose.runner.yaml config -q 2>/dev/null; then exit 1; fi
+      - name: Database TLS certificates from a private CA (R5)
+        run: |
+          bash deploy/db-tls/make-db-certs.sh /tmp/db-tls db.codeadapt.internal
+          sudo chown 0:70 /tmp/db-tls/server.key
+          # An unrelated private CA, for the tests that must be refused.
+          bash deploy/db-tls/make-db-certs.sh /tmp/rogue-tls db.codeadapt.internal
       - name: Start the App VM stack (localhost, generated passwords)
         run: |
           {
+            echo DB_TLS_DIR=/tmp/db-tls
             echo SITE_HOST=localhost
             echo DB_NAME=codeadapt
             echo DB_OWNER_USER=codeadapt_owner
@@ -380,12 +387,36 @@ jobs:
           q "SET ROLE codeadapt_worker; SELECT count(*) FROM jobs"
           if q "SET ROLE codeadapt_worker; SELECT count(*) FROM users"; then exit 1; fi
           if q "SET ROLE codeadapt_api; CREATE TABLE intruder (x int)"; then exit 1; fi
+          # R7: the API role can add to the audit log but not rewrite it, and cannot write
+          # the schema revision.
+          q "SET ROLE codeadapt_api; SELECT count(*) FROM audit_events"
+          if q "SET ROLE codeadapt_api; DELETE FROM audit_events"; then exit 1; fi
+          if q "SET ROLE codeadapt_api; UPDATE audit_events SET target = ''"; then exit 1; fi
+          if q "SET ROLE codeadapt_api; UPDATE alembic_version SET version_num = 'x'"; then exit 1; fi
+          # Owner-only administration runs through the admin service, over verified TLS.
+          docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" --profile admin \
+            run --rm admin purge-sessions
+      - uses: astral-sh/setup-uv@v5
+      - name: Database TLS, valid and invalid certificates, as the worker role (R5)
+        working-directory: backend
+        run: |
+          set -a; . "$APP_ENV"; set +a
+          uv sync --locked
+          CODEADAPT_TEST_TLS_REQUIRED=1 \
+          CODEADAPT_TEST_TLS_HOSTADDR=127.0.0.1 CODEADAPT_TEST_TLS_PORT=5432 \
+          CODEADAPT_TEST_TLS_NAME=db.codeadapt.internal \
+          CODEADAPT_TEST_TLS_CA=/tmp/db-tls/ca.crt CODEADAPT_TEST_TLS_ROGUE_CA=/tmp/rogue-tls/ca.crt \
+          CODEADAPT_TEST_TLS_USER="$WORKER_DB_USER" CODEADAPT_TEST_TLS_PASSWORD="$WORKER_DB_PASSWORD" \
+          CODEADAPT_TEST_TLS_DBNAME="$DB_NAME" \
+            uv run pytest tests/tls -v -p no:cacheprovider
       - name: Build sandbox image (so the worker gets past the image check to the gVisor check)
         run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
       - name: Production worker refuses to start without gVisor (runner has runc only)
         run: |
           {
             echo DB_HOST=127.0.0.1
+            echo DB_TLS_NAME=db.codeadapt.internal
+            echo DB_CA_FILE=/tmp/db-tls/ca.crt
             echo DB_NAME=codeadapt
             echo WORKER_DB_USER=codeadapt_worker
             echo WORKER_DB_PASSWORD=unused-in-this-check
