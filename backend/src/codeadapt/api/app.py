@@ -74,7 +74,7 @@ from codeadapt.db.session import as_utc, make_engine, make_session_factory
 from codeadapt.diagnosis import Outcome
 from codeadapt.learner import estimate
 from codeadapt.worker.adapt import learner_attempts, skill_maps_for
-from codeadapt.worker.recovery import pending_failure, retry_adaptation
+from codeadapt.worker.recovery import pending_failure, retry_adaptation, retry_available
 
 SESSION_COOKIE = "codeadapt_session"
 CSRF_HEADER = "X-CSRF-Token"
@@ -490,9 +490,16 @@ def create_app(
 
     # ------------------------------------------------------------------ adaptation
     def learner_next(session: Session, user: User) -> LearnerNext:
-        if pending_failure(session, user.id) is not None:
+        failure = pending_failure(session, user.id)
+        if failure is not None:
             # D6: never show a recommendation the policy made before the latest attempt.
-            return LearnerNext(recommendation=None, last_followup=None, adaptation_unavailable=True)
+            # R10: say whether a retry is valid now, so the button appears only then.
+            return LearnerNext(
+                recommendation=None,
+                last_followup=None,
+                adaptation_unavailable=True,
+                retry_available=retry_available(session, user.id, failure),
+            )
         rec = session.scalar(
             select(RecommendationRow)
             .where(RecommendationRow.user_id == user.id)

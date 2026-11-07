@@ -41,6 +41,7 @@ from codeadapt.worker.recovery import (
     RetryResult,
     pending_failure,
     retry_adaptation,
+    retry_available,
 )
 from tests.conftest import POSTGRES_URL
 from tests.paths import DEMO_CONTENT
@@ -200,12 +201,10 @@ def test_failed_retry_keeps_the_fallback_and_logs_redacted(
     assert _retry(sessions, user_id, PolicyV1()) is RetryResult.RECOVERED
 
 
-def test_retry_is_refused_once_a_newer_attempt_exists(
-    sessions: sessionmaker[Session], failed_second_attempt: tuple[list[int], int]
-) -> None:
-    ids, user_id = failed_second_attempt
+def _add_newer_attempt(sessions: sessionmaker[Session], user_id: int, job_id: int) -> None:
+    """A newer attempt with no adaptation output (for example, it did not compile)."""
     with sessions() as s:
-        old = s.get_one(Submission, s.get_one(Job, ids[1]).submission_id)
+        old = s.get_one(Submission, s.get_one(Job, job_id).submission_id)
         s.add(
             Submission(
                 user_id=user_id,
@@ -217,6 +216,28 @@ def test_retry_is_refused_once_a_newer_attempt_exists(
             )
         )
         s.commit()
+
+
+def test_retry_availability_follows_the_newest_attempt(
+    sessions: sessionmaker[Session], failed_second_attempt: tuple[list[int], int]
+) -> None:
+    """R10: "Try again" is offered only while re-running the failure is valid."""
+    ids, user_id = failed_second_attempt
+    with sessions() as s:
+        assert retry_available(s, user_id, pending_failure(s, user_id)) is True
+        assert retry_available(s, user_id, None) is False
+    _add_newer_attempt(sessions, user_id, ids[1])
+    with sessions() as s:
+        job = pending_failure(s, user_id)
+        assert job is not None  # the fallback still applies ...
+        assert retry_available(s, user_id, job) is False  # ... but not the retry
+
+
+def test_retry_is_refused_once_a_newer_attempt_exists(
+    sessions: sessionmaker[Session], failed_second_attempt: tuple[list[int], int]
+) -> None:
+    ids, user_id = failed_second_attempt
+    _add_newer_attempt(sessions, user_id, ids[1])
     # The newer attempt's own adaptation will run with the full history; re-running the
     # old one now would see a history it never saw, so the retry does nothing.
     assert _retry(sessions, user_id, PolicyV1()) is RetryResult.SUPERSEDED
@@ -245,12 +266,18 @@ def test_api_shows_the_fallback_then_recovers_on_retry(
 
     body = client.get("/api/v1/me/recommendation", headers=dev).json()
     # The recommendation from attempt 1 exists but is withheld, and so is any verdict.
-    assert body == {"recommendation": None, "last_followup": None, "adaptation_unavailable": True}
+    assert body == {
+        "recommendation": None,
+        "last_followup": None,
+        "adaptation_unavailable": True,
+        "retry_available": True,  # R10: the "Try again" button is shown
+    }
 
     retried = client.post("/api/v1/me/recommendation/retry", headers=dev)
     assert retried.status_code == 200
     body = retried.json()
     assert body["adaptation_unavailable"] is False
+    assert body["retry_available"] is False
     assert body["recommendation"] is not None
     with sessions() as s:  # the API retries with the worker's configured policy version
         newest = s.scalars(select(RecommendationRow).order_by(RecommendationRow.id.desc())).first()
@@ -258,6 +285,37 @@ def test_api_shows_the_fallback_then_recovers_on_retry(
     again = client.post("/api/v1/me/recommendation/retry", headers=dev).json()
     assert again == body
     assert _count(sessions, RecommendationRow) == 2
+
+
+def test_api_offers_no_retry_after_a_newer_attempt(
+    settings: Settings,
+    sessions: sessionmaker[Session],
+    failed_second_attempt: tuple[list[int], int],
+) -> None:
+    ids, user_id = failed_second_attempt
+    client = TestClient(create_app(settings, sessions))
+    dev = {"X-Dev-Role": "student"}
+    assert client.get("/api/v1/auth/me", headers=dev).status_code == 200
+    with sessions() as s:
+        dev_id = s.scalars(select(User.id).where(User.username == "dev-student")).one()
+        s.execute(update(Submission).where(Submission.user_id == user_id).values(user_id=dev_id))
+        s.execute(
+            update(RecommendationRow)
+            .where(RecommendationRow.user_id == user_id)
+            .values(user_id=dev_id)
+        )
+        s.commit()
+    _add_newer_attempt(sessions, dev_id, ids[1])
+    expected = {
+        "recommendation": None,
+        "last_followup": None,
+        "adaptation_unavailable": True,
+        "retry_available": False,
+    }
+    assert client.get("/api/v1/me/recommendation", headers=dev).json() == expected
+    # A retry sent anyway (an old page, a script) changes nothing.
+    assert client.post("/api/v1/me/recommendation/retry", headers=dev).json() == expected
+    assert _count(sessions, RecommendationRow) == 1
 
 
 class SlowPolicy(PolicyV1):

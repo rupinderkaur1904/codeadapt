@@ -463,6 +463,11 @@ export interface components {
             adaptation_unavailable: boolean;
             last_followup: components["schemas"]["FollowupView"] | null;
             recommendation: components["schemas"]["RecommendationView"] | null;
+            /**
+             * Retry Available
+             * @default false
+             */
+            retry_available: boolean;
         };
         /** LoginRequest */
         LoginRequest: {

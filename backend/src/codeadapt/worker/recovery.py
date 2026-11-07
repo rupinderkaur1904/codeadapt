@@ -75,6 +75,26 @@ def pending_failure(session: Session, user_id: int) -> Job | None:
     return session.scalars(query.order_by(Submission.created_at.desc()).limit(1)).first()
 
 
+def _newer_submission_exists(session: Session, user_id: int, job: Job) -> bool:
+    submission = session.get_one(Submission, job.submission_id)
+    newer = session.scalar(
+        select(Submission.id)
+        .where(Submission.user_id == user_id, Submission.created_at > submission.created_at)
+        .limit(1)
+    )
+    return newer is not None
+
+
+def retry_available(session: Session, user_id: int, job: Job | None) -> bool:
+    """Whether a retry of this pending failure would run now (R10, owner 2026-11-07).
+
+    False when there is no pending failure, or when the learner has submitted a newer
+    attempt since: re-running the older attempt would then use a history the policy never
+    saw, so only a new submission can produce the next recommendation.
+    """
+    return job is not None and not _newer_submission_exists(session, user_id, job)
+
+
 def retry_adaptation(
     session: Session, user_id: int, catalogue: Catalogue, policy: PolicyV1
 ) -> RetryResult:
@@ -82,14 +102,9 @@ def retry_adaptation(
     job = pending_failure(session, user_id)
     if job is None:
         return RetryResult.NOT_NEEDED
-    submission = session.get_one(Submission, job.submission_id)
-    newer = session.scalar(
-        select(Submission.id)
-        .where(Submission.user_id == user_id, Submission.created_at > submission.created_at)
-        .limit(1)
-    )
-    if newer is not None:
+    if _newer_submission_exists(session, user_id, job):
         return RetryResult.SUPERSEDED
+    submission = session.get_one(Submission, job.submission_id)
     diagnosis = session.scalars(
         select(DiagnosisRow)
         .where(DiagnosisRow.submission_id == submission.id)
