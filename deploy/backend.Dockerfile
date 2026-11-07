@@ -4,7 +4,7 @@
 #   docker build -f deploy/backend.Dockerfile --target worker -t codeadapt-worker:<tag> .
 # The development image is backend/Dockerfile.
 
-FROM python:3.13-slim AS base
+FROM python:3.13-slim@sha256:09a17cad02668ae61ece136b4fd36ac3849e14f670ebedb637ea3e15580525bc AS base
 RUN pip install --no-cache-dir uv==0.11.32 \
     && groupadd --system --gid 10001 codeadapt \
     && useradd --system --uid 10001 --gid codeadapt --home-dir /app --shell /usr/sbin/nologin codeadapt
@@ -43,7 +43,7 @@ FROM base AS worker
 # root-equivalent on that host (docs/deployment/milestone-3-architecture.md §4). The
 # process runs as uid 10001 and reaches the socket through the host's docker group,
 # granted at run time (compose: group_add with the socket's gid).
-COPY --from=docker:29-cli /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=docker:29-cli@sha256:2357639ad1ea7d0194134bf3292622fd4e562483966ed674e5d7c945b5f3b28d /usr/local/bin/docker /usr/local/bin/docker
 # DOCKER_CONFIG: the root filesystem is read-only at run time; the CLI keeps state in /tmp.
 ENV CODEADAPT_SANDBOX_RUNTIME=runsc CODEADAPT_WORKER_HEARTBEAT_FILE=/tmp/codeadapt-worker.heartbeat \
     DOCKER_CONFIG=/tmp/.docker
