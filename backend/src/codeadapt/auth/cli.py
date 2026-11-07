@@ -17,6 +17,7 @@ import sys
 from pathlib import Path
 
 from sqlalchemy import select
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
 
 from codeadapt import auth, ops
@@ -171,7 +172,16 @@ def main(argv: list[str] | None = None) -> int:
             target = auth.find_user(session, args.username)
             if target is None:
                 raise SystemExit(f"no user {args.username!r}")
-            counts = ops.erase_learner(session, target.id, args.apply)
+            try:
+                counts = ops.erase_learner(session, target.id, args.apply)
+            except ProgrammingError as exc:
+                if "permission denied" not in str(exc):
+                    raise
+                # R7: the API role cannot change or delete audit rows.
+                raise SystemExit(
+                    "erase-learner must run as the schema owner: use the `admin` Compose "
+                    "service (production runbook §4b), not the API container"
+                ) from None
             if args.apply:
                 # A record that an erasure happened, without the erased name.
                 auth.audit(

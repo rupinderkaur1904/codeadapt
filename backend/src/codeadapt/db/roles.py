@@ -3,7 +3,10 @@
 Three roles:
 
 - the *owner* role (the one migrations run as) owns the schema; nothing else uses it;
-- the *API* role reads and writes application tables, with no DDL;
+- the *API* role reads and writes application tables, with no DDL. It may add to the audit
+  log but never change or delete it, and it may read the schema revision but never write
+  it (owner decision R7, Gate B, 2026-11-07). Erasing a learner, which scrubs audit rows,
+  therefore runs as the owner (`codeadapt-admin` through the `admin` Compose service);
 - the *worker* role, used on the runner host whose Docker socket is root-equivalent
   (docs/deployment/milestone-3-architecture.md §4), gets only what the job pipeline uses.
   It cannot read accounts, password hashes, sessions or the audit log.
@@ -43,6 +46,11 @@ WORKER_INSERT = (
 WORKER_UPDATE = ("jobs",)
 # Never granted to the worker.
 WORKER_DENIED = ("users", "auth_sessions", "audit_events")
+# R7: the API role may only append to these (audit_events) or only read them
+# (alembic_version). A compromised API process cannot erase the access log or fake the
+# schema revision.
+API_APPEND_ONLY = ("audit_events",)
+API_READ_ONLY = ("alembic_version",)
 
 
 def _ident(name: str) -> str:
@@ -59,6 +67,15 @@ def grant_statements(api_role: str, worker_role: str, schema: str = "public") ->
         # API: data access on every table, no DDL.
         f"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA {sch} TO {api}",
         f"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA {sch} TO {api}",
+        # R7: no rewriting of the access log, no writes to the schema revision.
+        *(
+            f"REVOKE UPDATE, DELETE, TRUNCATE ON {sch}.{_ident(t)} FROM {api}"
+            for t in API_APPEND_ONLY
+        ),
+        *(
+            f"REVOKE INSERT, UPDATE, DELETE, TRUNCATE ON {sch}.{_ident(t)} FROM {api}"
+            for t in API_READ_ONLY
+        ),
         # Worker: start from nothing, then the explicit lists.
         f"REVOKE ALL ON ALL TABLES IN SCHEMA {sch} FROM {worker}",
         f"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA {sch} TO {worker}",

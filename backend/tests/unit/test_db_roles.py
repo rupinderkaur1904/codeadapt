@@ -6,18 +6,31 @@ from __future__ import annotations
 import asyncio
 import uuid
 from collections.abc import Iterator
+from dataclasses import replace
 from typing import Any
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import Engine, event, make_url, text
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session, sessionmaker
 
+from codeadapt import auth, ops
 from codeadapt.adaptation import PolicyV1
+from codeadapt.api.app import CSRF_HEADER, create_app
 from codeadapt.auth import cli as admin
+from codeadapt.config import Environment, Settings
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.db import roles
-from codeadapt.db.models import DiagnosisRow, Job, JobState, RecommendationRow, Submission
+from codeadapt.db.models import (
+    AuditEvent,
+    DiagnosisRow,
+    Job,
+    JobState,
+    RecommendationRow,
+    Submission,
+    User,
+)
 from codeadapt.db.session import make_engine, make_session_factory
 from codeadapt.diagnosis import FingerprintConsistencyV1
 from codeadapt.worker.pipeline import Pipeline
@@ -118,6 +131,128 @@ def test_api_role_has_data_access_but_no_ddl(db_url: str, role_names: tuple[str,
         with pytest.raises(ProgrammingError, match="permission denied"):
             conn.execute(text("CREATE TABLE intruder (x int)"))
     engine.dispose()
+
+
+def test_api_role_can_append_to_the_audit_log_but_never_rewrite_it(
+    db_url: str, role_names: tuple[str, str]
+) -> None:
+    """R7 (owner, Gate B): a compromised API process cannot erase the access log."""
+    api, _ = role_names
+    engine = _as_role(db_url, api)
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO audit_events (at, kind, username, client, target) "
+                "VALUES (now(), 'login_failed', 'x', 'c', '')"
+            )
+        )
+        assert conn.execute(text("SELECT count(*) FROM audit_events")).scalar() == 1
+    for statement in (
+        "UPDATE audit_events SET target = 'forged'",
+        "DELETE FROM audit_events",
+        "TRUNCATE audit_events",
+    ):
+        with engine.connect() as conn, pytest.raises(ProgrammingError, match="permission denied"):
+            conn.execute(text(statement))
+    engine.dispose()
+
+
+def test_api_role_can_read_but_never_write_the_schema_revision(
+    db_url: str, role_names: tuple[str, str]
+) -> None:
+    api, _ = role_names
+    engine = _as_role(db_url, api)
+    with engine.connect() as conn:
+        assert conn.execute(text("SELECT version_num FROM alembic_version")).scalar()
+    for statement in (
+        "UPDATE alembic_version SET version_num = 'forged'",
+        "DELETE FROM alembic_version",
+        "INSERT INTO alembic_version (version_num) VALUES ('forged')",
+        "TRUNCATE alembic_version",
+    ):
+        with engine.connect() as conn, pytest.raises(ProgrammingError, match="permission denied"):
+            conn.execute(text(statement))
+    engine.dispose()
+
+
+def test_the_api_still_works_under_the_reduced_api_role(
+    db_url: str, settings: Settings, role_names: tuple[str, str]
+) -> None:
+    """Login (audit + session rows), a failed login, logout and readiness, all as the API
+    role: R7 removes nothing the application itself needs."""
+    api, _ = role_names
+    password = "correct horse battery"  # noqa: S105 - test fixture
+    owner = make_session_factory(make_engine(db_url))
+    with owner() as s:
+        s.add(
+            User(
+                username="p001",
+                role="student",
+                data_class="synthetic",
+                password_hash=auth.hash_password(password),
+            )
+        )
+        s.commit()
+    engine = _as_role(db_url, api)
+    production = replace(settings, env=Environment.PRODUCTION, allowed_hosts=("testserver",))
+    client = TestClient(
+        create_app(production, make_session_factory(engine)), base_url="https://testserver"
+    )
+    bad = client.post("/api/v1/auth/login", json={"username": "p001", "password": "wrong"})
+    assert bad.status_code == 401
+    ok = client.post("/api/v1/auth/login", json={"username": "p001", "password": password})
+    assert ok.status_code == 200, ok.text
+    assert client.get("/api/v1/me/recommendation").status_code == 200
+    out = client.post("/api/v1/auth/logout", headers={CSRF_HEADER: ok.json()["csrf_token"]})
+    assert out.status_code == 204
+    assert client.get("/api/v1/ready").json() == {"status": "ready"}
+    with owner() as s:
+        assert s.query(AuditEvent).count() >= 2  # the failed and the successful login
+    engine.dispose()
+
+
+def test_erasure_needs_the_owner_connection_and_works_through_it(
+    db_url: str,
+    role_names: tuple[str, str],
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """R7: erase-learner deletes and scrubs audit rows, so the API role can no longer run
+    it; the owner connection (the `admin` Compose service) can, and so can purge-sessions."""
+    api, _ = role_names
+    owner = make_session_factory(make_engine(db_url))
+    with owner() as s:
+        user = User(username="p017", role="student", data_class="synthetic")
+        s.add(user)
+        s.flush()
+        auth.audit(s, "login", username="p017", client="c", user=user)
+        s.commit()
+        user_id = user.id
+    as_api = make_session_factory(_as_role(db_url, api))
+    with as_api() as s, pytest.raises(ProgrammingError, match="permission denied"):
+        ops.erase_learner(s, user_id, apply=True)
+    monkeypatch.setenv("CODEADAPT_ENV", "test")
+    url = make_url(db_url)
+    with owner() as s:  # a login role with the API's grants, to run the CLI as the API
+        s.execute(text(f'CREATE ROLE "{api}_login" LOGIN PASSWORD \'pw-{api}\' IN ROLE "{api}"'))
+        s.commit()
+    try:
+        api_url = url.set(username=f"{api}_login", password=f"pw-{api}")
+        monkeypatch.setenv("CODEADAPT_DATABASE_URL", api_url.render_as_string(hide_password=False))
+        with pytest.raises(SystemExit, match="schema owner"):
+            admin.main(["erase-learner", "p017", "--apply"])
+    finally:
+        with owner() as s:
+            s.execute(text(f'DROP ROLE "{api}_login"'))
+            s.commit()
+
+    monkeypatch.setenv("CODEADAPT_DATABASE_URL", db_url)  # the owner connection
+    assert admin.main(["erase-learner", "p017", "--apply"]) == 0
+    assert admin.main(["purge-sessions", "--apply"]) == 0
+    capsys.readouterr()
+    with owner() as s:
+        assert s.get(User, user_id) is None
+        assert s.query(AuditEvent).filter_by(username="p017").count() == 0
 
 
 def test_db_setup_creates_login_roles_that_can_connect(

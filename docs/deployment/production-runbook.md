@@ -95,6 +95,24 @@ Conventions:
 On session days, also run it hourly, and once before and once after the session. Copy
 the dumps off the VM. Run the restore drill before the pilot and then monthly.
 
+## 4b. Administration that needs the owner connection
+
+The API's database role can add audit rows but cannot change or delete them, and cannot
+write the schema revision (owner decision R7, `db/roles.py`). Commands that delete or
+scrub audit rows therefore run as the schema owner, through the `admin` Compose service.
+It is never started by `up`, and exits when the command ends:
+
+```
+alias admin='docker compose -f deploy/compose.app.yaml --env-file deploy/app.env --profile admin'
+admin run --rm admin erase-learner p017            # dry run: shows what would go
+admin run --rm admin erase-learner p017 --apply    # participant withdrawal (data governance §7)
+admin run --rm admin purge-sessions --older-than-days 30 --apply   # monthly
+```
+
+Read-only commands (`status`, `db-fingerprint`, `list`) and account commands
+(`create-user`, `disable`, `set-password`) still work through `app exec api
+codeadapt-admin ...`.
+
 ## 5. Before each class session
 
 1. `app exec api codeadapt-admin status` reports `"ok": true`.
