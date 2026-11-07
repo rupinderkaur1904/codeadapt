@@ -51,6 +51,7 @@ from codeadapt.config import Settings
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.content.models import Visibility
 from codeadapt.content.taxonomy import RETIRED
+from codeadapt.db import migrate
 from codeadapt.db.models import (
     DataClass,
     DiagnosisRow,
@@ -696,7 +697,32 @@ def create_app(
 
     @app.get("/api/v1/health")
     def health() -> dict[str, str]:
+        """Liveness: the process answers. Touches nothing else."""
         return {"status": "ok"}
+
+    expected_revision = migrate.head_revision()
+
+    @app.get(
+        "/api/v1/ready",
+        response_model=None,
+        responses={200: {"description": "Ready"}, 503: {"description": "Not ready"}},
+    )
+    def ready(request: Request) -> JSONResponse:
+        """Readiness (ADR-042): the database answers and its schema is at this code's
+        migration head. Public, like health, so a load balancer can call it; the answer
+        names no host, revision or error."""
+        try:
+            with sessions() as s:
+                revision = migrate.current_revision(s.connection())
+        except Exception:
+            log.warning("readiness check: database unavailable", exc_info=True)
+            return _problem(request, 503, "not-ready", "Database unavailable")
+        if revision != expected_revision:
+            log.warning(
+                "readiness check: schema revision %s, expected %s", revision, expected_revision
+            )
+            return _problem(request, 503, "not-ready", "Database schema is not up to date")
+        return JSONResponse({"status": "ready"})
 
     return app
 

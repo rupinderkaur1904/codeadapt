@@ -31,7 +31,12 @@ ROLES = {
     "unknown_role": "superuser",  # not a role the code knows: must be denied everything
 }
 # Routes that need no login by design. Anything else under /api must refuse anonymous callers.
-PUBLIC = {("POST", "/api/v1/auth/login"), ("GET", "/api/v1/health")}
+# /ready (ADR-042) is public like /health: a load balancer probes it without a session.
+PUBLIC = {
+    ("POST", "/api/v1/auth/login"),
+    ("GET", "/api/v1/health"),
+    ("GET", "/api/v1/ready"),
+}
 
 
 @pytest.fixture

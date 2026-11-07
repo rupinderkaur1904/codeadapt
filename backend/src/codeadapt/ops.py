@@ -1,0 +1,92 @@
+"""Operational status for monitoring (ADR-042): queue health, failures, schema revision.
+
+The status holds counts and ages only: no usernames, source, or error text, so it can be
+printed to a cron log or an uptime checker without exposing learner data.
+"""
+
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta
+
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
+
+from codeadapt.db import migrate
+from codeadapt.db.models import Job, JobState
+from codeadapt.db.session import as_utc
+from codeadapt.worker.pipeline import ADAPTATION_FAILED
+
+
+@dataclass(frozen=True)
+class Thresholds:
+    max_queue_age_seconds: float = 300.0  # a student has waited 5 minutes for a result
+    max_failed_jobs: int = 0  # infrastructure failures in the window
+    max_adaptation_failures: int = 0  # diagnoses delivered without a recommendation (D6)
+
+
+@dataclass(frozen=True)
+class Status:
+    window_hours: float
+    queued: int
+    running: int
+    running_with_expired_lease: int
+    oldest_queued_seconds: float | None
+    failed_in_window: int
+    adaptation_failures_in_window: int
+    done_in_window: int
+    schema_revision: str | None
+    expected_schema_revision: str | None
+
+    def problems(self, limits: Thresholds) -> list[str]:
+        found: list[str] = []
+        if self.schema_revision != self.expected_schema_revision:
+            found.append("database schema is not at the code's migration head")
+        if (
+            self.oldest_queued_seconds is not None
+            and self.oldest_queued_seconds > limits.max_queue_age_seconds
+        ):
+            found.append(
+                f"oldest queued job waited {self.oldest_queued_seconds:.0f} s "
+                f"(limit {limits.max_queue_age_seconds:.0f} s): is a worker running?"
+            )
+        if self.running_with_expired_lease:
+            found.append(f"{self.running_with_expired_lease} running job(s) lost their worker")
+        if self.failed_in_window > limits.max_failed_jobs:
+            found.append(f"{self.failed_in_window} job(s) failed in the window")
+        if self.adaptation_failures_in_window > limits.max_adaptation_failures:
+            found.append(
+                f"{self.adaptation_failures_in_window} diagnosis(es) had no recommendation "
+                "because adaptation failed"
+            )
+        return found
+
+    def as_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+def collect(session: Session, now: datetime, window_hours: float = 24.0) -> Status:
+    since = now - timedelta(hours=window_hours)
+
+    def count(*where: object) -> int:
+        return session.scalar(select(func.count()).select_from(Job).where(*where)) or 0  # type: ignore[arg-type]
+
+    oldest = session.scalar(select(func.min(Job.created_at)).where(Job.state == JobState.QUEUED))
+    return Status(
+        window_hours=window_hours,
+        queued=count(Job.state == JobState.QUEUED),
+        running=count(Job.state == JobState.RUNNING),
+        running_with_expired_lease=count(Job.state == JobState.RUNNING, Job.lease_until < now),
+        oldest_queued_seconds=(
+            round((now - as_utc(oldest)).total_seconds(), 1) if oldest is not None else None
+        ),
+        failed_in_window=count(Job.state == JobState.FAILED, Job.updated_at >= since),
+        adaptation_failures_in_window=count(
+            Job.state == JobState.DONE,
+            Job.updated_at >= since,
+            Job.last_error.like(ADAPTATION_FAILED + "%"),
+        ),
+        done_in_window=count(Job.state == JobState.DONE, Job.updated_at >= since),
+        schema_revision=migrate.current_revision(session.connection()),
+        expected_schema_revision=migrate.head_revision(),
+    )

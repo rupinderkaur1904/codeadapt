@@ -83,7 +83,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Health */
+        /**
+         * Health
+         * @description Liveness: the process answers. Touches nothing else.
+         */
         get: operations["health_api_v1_health_get"];
         put?: never;
         post?: never;
@@ -139,6 +142,28 @@ export interface paths {
         };
         /** Get Problem */
         get: operations["get_problem_api_v1_problems__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ready
+         * @description Readiness (ADR-042): the database answers and its schema is at this code's
+         *     migration head. Public, like health, so a load balancer can call it; the answer
+         *     names no host, revision or error.
+         */
+        get: operations["ready_api_v1_ready_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1018,6 +1043,33 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    ready_api_v1_ready_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ready */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Not ready */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
