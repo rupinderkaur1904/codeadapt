@@ -298,3 +298,141 @@ jobs:
       - name: Stop
         if: always()
         run: docker compose down -v
+
+  production-images:
+    # ADR-042 / Milestone 3: the production images build, run as non-root, and the App VM
+    # stack serves the web build and API over HTTPS with its headers. TLS here uses Caddy's
+    # internal CA for "localhost": CI-level evidence only, never proof of TLS on a host.
+    runs-on: ubuntu-24.04
+    needs: [backend, web]
+    env:
+      APP_ENV: /tmp/app.env
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build API, worker and proxy images
+        run: |
+          docker build -f deploy/backend.Dockerfile --target api -t codeadapt-api:local .
+          docker build -f deploy/backend.Dockerfile --target worker -t codeadapt-worker:local .
+          docker build -f deploy/web.Dockerfile -t codeadapt-proxy:local .
+      - name: Images run as non-root
+        run: |
+          for image in codeadapt-api:local codeadapt-worker:local; do
+            uid=$(docker run --rm --entrypoint id "$image" -u)
+            echo "$image uid=$uid"; test "$uid" != 0
+          done
+      - name: Compose files refuse to start without their settings
+        run: |
+          # (`! cmd` would not stop a bash -e step, so test explicitly.)
+          if docker compose -f deploy/compose.app.yaml config -q 2>/dev/null; then exit 1; fi
+          if docker compose -f deploy/compose.runner.yaml config -q 2>/dev/null; then exit 1; fi
+      - name: Database TLS certificates from a private CA (R5)
+        run: |
+          bash deploy/db-tls/make-db-certs.sh /tmp/db-tls db.codeadapt.internal
+          sudo chown 0:70 /tmp/db-tls/server.key
+          # An unrelated private CA, for the tests that must be refused.
+          bash deploy/db-tls/make-db-certs.sh /tmp/rogue-tls db.codeadapt.internal
+      - name: Start the App VM stack (localhost, generated passwords)
+        run: |
+          {
+            echo DB_TLS_DIR=/tmp/db-tls
+            echo SITE_HOST=localhost
+            echo DB_NAME=codeadapt
+            echo DB_OWNER_USER=codeadapt_owner
+            echo "DB_OWNER_PASSWORD=$(openssl rand -hex 24)"
+            echo API_DB_USER=codeadapt_api
+            echo "API_DB_PASSWORD=$(openssl rand -hex 24)"
+            echo WORKER_DB_USER=codeadapt_worker
+            echo "WORKER_DB_PASSWORD=$(openssl rand -hex 24)"
+            echo DB_PRIVATE_BIND=127.0.0.1
+            echo IMAGE_TAG=local
+          } > "$APP_ENV"
+          docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" up -d --no-build
+      - name: HTTPS, readiness and headers through the proxy
+        run: |
+          for i in $(seq 1 60); do curl -fsk https://localhost/api/v1/ready && break; sleep 2; done
+          curl -fsk https://localhost/api/v1/ready | jq -e '.status == "ready"'
+          curl -sk https://localhost/api/v1/problems -o /dev/null -w '%{http_code}\n' | grep -q 401
+          curl -fsk https://localhost/ | grep -q '<div id="root">'
+          web=$(curl -fsk -D - -o /dev/null https://localhost/)
+          echo "$web"
+          for h in strict-transport-security content-security-policy x-frame-options x-content-type-options; do
+            echo "$web" | grep -qi "^$h:"
+          done
+          api=$(curl -fsk -D - -o /dev/null https://localhost/api/v1/health)
+          echo "$api" | grep -qi '^strict-transport-security:'
+          echo "$api" | grep -qi "^content-security-policy: default-src 'none'"
+          # Plain HTTP is redirected to HTTPS.
+          curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://localhost/ | grep -q '^308 https://'
+          # An unknown Host is refused by the API itself (ADR-040).
+          docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" exec -T api python -c "
+          import urllib.error, urllib.request as u
+          try:
+              u.urlopen(u.Request('http://127.0.0.1:8000/api/v1/health', headers={'Host': 'evil.example'}))
+          except urllib.error.HTTPError as e:
+              assert e.code == 400, e.code
+          else:
+              raise SystemExit('unknown Host was accepted')
+          "
+          # The API container reports healthy (its health check sends an allowed Host).
+          for i in $(seq 1 30); do
+            s=$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" ps -q api)")
+            [ "$s" = healthy ] && break; sleep 2
+          done
+          echo "api health: $s"; test "$s" = healthy
+      - name: Least-privilege database roles are in force
+        run: |
+          set -a; . "$APP_ENV"; set +a
+          q() { docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" exec -T db \
+                psql -v ON_ERROR_STOP=1 -U "$DB_OWNER_USER" -d "$DB_NAME" -c "$1"; }
+          q "SET ROLE codeadapt_worker; SELECT count(*) FROM jobs"
+          if q "SET ROLE codeadapt_worker; SELECT count(*) FROM users"; then exit 1; fi
+          if q "SET ROLE codeadapt_api; CREATE TABLE intruder (x int)"; then exit 1; fi
+          # R7: the API role can add to the audit log but not rewrite it, and cannot write
+          # the schema revision.
+          q "SET ROLE codeadapt_api; SELECT count(*) FROM audit_events"
+          if q "SET ROLE codeadapt_api; DELETE FROM audit_events"; then exit 1; fi
+          if q "SET ROLE codeadapt_api; UPDATE audit_events SET target = ''"; then exit 1; fi
+          if q "SET ROLE codeadapt_api; UPDATE alembic_version SET version_num = 'x'"; then exit 1; fi
+          # Owner-only administration runs through the admin service, over verified TLS.
+          docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" --profile admin \
+            run --rm admin purge-sessions
+      - uses: astral-sh/setup-uv@v5
+      - name: Database TLS, valid and invalid certificates, as the worker role (R5)
+        working-directory: backend
+        run: |
+          set -a; . "$APP_ENV"; set +a
+          uv sync --locked
+          CODEADAPT_TEST_TLS_REQUIRED=1 \
+          CODEADAPT_TEST_TLS_HOSTADDR=127.0.0.1 CODEADAPT_TEST_TLS_PORT=5432 \
+          CODEADAPT_TEST_TLS_NAME=db.codeadapt.internal \
+          CODEADAPT_TEST_TLS_CA=/tmp/db-tls/ca.crt CODEADAPT_TEST_TLS_ROGUE_CA=/tmp/rogue-tls/ca.crt \
+          CODEADAPT_TEST_TLS_USER="$WORKER_DB_USER" CODEADAPT_TEST_TLS_PASSWORD="$WORKER_DB_PASSWORD" \
+          CODEADAPT_TEST_TLS_DBNAME="$DB_NAME" \
+            uv run pytest tests/tls -v -p no:cacheprovider
+      - name: Build sandbox image (so the worker gets past the image check to the gVisor check)
+        run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
+      - name: Production worker refuses to start without gVisor (runner has runc only)
+        run: |
+          {
+            echo DB_HOST=127.0.0.1
+            echo DB_TLS_NAME=db.codeadapt.internal
+            echo DB_CA_FILE=/tmp/db-tls/ca.crt
+            echo DB_NAME=codeadapt
+            echo WORKER_DB_USER=codeadapt_worker
+            echo WORKER_DB_PASSWORD=unused-in-this-check
+            echo "DOCKER_SOCKET_GID=$(stat -c %g /var/run/docker.sock)"
+            echo IMAGE_TAG=local
+          } > /tmp/runner.env
+          set +e
+          out=$(docker compose -f deploy/compose.runner.yaml --env-file /tmp/runner.env run --rm --no-deps worker 2>&1)
+          code=$?
+          set -e
+          echo "$out" | tail -5
+          test "$code" -ne 0
+          echo "$out" | grep -q "runtime 'runsc' is not registered"
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" logs --no-color
+      - name: Stop
+        if: always()
+        run: docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" down -v || true

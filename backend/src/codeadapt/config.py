@@ -24,6 +24,9 @@ class Settings:
     worker_poll_seconds: float = 1.0
     job_lease_seconds: float = 600.0
     job_max_attempts: int = 3
+    # ADR-042: the worker touches this file every few seconds while its event loop runs;
+    # `codeadapt-worker --check` (a container health check) fails when it goes stale.
+    worker_heartbeat_file: Path | None = None
     # ADR-029: login sessions and request limits.
     session_hours: float = 12.0
     login_max_failures: int = 5  # per username or per client, within the window below
@@ -82,6 +85,11 @@ class Settings:
             database_url=database_url,
             content_dir=default_content_dir(),
             worker_poll_seconds=float(os.environ.get("CODEADAPT_WORKER_POLL_SECONDS", "1.0")),
+            worker_heartbeat_file=(
+                Path(os.environ["CODEADAPT_WORKER_HEARTBEAT_FILE"])
+                if os.environ.get("CODEADAPT_WORKER_HEARTBEAT_FILE")
+                else None
+            ),
             session_hours=float(os.environ.get("CODEADAPT_SESSION_HOURS", "12")),
             submissions_per_minute=_optional_int(
                 os.environ.get("CODEADAPT_SUBMISSIONS_PER_MINUTE"),

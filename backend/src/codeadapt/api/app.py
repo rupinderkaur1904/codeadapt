@@ -22,6 +22,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from codeadapt import auth, logs
+from codeadapt.adaptation import PolicyV1
 from codeadapt.adaptation.skillmap import SkillMap
 from codeadapt.adaptation.technique import TECHNIQUE_NOTE, banned_names_found
 from codeadapt.api import feedback, recommendation
@@ -51,6 +52,7 @@ from codeadapt.config import Settings
 from codeadapt.content.catalogue import Catalogue
 from codeadapt.content.models import Visibility
 from codeadapt.content.taxonomy import RETIRED
+from codeadapt.db import migrate
 from codeadapt.db.models import (
     DataClass,
     DiagnosisRow,
@@ -72,6 +74,7 @@ from codeadapt.db.session import as_utc, make_engine, make_session_factory
 from codeadapt.diagnosis import Outcome
 from codeadapt.learner import estimate
 from codeadapt.worker.adapt import learner_attempts, skill_maps_for
+from codeadapt.worker.recovery import pending_failure, retry_adaptation, retry_available
 
 SESSION_COOKIE = "codeadapt_session"
 CSRF_HEADER = "X-CSRF-Token"
@@ -104,6 +107,7 @@ def create_app(
     settings: Settings | None = None,
     sessions: sessionmaker[Session] | None = None,
     catalogue: Catalogue | None = None,
+    policy: PolicyV1 | None = None,
 ) -> FastAPI:
     if settings is None:  # started by uvicorn's factory: this process owns its logging
         settings = Settings.from_env()
@@ -111,6 +115,8 @@ def create_app(
     settings.require_api_config()  # ADR-040: refuse to start half-configured in production
     sessions = sessions or make_session_factory(make_engine(settings.database_url))
     catalogue = catalogue or Catalogue.load(settings.content_dir)
+    # The same policy the worker runs (worker/main.py), used only by a learner's D6 retry.
+    policy = policy or PolicyV1(version=settings.policy_version)
     with sessions() as s:
         catalogue.sync(s)
 
@@ -483,9 +489,17 @@ def create_app(
         return submission_view(session, owned_submission(request, session, user, submission_id))
 
     # ------------------------------------------------------------------ adaptation
-    @app.get("/api/v1/me/recommendation", response_model=LearnerNext)
-    def my_recommendation(session: DB, user: CurrentUser) -> LearnerNext:
-        """The current user's latest recommendation and latest follow-up verdict."""
+    def learner_next(session: Session, user: User) -> LearnerNext:
+        failure = pending_failure(session, user.id)
+        if failure is not None:
+            # D6: never show a recommendation the policy made before the latest attempt.
+            # R10: say whether a retry is valid now, so the button appears only then.
+            return LearnerNext(
+                recommendation=None,
+                last_followup=None,
+                adaptation_unavailable=True,
+                retry_available=retry_available(session, user.id, failure),
+            )
         rec = session.scalar(
             select(RecommendationRow)
             .where(RecommendationRow.user_id == user.id)
@@ -507,6 +521,22 @@ def create_app(
                 recommendation.followup_view(catalogue, latest[1], latest[0]) if latest else None
             ),
         )
+
+    @app.get("/api/v1/me/recommendation", response_model=LearnerNext)
+    def my_recommendation(session: DB, user: CurrentUser) -> LearnerNext:
+        """The current user's latest recommendation and latest follow-up verdict."""
+        return learner_next(session, user)
+
+    @app.post("/api/v1/me/recommendation/retry", response_model=LearnerNext)
+    def retry_my_recommendation(session: DB, user: CurrentUser) -> LearnerNext:
+        """Retry the adaptation step that failed after the user's latest attempt (D6).
+
+        Idempotent: it does nothing when there is no pending failure, when a newer attempt
+        exists, or when another retry already claimed it. The answer is always the current
+        state, so a failed retry still shows the neutral fallback message.
+        """
+        retry_adaptation(session, user.id, catalogue, policy)
+        return learner_next(session, user)
 
     # ------------------------------------------------------------------ research
     Researcher = Annotated[User, Depends(researcher)]  # noqa: N806 - type alias
@@ -696,7 +726,32 @@ def create_app(
 
     @app.get("/api/v1/health")
     def health() -> dict[str, str]:
+        """Liveness: the process answers. Touches nothing else."""
         return {"status": "ok"}
+
+    expected_revision = migrate.head_revision()
+
+    @app.get(
+        "/api/v1/ready",
+        response_model=None,
+        responses={200: {"description": "Ready"}, 503: {"description": "Not ready"}},
+    )
+    def ready(request: Request) -> JSONResponse:
+        """Readiness (ADR-042): the database answers and its schema is at this code's
+        migration head. Public, like health, so a load balancer can call it; the answer
+        names no host, revision or error."""
+        try:
+            with sessions() as s:
+                revision = migrate.current_revision(s.connection())
+        except Exception:
+            log.warning("readiness check: database unavailable", exc_info=True)
+            return _problem(request, 503, "not-ready", "Database unavailable")
+        if revision != expected_revision:
+            log.warning(
+                "readiness check: schema revision %s, expected %s", revision, expected_revision
+            )
+            return _problem(request, 503, "not-ready", "Database schema is not up to date")
+        return JSONResponse({"status": "ready"})
 
     return app
 

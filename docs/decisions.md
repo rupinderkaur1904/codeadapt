@@ -905,3 +905,86 @@ with it. The owner asked for them to be built again, from scratch, on GitHub (20
 **Consequences.** Deployment runs `alembic upgrade head` as before; a database with
 case-colliding names needs those resolved first (the error lists them).
 
+
+## ADR-042 — Operational safety for a controlled pilot: log redaction, readiness, worker lifecycle, adaptation-failure marker (Milestone 3, 2026-11-07)
+
+**Context.** The Milestone 3 baseline audit (`docs/reviews/milestone-3-baseline-audit.md`)
+found that data could reach logs (F07), that nothing reported readiness or worker health
+(F05), that a deploy killed jobs mid-run (F08), that the first submission to each problem
+stalled the queue (F12), that nothing measured queue health (F09), and that an adaptation
+failure was silent (F06, audit D6).
+
+**Decision.**
+1. *Logs.* Every engine sets `hide_parameters=True`, so bound values (submission source,
+   password and token hashes) never appear in exception text. Every log record passes
+   through `logs.RedactingFormatter`, which masks database URL passwords and cookie,
+   CSRF, token and password values in the message, extra fields and traceback. Stored job
+   errors are redacted and capped at 2,000 characters. uvicorn runs with `--no-access-log`;
+   the app's own request log has no query string and no client address. Redaction is a
+   safety net: code still must not log secrets or source.
+2. *Readiness.* `GET /api/v1/ready` is 200 only when the database answers and its schema
+   is at this code's migration head, otherwise 503 with no internal detail. It is public,
+   like `/api/v1/health` (liveness, unchanged).
+3. *Worker lifecycle.* SIGTERM and SIGINT stop the worker from claiming new jobs; the job
+   in progress finishes and is recorded, then the process exits 0. When
+   `CODEADAPT_WORKER_HEARTBEAT_FILE` is set the worker touches it every 10 s, and
+   `codeadapt-worker --check` (a container health check) fails when it is older than 60 s.
+   `codeadapt-worker --warm-up` measures every content version's fingerprints through the
+   existing cached path before a session.
+4. *Adaptation failure (D6), operational part only.* When the policy step fails after a
+   diagnosis is committed, the diagnosis is kept (as before), the job is still DONE (the
+   student's diagnosis was delivered), and `jobs.last_error` now carries
+   `adaptation failed: <redacted error>` together with a structured `adaptation_failed` log
+   event. Before, this was a log line only.
+5. *Monitoring.* `codeadapt-admin status` prints queue depth, oldest queued age, lost
+   workers, failed jobs, adaptation failures and the schema revision as JSON (counts only,
+   no learner data). It exits 1 when a threshold is crossed, so cron or an uptime checker can
+   alert on it.
+
+**Not changed.** Diagnosis, evidence, fingerprints, policy, learner model, content and
+evaluation (checked against the Milestone 3 research-freeze manifest).
+
+**Addendum, 2026-11-07: learner-facing D6 (owner decision).** After an adaptation failure the
+learner's latest stored recommendation predates an attempt the policy never saw, so it may
+be stale. Now (`worker/recovery.py`):
+
+- `GET /api/v1/me/recommendation` returns `adaptation_unavailable: true` with no
+  recommendation and no follow-up verdict whenever a failure is newer than the submission
+  behind the latest recommendation. Submissions, diagnoses and feedback are never touched.
+  The web card's text was changed by the owner at Gate B (R10, below).
+- `POST /api/v1/me/recommendation/retry` (login and CSRF required, own attempts only) runs
+  the unchanged, research-frozen `adapt` on the same submission and diagnosis. It runs only
+  while that submission is the learner's newest one, so the policy sees exactly the attempt
+  history it would have seen the first time; otherwise it does nothing (the newer
+  attempt's own adaptation applies).
+- At most one retry takes effect: the claim is a conditional `UPDATE` of the job's marker
+  (`adaptation failed: ...` to `adaptation recovered by retry; was: ...`), committed in the
+  same transaction as the adaptation rows. A repeated or concurrent retry finds nothing to
+  claim (tested, including a PostgreSQL row-lock race). A retry that fails again rolls
+  everything back, keeps the fallback, and logs a redacted `adaptation_retry_failed` event.
+- `codeadapt-admin status` still counts a recovered failure as a failure, and reports
+  recoveries separately.
+
+- A redelivered job that already has its diagnosis but no adaptation output (the previous
+  worker stopped between the two commits) is finished with the same marker, so the learner
+  gets the fallback and the retry instead of a silently stale card.
+
+The policy, its inputs and its outputs are unchanged; only the time at which a recovered
+recommendation is stored differs. The API's retry uses the worker's configured policy
+version (`CODEADAPT_POLICY_VERSION`).
+
+**Addendum, 2026-11-07: D6 messages (owner decision R10, Gate B).** The response also
+carries `retry_available`, true only while a retry would run now (a failure is pending and
+no newer attempt exists). The web card shows exactly one of:
+
+- retry valid: "We couldn't prepare your next recommended problem. You can try again, or
+  submit another solution." with a "Try again" button;
+- retry not valid (a newer attempt without adaptation output, such as one that did not
+  compile): "We couldn't prepare your next recommended problem. Your previous work is
+  saved. Submit another solution to continue." and no button.
+
+A retry sent while it is not valid still does nothing and returns the current state.
+
+**Consequences.** Monitoring needs one cron entry or uptime probe (runbook). A worker
+container needs a stop grace period longer than one job (120 s suggested); a worker killed
+anyway is recovered by the lease, as before (ADR-031).

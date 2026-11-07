@@ -190,6 +190,12 @@ class FollowupView(_Out):
 class LearnerNext(_Out):
     recommendation: RecommendationView | None
     last_followup: FollowupView | None
+    # D6 (ADR-042): adaptation failed after the learner's latest attempt. Recommendation
+    # and follow-up are then withheld, because they predate that attempt and may be stale.
+    adaptation_unavailable: bool = False
+    # R10 (owner 2026-11-07): with adaptation_unavailable, whether a retry is valid now.
+    # False once a newer attempt exists: only a new submission can then continue.
+    retry_available: bool = False
 
 
 class ResearchSubmissionRow(_Out):
