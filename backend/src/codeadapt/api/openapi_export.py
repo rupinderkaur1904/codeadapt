@@ -7,7 +7,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from codeadapt.config import Environment, Settings
+from codeadapt.config import Environment, Settings, default_content_dir
 
 
 def main() -> int:
@@ -17,9 +17,10 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as tmp:
         url = f"sqlite:///{Path(tmp) / 'openapi.sqlite3'}"
         upgrade(url)
-        base = Settings.from_env()
+        # Built with fixed test settings: the document must not depend on the caller's
+        # environment (and an unset CODEADAPT_ENV now means production, ADR-040).
         app = create_app(
-            Settings(env=Environment.TEST, database_url=url, content_dir=base.content_dir)
+            Settings(env=Environment.TEST, database_url=url, content_dir=default_content_dir())
         )
         json.dump(app.openapi(), sys.stdout, indent=2, sort_keys=True)
         sys.stdout.write("\n")

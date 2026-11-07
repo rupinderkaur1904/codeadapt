@@ -23,7 +23,12 @@ PASSWORD = "correct horse battery"  # noqa: S105 - test fixture
 
 @pytest.fixture
 def production(settings: Settings) -> Settings:
-    return replace(settings, env=Environment.PRODUCTION, submissions_per_minute=2)
+    return replace(
+        settings,
+        env=Environment.PRODUCTION,
+        submissions_per_minute=2,
+        allowed_hosts=("testserver",),
+    )
 
 
 @pytest.fixture
@@ -240,3 +245,14 @@ def test_admin_backup_copies_a_consistent_sqlite_database(
     copy.close()
     with pytest.raises(SystemExit, match="refusing"):
         admin(["backup", str(destination)])
+
+
+def test_admin_cli_refuses_a_name_that_differs_only_in_case(
+    db_url: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("CODEADAPT_DATABASE_URL", db_url)
+    monkeypatch.setattr("sys.stdin", io.StringIO(PASSWORD + "\n"))
+    assert admin(["create-user", "Alice", "--role", "student", "--data-class", "dev"]) == 0
+    monkeypatch.setattr("sys.stdin", io.StringIO(PASSWORD + "\n"))
+    with pytest.raises(SystemExit, match="names ignore case"):
+        admin(["create-user", "alice", "--role", "researcher", "--data-class", "dev"])
