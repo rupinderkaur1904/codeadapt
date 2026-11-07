@@ -137,3 +137,67 @@ def purge_dead_sessions(
         session.execute(delete(AuthSession).where(dead))
         session.commit()
     return count
+
+
+def erase_learner(session: Session, user_id: int, apply: bool) -> dict[str, int]:
+    """Every row that belongs to one account, children first (participant withdrawal,
+    docs/pilot/data-governance.md §7). Returns row counts per table.
+
+    Without ``apply`` nothing is deleted (dry run). Shared rows (content versions,
+    environments, fingerprints) are not the learner's and are kept. Aggregate results
+    already computed outside the database are not affected.
+    """
+    from sqlalchemy import delete, or_
+
+    from codeadapt.db.models import (
+        AuditEvent,
+        AuthSession,
+        DiagnosisRow,
+        ExecutionRun,
+        FollowupEvaluationRow,
+        RecommendationRow,
+        Submission,
+        TestObservation,
+        User,
+    )
+
+    user = session.get(User, user_id)
+    if user is None:
+        raise LookupError(f"no user with id {user_id}")
+    subs = select(Submission.id).where(Submission.user_id == user_id)
+    recs = select(RecommendationRow.id).where(RecommendationRow.user_id == user_id)
+    runs = select(ExecutionRun.id).where(ExecutionRun.submission_id.in_(subs))
+    plan = (
+        (
+            FollowupEvaluationRow,
+            or_(
+                FollowupEvaluationRow.recommendation_id.in_(recs),
+                FollowupEvaluationRow.submission_id.in_(subs),
+            ),
+        ),
+        (RecommendationRow, RecommendationRow.user_id == user_id),
+        (DiagnosisRow, DiagnosisRow.submission_id.in_(subs)),
+        (TestObservation, TestObservation.run_id.in_(runs)),
+        (ExecutionRun, ExecutionRun.submission_id.in_(subs)),
+        (Job, Job.submission_id.in_(subs)),
+        (Submission, Submission.user_id == user_id),
+        (AuthSession, AuthSession.user_id == user_id),
+        (
+            AuditEvent,
+            or_(
+                AuditEvent.user_id == user_id,
+                func.lower(AuditEvent.username) == func.lower(user.username),
+            ),
+        ),
+        (User, User.id == user_id),
+    )
+    counts: dict[str, int] = {}
+    for table, where in plan:
+        counts[table.__tablename__] = (
+            session.scalar(select(func.count()).select_from(table).where(where)) or 0
+        )
+        if apply:
+            session.execute(delete(table).where(where))
+    if apply:
+        session.commit()
+    return counts

@@ -428,3 +428,69 @@ def test_purge_removes_only_long_dead_sessions(
         left = set(s.scalars(select(AuthSession.token_hash)))
         assert {h.rstrip("0") for h in left} == {"live", "expired_recently"}
         assert s.scalar(select(func.count()).select_from(AuditEvent)) == 1  # untouched
+
+
+# ---------------------------------------------------------------- participant erasure
+
+
+def test_erase_learner_removes_every_derived_row_and_nothing_else(
+    db_url: str,
+    sessions: sessionmaker[Session],
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from codeadapt.db.models import (
+        AuditEvent,
+        DataClass,
+        ExecutionRun,
+        FollowupEvaluationRow,
+        ProblemVersion,
+        TestObservation,
+        User,
+    )
+
+    # Learner "u" with a diagnosed submission and a recommendation; a second learner kept.
+    job_id, _, working = _diagnosed(sessions)
+    assert _adapt(sessions, working, job_id) is None
+    with sessions() as s:
+        other = User(username="keep", role="student", data_class=DataClass.DEV.value)
+        s.add(other)
+        s.flush()
+        version = s.scalars(select(ProblemVersion.version)).first()
+        s.add(
+            Submission(
+                user_id=other.id,
+                problem_version=version,
+                source="y",
+                source_sha256="1" * 64,
+                origin="student",
+                data_class=DataClass.DEV.value,
+            )
+        )
+        from codeadapt import auth
+
+        auth.audit(s, auth.AuditKind.LOGIN, username="U", client="10.0.0.1")
+        auth.audit(s, auth.AuditKind.LOGIN, username="keep", user=other, client="10.0.0.2")
+        s.commit()
+    monkeypatch.setenv("CODEADAPT_ENV", "test")
+    monkeypatch.setenv("CODEADAPT_DATABASE_URL", db_url)
+
+    assert admin.main(["erase-learner", "U"]) == 0  # dry run, name ignores case
+    dry = json.loads(capsys.readouterr().out)
+    assert dry["applied"] is False
+    assert dry["rows"]["submissions"] == 1 and dry["rows"]["users"] == 1
+    assert _count(sessions, RecommendationRow) == 1  # nothing deleted yet
+
+    assert admin.main(["erase-learner", "u", "--apply"]) == 0
+    with sessions() as s:
+        assert s.scalar(select(User).where(User.username == "u")) is None
+        assert s.scalar(select(func.count()).select_from(Submission)) == 1  # "keep" only
+        for table in (DiagnosisRow, RecommendationRow, FollowupEvaluationRow, ExecutionRun):
+            assert s.scalar(select(func.count()).select_from(table)) == 0
+        assert s.scalar(select(func.count()).select_from(TestObservation)) == 0
+        assert s.scalar(select(func.count()).select_from(Job)) == 0
+        names = set(s.scalars(select(AuditEvent.username)))
+        assert names == {"keep", "(erased)"}  # the erased name is gone everywhere
+        assert s.scalar(select(func.count()).select_from(ProblemVersion))  # shared rows kept
+    with pytest.raises(SystemExit, match="no user"):
+        admin.main(["erase-learner", "u", "--apply"])

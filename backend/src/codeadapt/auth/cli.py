@@ -131,6 +131,13 @@ def main(argv: list[str] | None = None) -> int:
         help="schema revision, row counts and per-table SHA-256 as JSON (compare a source "
         "database with its restored copy)",
     )
+    erase = sub.add_parser(
+        "erase-learner",
+        help="delete one account and every row derived from it (participant withdrawal); "
+        "dry run unless --apply",
+    )
+    erase.add_argument("username")
+    erase.add_argument("--apply", action="store_true")
     purge = sub.add_parser(
         "purge-sessions",
         help="delete login sessions that expired or were revoked long ago (dry run unless --apply)",
@@ -160,6 +167,23 @@ def main(argv: list[str] | None = None) -> int:
     with sessions() as session:
         if args.command == "status":
             return _status(session, args)
+        if args.command == "erase-learner":
+            target = auth.find_user(session, args.username)
+            if target is None:
+                raise SystemExit(f"no user {args.username!r}")
+            counts = ops.erase_learner(session, target.id, args.apply)
+            if args.apply:
+                # A record that an erasure happened, without the erased name.
+                auth.audit(
+                    session,
+                    auth.AuditKind.ACCOUNT_ERASED,
+                    username="(erased)",
+                    client=_OPERATOR,
+                    target=f"rows={sum(counts.values())}",
+                )
+                session.commit()
+            print(json.dumps({"applied": args.apply, "rows": counts}))
+            return 0
         if args.command == "purge-sessions":
             n = ops.purge_dead_sessions(session, utcnow(), args.older_than_days, args.apply)
             done = "deleted" if args.apply else "found (dry run)"
