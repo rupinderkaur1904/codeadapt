@@ -29,6 +29,9 @@ const AttemptsPage = lazy(() =>
 const PresentationPage = lazy(() =>
   import("./presentation/PresentationPage").then((m) => ({ default: m.PresentationPage })),
 );
+const AccountPage = lazy(() =>
+  import("./pages/AccountPage").then((m) => ({ default: m.AccountPage })),
+);
 const LearnerModelPage = lazy(() =>
   import("./pages/LearnerModelPage").then((m) => ({ default: m.LearnerModelPage })),
 );
@@ -154,7 +157,7 @@ function AppShell() {
         </nav>
         {!devStub && (
           <span className="account">
-            {user.username}
+            <NavLink to="/account">{user.username}</NavLink>
             <button
               type="button"
               onClick={() => {
@@ -198,6 +201,16 @@ function AppShell() {
             <Route path="/research/learners" element={<LearnersPage />} />
             <Route path="/research/submissions/:id" element={<TracePage />} />
             <Route path="/research/learners/:username" element={<LearnerModelPage />} />
+            <Route
+              path="/account"
+              element={
+                devStub ? (
+                  <p>Password change needs a real login.</p>
+                ) : (
+                  <AccountPage username={user.username} />
+                )
+              }
+            />
             <Route path="*" element={<p>Page not found.</p>} />
           </Routes>
         </Suspense>
