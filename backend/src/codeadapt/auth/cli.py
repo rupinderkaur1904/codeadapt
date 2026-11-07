@@ -1,5 +1,5 @@
 """`codeadapt-admin`: create accounts, set passwords, disable accounts (ADR-029); back up
-a SQLite database.
+a SQLite database; report operational status (ADR-042).
 
 Passwords are read from the terminal without echo, or from stdin when it is not a
 terminal (one line). They are never accepted as command-line arguments, which other local
@@ -10,15 +10,17 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import json
 import sqlite3
 import sys
 from pathlib import Path
 
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from codeadapt import auth
+from codeadapt import auth, ops
 from codeadapt.config import Settings
-from codeadapt.db.models import DataClass, Role, User
+from codeadapt.db.models import DataClass, Role, User, utcnow
 from codeadapt.db.session import make_engine, make_session_factory
 
 _OPERATOR = "codeadapt-admin"
@@ -56,6 +58,19 @@ def _backup(database_url: str, destination: Path) -> int:
     return 0
 
 
+def _status(session: Session, args: argparse.Namespace) -> int:
+    report = ops.collect(session, utcnow(), args.window_hours)
+    problems = report.problems(
+        ops.Thresholds(
+            max_queue_age_seconds=args.max_queue_age_seconds,
+            max_failed_jobs=args.max_failed_jobs,
+            max_adaptation_failures=args.max_adaptation_failures,
+        )
+    )
+    print(json.dumps({**report.as_dict(), "ok": not problems, "problems": problems}))
+    return 1 if problems else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="codeadapt-admin", description=__doc__.split("\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -69,6 +84,17 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("list", help="list accounts")
     backup = sub.add_parser("backup", help="consistent online copy of a SQLite database")
     backup.add_argument("destination", type=Path)
+    status = sub.add_parser(
+        "status",
+        help="queue and failure counts as JSON; exit 1 when a threshold is crossed (monitoring)",
+    )
+    status.add_argument("--window-hours", type=float, default=24.0)
+    limits = ops.Thresholds()
+    status.add_argument("--max-queue-age-seconds", type=float, default=limits.max_queue_age_seconds)
+    status.add_argument("--max-failed-jobs", type=int, default=limits.max_failed_jobs)
+    status.add_argument(
+        "--max-adaptation-failures", type=int, default=limits.max_adaptation_failures
+    )
     args = parser.parse_args(argv)
 
     settings = Settings.from_env()
@@ -76,6 +102,8 @@ def main(argv: list[str] | None = None) -> int:
         return _backup(settings.database_url, args.destination)
     sessions = make_session_factory(make_engine(settings.database_url))
     with sessions() as session:
+        if args.command == "status":
+            return _status(session, args)
         if args.command == "list":
             for u in session.scalars(select(User).order_by(User.username)):
                 login = "disabled" if u.disabled else ("login" if u.password_hash else "no-login")
