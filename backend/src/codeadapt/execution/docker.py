@@ -187,6 +187,17 @@ class DockerSandbox:
                 f"`docker build -t {self.config.image} sandbox/`"
             )
 
+    async def registered_runtimes(self) -> set[str]:
+        """Container runtimes the daemon has registered (``docker info`` ``.Runtimes``)."""
+        info = await self._cli("info", "--format", "{{json .Runtimes}}")
+        if info.returncode != 0:
+            raise SandboxUnavailableError(f"docker info failed: {info.stderr.strip()}")
+        try:
+            runtimes = json.loads(info.stdout or "{}")
+        except ValueError as exc:
+            raise SandboxUnavailableError("docker info returned unreadable runtimes") from exc
+        return set(runtimes) if isinstance(runtimes, dict) else set()
+
     async def environment(self) -> EnvironmentInfo:
         if self._environment is not None:
             return self._environment

@@ -91,6 +91,19 @@ production). Logins, account changes, researcher-endpoint requests and staff vie
 users' submissions go to the append-only `audit_events` table. The dev `X-Dev-Role` stub
 is ignored outside dev/test.
 
+**Fail-closed production (ADR-040).** An unset `CODEADAPT_ENV` means production; an
+unknown value stops start-up. The dev stub therefore needs an explicit `dev` or `test`. In
+production the API also requires `CODEADAPT_ALLOWED_HOSTS` (Host allow-list), serves no
+OpenAPI document or interactive docs, and sends HSTS. In every environment API responses carry
+`nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Cache-Control: no-store`
+and `default-src 'none'` CSP, and request bodies over 1 MiB get 413. An account whose role is
+not `student`, `researcher` or `admin` is refused (403) on every endpoint. The production
+worker refuses to start unless `CODEADAPT_SANDBOX_RUNTIME` names a `runsc` runtime registered
+with Docker; every container is started with that explicit runtime, so there is no fallback to
+runc. The only exception is the logged `CODEADAPT_SANDBOX_ALLOW_RUNC=local-demo-only` of the
+local login-mode demo. `tests/unit/test_authorization_matrix.py` holds the permission/IDOR
+table; any new `/api` route that answers an anonymous caller fails it.
+
 ## 4. Limits (defaults, configurable)
 
 | Limit | Compile | Run (per test) |
