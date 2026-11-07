@@ -966,8 +966,13 @@ be stale. Now (`worker/recovery.py`):
 - `codeadapt-admin status` still counts a recovered failure as a failure, and reports
   recoveries separately.
 
+- A redelivered job that already has its diagnosis but no adaptation output (the previous
+  worker stopped between the two commits) is finished with the same marker, so the learner
+  gets the fallback and the retry instead of a silently stale card.
+
 The policy, its inputs and its outputs are unchanged; only the time at which a recovered
-recommendation is stored differs.
+recommendation is stored differs. The API's retry uses the worker's configured policy
+version (`CODEADAPT_POLICY_VERSION`).
 
 **Consequences.** Monitoring needs one cron entry or uptime probe (runbook). A worker
 container needs a stop grace period longer than one job (120 s suggested); a worker killed

@@ -6,6 +6,7 @@ printed to a cron log or an uptime checker without exposing learner data.
 
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 
@@ -149,6 +150,9 @@ def purge_dead_sessions(
     return count
 
 
+ERASED_TARGET = "(erased learner)"
+
+
 def erase_learner(session: Session, user_id: int, apply: bool) -> dict[str, int]:
     """Every row that belongs to one account, children first (participant withdrawal,
     docs/pilot/data-governance.md §7). Returns row counts per table.
@@ -202,6 +206,26 @@ def erase_learner(session: Session, user_id: int, apply: bool) -> dict[str, int]
         (User, User.id == user_id),
     )
     counts: dict[str, int] = {}
+    # Researchers' access records stay (they evidence access control), but they must not
+    # keep pointing at the withdrawn learner: their code name in a query string, or one of
+    # their submission ids in a path, is replaced (data-governance.md §7).
+    sub_ids = list(session.scalars(subs))
+    name = re.compile(rf"username={re.escape(user.username)}(?:&|$)", re.I)
+    referencing = [
+        event
+        for event in session.scalars(
+            select(AuditEvent).where(
+                AuditEvent.user_id.is_distinct_from(user_id),
+                func.lower(AuditEvent.username) != func.lower(user.username),
+            )
+        )
+        if name.search(event.target or "") or any(i in (event.target or "") for i in sub_ids)
+    ]
+    counts["audit_events_scrubbed"] = len(referencing)
+    if apply:
+        for event in referencing:
+            event.target = ERASED_TARGET
+        session.flush()
     for table, where in plan:
         counts[table.__tablename__] = (
             session.scalar(select(func.count()).select_from(table).where(where)) or 0

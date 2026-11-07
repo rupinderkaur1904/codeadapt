@@ -118,6 +118,20 @@ def test_heartbeat_task_keeps_the_file_fresh(tmp_path: Path) -> None:
     assert worker_main.check_heartbeat(beat) == 0
 
 
+def test_heartbeat_task_survives_an_unwritable_file(tmp_path: Path) -> None:
+    beat = tmp_path / "missing-dir" / "worker.heartbeat"  # the directory does not exist
+
+    async def scenario() -> bool:
+        task = asyncio.create_task(worker_main.heartbeat_file(beat, interval=0.01))
+        await asyncio.sleep(0.05)
+        alive = not task.done()
+        task.cancel()
+        return alive
+
+    assert asyncio.run(scenario())  # still running; the stale file reports it instead
+    assert worker_main.check_heartbeat(beat) == 1
+
+
 def test_check_command_needs_a_heartbeat_file(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("CODEADAPT_ENV", "test")
     monkeypatch.delenv("CODEADAPT_WORKER_HEARTBEAT_FILE", raising=False)
@@ -471,6 +485,16 @@ def test_erase_learner_removes_every_derived_row_and_nothing_else(
 
         auth.audit(s, auth.AuditKind.LOGIN, username="U", client="10.0.0.1")
         auth.audit(s, auth.AuditKind.LOGIN, username="keep", user=other, client="10.0.0.2")
+        # Researcher views of the learner: by code name, and by submission id.
+        sub_id = s.get_one(Job, job_id).submission_id
+        for target in (
+            "/api/v1/research/learner-model?username=U",
+            f"/api/v1/research/submissions/{sub_id}/trace",
+            "/api/v1/research/learner-model?username=u2",  # another code name: kept
+        ):
+            auth.audit(
+                s, auth.AuditKind.RESEARCH_ACCESS, username="res", client="10.0.0.3", target=target
+            )
         s.commit()
     monkeypatch.setenv("CODEADAPT_ENV", "test")
     monkeypatch.setenv("CODEADAPT_DATABASE_URL", db_url)
@@ -479,6 +503,7 @@ def test_erase_learner_removes_every_derived_row_and_nothing_else(
     dry = json.loads(capsys.readouterr().out)
     assert dry["applied"] is False
     assert dry["rows"]["submissions"] == 1 and dry["rows"]["users"] == 1
+    assert dry["rows"]["audit_events_scrubbed"] == 2
     assert _count(sessions, RecommendationRow) == 1  # nothing deleted yet
 
     assert admin.main(["erase-learner", "u", "--apply"]) == 0
@@ -490,7 +515,13 @@ def test_erase_learner_removes_every_derived_row_and_nothing_else(
         assert s.scalar(select(func.count()).select_from(TestObservation)) == 0
         assert s.scalar(select(func.count()).select_from(Job)) == 0
         names = set(s.scalars(select(AuditEvent.username)))
-        assert names == {"keep", "(erased)"}  # the erased name is gone everywhere
+        assert names == {"keep", "res", "(erased)"}  # the erased name is gone everywhere
+        targets = sorted(s.scalars(select(AuditEvent.target).where(AuditEvent.username == "res")))
+        assert targets == [
+            "(erased learner)",
+            "(erased learner)",
+            "/api/v1/research/learner-model?username=u2",
+        ]
         assert s.scalar(select(func.count()).select_from(ProblemVersion))  # shared rows kept
     with pytest.raises(SystemExit, match="no user"):
         admin.main(["erase-learner", "u", "--apply"])

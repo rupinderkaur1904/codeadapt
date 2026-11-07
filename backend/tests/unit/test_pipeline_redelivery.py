@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from codeadapt.content.catalogue import Catalogue
@@ -16,6 +16,7 @@ from codeadapt.db.models import (
     Job,
     JobState,
     RecommendationRow,
+    Submission,
     utcnow,
 )
 from codeadapt.diagnosis import FingerprintConsistencyV1
@@ -102,3 +103,46 @@ def test_other_method_version_does_not_count_as_done(sessions: sessionmaker[Sess
         row = s.get_one(Job, job_id)
         assert row.state == JobState.FAILED.value
         assert "sandbox." in (row.last_error or "")
+
+
+def test_redelivered_job_without_adaptation_output_is_marked_for_the_fallback(
+    sessions: sessionmaker[Session],
+) -> None:
+    # ADR-042 D6: the first worker died after the diagnosis commit and before adaptation
+    # committed. The redelivered job is DONE (diagnosis delivered, not re-run) and carries
+    # the adaptation marker, so the learner sees the fallback instead of a stale card.
+    from codeadapt.worker.pipeline import ADAPTATION_FAILED, REDELIVERED_UNCONFIRMED
+
+    (job_id,) = enqueue(sessions)
+    method = FingerprintConsistencyV1()
+    record_diagnosis(sessions, job_id, method)
+    job = claim(sessions, "w2")
+    assert job is not None
+    asyncio.run(Pipeline(NoSandbox(), sessions, Catalogue.load(DEMO_CONTENT), method).handle(job))
+    with sessions() as s:
+        row = s.get_one(Job, job_id)
+    assert row.state == JobState.DONE.value
+    assert row.last_error == ADAPTATION_FAILED + REDELIVERED_UNCONFIRMED
+
+
+def test_redelivered_job_with_adaptation_output_is_not_marked(
+    sessions: sessionmaker[Session],
+) -> None:
+    from codeadapt.adaptation import PolicyV1
+
+    (job_id,) = enqueue(sessions)
+    method = FingerprintConsistencyV1()
+    record_diagnosis(sessions, job_id, method)
+    pipeline = Pipeline(NoSandbox(), sessions, Catalogue.load(DEMO_CONTENT), method, PolicyV1())
+    with sessions() as s:  # the first worker did commit its adaptation output
+        s.execute(update(DiagnosisRow).values(outcome="no_failure_observed"))
+        s.commit()
+        sub = s.get_one(Submission, s.get_one(Job, job_id).submission_id)
+        diag = s.scalars(select(DiagnosisRow)).one()
+        assert pipeline.adapt_after_diagnosis(s, sub, diag) is None
+    job = claim(sessions, "w2")
+    assert job is not None
+    asyncio.run(pipeline.handle(job))
+    with sessions() as s:
+        row = s.get_one(Job, job_id)
+    assert row.state == JobState.DONE.value and row.last_error is None

@@ -252,6 +252,9 @@ def test_api_shows_the_fallback_then_recovers_on_retry(
     body = retried.json()
     assert body["adaptation_unavailable"] is False
     assert body["recommendation"] is not None
+    with sessions() as s:  # the API retries with the worker's configured policy version
+        newest = s.scalars(select(RecommendationRow).order_by(RecommendationRow.id.desc())).first()
+        assert newest is not None and newest.policy_version == settings.policy_version
     again = client.post("/api/v1/me/recommendation/retry", headers=dev).json()
     assert again == body
     assert _count(sessions, RecommendationRow) == 2
