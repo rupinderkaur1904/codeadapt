@@ -99,7 +99,11 @@ async def heartbeat_file(path: Path, interval: float = HEARTBEAT_INTERVAL_SECOND
     loop or a dead process lets it go stale (ADR-042).
     """
     while True:
-        await asyncio.to_thread(path.touch)
+        try:
+            await asyncio.to_thread(path.touch)
+        except OSError as exc:
+            # Keep serving jobs; the stale file makes the health check report the problem.
+            log.warning("cannot write the heartbeat file %s: %s", path, exc)
         await asyncio.sleep(interval)
 
 

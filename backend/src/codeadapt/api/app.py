@@ -115,7 +115,8 @@ def create_app(
     settings.require_api_config()  # ADR-040: refuse to start half-configured in production
     sessions = sessions or make_session_factory(make_engine(settings.database_url))
     catalogue = catalogue or Catalogue.load(settings.content_dir)
-    policy = policy or PolicyV1()  # the worker's policy, used only by a learner's D6 retry
+    # The same policy the worker runs (worker/main.py), used only by a learner's D6 retry.
+    policy = policy or PolicyV1(version=settings.policy_version)
     with sessions() as s:
         catalogue.sync(s)
 

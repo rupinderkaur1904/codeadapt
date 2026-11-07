@@ -24,8 +24,10 @@ from codeadapt.db.models import (
     Environment,
     ExecutionRun,
     FingerprintSetRow,
+    FollowupEvaluationRow,
     Job,
     JobState,
+    RecommendationRow,
     Submission,
     TestObservation,
     utcnow,
@@ -48,6 +50,10 @@ from codeadapt.worker.recovery import ADAPTATION_FAILED
 log = logging.getLogger(__name__)
 
 __all__ = ["ADAPTATION_FAILED", "ContentUnavailableError", "Pipeline"]
+
+# Recorded after ADAPTATION_FAILED when a redelivered job already had its diagnosis but no
+# adaptation output: the previous worker may have stopped before adaptation committed.
+REDELIVERED_UNCONFIRMED = "not confirmed: the worker stopped after the diagnosis (redelivered job)"
 
 
 class ContentUnavailableError(RuntimeError):
@@ -83,6 +89,12 @@ class Pipeline:
                     # submission again, which would add a second, possibly different diagnosis
                     # and a second recommendation.
                     log.info("job %s already has diagnosis %s", job.id, existing.id)
+                    if not self._has_adaptation_output(session, job.submission_id):
+                        # The worker stopped between the diagnosis and the adaptation commit.
+                        # Adaptation may never have run, so the learner's recommendation may
+                        # be stale: record it like any adaptation failure (D6), so the learner
+                        # sees the fallback and can retry.
+                        self.adaptation_errors[job.submission_id] = REDELIVERED_UNCONFIRMED
                 else:
                     await self.process(session, job.submission_id)
             except SandboxUnavailableError as exc:
@@ -126,6 +138,20 @@ class Pipeline:
                 except ContentUnavailableError:
                     results[key] = False
         return results
+
+    @staticmethod
+    def _has_adaptation_output(session: Session, submission_id: str) -> bool:
+        rec = session.scalar(
+            select(RecommendationRow.id).where(RecommendationRow.submission_id == submission_id)
+        )
+        if rec is not None:
+            return True
+        followup = session.scalar(
+            select(FollowupEvaluationRow.id).where(
+                FollowupEvaluationRow.submission_id == submission_id
+            )
+        )
+        return followup is not None
 
     def _existing_diagnosis(self, session: Session, submission_id: str) -> DiagnosisRow | None:
         """A diagnosis this worker's method version already recorded for the submission."""
