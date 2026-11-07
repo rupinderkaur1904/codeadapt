@@ -61,6 +61,25 @@ services:
     networks: [internal]
     restart: "no"
 
+  admin:
+    # One-off administration as the schema owner (owner decision R7): the API role can
+    # neither change nor delete audit rows, so erase-learner (and, for consistency,
+    # purge-sessions) run here. Never started by `up`; use
+    #   docker compose ... run --rm admin erase-learner <code-name> [--apply]
+    profiles: [admin]
+    image: codeadapt-api:${IMAGE_TAG:-local}
+    environment:
+      CODEADAPT_ENV: production
+      CODEADAPT_DATABASE_URL: postgresql+psycopg://${DB_OWNER_USER:?}:${DB_OWNER_PASSWORD:?}@db:5432/${DB_NAME:?}
+    entrypoint: ["codeadapt-admin"]
+    depends_on: { db: { condition: service_healthy } }
+    networks: [internal]
+    restart: "no"
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
   api:
     image: codeadapt-api:${IMAGE_TAG:-local}
     restart: unless-stopped
