@@ -126,6 +126,17 @@ def main(argv: list[str] | None = None) -> int:
     )
     grants.add_argument("--api-role", default="codeadapt_api")
     grants.add_argument("--worker-role", default="codeadapt_worker")
+    sub.add_parser(
+        "db-fingerprint",
+        help="schema revision, row counts and per-table SHA-256 as JSON (compare a source "
+        "database with its restored copy)",
+    )
+    purge = sub.add_parser(
+        "purge-sessions",
+        help="delete login sessions that expired or were revoked long ago (dry run unless --apply)",
+    )
+    purge.add_argument("--older-than-days", type=float, default=30.0)
+    purge.add_argument("--apply", action="store_true")
     setup = sub.add_parser(
         "db-setup",
         help="as the schema owner: create or update the API and worker login roles "
@@ -149,6 +160,14 @@ def main(argv: list[str] | None = None) -> int:
     with sessions() as session:
         if args.command == "status":
             return _status(session, args)
+        if args.command == "purge-sessions":
+            n = ops.purge_dead_sessions(session, utcnow(), args.older_than_days, args.apply)
+            done = "deleted" if args.apply else "found (dry run)"
+            print(f"purge-sessions: {n} dead session(s) {done}")
+            return 0
+        if args.command == "db-fingerprint":
+            print(json.dumps(ops.database_fingerprint(session), sort_keys=True))
+            return 0
         if args.command == "list":
             for u in session.scalars(select(User).order_by(User.username)):
                 login = "disabled" if u.disabled else ("login" if u.password_hash else "no-login")

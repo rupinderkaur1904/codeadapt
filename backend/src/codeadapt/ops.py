@@ -90,3 +90,50 @@ def collect(session: Session, now: datetime, window_hours: float = 24.0) -> Stat
         schema_revision=migrate.current_revision(session.connection()),
         expected_schema_revision=migrate.head_revision(),
     )
+
+
+def database_fingerprint(session: Session) -> dict[str, object]:
+    """Schema revision, row count and a SHA-256 of every table's rows in primary-key order.
+
+    Run against a source database and its restored copy: equal fingerprints mean the
+    restore reproduced every row (M3.5). Prints digests only, never row contents.
+    """
+    import hashlib
+    import json
+
+    from codeadapt.db.models import Base
+
+    tables: dict[str, dict[str, object]] = {}
+    for table in Base.metadata.sorted_tables:
+        order = list(table.primary_key.columns) or list(table.columns)
+        digest = hashlib.sha256()
+        count = 0
+        for row in session.execute(select(table).order_by(*order)):
+            digest.update(json.dumps(list(row), default=str, sort_keys=True).encode())
+            digest.update(b"\n")
+            count += 1
+        tables[table.name] = {"rows": count, "sha256": digest.hexdigest()}
+    return {"schema_revision": migrate.current_revision(session.connection()), "tables": tables}
+
+
+def purge_dead_sessions(
+    session: Session, now: datetime, older_than_days: float, apply: bool
+) -> int:
+    """Login sessions that expired or were revoked more than ``older_than_days`` ago.
+
+    They can never authenticate again; they only hold token hashes, CSRF values and
+    timestamps. Without ``apply`` nothing is deleted (dry run). Learner and research data
+    and the audit log are never touched; their retention is an owner decision
+    (docs/pilot/data-governance.md).
+    """
+    from sqlalchemy import delete, or_
+
+    from codeadapt.db.models import AuthSession
+
+    cutoff = now - timedelta(days=older_than_days)
+    dead = or_(AuthSession.expires_at < cutoff, AuthSession.revoked_at < cutoff)
+    count = session.scalar(select(func.count()).select_from(AuthSession).where(dead)) or 0
+    if apply and count:
+        session.execute(delete(AuthSession).where(dead))
+        session.commit()
+    return count

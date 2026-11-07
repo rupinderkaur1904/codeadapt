@@ -389,3 +389,42 @@ def test_status_command_prints_counts_only_and_signals_problems(
     assert json.loads(out)["failed_in_window"] == 1
     assert "secret detail" not in out
     assert admin.main(["status", "--max-failed-jobs", "1"]) == 0
+
+
+def test_purge_removes_only_long_dead_sessions(
+    sessions: sessionmaker[Session],
+) -> None:
+    from codeadapt import auth
+    from codeadapt.db.models import AuditEvent, AuthSession, User
+
+    now = utcnow()
+    with sessions() as s:
+        user = User(username="p", role="student", data_class="synthetic")
+        s.add(user)
+        s.flush()
+        rows: dict[str, dict[str, Any]] = {
+            "live": {"expires_at": now + timedelta(hours=1), "revoked_at": None},
+            "expired_recently": {"expires_at": now - timedelta(days=1), "revoked_at": None},
+            "expired_long_ago": {"expires_at": now - timedelta(days=60), "revoked_at": None},
+            "revoked_long_ago": {
+                "expires_at": now + timedelta(hours=1),
+                "revoked_at": now - timedelta(days=45),
+            },
+        }
+        for name, times in rows.items():
+            s.add(
+                AuthSession(
+                    token_hash=name.ljust(64, "0"),
+                    user_id=user.id,
+                    csrf_token="c",  # noqa: S106 - fixture
+                    **times,
+                )
+            )
+        auth.audit(s, auth.AuditKind.LOGIN, username="p", user=user, client="t")
+        s.commit()
+        assert ops.purge_dead_sessions(s, now, 30, apply=False) == 2  # dry run
+        assert s.scalar(select(func.count()).select_from(AuthSession)) == 4
+        assert ops.purge_dead_sessions(s, now, 30, apply=True) == 2
+        left = set(s.scalars(select(AuthSession.token_hash)))
+        assert {h.rstrip("0") for h in left} == {"live", "expired_recently"}
+        assert s.scalar(select(func.count()).select_from(AuditEvent)) == 1  # untouched
