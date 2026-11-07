@@ -5,9 +5,13 @@ import { api } from "../api/client";
 
 export const RECOMMENDATION_KEY = ["recommendation"] as const;
 
-/** Shown when adaptation failed after the latest attempt (D6, owner decision 2026-11-07). */
+/** Shown when adaptation failed after the latest attempt and a retry is valid (D6, R10). */
 export const ADAPTATION_FALLBACK =
-  "We couldn't prepare your next recommended problem right now. Please try again in a moment.";
+  "We couldn't prepare your next recommended problem. You can try again, or submit another solution.";
+
+/** Shown when adaptation failed and only a new submission can continue (D6, R10). */
+export const ADAPTATION_FALLBACK_NO_RETRY =
+  "We couldn't prepare your next recommended problem. Your previous work is saved. Submit another solution to continue.";
 
 /** "Recommended next" from the adaptive policy, plus the verdict on the last follow-up. */
 export function RecommendationCard({ currentSlug }: { currentSlug?: string }) {
@@ -19,13 +23,17 @@ export function RecommendationCard({ currentSlug }: { currentSlug?: string }) {
   });
   if (!next.data) return null;
   if (next.data.adaptation_unavailable) {
-    // Never show a recommendation or verdict made before the latest attempt.
+    // Never show a recommendation or verdict made before the latest attempt. Offer
+    // "Try again" only while the server says a retry is valid now (owner decision R10).
+    const canRetry = next.data.retry_available;
     return (
       <aside className="recommendation" aria-label="Recommended next">
-        <p role="status">{ADAPTATION_FALLBACK}</p>
-        <button type="button" onClick={() => retry.mutate()} disabled={retry.isPending}>
-          {retry.isPending ? "Trying again…" : "Try again"}
-        </button>
+        <p role="status">{canRetry ? ADAPTATION_FALLBACK : ADAPTATION_FALLBACK_NO_RETRY}</p>
+        {canRetry && (
+          <button type="button" onClick={() => retry.mutate()} disabled={retry.isPending}>
+            {retry.isPending ? "Trying again…" : "Try again"}
+          </button>
+        )}
       </aside>
     );
   }

@@ -183,6 +183,7 @@ def test_recommendation_retry_needs_login_and_csrf(
         "recommendation": None,
         "last_followup": None,
         "adaptation_unavailable": False,
+        "retry_available": False,
     }
     assert (
         clients["unknown_role"].post(url, headers={CSRF_HEADER: csrf["unknown_role"]}).status_code

@@ -950,9 +950,8 @@ be stale. Now (`worker/recovery.py`):
 
 - `GET /api/v1/me/recommendation` returns `adaptation_unavailable: true` with no
   recommendation and no follow-up verdict whenever a failure is newer than the submission
-  behind the latest recommendation. The web card shows the neutral message "We couldn't
-  prepare your next recommended problem right now. Please try again in a moment." and a
-  "Try again" button. Submissions, diagnoses and feedback are never touched.
+  behind the latest recommendation. Submissions, diagnoses and feedback are never touched.
+  The web card's text was changed by the owner at Gate B (R10, below).
 - `POST /api/v1/me/recommendation/retry` (login and CSRF required, own attempts only) runs
   the unchanged, research-frozen `adapt` on the same submission and diagnosis. It runs only
   while that submission is the learner's newest one, so the policy sees exactly the attempt
@@ -973,6 +972,18 @@ be stale. Now (`worker/recovery.py`):
 The policy, its inputs and its outputs are unchanged; only the time at which a recovered
 recommendation is stored differs. The API's retry uses the worker's configured policy
 version (`CODEADAPT_POLICY_VERSION`).
+
+**Addendum, 2026-11-07: D6 messages (owner decision R10, Gate B).** The response also
+carries `retry_available`, true only while a retry would run now (a failure is pending and
+no newer attempt exists). The web card shows exactly one of:
+
+- retry valid: "We couldn't prepare your next recommended problem. You can try again, or
+  submit another solution." with a "Try again" button;
+- retry not valid (a newer attempt without adaptation output, such as one that did not
+  compile): "We couldn't prepare your next recommended problem. Your previous work is
+  saved. Submit another solution to continue." and no button.
+
+A retry sent while it is not valid still does nothing and returns the current state.
 
 **Consequences.** Monitoring needs one cron entry or uptime probe (runbook). A worker
 container needs a stop grace period longer than one job (120 s suggested); a worker killed
