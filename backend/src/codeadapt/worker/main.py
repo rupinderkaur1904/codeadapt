@@ -13,6 +13,7 @@ import sys
 import time
 from pathlib import Path
 
+from sqlalchemy import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
 from codeadapt import logs
@@ -85,6 +86,32 @@ async def require_production_runtime(settings: Settings, sandbox: DockerSandbox)
         raise SandboxUnavailableError(
             f"container runtime {runtime!r} is not registered with the Docker daemon; "
             "install gVisor (runsc install) and restart Docker"
+        )
+
+
+def require_database_tls(settings: Settings) -> None:
+    """R5 (owner decision, Gate B): in production the worker reaches PostgreSQL only over
+    TLS that verifies the server's certificate against the private CA and its host name.
+
+    The worker runs on the runner VM, so its database traffic crosses the network between
+    the two VMs. It refuses to start unless the database URL sets ``sslmode=verify-full``
+    and an ``sslrootcert`` file that exists. SQLite (the local demo) is not affected.
+    """
+    if settings.env is not Environment.PRODUCTION:
+        return
+    url = make_url(settings.database_url)
+    if not url.drivername.startswith("postgresql"):
+        return
+    mode, root = url.query.get("sslmode"), url.query.get("sslrootcert")
+    if mode != "verify-full":
+        raise ConfigError(
+            "production requires sslmode=verify-full in CODEADAPT_DATABASE_URL: the worker "
+            "does not send learner data to PostgreSQL without verified TLS"
+        )
+    if not isinstance(root, str) or not Path(root).is_file():
+        raise ConfigError(
+            "production requires sslrootcert=<CA certificate file> in CODEADAPT_DATABASE_URL, "
+            "and the file must exist (deploy/db-tls/make-db-certs.sh)"
         )
 
 
@@ -170,6 +197,7 @@ def _install_stop_handlers(stop: asyncio.Event) -> None:
 
 
 async def run(settings: Settings, *, once: bool = False, warm_up: bool = False) -> int:
+    require_database_tls(settings)
     sessions = make_session_factory(make_engine(settings.database_url))
     sandbox = DockerSandbox(DockerSandboxConfig.from_env())
     await sandbox.check_available()
