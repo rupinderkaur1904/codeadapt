@@ -103,12 +103,9 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(entry, default=str)
 
 
-def configure(production: bool) -> None:
-    """Install one handler on the root logger, once. `CODEADAPT_LOG_FORMAT` (json|text)
-    overrides the default (json in production, text otherwise)."""
-    root = logging.getLogger()
-    if any(getattr(h, "_codeadapt", False) for h in root.handlers):
-        return
+def make_handler(production: bool) -> logging.Handler:
+    """The one redacting stderr handler. `CODEADAPT_LOG_FORMAT` (json|text) overrides the
+    default (json in production, text otherwise)."""
     fmt = os.environ.get("CODEADAPT_LOG_FORMAT") or ("json" if production else "text")
     handler = logging.StreamHandler()
     handler._codeadapt = True  # type: ignore[attr-defined]
@@ -119,5 +116,25 @@ def configure(production: bool) -> None:
             else logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
         )
     )
-    root.addHandler(handler)
+    return handler
+
+
+def uvicorn_handler() -> logging.Handler:
+    """Factory for `uvicorn_logging.json` (R8): uvicorn's own loggers go through the same
+    redacting handler as the application. Production unless `CODEADAPT_ENV` says otherwise,
+    as in `config.py` (ADR-040)."""
+    return make_handler(os.environ.get("CODEADAPT_ENV", "production") == "production")
+
+
+# Passed to uvicorn with `--log-config` in the API image (deploy/backend.Dockerfile).
+UVICORN_LOG_CONFIG = os.path.join(os.path.dirname(__file__), "uvicorn_logging.json")
+
+
+def configure(production: bool) -> None:
+    """Install one redacting handler on the root logger, once. Under uvicorn started with
+    `UVICORN_LOG_CONFIG` the handler is already there, and this does nothing."""
+    root = logging.getLogger()
+    if any(getattr(h, "_codeadapt", False) for h in root.handlers):
+        return
+    root.addHandler(make_handler(production))
     root.setLevel(os.environ.get("CODEADAPT_LOG_LEVEL", "INFO").upper())

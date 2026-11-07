@@ -33,8 +33,9 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
 # --proxy-headers with --forwarded-allow-ips naming ONLY the reverse proxy (never '*'),
 # so the login throttle sees real clients (deployment.md §7). --no-access-log: the app
 # logs requests itself without query strings or client addresses (ADR-042).
+# --log-config: uvicorn's own loggers go through the app's redacting handler (R8).
 ENV FORWARDED_ALLOW_IPS=127.0.0.1
-CMD ["sh", "-c", "exec uvicorn codeadapt.api.app:create_app --factory --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips \"$FORWARDED_ALLOW_IPS\" --no-access-log"]
+CMD ["sh", "-c", "exec uvicorn codeadapt.api.app:create_app --factory --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips \"$FORWARDED_ALLOW_IPS\" --no-access-log --log-config /app/backend/src/codeadapt/uvicorn_logging.json"]
 
 # ---------------------------------------------------------------- worker: Docker CLI
 FROM base AS worker
