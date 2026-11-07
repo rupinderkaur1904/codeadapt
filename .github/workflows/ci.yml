@@ -380,6 +380,8 @@ jobs:
           q "SET ROLE codeadapt_worker; SELECT count(*) FROM jobs"
           if q "SET ROLE codeadapt_worker; SELECT count(*) FROM users"; then exit 1; fi
           if q "SET ROLE codeadapt_api; CREATE TABLE intruder (x int)"; then exit 1; fi
+      - name: Build sandbox image (so the worker gets past the image check to the gVisor check)
+        run: docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
       - name: Production worker refuses to start without gVisor (runner has runc only)
         run: |
           {
@@ -396,7 +398,7 @@ jobs:
           set -e
           echo "$out" | tail -5
           test "$code" -ne 0
-          echo "$out" | grep -q "runsc"
+          echo "$out" | grep -q "runtime 'runsc' is not registered"
       - name: Logs on failure
         if: failure()
         run: docker compose -f deploy/compose.app.yaml --env-file "$APP_ENV" logs --no-color
