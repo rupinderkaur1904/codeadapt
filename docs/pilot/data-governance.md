@@ -118,9 +118,9 @@ The points needing review:
 
 | Data | Retention | How |
 | --- | --- | --- |
-| Login sessions | deleted 30 days after expiry or revocation | `codeadapt-admin purge-sessions --older-than-days 30 --apply`, monthly |
+| Login sessions | deleted 30 days after expiry or revocation | `admin run --rm admin purge-sessions --older-than-days 30 --apply` (owner connection, runbook §4b), monthly |
 | Application logs | 30 days | logging driver rotation (`max-size`/`max-file`), or the host's journald retention |
-| Audit events | until the pilot data is deleted (they evidence access control) | deleted with the account (§7) |
+| Audit events | until the pilot data is deleted (they evidence access control) | deleted with the account (§7). The API's database role can add audit rows but cannot change or delete them (R7) |
 | Pilot research data (submissions, runs, diagnoses, recommendations) | until analysis ends, at most **12 months** after the last session, unless the ethics review sets otherwise | then deleted, or irreversibly anonymised by removing usernames, IP addresses and free text; **[REVIEW]** whether source code can ever count as anonymous |
 | Backups | rolling 30 days during the pilot; all deleted when the research data is deleted | `BACKUP_RETENTION_DAYS=30`; off-host copies deleted by hand |
 | Code-to-person key and consent forms | as the ethics review requires; the key is destroyed when the data is deleted or anonymised | owner, offline |
@@ -131,8 +131,9 @@ The points needing review:
   telling the owner (§8). Their account is disabled at once
   (`codeadapt-admin disable`).
 - **Erasure:** their data is deleted from the database within 14 days with
-  `codeadapt-admin erase-learner <code> --apply`. Run it first without `--apply` to see
-  what will go. Backups age out within the backup retention period.
+  `admin run --rm admin erase-learner <code> --apply` (as the schema owner, runbook §4b;
+  the API's own database role cannot change or delete audit rows). Run it first without
+  `--apply` to see what will go. Backups age out within the backup retention period.
   - The command deletes the account, its sessions, its submissions and everything derived
     from them (runs, outputs, diagnoses, recommendations, follow-ups), and every audit row
     carrying its name.
