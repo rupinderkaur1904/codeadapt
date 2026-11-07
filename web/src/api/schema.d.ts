@@ -83,7 +83,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Health */
+        /**
+         * Health
+         * @description Liveness: the process answers. Touches nothing else.
+         */
         get: operations["health_api_v1_health_get"];
         put?: never;
         post?: never;
@@ -107,6 +110,30 @@ export interface paths {
         get: operations["my_recommendation_api_v1_me_recommendation_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/recommendation/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retry My Recommendation
+         * @description Retry the adaptation step that failed after the user's latest attempt (D6).
+         *
+         *     Idempotent: it does nothing when there is no pending failure, when a newer attempt
+         *     exists, or when another retry already claimed it. The answer is always the current
+         *     state, so a failed retry still shows the neutral fallback message.
+         */
+        post: operations["retry_my_recommendation_api_v1_me_recommendation_retry_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -139,6 +166,28 @@ export interface paths {
         };
         /** Get Problem */
         get: operations["get_problem_api_v1_problems__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ready
+         * @description Readiness (ADR-042): the database answers and its schema is at this code's
+         *     migration head. Public, like health, so a load balancer can call it; the answer
+         *     names no host, revision or error.
+         */
+        get: operations["ready_api_v1_ready_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -407,8 +456,18 @@ export interface components {
         };
         /** LearnerNext */
         LearnerNext: {
+            /**
+             * Adaptation Unavailable
+             * @default false
+             */
+            adaptation_unavailable: boolean;
             last_followup: components["schemas"]["FollowupView"] | null;
             recommendation: components["schemas"]["RecommendationView"] | null;
+            /**
+             * Retry Available
+             * @default false
+             */
+            retry_available: boolean;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -957,6 +1016,37 @@ export interface operations {
             };
         };
     };
+    retry_my_recommendation_api_v1_me_recommendation_retry_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-dev-role"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearnerNext"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_problems_api_v1_problems_get: {
         parameters: {
             query?: never;
@@ -1018,6 +1108,33 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    ready_api_v1_ready_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ready */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Not ready */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -1,0 +1,36 @@
+# Runner VM (Option C): the worker only, with Docker + gVisor on this host. The Docker
+# socket is root-equivalent: this VM holds nothing but the worker's database password
+# (docs/deployment/milestone-3-architecture.md §4). Run from the repository root:
+#
+#   cp deploy/runner.env.example deploy/runner.env   # fill in; never commit runner.env
+#   docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/
+#   docker compose -f deploy/compose.runner.yaml --env-file deploy/runner.env up -d --build
+#
+# The worker refuses to start unless Docker has a registered runsc runtime (ADR-040).
+name: codeadapt-runner
+
+services:
+  worker:
+    build: { context: .., dockerfile: deploy/backend.Dockerfile, target: worker }
+    image: codeadapt-worker:${IMAGE_TAG:-local}
+    restart: unless-stopped
+    environment:
+      CODEADAPT_ENV: production
+      # R5: TLS to the App VM's database, verifying its certificate against the private CA
+      # and its name (DB_TLS_NAME, mapped to the App VM's private address below).
+      CODEADAPT_DATABASE_URL: postgresql+psycopg://${WORKER_DB_USER:?}:${WORKER_DB_PASSWORD:?}@${DB_TLS_NAME:?}:5432/${DB_NAME:?}?sslmode=verify-full&sslrootcert=/etc/codeadapt/db-ca.crt
+      CODEADAPT_SANDBOX_RUNTIME: runsc
+      CODEADAPT_SANDBOX_MAX_CONCURRENCY: ${SANDBOX_MAX_CONCURRENCY:-2}
+    extra_hosts: ["${DB_TLS_NAME:?}:${DB_HOST:?}"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DB_CA_FILE:?}:/etc/codeadapt/db-ca.crt:ro
+    # The socket's group on this host (stat -c %g /var/run/docker.sock).
+    group_add: ["${DOCKER_SOCKET_GID:?}"]
+    # Finish the current job on `docker compose stop` (ADR-042); a killed worker's job is
+    # picked up again when its lease expires (ADR-031).
+    stop_grace_period: 120s
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]

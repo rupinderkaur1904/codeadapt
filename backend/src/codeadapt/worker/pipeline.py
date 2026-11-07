@@ -24,8 +24,10 @@ from codeadapt.db.models import (
     Environment,
     ExecutionRun,
     FingerprintSetRow,
+    FollowupEvaluationRow,
     Job,
     JobState,
+    RecommendationRow,
     Submission,
     TestObservation,
     utcnow,
@@ -41,9 +43,17 @@ from codeadapt.execution.models import (
     EnvironmentInfo,
     RunResult,
 )
+from codeadapt.logs import redact
 from codeadapt.worker.adapt import adapt
+from codeadapt.worker.recovery import ADAPTATION_FAILED
 
 log = logging.getLogger(__name__)
+
+__all__ = ["ADAPTATION_FAILED", "ContentUnavailableError", "Pipeline"]
+
+# Recorded after ADAPTATION_FAILED when a redelivered job already had its diagnosis but no
+# adaptation output: the previous worker may have stopped before adaptation committed.
+REDELIVERED_UNCONFIRMED = "not confirmed: the worker stopped after the diagnosis (redelivered job)"
 
 
 class ContentUnavailableError(RuntimeError):
@@ -65,6 +75,8 @@ class Pipeline:
         self.method = method
         self.policy = policy or PolicyV1()
         self._fingerprint_lock = asyncio.Lock()
+        # submission id -> why adaptation failed after its diagnosis was committed
+        self.adaptation_errors: dict[str, str] = {}
 
     # ------------------------------------------------------------------ job handling
     async def handle(self, job: Job) -> None:
@@ -77,24 +89,69 @@ class Pipeline:
                     # submission again, which would add a second, possibly different diagnosis
                     # and a second recommendation.
                     log.info("job %s already has diagnosis %s", job.id, existing.id)
+                    if not self._has_adaptation_output(session, job.submission_id):
+                        # The worker stopped between the diagnosis and the adaptation commit.
+                        # Adaptation may never have run, so the learner's recommendation may
+                        # be stale: record it like any adaptation failure (D6), so the learner
+                        # sees the fallback and can retry.
+                        self.adaptation_errors[job.submission_id] = REDELIVERED_UNCONFIRMED
                 else:
                     await self.process(session, job.submission_id)
             except SandboxUnavailableError as exc:
+                self.adaptation_errors.pop(job.submission_id, None)
                 log.warning("sandbox unavailable; requeueing job %s: %s", job.id, exc)
                 session.rollback()
-                if not queue.requeue(session, job, f"sandbox unavailable: {exc}"):
+                if not queue.requeue(session, job, f"sandbox unavailable: {_error_text(exc)}"):
                     log.warning("job %s was reclaimed by another worker", job.id)
                 return
             except Exception as exc:
+                self.adaptation_errors.pop(job.submission_id, None)
                 log.exception("job %s failed", job.id)
                 session.rollback()
                 if not queue.finish(
-                    session, job, state=JobState.FAILED, error=f"{type(exc).__name__}: {exc}"
+                    session, job, state=JobState.FAILED, error=_error_text(exc, with_type=True)
                 ):
                     log.warning("job %s was reclaimed by another worker", job.id)
                 return
-            if not queue.finish(session, job, state=JobState.DONE):
+            adaptation_error = self.adaptation_errors.pop(job.submission_id, None)
+            marker = (
+                f"{ADAPTATION_FAILED}{adaptation_error}" if adaptation_error is not None else None
+            )
+            # DONE: the diagnosis is recorded; the marker says no recommendation was made.
+            if not queue.finish(session, job, state=JobState.DONE, error=marker):
                 log.warning("job %s was reclaimed by another worker", job.id)
+
+    async def warm_up(self) -> dict[str, bool]:
+        """Measure and store the fingerprints of every catalogue version in this environment.
+
+        Uses the same cached path as the first submission to a problem, so a class session
+        does not wait 1-2 minutes per problem (audit D7). Returns slug@version -> valid.
+        """
+        results: dict[str, bool] = {}
+        with self.sessions() as session:
+            environment = self._environment(session, await self.sandbox.environment())
+            for problem in self.catalogue.problems:
+                key = f"{problem.spec.slug}@{problem.version[:12]}"
+                try:
+                    await self._fingerprints(session, problem, environment)
+                    results[key] = True
+                except ContentUnavailableError:
+                    results[key] = False
+        return results
+
+    @staticmethod
+    def _has_adaptation_output(session: Session, submission_id: str) -> bool:
+        rec = session.scalar(
+            select(RecommendationRow.id).where(RecommendationRow.submission_id == submission_id)
+        )
+        if rec is not None:
+            return True
+        followup = session.scalar(
+            select(FollowupEvaluationRow.id).where(
+                FollowupEvaluationRow.submission_id == submission_id
+            )
+        )
+        return followup is not None
 
     def _existing_diagnosis(self, session: Session, submission_id: str) -> DiagnosisRow | None:
         """A diagnosis this worker's method version already recorded for the submission."""
@@ -187,14 +244,32 @@ class Pipeline:
         )
         session.add(row)
         session.commit()
-        # Adaptation runs on committed evidence; a failure here must not lose the diagnosis.
+        error = self.adapt_after_diagnosis(session, submission, row)
+        if error is not None:
+            self.adaptation_errors[submission.id] = error
+        return row
+
+    def adapt_after_diagnosis(
+        self, session: Session, submission: Submission, row: DiagnosisRow
+    ) -> str | None:
+        """Run the adaptive policy on the committed diagnosis.
+
+        A failure here must not lose the diagnosis: it is rolled back alone and returned as
+        text, which `handle` records on the job (ADR-042, audit D6). Nothing about what is
+        diagnosed or recommended changes; the failure only stops being silent.
+        """
         try:
             adapt(session, submission, row, self.catalogue, self.policy)
             session.commit()
-        except Exception:
-            log.exception("adaptation failed for submission %s", submission.id)
+        except Exception as exc:
+            log.exception(
+                "adaptation failed for submission %s",
+                submission.id,
+                extra={"event": "adaptation_failed", "submission_id": submission.id},
+            )
             session.rollback()
-        return row
+            return _error_text(exc, with_type=True)
+        return None
 
     # ------------------------------------------------------------------ provenance
     @staticmethod
@@ -264,6 +339,15 @@ class Pipeline:
                 f"{row.report.get('errors')}"
             )
         return FingerprintSet.model_validate(row.data), row
+
+
+MAX_ERROR_CHARS = 2000
+
+
+def _error_text(exc: BaseException, *, with_type: bool = False) -> str:
+    """An exception as stored in `jobs.last_error`: redacted and bounded (ADR-042)."""
+    text = f"{type(exc).__name__}: {exc}" if with_type else str(exc)
+    return redact(text)[:MAX_ERROR_CHARS]
 
 
 def _predictions(fps: FingerprintSet, model: str | None) -> dict[str, Signature]:

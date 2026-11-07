@@ -113,6 +113,8 @@ export const api = {
   /** The current user's most recent submissions across every problem (the API caps it at 50). */
   listAllSubmissions: () => request<SubmissionView[]>("/submissions?limit=50"),
   myRecommendation: () => request<LearnerNext>("/me/recommendation"),
+  /** Retry the adaptation step that failed after the latest attempt (D6); idempotent. */
+  retryRecommendation: () => request<LearnerNext>("/me/recommendation/retry", { method: "POST" }),
   researchSubmissions: (filters: ResearchFilters, offset = 0, limit = RESEARCH_PAGE_SIZE) =>
     request<ResearchSubmissionRow[]>(
       `/research/submissions${query({
