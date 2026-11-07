@@ -40,6 +40,7 @@ class AuditKind:
     PASSWORD_CHANGED = "password_changed"  # noqa: S105 - self-service change (ADR-041)
     PASSWORD_CHANGE_FAILED = "password_change_failed"  # noqa: S105 - wrong current password
     ACCOUNT_DISABLED = "account_disabled"
+    ACCOUNT_ERASED = "account_erased"  # participant withdrawal; the name is not kept
 
 
 def hash_password(password: str) -> str:
