@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import getpass
 import json
+import os
 import sqlite3
 import sys
 from pathlib import Path
@@ -20,10 +21,12 @@ from sqlalchemy.orm import Session
 
 from codeadapt import auth, ops
 from codeadapt.config import Settings
+from codeadapt.db import roles
 from codeadapt.db.models import DataClass, Role, User, utcnow
 from codeadapt.db.session import make_engine, make_session_factory
 
 _OPERATOR = "codeadapt-admin"
+MIN_DB_PASSWORD_CHARS = 16
 
 
 def _read_password() -> str:
@@ -55,6 +58,28 @@ def _backup(database_url: str, destination: Path) -> int:
     if check != "ok":
         raise SystemExit(f"backup failed its integrity check: {check}")
     print(f"backup: {destination} (schema revision {revision}, integrity ok)")
+    return 0
+
+
+def _db_setup(database_url: str, api_role: str, worker_role: str) -> int:
+    if not database_url.startswith("postgresql"):
+        raise SystemExit("db-setup is for PostgreSQL deployments")
+    if "CHANGE_ME" in database_url:
+        raise SystemExit("the owner database password is still the example placeholder")
+    passwords = {}
+    for role, variable in (
+        (api_role, "CODEADAPT_API_DB_PASSWORD"),
+        (worker_role, "CODEADAPT_WORKER_DB_PASSWORD"),
+    ):
+        value = os.environ.get(variable, "")
+        if len(value) < MIN_DB_PASSWORD_CHARS or value.startswith("CHANGE_ME"):
+            raise SystemExit(f"{variable} must be set to a generated password")
+        passwords[role] = value
+    engine = make_engine(database_url)
+    with engine.begin() as connection:
+        roles.setup_roles(connection, passwords, api_role, worker_role)
+    engine.dispose()
+    print(f"db-setup: roles {api_role}, {worker_role} ready; grants applied")
     return 0
 
 
@@ -95,9 +120,29 @@ def main(argv: list[str] | None = None) -> int:
     status.add_argument(
         "--max-adaptation-failures", type=int, default=limits.max_adaptation_failures
     )
+    grants = sub.add_parser(
+        "db-grants",
+        help="print least-privilege PostgreSQL grants for the API and worker roles (psql)",
+    )
+    grants.add_argument("--api-role", default="codeadapt_api")
+    grants.add_argument("--worker-role", default="codeadapt_worker")
+    setup = sub.add_parser(
+        "db-setup",
+        help="as the schema owner: create or update the API and worker login roles "
+        "(passwords from CODEADAPT_API_DB_PASSWORD and CODEADAPT_WORKER_DB_PASSWORD) and "
+        "apply the grants",
+    )
+    setup.add_argument("--api-role", default="codeadapt_api")
+    setup.add_argument("--worker-role", default="codeadapt_worker")
     args = parser.parse_args(argv)
+    if args.command == "db-grants":  # needs no database connection
+        for statement in roles.grant_statements(args.api_role, args.worker_role):
+            print(f"{statement};")
+        return 0
 
     settings = Settings.from_env()
+    if args.command == "db-setup":
+        return _db_setup(settings.database_url, args.api_role, args.worker_role)
     if args.command == "backup":
         return _backup(settings.database_url, args.destination)
     sessions = make_session_factory(make_engine(settings.database_url))

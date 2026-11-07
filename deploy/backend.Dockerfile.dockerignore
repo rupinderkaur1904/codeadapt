@@ -1,0 +1,10 @@
+# Build context is the repository root; send only what the backend images need.
+*
+!backend/pyproject.toml
+!backend/uv.lock
+!backend/alembic.ini
+!backend/migrations
+!backend/src
+!content
+**/__pycache__
+**/*.pyc
