@@ -17,6 +17,28 @@ Conventions:
 - [ ] `sha256sum -c --quiet docs/reviews/milestone-3/research-freeze.sha256` is silent on
       that tag, or any change has an approved ADR.
 
+## 0a. Pinned base images (R6)
+
+Every image pulled from a registry is pinned to an immutable SHA-256 digest (owner
+decision R6, Gate B). The tag stays next to the digest for readability, but Docker uses
+only the digest, so a re-pushed tag cannot change a build. Each digest is a multi-platform
+index: it covers both x86-64 (the runner) and Arm64 (an Arm app VM). The test
+`tests/unit/test_deploy_files.py` fails if an image is unpinned or missing from this table.
+
+| Image | Used in | Pinned reference | Recorded |
+| --- | --- | --- | --- |
+| Python | API and worker images | `python:3.13-slim@sha256:09a17cad02668ae61ece136b4fd36ac3849e14f670ebedb637ea3e15580525bc` | 2026-11-07 |
+| Docker CLI | worker image | `docker:29-cli@sha256:2357639ad1ea7d0194134bf3292622fd4e562483966ed674e5d7c945b5f3b28d` | 2026-11-07 |
+| Node | web build stage | `node:22-alpine@sha256:0e1754758c2df4cfa3e68d59e2e1b7374bb7fd9ea6328eaaacf15cc934af8202` | 2026-11-07 |
+| Caddy | reverse proxy image | `caddy:2.8.4-alpine@sha256:af32e97399febea808609119bb21544d0265c58a02836576e32a2d082c262c17` | 2026-11-07 |
+| PostgreSQL | database (app Compose file) | `postgres:16.4-alpine@sha256:5660c2cbfea50c7a9127d17dc4e48543eedd3d7a41a595a2dfa572471e37e64c` | 2026-11-07 |
+| GCC | sandbox image (research-frozen, pinned since Milestone 1) | `gcc:14.2.0@sha256:b99b86a28812b1e6453a231a947dc43d76fe192788a12f344a9b568bf9f5d24c` | earlier |
+
+**Updating a pin** (for security fixes): look up the new digest
+(`docker buildx imagetools inspect <image>:<tag>`), change the file and this table in one
+pull request, and let CI rebuild the production images. Never change the GCC pin: it is
+part of the research freeze.
+
 ## 1. App VM
 
 1. A Linux VM with automatic security updates turned on. Allow SSH only by key, from the
