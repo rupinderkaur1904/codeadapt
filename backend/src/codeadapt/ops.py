@@ -9,13 +9,13 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from codeadapt.db import migrate
 from codeadapt.db.models import Job, JobState
 from codeadapt.db.session import as_utc
-from codeadapt.worker.pipeline import ADAPTATION_FAILED
+from codeadapt.worker.recovery import ADAPTATION_FAILED, ADAPTATION_RECOVERED
 
 
 @dataclass(frozen=True)
@@ -34,6 +34,7 @@ class Status:
     oldest_queued_seconds: float | None
     failed_in_window: int
     adaptation_failures_in_window: int
+    adaptation_recovered_in_window: int
     done_in_window: int
     schema_revision: str | None
     expected_schema_revision: str | None
@@ -84,7 +85,16 @@ def collect(session: Session, now: datetime, window_hours: float = 24.0) -> Stat
         adaptation_failures_in_window=count(
             Job.state == JobState.DONE,
             Job.updated_at >= since,
-            Job.last_error.like(ADAPTATION_FAILED + "%"),
+            # A failure a learner's retry later recovered still happened: count it.
+            or_(
+                Job.last_error.like(ADAPTATION_FAILED + "%"),
+                Job.last_error.like(ADAPTATION_RECOVERED + "%"),
+            ),
+        ),
+        adaptation_recovered_in_window=count(
+            Job.state == JobState.DONE,
+            Job.updated_at >= since,
+            Job.last_error.like(ADAPTATION_RECOVERED + "%"),
         ),
         done_in_window=count(Job.state == JobState.DONE, Job.updated_at >= since),
         schema_revision=migrate.current_revision(session.connection()),

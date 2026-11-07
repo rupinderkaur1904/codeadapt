@@ -942,11 +942,32 @@ failure was silent (F06, audit D6).
    alert on it.
 
 **Not changed.** Diagnosis, evidence, fingerprints, policy, learner model, content and
-evaluation (checked against the Milestone 3 research-freeze manifest). What the learner sees
-after an adaptation failure is unchanged: the latest stored recommendation, which may
-belong to an earlier submission. Hiding it, or re-running adaptation later (which would see
-a different attempt history), changes learner-facing behaviour and waits for an owner
-decision.
+evaluation (checked against the Milestone 3 research-freeze manifest).
+
+**Addendum, 2026-11-07: learner-facing D6 (owner decision).** After an adaptation failure the
+learner's latest stored recommendation predates an attempt the policy never saw, so it may
+be stale. Now (`worker/recovery.py`):
+
+- `GET /api/v1/me/recommendation` returns `adaptation_unavailable: true` with no
+  recommendation and no follow-up verdict whenever a failure is newer than the submission
+  behind the latest recommendation. The web card shows the neutral message "We couldn't
+  prepare your next recommended problem right now. Please try again in a moment." and a
+  "Try again" button. Submissions, diagnoses and feedback are never touched.
+- `POST /api/v1/me/recommendation/retry` (login and CSRF required, own attempts only) runs
+  the unchanged, research-frozen `adapt` on the same submission and diagnosis. It runs only
+  while that submission is the learner's newest one, so the policy sees exactly the attempt
+  history it would have seen the first time; otherwise it does nothing (the newer
+  attempt's own adaptation applies).
+- At most one retry takes effect: the claim is a conditional `UPDATE` of the job's marker
+  (`adaptation failed: ...` to `adaptation recovered by retry; was: ...`), committed in the
+  same transaction as the adaptation rows. A repeated or concurrent retry finds nothing to
+  claim (tested, including a PostgreSQL row-lock race). A retry that fails again rolls
+  everything back, keeps the fallback, and logs a redacted `adaptation_retry_failed` event.
+- `codeadapt-admin status` still counts a recovered failure as a failure, and reports
+  recoveries separately.
+
+The policy, its inputs and its outputs are unchanged; only the time at which a recovered
+recommendation is stored differs.
 
 **Consequences.** Monitoring needs one cron entry or uptime probe (runbook). A worker
 container needs a stop grace period longer than one job (120 s suggested); a worker killed

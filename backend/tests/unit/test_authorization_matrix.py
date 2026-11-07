@@ -164,3 +164,27 @@ def test_every_api_route_needs_login(
             assert r.status_code == 401, (method, route.path, r.status_code)
             checked += 1
     assert checked >= 10
+
+
+def test_recommendation_retry_needs_login_and_csrf(
+    app_and_clients: tuple[object, dict[str, TestClient], dict[str, str], str],
+) -> None:
+    # D6 retry (ADR-042) acts only on the caller's own attempts; it still needs a session
+    # and the session's CSRF token, like every other state-changing request.
+    _, clients, csrf, _ = app_and_clients
+    url = "/api/v1/me/recommendation/retry"
+    assert clients["anonymous"].post(url).status_code == 401
+    assert clients["owner"].post(url).status_code == 403
+    wrong = clients["owner"].post(url, headers={CSRF_HEADER: csrf["other_student"]})
+    assert wrong.status_code == 403
+    ok = clients["owner"].post(url, headers={CSRF_HEADER: csrf["owner"]})
+    assert ok.status_code == 200
+    assert ok.json() == {
+        "recommendation": None,
+        "last_followup": None,
+        "adaptation_unavailable": False,
+    }
+    assert (
+        clients["unknown_role"].post(url, headers={CSRF_HEADER: csrf["unknown_role"]}).status_code
+        == 403
+    )

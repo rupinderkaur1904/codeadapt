@@ -281,6 +281,11 @@
       "LearnerNext": {
         "additionalProperties": false,
         "properties": {
+          "adaptation_unavailable": {
+            "default": false,
+            "title": "Adaptation Unavailable",
+            "type": "boolean"
+          },
           "last_followup": {
             "anyOf": [
               {
@@ -1560,6 +1565,53 @@
           }
         },
         "summary": "My Recommendation"
+      }
+    },
+    "/api/v1/me/recommendation/retry": {
+      "post": {
+        "description": "Retry the adaptation step that failed after the user's latest attempt (D6).\n\nIdempotent: it does nothing when there is no pending failure, when a newer attempt\nexists, or when another retry already claimed it. The answer is always the current\nstate, so a failed retry still shows the neutral fallback message.",
+        "operationId": "retry_my_recommendation_api_v1_me_recommendation_retry_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-dev-role",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Dev-Role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnerNext"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retry My Recommendation"
       }
     },
     "/api/v1/problems": {

@@ -43,13 +43,11 @@ from codeadapt.execution.models import (
 )
 from codeadapt.logs import redact
 from codeadapt.worker.adapt import adapt
+from codeadapt.worker.recovery import ADAPTATION_FAILED
 
 log = logging.getLogger(__name__)
 
-
-# Prefix of `jobs.last_error` on a DONE job whose diagnosis was recorded but whose
-# adaptation step failed (ADR-042). Ops status counts these.
-ADAPTATION_FAILED = "adaptation failed: "
+__all__ = ["ADAPTATION_FAILED", "ContentUnavailableError", "Pipeline"]
 
 
 class ContentUnavailableError(RuntimeError):
