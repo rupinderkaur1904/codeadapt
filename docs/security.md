@@ -91,6 +91,12 @@ production). Logins, account changes, researcher-endpoint requests and staff vie
 users' submissions go to the append-only `audit_events` table. The dev `X-Dev-Role` stub
 is ignored outside dev/test.
 
+**Accounts (ADR-041).** Usernames are unique ignoring case (index on `lower(username)`,
+migration 0006). Login ends the browser's previous session before starting a new one. Users
+change their own password at `POST /api/v1/auth/password` (current password required; every
+session of the account ends; the browser gets a new one); wrong current passwords count
+towards the login throttle.
+
 **Fail-closed production (ADR-040).** An unset `CODEADAPT_ENV` means production; an
 unknown value stops start-up. The dev stub therefore needs an explicit `dev` or `test`. In
 production the API also requires `CODEADAPT_ALLOWED_HOSTS` (Host allow-list), serves no

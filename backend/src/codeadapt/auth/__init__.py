@@ -37,6 +37,8 @@ class AuditKind:
     STAFF_VIEW_SUBMISSION = "staff_view_submission"
     ACCOUNT_CREATED = "account_created"
     PASSWORD_SET = "password_set"  # noqa: S105 - an event name, not a password
+    PASSWORD_CHANGED = "password_changed"  # noqa: S105 - self-service change (ADR-041)
+    PASSWORD_CHANGE_FAILED = "password_change_failed"  # noqa: S105 - wrong current password
     ACCOUNT_DISABLED = "account_disabled"
 
 
@@ -57,8 +59,14 @@ def _digest(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
+def find_user(session: Session, username: str) -> User | None:
+    """The account for ``username``, ignoring case (ADR-041). The database compares with its
+    own ``lower()``, the same function its unique index uses, so lookup and uniqueness agree."""
+    return session.scalar(select(User).where(func.lower(User.username) == func.lower(username)))
+
+
 def authenticate(session: Session, username: str, password: str) -> User | None:
-    user = session.scalar(select(User).where(User.username == username))
+    user = find_user(session, username)
     ok = verify_password(user.password_hash if user else None, password)
     if user is None or not ok or user.disabled:
         return None
@@ -101,6 +109,15 @@ def revoke_all(session: Session, user: User) -> None:
         row.revoked_at = utcnow()
 
 
+def revoke_token(session: Session, token: str | None) -> None:
+    """End the session behind a cookie token, if it is live (rotation at login, ADR-041)."""
+    if not token:
+        return
+    row = session.get(AuthSession, _digest(token))
+    if row is not None and row.revoked_at is None:
+        row.revoked_at = utcnow()
+
+
 def csrf_matches(row: AuthSession, header: str | None) -> bool:
     return header is not None and secrets.compare_digest(row.csrf_token, header)
 
@@ -126,15 +143,17 @@ def audit(
 
 
 def recent_failures(session: Session, username: str, client: str, since: datetime) -> int:
-    """Failed logins for this username, or from this client, since ``since``."""
+    """Failed logins and failed password changes for this username (ignoring case, so a
+    change of case does not reset the count) or from this client, since ``since``."""
     return (
         session.scalar(
             select(func.count())
             .select_from(AuditEvent)
             .where(
-                AuditEvent.kind == AuditKind.LOGIN_FAILED,
+                AuditEvent.kind.in_((AuditKind.LOGIN_FAILED, AuditKind.PASSWORD_CHANGE_FAILED)),
                 AuditEvent.at >= since,
-                (AuditEvent.username == username[:64]) | (AuditEvent.client == client[:64]),
+                (func.lower(AuditEvent.username) == func.lower(username[:64]))
+                | (AuditEvent.client == client[:64]),
             )
         )
         or 0
