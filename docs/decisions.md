@@ -836,3 +836,44 @@ learner.
 **Fixtures:** `policy_v1_golden.json` keeps pinning 1.4 on the E2 catalogue it was made for;
 `policy_v1_5_golden.json` records 1.5 on the 286 histories of tests/unit/policy_cases.py.
 
+## ADR-040 — Fail-closed production configuration, gVisor required, HTTP hardening (Milestone 2, 2026-11-06)
+
+**Context.** The 2026-11-06 audit found, in the code on GitHub: `CODEADAPT_ENV` defaulted to
+`dev`, so a deployment that forgot to set it served the `X-Dev-Role` stub and anyone could act
+as a researcher (D4); a production worker ran student code under runc when
+`CODEADAPT_SANDBOX_RUNTIME` was unset (D5); the API had no Host allow-list, no security
+headers, no body limit, and served OpenAPI docs in production. The M8 hardening branch
+(`claude/project-thread-edygvs`, whose decision record was numbered ADR-039) was never pushed
+and could not be recovered from GitHub; this ADR is new work on `main`, not a reconstruction
+of that branch. The number ADR-039 stays unused so it cannot be confused with the lost record.
+
+**Decision.**
+1. `CODEADAPT_ENV` unset or blank means `production`; a value other than `dev`, `test` or
+   `production` is a start-up error. The dev stub needs an explicit `dev` or `test`.
+   Configuration errors name the variable, never its value.
+2. Production API start-up requires `CODEADAPT_ALLOWED_HOSTS` (no `*`); Starlette's
+   `TrustedHostMiddleware` answers other hosts with 400.
+3. Production serves no `/api/docs`, `/api/redoc` or `/api/openapi.json`.
+4. Every API response gets `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+   `Referrer-Policy: no-referrer`, `Cache-Control: no-store`,
+   `Cross-Origin-Resource-Policy: same-origin` and `Content-Security-Policy: default-src
+   'none'; frame-ancestors 'none'` (docs pages, dev/test only, are exempt from the CSP);
+   production adds HSTS. The web build's headers are the reverse proxy's job
+   (docs/deployment.md §7).
+5. Request bodies over 1 MiB are refused with 413, counted as they arrive.
+6. A logged-in account whose role is not a known `Role` is refused with 403 everywhere.
+7. In production the worker refuses to start unless `CODEADAPT_SANDBOX_RUNTIME` names a
+   `runsc` runtime that the daemon has registered. Containers are always started with the
+   explicit `--runtime`, so a runtime that later disappears fails runs as infrastructure
+   errors rather than falling back. `CODEADAPT_SANDBOX_ALLOW_RUNC=local-demo-only` (any other
+   value is an error) is the single, logged exception, used by compose.demo.yaml.
+8. `X-Dev-Role` stays *ignored* (not refused) in production, because the web client sends it
+   on every request; it never selects an identity there. Tests pin this next to real sessions.
+
+**Not changed.** Session, password and CSRF design (ADR-029); the diagnostic method,
+recommendation policy 1.5, evidence, learner model and all content. No migration.
+
+**Consequences.** Local runs must export `CODEADAPT_ENV=dev` (docs/development.md). CI jobs
+already set it or build settings in code. gVisor in production is enforced by the worker but
+still unverified on a real deployment host (docs/deployment.md §8).
+

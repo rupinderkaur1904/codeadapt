@@ -8,6 +8,8 @@ cd "$(dirname "$0")/../../backend"
 export CODEADAPT_ENV=production
 export CODEADAPT_DATABASE_URL="sqlite:///$1/demo.sqlite3"
 export CODEADAPT_WORKER_POLL_SECONDS=0.5
+export CODEADAPT_ALLOWED_HOSTS=localhost,127.0.0.1   # ADR-040
+export CODEADAPT_SANDBOX_ALLOW_RUNC=local-demo-only  # ADR-040: local rehearsal only
 rm -f "$1"/demo.sqlite3*
 uv run alembic upgrade head
 echo 'student demo password' | uv run codeadapt-admin create-user demo-student --role student --data-class dev

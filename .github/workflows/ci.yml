@@ -194,6 +194,22 @@ jobs:
           CODEADAPT_REQUIRE_SANDBOX: "1"
           CODEADAPT_SANDBOX_RUNTIME: runsc
         run: uv run pytest ${{ matrix.tests }}
+      - name: Production worker starts only under a registered gVisor runtime (ADR-040)
+        if: matrix.shard == 'core'
+        env:
+          CODEADAPT_ENV: production
+          CODEADAPT_DATABASE_URL: sqlite:////tmp/prod-check.sqlite3
+        run: |
+          uv run alembic upgrade head
+          CODEADAPT_SANDBOX_RUNTIME=runsc uv run codeadapt-worker --once
+          if uv run codeadapt-worker --once 2> /tmp/runc.err; then
+            echo "production worker started without gVisor"; exit 1
+          fi
+          grep -q "requires CODEADAPT_SANDBOX_RUNTIME=runsc" /tmp/runc.err
+          if CODEADAPT_SANDBOX_RUNTIME=runsc-missing uv run codeadapt-worker --once 2> /tmp/missing.err; then
+            echo "production worker started with an unregistered runtime"; exit 1
+          fi
+          grep -q "not registered" /tmp/missing.err
       - name: No sandbox leftovers
         run: |
           test -z "$(docker ps -aq --filter label=org.codeadapt.sandbox=1)"

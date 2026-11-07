@@ -53,6 +53,7 @@ To test the production tier: `CODEADAPT_SANDBOX_RUNTIME=runsc uv run pytest -m s
 
 ```bash
 cd backend
+export CODEADAPT_ENV=dev   # required: an unset CODEADAPT_ENV means production (ADR-040)
 uv run alembic upgrade head                                   # creates ./codeadapt-dev.sqlite3
 uv run uvicorn codeadapt.api.app:create_app --factory --port 8000
 uv run codeadapt-worker            # second terminal; --once drains the queue and exits
