@@ -1,4 +1,5 @@
-# Image for the API and the worker (development compose stack; production hardening in M8).
+# Image for the API and the worker (development compose stack only). Production images:
+# deploy/backend.Dockerfile (Milestone 3, ADR-042).
 FROM python:3.13-slim
 
 # docker CLI for the worker only; the API never uses it (security.md §2).

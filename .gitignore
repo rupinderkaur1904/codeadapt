@@ -33,3 +33,6 @@ exports/
 # Web test output
 web/playwright-report/
 web/test-results/
+
+# Filled-in deployment settings (secrets): only the *.example files are committed.
+deploy/*.env
