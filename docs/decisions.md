@@ -905,3 +905,49 @@ with it. The owner asked for them to be built again, from scratch, on GitHub (20
 **Consequences.** Deployment runs `alembic upgrade head` as before; a database with
 case-colliding names needs those resolved first (the error lists them).
 
+
+## ADR-042 — Operational safety for a controlled pilot: log redaction, readiness, worker lifecycle, adaptation-failure marker (Milestone 3, 2026-11-07)
+
+**Context.** The Milestone 3 baseline audit (`docs/reviews/milestone-3-baseline-audit.md`)
+found that data could reach logs (F07), that nothing reported readiness or worker health
+(F05), that a deploy killed jobs mid-run (F08), that the first submission to each problem
+stalled the queue (F12), that nothing measured queue health (F09), and that an adaptation
+failure was silent (F06, audit D6).
+
+**Decision.**
+1. *Logs.* Every engine sets `hide_parameters=True`, so bound values (submission source,
+   password and token hashes) never appear in exception text. Every log record passes
+   through `logs.RedactingFormatter`, which masks database URL passwords and cookie,
+   CSRF, token and password values in the message, extra fields and traceback. Stored job
+   errors are redacted and capped at 2,000 characters. uvicorn runs with `--no-access-log`;
+   the app's own request log has no query string and no client address. Redaction is a
+   safety net: code still must not log secrets or source.
+2. *Readiness.* `GET /api/v1/ready` is 200 only when the database answers and its schema
+   is at this code's migration head, otherwise 503 with no internal detail. It is public,
+   like `/api/v1/health` (liveness, unchanged).
+3. *Worker lifecycle.* SIGTERM and SIGINT stop the worker from claiming new jobs; the job
+   in progress finishes and is recorded, then the process exits 0. When
+   `CODEADAPT_WORKER_HEARTBEAT_FILE` is set the worker touches it every 10 s, and
+   `codeadapt-worker --check` (a container health check) fails when it is older than 60 s.
+   `codeadapt-worker --warm-up` measures every content version's fingerprints through the
+   existing cached path before a session.
+4. *Adaptation failure (D6), operational part only.* When the policy step fails after a
+   diagnosis is committed, the diagnosis is kept (as before), the job is still DONE (the
+   student's diagnosis was delivered), and `jobs.last_error` now carries
+   `adaptation failed: <redacted error>` together with a structured `adaptation_failed` log
+   event. Before, this was a log line only.
+5. *Monitoring.* `codeadapt-admin status` prints queue depth, oldest queued age, lost
+   workers, failed jobs, adaptation failures and the schema revision as JSON (counts only,
+   no learner data). It exits 1 when a threshold is crossed, so cron or an uptime checker can
+   alert on it.
+
+**Not changed.** Diagnosis, evidence, fingerprints, policy, learner model, content and
+evaluation (checked against the Milestone 3 research-freeze manifest). What the learner sees
+after an adaptation failure is unchanged: the latest stored recommendation, which may
+belong to an earlier submission. Hiding it, or re-running adaptation later (which would see
+a different attempt history), changes learner-facing behaviour and waits for an owner
+decision.
+
+**Consequences.** Monitoring needs one cron entry or uptime probe (runbook). A worker
+container needs a stop grace period longer than one job (120 s suggested); a worker killed
+anyway is recovered by the lease, as before (ADR-031).

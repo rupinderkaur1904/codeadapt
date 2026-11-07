@@ -1494,6 +1494,7 @@
     },
     "/api/v1/health": {
       "get": {
+        "description": "Liveness: the process answers. Touches nothing else.",
         "operationId": "health_api_v1_health_get",
         "responses": {
           "200": {
@@ -1664,6 +1665,26 @@
           }
         },
         "summary": "Get Problem"
+      }
+    },
+    "/api/v1/ready": {
+      "get": {
+        "description": "Readiness (ADR-042): the database answers and its schema is at this code's\nmigration head. Public, like health, so a load balancer can call it; the answer\nnames no host, revision or error.",
+        "operationId": "ready_api_v1_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Ready"
+          },
+          "503": {
+            "description": "Not ready"
+          }
+        },
+        "summary": "Ready"
       }
     },
     "/api/v1/research/learner-model": {
