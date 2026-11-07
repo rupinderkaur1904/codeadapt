@@ -292,7 +292,12 @@ def test_me_recommendation_shows_next_problem_and_verdict_without_internal_label
     client: TestClient, sessions: sessionmaker[Session]
 ) -> None:
     empty = client.get("/api/v1/me/recommendation", headers=STUDENT).json()
-    assert empty == {"recommendation": None, "last_followup": None}
+    assert empty == {
+        "recommendation": None,
+        "last_followup": None,
+        "adaptation_unavailable": False,
+        "retry_available": False,
+    }
 
     me = Learner.create(sessions, "dev-student")
     me.submit(
@@ -319,7 +324,12 @@ def test_me_recommendation_shows_next_problem_and_verdict_without_internal_label
 
     # Another learner's state is not visible.
     other = client.get("/api/v1/me/recommendation", headers={"X-Dev-Role": "researcher"}).json()
-    assert other == {"recommendation": None, "last_followup": None}
+    assert other == {
+        "recommendation": None,
+        "last_followup": None,
+        "adaptation_unavailable": False,
+        "retry_available": False,
+    }
 
 
 def test_qualified_diagnosis_and_followup_wording_stay_within_the_evidence(
@@ -461,7 +471,13 @@ def test_learner_model_is_researcher_only_and_leaves_student_responses_unchanged
 
     # Student-facing responses carry no learner-model output.
     after = client.get("/api/v1/me/recommendation", headers=STUDENT).json()
-    assert set(after) == set(before) == {"recommendation", "last_followup"}
+    # `adaptation_unavailable` and `retry_available` are the D6 fallback flags (ADR-042),
+    # not learner-model output.
+    assert (
+        set(after)
+        == set(before)
+        == {"recommendation", "last_followup", "adaptation_unavailable", "retry_available"}
+    )
     student_text = str(after) + str(client.get("/api/v1/problems", headers=STUDENT).json())
     for internal in ("p_known", "bkt", "assumed parameters", "estimate", "mastered"):
         assert internal not in student_text.lower()

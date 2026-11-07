@@ -7,8 +7,13 @@ import asyncio
 import contextlib
 import logging
 import os
+import signal
 import socket
+import sys
+import time
+from pathlib import Path
 
+from sqlalchemy import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
 from codeadapt import logs
@@ -84,7 +89,115 @@ async def require_production_runtime(settings: Settings, sandbox: DockerSandbox)
         )
 
 
-async def run(settings: Settings, *, once: bool = False) -> int:
+def require_database_tls(settings: Settings) -> None:
+    """R5 (owner decision, Gate B): in production the worker reaches PostgreSQL only over
+    TLS that verifies the server's certificate against the private CA and its host name.
+
+    The worker runs on the runner VM, so its database traffic crosses the network between
+    the two VMs. It refuses to start unless the database URL sets ``sslmode=verify-full``
+    and an ``sslrootcert`` file that exists. SQLite (the local demo) is not affected.
+    """
+    if settings.env is not Environment.PRODUCTION:
+        return
+    url = make_url(settings.database_url)
+    if not url.drivername.startswith("postgresql"):
+        return
+    mode, root = url.query.get("sslmode"), url.query.get("sslrootcert")
+    if mode != "verify-full":
+        raise ConfigError(
+            "production requires sslmode=verify-full in CODEADAPT_DATABASE_URL: the worker "
+            "does not send learner data to PostgreSQL without verified TLS"
+        )
+    if not isinstance(root, str) or not Path(root).is_file():
+        raise ConfigError(
+            "production requires sslrootcert=<CA certificate file> in CODEADAPT_DATABASE_URL, "
+            "and the file must exist (deploy/db-tls/make-db-certs.sh)"
+        )
+
+
+HEARTBEAT_INTERVAL_SECONDS = 10.0
+HEARTBEAT_MAX_AGE_SECONDS = 60.0
+
+
+async def heartbeat_file(path: Path, interval: float = HEARTBEAT_INTERVAL_SECONDS) -> None:
+    """Touch ``path`` every ``interval`` seconds while the event loop is responsive.
+
+    Jobs await Docker without blocking the loop, so a long job keeps the file fresh; a hung
+    loop or a dead process lets it go stale (ADR-042).
+    """
+    while True:
+        try:
+            await asyncio.to_thread(path.touch)
+        except OSError as exc:
+            # Keep serving jobs; the stale file makes the health check report the problem.
+            log.warning("cannot write the heartbeat file %s: %s", path, exc)
+        await asyncio.sleep(interval)
+
+
+def check_heartbeat(path: Path, max_age: float = HEARTBEAT_MAX_AGE_SECONDS) -> int:
+    """Exit status for a container health check: 0 if the heartbeat is fresh."""
+    try:
+        age = time.time() - path.stat().st_mtime
+    except FileNotFoundError:
+        print(f"unhealthy: no heartbeat file at {path}", file=sys.stderr)
+        return 1
+    if age > max_age:
+        print(f"unhealthy: last heartbeat {age:.0f} s ago", file=sys.stderr)
+        return 1
+    print(f"healthy: last heartbeat {age:.0f} s ago")
+    return 0
+
+
+async def serve(
+    pipeline: Pipeline,
+    sessions: sessionmaker[Session],
+    settings: Settings,
+    *,
+    once: bool = False,
+    stop: asyncio.Event | None = None,
+) -> int:
+    """Claim and process jobs until the queue is empty (``once``) or ``stop`` is set.
+
+    A stop request never interrupts a job: the current job finishes and is recorded, then
+    the loop exits without claiming another (ADR-042). If the process is killed anyway, the
+    job's lease expires and another worker picks it up (ADR-031).
+    """
+    stop = stop or asyncio.Event()
+    worker_id = f"{socket.gethostname()}:{os.getpid()}"
+    processed = 0
+    while not stop.is_set():
+        with sessions() as session:
+            job = queue.claim_next(
+                session,
+                worker_id,
+                lease_seconds=settings.job_lease_seconds,
+                max_attempts=settings.job_max_attempts,
+            )
+        if job is not None:
+            log.info("processing job %s (submission %s)", job.id, job.submission_id)
+            await handle_with_heartbeat(
+                pipeline, sessions, job, lease_seconds=settings.job_lease_seconds
+            )
+            processed += 1
+        elif once:
+            break
+        else:
+            with contextlib.suppress(TimeoutError):
+                await asyncio.wait_for(stop.wait(), timeout=settings.worker_poll_seconds)
+    if stop.is_set():
+        log.info("stop requested: no further jobs will be claimed")
+    return processed
+
+
+def _install_stop_handlers(stop: asyncio.Event) -> None:
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        with contextlib.suppress(NotImplementedError):  # not available on Windows
+            loop.add_signal_handler(sig, stop.set)
+
+
+async def run(settings: Settings, *, once: bool = False, warm_up: bool = False) -> int:
+    require_database_tls(settings)
     sessions = make_session_factory(make_engine(settings.database_url))
     sandbox = DockerSandbox(DockerSandboxConfig.from_env())
     await sandbox.check_available()
@@ -102,36 +215,55 @@ async def run(settings: Settings, *, once: bool = False) -> int:
         FingerprintConsistencyV1(),
         PolicyV1(version=settings.policy_version),
     )
-    worker_id = f"{socket.gethostname()}:{os.getpid()}"
-    processed = 0
-    while True:
-        with sessions() as session:
-            job = queue.claim_next(
-                session,
-                worker_id,
-                lease_seconds=settings.job_lease_seconds,
-                max_attempts=settings.job_max_attempts,
-            )
-        if job is not None:
-            log.info("processing job %s (submission %s)", job.id, job.submission_id)
-            await handle_with_heartbeat(
-                pipeline, sessions, job, lease_seconds=settings.job_lease_seconds
-            )
-            processed += 1
-        elif once:
-            return processed
-        else:
-            await asyncio.sleep(settings.worker_poll_seconds)
+    if warm_up:
+        results = await pipeline.warm_up()
+        invalid = sorted(slug for slug, ok in results.items() if not ok)
+        log.info("warm-up measured %d content version(s)", len(results))
+        if invalid:
+            log.error("content failed validation during warm-up: %s", ", ".join(invalid))
+            return -1
+        return len(results)
+    stop = asyncio.Event()
+    _install_stop_handlers(stop)
+    beat = (
+        asyncio.create_task(heartbeat_file(settings.worker_heartbeat_file))
+        if settings.worker_heartbeat_file is not None
+        else None
+    )
+    try:
+        return await serve(pipeline, sessions, settings, once=once, stop=stop)
+    finally:
+        if beat is not None:
+            beat.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await beat
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="codeadapt-worker")
-    parser.add_argument("--once", action="store_true", help="drain the queue, then exit")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--once", action="store_true", help="drain the queue, then exit")
+    mode.add_argument(
+        "--warm-up",
+        action="store_true",
+        help="measure and store fingerprints for every content version, then exit",
+    )
+    mode.add_argument(
+        "--check",
+        action="store_true",
+        help="health check: exit 0 if the running worker's heartbeat file is fresh",
+    )
     args = parser.parse_args(argv)
     settings = Settings.from_env()
+    if args.check:
+        if settings.worker_heartbeat_file is None:
+            parser.error("--check needs CODEADAPT_WORKER_HEARTBEAT_FILE")
+        return check_heartbeat(settings.worker_heartbeat_file)
     logs.configure(production=settings.env is Environment.PRODUCTION)
-    processed = asyncio.run(run(settings, once=args.once))
-    log.info("processed %d job(s)", processed)
+    result = asyncio.run(run(settings, once=args.once, warm_up=args.warm_up))
+    if args.warm_up:
+        return 1 if result < 0 else 0
+    log.info("processed %d job(s)", result)
     return 0
 
 

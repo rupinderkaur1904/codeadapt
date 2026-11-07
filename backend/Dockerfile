@@ -1,4 +1,5 @@
-# Image for the API and the worker (development compose stack; production hardening in M8).
+# Image for the API and the worker (development compose stack only). Production images:
+# deploy/backend.Dockerfile (Milestone 3, ADR-042).
 FROM python:3.13-slim
 
 # docker CLI for the worker only; the API never uses it (security.md §2).
@@ -16,4 +17,6 @@ RUN uv sync --locked --no-dev
 
 ENV CODEADAPT_CONTENT_DIR=/app/content/demo
 EXPOSE 8000
-CMD ["uvicorn", "codeadapt.api.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+# --no-access-log: the app logs each request itself without the query string (ADR-042);
+# uvicorn's access log would print query strings and client addresses.
+CMD ["uvicorn", "codeadapt.api.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]

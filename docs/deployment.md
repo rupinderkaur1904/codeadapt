@@ -37,6 +37,7 @@ the M9 decisions (ethics determination, consent, cohort, data retention).
 | `CODEADAPT_SUBMISSIONS_PER_MINUTE` | API | default 10 in production; `none` disables |
 | `CODEADAPT_POLICY_VERSION` | worker | recommendation policy, `1.5` (default) or `1.4` (ADR-038) |
 | `CODEADAPT_LOG_FORMAT`, `CODEADAPT_LOG_LEVEL` | API, worker | default `json` and `INFO` in production |
+| `CODEADAPT_WORKER_HEARTBEAT_FILE` | worker | e.g. `/tmp/codeadapt-worker.heartbeat`; enables `codeadapt-worker --check` as the container health check (ADR-042) |
 
 ## 3. Runner VM
 
@@ -76,7 +77,22 @@ The password is read without echo, or as one line on stdin. Real-student account
 
 The API and worker write one JSON object per line to stderr: request method, path (never
 the query string), status, duration and request id. The same id is returned to the
-browser in `X-Request-ID`. Logs never contain source code, passwords or tokens. Security
+browser in `X-Request-ID`. Logs never contain source code, passwords or tokens: database
+errors carry no bound values, every record passes a redaction filter, and uvicorn must run
+with `--no-access-log` (its access log prints query strings and client addresses) (ADR-042).
+
+Probes and monitoring (ADR-042):
+
+- `GET /api/v1/health`: liveness. `GET /api/v1/ready`: 200 only when the database answers
+  and its schema is at the code's migration head.
+- `codeadapt-worker --check`: worker health from its heartbeat file.
+- `codeadapt-admin status`: queue depth, oldest queued age, lost workers, failed jobs and
+  adaptation failures as JSON; exit 1 when a threshold is crossed. Run it from cron every
+  few minutes and alert on a non-zero exit.
+- `codeadapt-worker --warm-up` before a class session measures every problem's
+  fingerprints, so the first submission to a problem does not wait 1-2 minutes.
+- Stop the worker with SIGTERM and a grace period of at least 120 s: it finishes the
+  current job and claims no more. Security
 and researcher-access events go to the `audit_events` table (ADR-029). How long logs and
 audit rows are kept is an owner decision (M9).
 
@@ -99,8 +115,12 @@ audit rows are kept is an owner decision (M9).
 
 ## 8. Not yet verified
 
-- PostgreSQL: the driver (psycopg 3) is a dependency and the `backend-postgres` CI job runs
-  every non-sandbox test against PostgreSQL 16, each on a freshly migrated database
-  (`CODEADAPT_TEST_POSTGRES_URL`). The sandbox pipeline tests still run on SQLite.
-- The production container image (the current `backend/Dockerfile` is the dev image).
-- gVisor on the real runner VM (CI and the development container only, ADR-028).
+- PostgreSQL: the driver (psycopg 3) is a dependency; the `backend-postgres` CI job runs
+  every non-sandbox test against PostgreSQL 16, and `sandbox-postgres` runs the sandbox
+  pipeline against it, each on a freshly migrated database.
+- Production images, compose files, reverse proxy and database roles now exist in
+  `deploy/` (Milestone 3, ADR-042) and are built and smoke-tested in the
+  `production-images` CI job. That is CI-level evidence: TLS uses Caddy's internal CA for
+  `localhost` there. TLS with a real certificate is not verified until it runs on a host.
+- gVisor on the real runner VM: see `docs/deployment/gvisor-verification.md` (levels L1-L3;
+  L3, the host, is not verified).

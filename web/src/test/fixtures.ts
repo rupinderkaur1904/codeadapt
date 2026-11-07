@@ -61,6 +61,8 @@ export const compileError: SubmissionView = {
 };
 
 export const next: LearnerNext = {
+  adaptation_unavailable: false,
+  retry_available: false,
   recommendation: {
     action: "new_problem",
     problem_slug: "count-occurrences",
