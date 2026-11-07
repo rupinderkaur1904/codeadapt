@@ -305,6 +305,11 @@
                 "type": "null"
               }
             ]
+          },
+          "retry_available": {
+            "default": false,
+            "title": "Retry Available",
+            "type": "boolean"
           }
         },
         "required": [
