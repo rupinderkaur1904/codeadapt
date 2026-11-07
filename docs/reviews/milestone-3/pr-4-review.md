@@ -9,9 +9,11 @@
 
 ## Verdict
 
-Four defects were found and fixed during this review, each with a test (section 2). Three
-lower-risk items stay open and are listed for Gate B (section 3). Nothing found blocks a
-merge once CI is green on the head commit. The merge decision is the owner's.
+Four defects were found and fixed during this review, each with a test (section 2). The
+owner then decided every open item at Gate B on 2026-11-07, and R5, R6, R7, R8 and R10
+are now implemented with regression tests (section 6). Nothing found blocks a merge once
+the complete CI pipeline is green on the final head commit. The merge decision is the
+owner's.
 
 ## 1. What was reviewed, area by area
 
@@ -39,7 +41,7 @@ merge once CI is green on the head commit. The merge decision is the owner's.
 | R3 | Medium (privacy, withdrawal) | `erase-learner` removed every audit row carrying the learner's name. However, a researcher's access record stores the path and query, for example `learner-model?username=p017`, or a trace path containing the learner's submission id. These records survived the erasure. | The researcher's access records are kept, because they show access control was followed, but any target that names the learner gets `(erased learner)`. Other learners' records are untouched. The dry run reports `audit_events_scrubbed`. | The erase test now covers both kinds of target and one record that must be kept. |
 | R4 | Low (operations) | If the heartbeat file could not be written, the heartbeat task died. When the worker then stopped, the task's exception could replace the worker's normal exit. | The worker logs a warning and keeps going. The stale file still makes the health check fail. | `test_heartbeat_task_survives_an_unwritable_file` |
 
-## 3. Open items (not fixed here, proposed for Gate B)
+## 3. Items proposed for Gate B (all decided; see section 6 for what was done)
 
 | # | Severity | Item | Proposal | Who decides |
 | --- | --- | --- | --- | --- |
@@ -77,3 +79,28 @@ merge once CI is green on the head commit. The merge decision is the owner's.
 
 The sandbox, gVisor, end-to-end and production-image suites run in CI on the PR. Their
 result on the head commit is the one that counts.
+
+## 6. Gate B decisions (owner, 2026-11-07) and what was done
+
+The owner reviewed this document and decided every open item. Each change is limited to
+the approved operational scope: no change to sandbox execution, research algorithms,
+migrations, recommendation policy, diagnosis or evaluation. The research-freeze check
+passes after every commit.
+
+| # | Owner decision | Commit | What changed | Regression tests |
+| --- | --- | --- | --- | --- |
+| R10 | Two messages; "Try again" only when a retry is valid | `14f2539` | The learner response gains `retry_available`, true only while a failure is pending and no newer attempt exists. With it: "We couldn't prepare your next recommended problem. You can try again, or submit another solution." and the button. Without it: "We couldn't prepare your next recommended problem. Your previous work is saved. Submit another solution to continue." and no button. | Backend: availability follows the newest attempt; the API offers no retry after a newer attempt, and a retry sent anyway changes nothing. Web: each message, and the button only when valid. |
+| R7 | Revoke audit rewrites and schema-revision writes from the API role | `26c9864` | `db-setup` revokes `UPDATE`, `DELETE` and `TRUNCATE` on `audit_events`, and every write on `alembic_version`, from the API role. `erase-learner` and `purge-sessions` run as the schema owner through a new one-off `admin` Compose service (runbook §4b). Run from the API container, `erase-learner` stops with a message pointing there. | PostgreSQL: the API role can insert and read audit rows but not change, delete or truncate them; it can read but not write the schema revision; login, failed login, logout and `/ready` still work under it; erasure fails as the API role and works through the owner connection. CI checks the same grants on the production stack. |
+| R8 | Route uvicorn's logs through the redacting configuration | `a9dc660` | The API image starts uvicorn with `--log-config codeadapt/uvicorn_logging.json`, which puts the application's redacting handler on the root logger and makes uvicorn's loggers use it. | A real uvicorn whose start-up fails with a database URL, a password and a session cookie in the error: without the config all three leak (control); with it none do, the event is still logged as JSON, and the traceback is masked. One handler only; the image uses the config. |
+| R6 | Pin production images by SHA-256 digest; record them in the runbook | `df01a67` | `python`, `docker` CLI, `node`, `caddy` and `postgres` pinned to multi-platform digests (amd64 and arm64), looked up on 2026-11-07. Runbook §0a lists them with the update procedure. The GCC pin is unchanged (research freeze). | Every external image in `deploy/` and `sandbox/` must carry a digest, and every digest must be in the runbook. |
+| R5 | PostgreSQL TLS from a private CA; worker `verify-full`; test valid and invalid certificates | `01ecf11` | `deploy/db-tls/make-db-certs.sh` (private CA, server certificate for `db.codeadapt.internal` and `db`); PostgreSQL with `ssl=on`, TLS 1.2 or later, and a `pg_hba.conf` that refuses TCP without TLS; every database URL uses `sslmode=verify-full`; the production worker refuses to start without it. | Unit: the worker guard (no TLS, `require`, `verify-ca`, missing CA all refused) and the certificate script. CI, against the production Compose stack as the worker role: a valid certificate connects over TLS 1.2+; another CA's certificate, another name, an address instead of the name, and plain text are all refused. |
+
+**Still not verified, and not claimed:**
+
+- TLS, gVisor and the network rules on a real host. The runbook lists the host checks
+  (§1 step 8, §2 steps 6 and 10). CI runs the production images on one machine, which is
+  evidence about the configuration, not about a host.
+- An expired server certificate is not tested. libpq refuses one under `verify-full`, as
+  it does an unknown CA. The runbook says to issue the next certificate before 397 days.
+- The `admin` service and the TLS settings change the runbook. The owner should read
+  §0a, §1 step 5, §2 steps 5 and 10, and §4b before provisioning.
