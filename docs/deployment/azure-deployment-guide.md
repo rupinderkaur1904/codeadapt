@@ -165,7 +165,7 @@ SSH through the App VM (the runner accepts SSH from the app subnet only):
 pick up the key, add the key with `ssh-add` first.
 
 ```
-sudo apt-get update && sudo apt-get -y upgrade
+sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get install -y bzip2   # gVisor's archive
 # Docker exactly as Step C.2, then:
 sudo git clone https://github.com/rupinderkaur1904/codeadapt.git /opt/codeadapt
 cd /opt/codeadapt && sudo git checkout <REVISION>

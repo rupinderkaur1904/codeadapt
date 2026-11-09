@@ -12,6 +12,7 @@ GVISOR_RELEASE="20261005"
 GVISOR_SHA512="79869ae9a589355a46d46fdac068d9a954e741741ffe77c64e38c56ea955498c1cb04e9bce44e1cce5155333e6b76bee72347c6661bb7c78fd2fe3aad198c8fe"
 
 [ "$(id -u)" = 0 ] || { echo "run as root" >&2; exit 1; }
+command -v bzip2 >/dev/null || { echo "bzip2 is missing: apt-get install -y bzip2 (Azure's Ubuntu image lacks it)" >&2; exit 1; }
 [ "$(uname -m)" = x86_64 ] || { echo "the runner must be x86-64 (fingerprints were measured there)" >&2; exit 1; }
 
 work=$(mktemp -d)
