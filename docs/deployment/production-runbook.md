@@ -68,7 +68,7 @@ part of the research freeze.
      every client verifies the certificate and the name (`sslmode=verify-full`).
 6. Create the settings file:
    - `cp deploy/app.env.example deploy/app.env && chmod 600 deploy/app.env`;
-   - fill in every value, generating each password with `openssl rand -base64 32`;
+   - fill in every value, generating each password with `openssl rand -hex 32`;
    - set `DB_PRIVATE_BIND` to this VM's **private** address and `DB_TLS_DIR` to
      `/etc/codeadapt/db-tls`.
 7. Pull the images (`sudo deploy/pull-images.sh app release-images.env`) and start:
