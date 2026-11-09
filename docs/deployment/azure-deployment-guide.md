@@ -56,7 +56,7 @@ Portal → Virtual machines → Create → Azure virtual machine.
 | | Name | `codeadapt-app-vm` |
 | | Region | (Asia Pacific) Central India |
 | | Availability options | No infrastructure redundancy required |
-| | Security type | Trusted launch |
+| | Security type | Standard (B2pts v2 does not support Trusted launch) |
 | | Image | Ubuntu Server 24.04 LTS, **Arm64** |
 | | Size | **Standard_B2pts_v2** (shown as free-services eligible) |
 | | Authentication | SSH public key, a **new** key pair named `codeadapt-key` (never Relay's) |
@@ -88,6 +88,7 @@ SSH from your laptop: `ssh -i codeadapt-key.pem azureuser@<app public IP>`.
 ```
 # 1. Updates, and 1 GiB of swap (1 GiB RAM is tight for PostgreSQL + API + Caddy)
 sudo apt-get update && sudo apt-get -y upgrade
+echo 'PermitRootLogin no' | sudo tee /etc/ssh/sshd_config.d/10-codeadapt.conf && sudo sshd -t && sudo systemctl reload ssh
 cat /etc/apt/apt.conf.d/20auto-upgrades        # both lines should end in "1"
 sudo fallocate -l 1G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile
 sudo swapon /swapfile && echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
