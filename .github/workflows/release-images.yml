@@ -1,0 +1,150 @@
+name: release-images
+
+# Milestone 4 (Azure, docs/deployment/azure-deployment-guide.md): the production images are
+# built HERE, not on the 1 GiB VMs, and the VMs pull them by digest (deploy/pull-images.sh).
+#
+#   api, proxy     linux/arm64 (the App VM, B2pts v2) and linux/amd64
+#   worker, sandbox linux/amd64 only: the runner stays x86-64, the architecture the
+#                   fingerprints were measured on
+#
+# Pull requests that touch the deployment files build every image without pushing, so an
+# Arm64 build failure shows up before merge. A push to main (or a manual run on main)
+# pushes them to GHCR with the immutable tag sha-<commit> and writes the digests to the
+# run summary and the `release-images` artifact. Nothing here deploys anything.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - deploy/**
+      - sandbox/**
+      - backend/**
+      - web/**
+      - content/**
+      - .github/workflows/release-images.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-images-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            file: deploy/backend.Dockerfile
+            target: api
+            context: .
+            platforms: linux/arm64,linux/amd64
+          - name: proxy
+            file: deploy/web.Dockerfile
+            target: ""
+            context: .
+            platforms: linux/arm64,linux/amd64
+          - name: worker
+            file: deploy/backend.Dockerfile
+            target: worker
+            context: .
+            platforms: linux/amd64
+          - name: sandbox
+            file: sandbox/Dockerfile
+            target: ""
+            context: sandbox
+            platforms: linux/amd64
+    name: build (${{ matrix.name }})
+    env:
+      PUSH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image name
+        id: ref
+        run: |
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "image=ghcr.io/${owner}/codeadapt-${{ matrix.name }}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        if: env.PUSH == 'true'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build${{ env.PUSH == 'true' && ' and push' || ' (no push)' }}
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          target: ${{ matrix.target }}
+          platforms: ${{ matrix.platforms }}
+          push: ${{ env.PUSH == 'true' }}
+          tags: ${{ steps.ref.outputs.image }}:sha-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+      - name: Record the digest
+        if: env.PUSH == 'true'
+        run: |
+          echo "${{ steps.ref.outputs.image }}@${{ steps.build.outputs.digest }}" \
+            > "digest-${{ matrix.name }}.txt"
+      - uses: actions/upload-artifact@v4
+        if: env.PUSH == 'true'
+        with:
+          name: digest-${{ matrix.name }}
+          path: digest-${{ matrix.name }}.txt
+          retention-days: 90
+
+  manifest:
+    # One file the operator copies to each VM: which image digests belong to this commit.
+    # It holds no secret.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: digest-*
+          merge-multiple: true
+      - name: Write release-images.env
+        run: |
+          {
+            echo "# CodeAdapt release images for commit ${GITHUB_SHA}. No secrets."
+            echo "# Use on a VM with: sudo deploy/pull-images.sh <app|runner> release-images.env"
+            echo "REVISION=${GITHUB_SHA}"
+            echo "IMAGE_TAG=sha-${GITHUB_SHA:0:12}"
+            for n in api proxy worker sandbox; do
+              ref=$(cat "digest-$n.txt")
+              echo "$ref" | grep -Eq '^ghcr\.io/[a-z0-9._-]+/codeadapt-[a-z]+@sha256:[0-9a-f]{64}$'
+              echo "$(echo "$n" | tr '[:lower:]' '[:upper:]')_IMAGE=$ref"
+            done
+          } > release-images.env
+          cat release-images.env
+          {
+            echo '### Release images'
+            echo
+            echo 'Copy this file to each VM as `release-images.env`:'
+            echo
+            echo '```'
+            cat release-images.env
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-images
+          path: release-images.env
+          retention-days: 90

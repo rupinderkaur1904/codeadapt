@@ -4,6 +4,13 @@ Status: **prepared, never executed.** Every step below needs owner Gate A (archi
 and provider) and Gate B (provisioning and exposure) to be recorded first. Nothing in this
 repository has been deployed. Real students also need Gate C (docs/pilot/).
 
+On Azure, follow docs/deployment/azure-deployment-guide.md, which applies this runbook to
+the approved Milestone 4 architecture. Progress is recorded in m4-deployment-progress.md.
+
+Images are built by the `release-images` workflow, never on the VMs. Each VM pulls this
+release's images by digest with `deploy/pull-images.sh <app|runner> release-images.env`, and
+Compose then starts with `--no-build`.
+
 Conventions:
 
 - commands run from a checkout of the approved release tag on each VM;
@@ -64,7 +71,8 @@ part of the research freeze.
    - fill in every value, generating each password with `openssl rand -base64 32`;
    - set `DB_PRIVATE_BIND` to this VM's **private** address and `DB_TLS_DIR` to
      `/etc/codeadapt/db-tls`.
-7. Start: `app up -d --build`. This runs `migrate`, then `db-setup` (roles and grants),
+7. Pull the images (`sudo deploy/pull-images.sh app release-images.env`) and start:
+   `app up -d --no-build`. This runs `migrate`, then `db-setup` (roles and grants),
    then `api` and `proxy`.
 8. Verify. Record each output in `docs/deployment/host-verification-<date>.md`.
    - `curl -sI https://$SITE_HOST/` shows a valid certificate (no `-k`), and the headers
@@ -80,10 +88,15 @@ part of the research freeze.
 1. A separate Linux VM on the same private network, with no public inbound ports and SSH
    by key from the operator only.
 2. **Block egress** except TCP 5432 to the App VM's private address (and the package
-   mirrors during installation only). Check that `curl https://example.com` fails.
+   mirrors during installation only): `deploy/host/firewall.sh` on the host, behind the cloud
+   firewall. Check that `curl https://example.com` fails; `deploy/host/verify-host.sh runner`
+   checks this and more.
 3. Install Docker and the **pinned** gVisor release, with its checksum verified, exactly
-   as the `sandbox-gvisor` CI job does. Then run `runsc install` and restart Docker.
-4. Build the sandbox image: `docker build -t codeadapt-sandbox:gcc14.2-1 sandbox/`.
+   as the `sandbox-gvisor` CI job does (`deploy/host/install-gvisor.sh`, same pin). Then run
+   `runsc install` and restart Docker.
+4. Pull the worker and sandbox images: `sudo deploy/pull-images.sh runner release-images.env`.
+   It tags the sandbox image `codeadapt-sandbox:gcc14.2-1`, built in CI from the unchanged
+   `sandbox/Dockerfile`.
 5. Create the settings file: `cp deploy/runner.env.example deploy/runner.env`, then
    `chmod 600`, and fill it in:
    - the worker password from `app.env`;
@@ -94,7 +107,7 @@ part of the research freeze.
    (`sslmode=verify-full` with an existing CA file).
 6. Run the gVisor host verification, `docs/deployment/gvisor-verification.md` level L3,
    all steps. **Stop here if any step fails.**
-7. Start: `runner up -d --build`. The worker refuses to start without `runsc` (ADR-040).
+7. Start: `runner up -d --no-build`. The worker refuses to start without `runsc` (ADR-040).
 8. Warm up: `runner run --rm worker codeadapt-worker --warm-up`. It should list every
    content version as valid.
 9. End-to-end: submit the lower-bound reference solution with a test account
@@ -171,13 +184,15 @@ codeadapt-admin ...`.
 ## 6. Upgrades
 
 1. Back up.
-2. `git fetch && git checkout <new tag>`.
-3. `app up -d --build`. It migrates and re-applies grants, then restarts `api`.
-4. `runner up -d --build`. The old worker gets SIGTERM, finishes its job, and the new one
+2. `git fetch && git checkout <new commit>`, and pull its images with `deploy/pull-images.sh`
+   (the new `release-images.env`); set the new `IMAGE_TAG` in each env file.
+3. `app up -d --no-build`. It migrates and re-applies grants, then restarts `api`.
+4. `runner up -d --no-build`. The old worker gets SIGTERM, finishes its job, and the new one
    starts.
 5. Check `/api/v1/ready` and `codeadapt-admin status`.
 
-**Rollback:** check out the previous tag and run `up -d --build` again. If the new release
+**Rollback:** check out the previous commit, pull its images again with its
+`release-images.env`, set its `IMAGE_TAG` and run `up -d --no-build`. If the new release
 included a migration, restore the pre-upgrade dump into a new database as described in
 backup-and-restore.md. Never downgrade a migration on the live database without first
 taking a fresh backup.
