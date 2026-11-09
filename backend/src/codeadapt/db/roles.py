@@ -45,7 +45,7 @@ WORKER_INSERT = (
 )
 WORKER_UPDATE = ("jobs",)
 # Never granted to the worker.
-WORKER_DENIED = ("users", "auth_sessions", "audit_events")
+WORKER_DENIED = ("users", "auth_sessions", "audit_events", "invite_codes")
 # R7: the API role may only append to these (audit_events) or only read them
 # (alembic_version). A compromised API process cannot erase the access log or fake the
 # schema revision.

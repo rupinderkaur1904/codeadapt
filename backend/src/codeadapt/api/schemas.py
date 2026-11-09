@@ -278,6 +278,25 @@ class PasswordChange(BaseModel):
     new_password: str = Field(min_length=1, max_length=1024)
 
 
+class SignupRequest(BaseModel):
+    """Self-service sign-up with an invite code (ADR-044). The server checks the username's
+    form and the password's length (``auth.MIN_PASSWORD_LENGTH``)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    username: str = Field(min_length=1, max_length=64)
+    password: str = Field(min_length=1, max_length=1024)
+    invite_code: str = Field(min_length=1, max_length=64)
+
+
+class SignupStatus(_Out):
+    """Whether this deployment accepts sign-ups, so the login page can offer one."""
+
+    enabled: bool
+    needs_invite_code: bool
+    min_password_length: int
+
+
 class AuthUser(_Out):
     username: str
     role: str

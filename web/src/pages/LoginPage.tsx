@@ -1,6 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
 
 import { ApiError, api, type AuthUser } from "../api/client";
+import { SignupPage } from "./SignupPage";
 
 function message(error: unknown): string {
   if (error instanceof ApiError && error.status === 429) {
@@ -10,8 +12,11 @@ function message(error: unknown): string {
   return "Could not reach the server. Try again.";
 }
 
-/** Login form. Accounts are created by the study team; there is no sign-up. */
+/** Login form. Accounts are created by the study team, or, where the deployment turns it
+ * on, by the person themselves with an invite code (ADR-044). */
 export function LoginPage({ onLoggedIn }: { onLoggedIn: (user: AuthUser) => void }) {
+  const signup = useQuery({ queryKey: ["signup-status"], queryFn: api.signupStatus, retry: false });
+  const [signingUp, setSigningUp] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +34,16 @@ export function LoginPage({ onLoggedIn }: { onLoggedIn: (user: AuthUser) => void
     } finally {
       setBusy(false);
     }
+  }
+
+  if (signingUp && signup.data?.enabled) {
+    return (
+      <SignupPage
+        minPasswordLength={signup.data.min_password_length}
+        onSignedUp={onLoggedIn}
+        onCancel={() => setSigningUp(false)}
+      />
+    );
   }
 
   return (
@@ -61,6 +76,14 @@ export function LoginPage({ onLoggedIn }: { onLoggedIn: (user: AuthUser) => void
       <button type="submit" disabled={busy}>
         {busy ? "Logging in…" : "Log in"}
       </button>
+      {signup.data?.enabled && (
+        <p className="muted">
+          New here?{" "}
+          <button type="button" className="link" onClick={() => setSigningUp(true)}>
+            Create an account
+          </button>
+        </p>
+      )}
     </form>
   );
 }
