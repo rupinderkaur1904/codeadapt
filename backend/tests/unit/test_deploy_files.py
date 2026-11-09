@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
 import pytest
 
@@ -18,7 +19,9 @@ def _external_images() -> list[tuple[str, str]]:
     for path in [*DEPLOY.glob("*.Dockerfile"), REPO_ROOT / "sandbox" / "Dockerfile"]:
         stages: set[str] = set()
         for line in path.read_text().splitlines():
-            if m := re.match(r"\s*FROM\s+(\S+)(?:\s+AS\s+(\S+))?", line, re.I):
+            if m := re.match(
+                r"\s*FROM\s+(?:--platform=\S+\s+)?(\S+)(?:\s+AS\s+(\S+))?", line, re.I
+            ):
                 if m.group(1) not in stages:
                     found.append((path.name, m.group(1)))
                 if m.group(2):
@@ -89,3 +92,80 @@ def test_the_runner_reaches_the_database_by_its_certificate_name() -> None:
     runner = (DEPLOY / "compose.runner.yaml").read_text()
     assert '"${DB_TLS_NAME:?}:${DB_HOST:?}"' in runner  # extra_hosts
     assert "${DB_CA_FILE:?}:/etc/codeadapt/db-ca.crt:ro" in runner
+
+
+# ---------------------------------------------------------------- Milestone 4: Azure hosts
+
+WORKFLOWS = REPO_ROOT / ".github" / "workflows"
+HOST = DEPLOY / "host"
+
+
+def _ci_env(name: str) -> str:
+    m = re.search(rf'^\s*{name}:\s*"?([0-9a-f]+)"?\s*$', (WORKFLOWS / "ci.yml").read_text(), re.M)
+    assert m, f"{name} not found in ci.yml"
+    return m.group(1)
+
+
+def test_the_host_gvisor_install_uses_the_ci_pin() -> None:
+    """The runner VM gets exactly the gVisor release the sandbox-gvisor CI job tests."""
+    script = (HOST / "install-gvisor.sh").read_text()
+    release, sha512 = _ci_env("GVISOR_RELEASE"), _ci_env("GVISOR_SHA512")
+    assert f'GVISOR_RELEASE="{release}"' in script
+    assert f'GVISOR_SHA512="{sha512}"' in script
+    assert "sha512sum -c" in script
+    assert f"release-{release}.0" in (HOST / "verify-host.sh").read_text()
+
+
+def test_the_runner_images_are_x86_64_only() -> None:
+    """Fingerprints were measured on x86-64: never ship an Arm worker or sandbox."""
+    workflow = (WORKFLOWS / "release-images.yml").read_text()
+    builds = dict(re.findall(r"- name: (\w+)\n(?:\s+\w+: .*\n)*?\s+platforms: (\S+)", workflow))
+    assert builds == {
+        "api": "linux/arm64,linux/amd64",
+        "proxy": "linux/arm64,linux/amd64",
+        "worker": "linux/amd64",
+        "sandbox": "linux/amd64",
+    }
+    assert "uname -m" in (HOST / "install-gvisor.sh").read_text()
+
+
+def test_pulled_images_get_the_names_the_compose_files_and_worker_use() -> None:
+    from codeadapt.execution.docker import DEFAULT_IMAGE
+
+    script = (DEPLOY / "pull-images.sh").read_text()
+    assert f'SANDBOX) echo "{DEFAULT_IMAGE}"' in script
+    for name in ("api", "proxy", "worker"):
+        assert f"codeadapt-{name}:$image_tag" in script
+        compose = "compose.runner.yaml" if name == "worker" else "compose.app.yaml"
+        assert f"codeadapt-{name}:${{IMAGE_TAG" in (DEPLOY / compose).read_text()
+    # Only digests: a tag alone could be re-pushed.
+    assert "@sha256:[0-9a-f]{64}$" in script
+
+
+def test_the_runner_firewall_closes_egress_and_metadata() -> None:
+    script = (HOST / "firewall.sh").read_text()
+    runner = script.split("apply_runner() {")[1].split("\n}\n")[0]
+    # Containers: the database port only, then drop.
+    containers = runner.split("chain OUTPUT")[0]
+    assert '-p tcp -d "$db_host" --dport 5432 -j RETURN' in containers
+    assert containers.rstrip().endswith("iptables -A $c -j DROP")
+    # Host: closes with REJECT; 80/443 only behind the maintenance flag.
+    out = runner.split("chain OUTPUT CODEADAPT-OUT")[1].split("chain INPUT")[0]
+    assert out.rstrip().endswith("iptables -A $o -j REJECT")
+    assert "if [ -e $MAINT_FLAG ]; then" in out
+    app = script.split("apply_app() {")[1].split("\n}\n")[0]
+    assert "-d $METADATA -j DROP" in app
+
+
+def test_the_example_runner_runs_one_sandbox_at_a_time() -> None:
+    """1 GiB runner VM: each sandbox may use 256 MiB plus gVisor's own memory (D5)."""
+    assert "SANDBOX_MAX_CONCURRENCY=1" in (DEPLOY / "runner.env.example").read_text()
+
+
+@pytest.mark.parametrize(
+    "path",
+    [DEPLOY / "pull-images.sh", *sorted(HOST.glob("*.sh"))],
+    ids=lambda p: p.name,
+)
+def test_host_scripts_are_executable(path: Path) -> None:
+    assert path.stat().st_mode & 0o111
