@@ -13,7 +13,7 @@ What has actually been done, with evidence, is recorded in
   `relay-nsg` or `relay-rg`, change it.
 - Everything for CodeAdapt goes in `codeadapt-rg`, Central India, tag `project=codeadapt`.
 - No secret goes into GitHub, a screenshot, a chat message or a log. Passwords are made on
-  the VM with `openssl rand -base64 32` and stay in `chmod 600` files there.
+  the VM with `openssl rand -hex 32` and stay in `chmod 600` files there.
 - The VMs never build images. CI builds them (`release-images` workflow) and the VMs pull
   them by digest with `deploy/pull-images.sh`.
 - Never click "Upgrade" to pay-as-you-go.
@@ -117,7 +117,7 @@ sudo deploy/pull-images.sh app release-images.env
 sudo deploy/db-tls/make-db-certs.sh /etc/codeadapt/db-tls db.codeadapt.internal
 sudo cp deploy/app.env.example deploy/app.env && sudo chmod 600 deploy/app.env
 sudo nano deploy/app.env     # SITE_HOST=<the DNS name>, DB_PRIVATE_BIND=10.30.1.4, IMAGE_TAG=<printed>,
-                             # each password from: openssl rand -base64 32
+                             # each password from: openssl rand -hex 32
 ```
 
 Move `ca.key` off the VM (runbook §1 step 5) before going further.
