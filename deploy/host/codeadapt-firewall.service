@@ -1,0 +1,16 @@
+# Re-applies deploy/host/firewall.sh at every boot, after Docker has made its chains.
+# Install (from the checkout in /opt/codeadapt):
+#   sudo cp deploy/host/codeadapt-firewall.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now codeadapt-firewall
+[Unit]
+Description=CodeAdapt host firewall
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/opt/codeadapt/deploy/host/firewall.sh apply
+
+[Install]
+WantedBy=multi-user.target

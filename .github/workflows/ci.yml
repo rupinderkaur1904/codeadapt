@@ -314,6 +314,8 @@ jobs:
           docker build -f deploy/backend.Dockerfile --target api -t codeadapt-api:local .
           docker build -f deploy/backend.Dockerfile --target worker -t codeadapt-worker:local .
           docker build -f deploy/web.Dockerfile -t codeadapt-proxy:local .
+      - name: Deployment shell scripts (shellcheck)
+        run: shellcheck -S warning deploy/*.sh deploy/host/*.sh deploy/backup/*.sh deploy/db-tls/*.sh
       - name: Images run as non-root
         run: |
           for image in codeadapt-api:local codeadapt-worker:local; do

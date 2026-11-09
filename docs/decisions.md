@@ -988,3 +988,44 @@ A retry sent while it is not valid still does nothing and returns the current st
 **Consequences.** Monitoring needs one cron entry or uptime probe (runbook). A worker
 container needs a stop grace period longer than one job (120 s suggested); a worker killed
 anyway is recovered by the lease, as before (ADR-031).
+
+## ADR-043 — Azure deployment: images built in CI and pulled by digest, host firewall, one sandbox at a time (Milestone 4, 2026-11-09)
+
+**Context.** The owner approved (2026-11-09) two Azure for Students VMs in a separate
+`codeadapt-rg` and VNet: an App VM on B2pts v2 (Arm64, 1 GiB, free hours) and a runner VM on
+B2ats v2 (x86-64, 1 GiB, paid, switched on only for sessions, no public IP). Building the
+images on 1 GiB VMs is slow and can run out of memory, and an App VM on Arm needs Arm images.
+Docker-published ports and container traffic bypass ufw, so a host firewall must use Docker's
+own chain. Each sandbox may use 256 MiB, plus gVisor's own memory.
+
+**Decision.**
+
+- The `release-images` workflow builds the images in CI: `api` and `proxy` for Arm64 and
+  x86-64, `worker` and `sandbox` for x86-64 only (the fingerprints were measured on x86-64; a
+  test fails if an Arm worker or sandbox is added). A push to `main` publishes them to GHCR
+  under `sha-<commit>` and writes a `release-images.env` file of digests. Pull requests that
+  touch the deployment files build every image without publishing it.
+- `deploy/pull-images.sh` accepts digests only, checks that each image was built from the
+  commit checked out on the VM, and gives the images the local names the Compose files
+  already use, so the Compose files and the sandbox image name are unchanged. The sandbox
+  image is built from the unchanged, research-frozen `sandbox/Dockerfile`.
+- The web build stage runs on the build machine's platform; its output is static files.
+- `deploy/host/firewall.sh` adds rules behind the Azure NSGs. On the runner, the worker
+  container may reach only the database port, and the host may reach only the Azure platform
+  address, the database port, and, in an explicit maintenance mode, ports 80/443. On the App
+  VM, the published database port answers the runner subnet only. On both VMs, no container
+  can reach the metadata service.
+- `deploy/host/install-gvisor.sh` installs the same gVisor pin as CI (a test keeps them
+  equal). `deploy/host/verify-host.sh` makes read-only host checks whose output is the
+  evidence recorded in `docs/deployment/m4-deployment-progress.md`.
+- The example runner settings run one sandbox at a time (`SANDBOX_MAX_CONCURRENCY=1`) on the
+  1 GiB runner (decision D5). The Compose default is unchanged.
+
+**Not changed.** Diagnosis, fingerprints, evidence, BKT, recommendation policy, content and
+evaluation (the research freeze checks pass). No host exists yet: TLS on a real name, gVisor
+level L3, database TLS and the egress rules on a host remain **unverified** until the host
+checks are run and recorded.
+
+**Consequences.** GHCR packages start private: the owner either makes them public (they hold
+only public code and demo content) or gives each VM a read-only token. The runner gets
+security updates only during an installation window (about monthly, and before the pilot).
