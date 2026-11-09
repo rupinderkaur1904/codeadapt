@@ -3,22 +3,24 @@
 Passwords are hashed with Argon2id. A login creates a server-side session: the browser
 holds a random token in an HTTP-only cookie and the database holds only its SHA-256, so a
 database leak does not reveal live session tokens. Each session also carries a CSRF token
-that state-changing requests must echo in a header. There is no self-registration: an
-operator creates accounts with `codeadapt-admin`.
+that state-changing requests must echo in a header. An operator creates accounts with
+`codeadapt-admin`; when the deployment turns it on (ADR-044), a person holding a
+researcher-issued invite code may also create a student account of data class `dev`.
 """
 
 from __future__ import annotations
 
 import hashlib
+import re
 import secrets
 from datetime import datetime, timedelta
 
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
-from codeadapt.db.models import AuditEvent, AuthSession, User, utcnow
+from codeadapt.db.models import AuditEvent, AuthSession, InviteCode, User, utcnow
 from codeadapt.db.session import as_utc
 
 # argon2-cffi's defaults are Argon2id with RFC 9106's low-memory profile.
@@ -41,6 +43,12 @@ class AuditKind:
     PASSWORD_CHANGE_FAILED = "password_change_failed"  # noqa: S105 - wrong current password
     ACCOUNT_DISABLED = "account_disabled"
     ACCOUNT_ERASED = "account_erased"  # participant withdrawal; the name is not kept
+    # ADR-044: self-service sign-up with an invite code.
+    SIGNUP = "signup"
+    SIGNUP_FAILED = "signup_failed"  # wrong, expired, used-up or revoked invite code
+    SIGNUP_THROTTLED = "signup_throttled"
+    INVITE_CREATED = "invite_created"
+    INVITE_REVOKED = "invite_revoked"
 
 
 def hash_password(password: str) -> str:
@@ -155,6 +163,107 @@ def recent_failures(session: Session, username: str, client: str, since: datetim
                 AuditEvent.at >= since,
                 (func.lower(AuditEvent.username) == func.lower(username[:64]))
                 | (AuditEvent.client == client[:64]),
+            )
+        )
+        or 0
+    )
+
+
+# ---------------------------------------------------------------- invite codes (ADR-044)
+
+# No 0/O, 1/I/L: codes are read aloud and copied from a slide. 31 symbols, 12 of them
+# give about 59 bits; with the sign-up throttle that is far beyond guessing.
+_CODE_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
+_CODE_LENGTH = 12
+MAX_INVITE_USES = 500
+MAX_INVITE_DAYS = 90
+# Sign-up usernames: 3-32 letters, digits, dot, dash, underscore, starting with a letter or
+# digit. Operator-created names (codeadapt-admin) keep the wider 64-character rule.
+_SIGNUP_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{2,31}")
+# The development stub's fixed accounts (api/app.py) and names a person could mistake for
+# staff are never available through sign-up.
+_RESERVED_PREFIXES = ("dev-",)
+_RESERVED_NAMES = frozenset({"admin", "administrator", "root", "researcher", "codeadapt"})
+
+
+def normalise_invite_code(code: str) -> str:
+    return "".join(ch for ch in code.upper() if ch not in " -")
+
+
+def format_invite_code(code: str) -> str:
+    return "-".join(code[i : i + 4] for i in range(0, len(code), 4))
+
+
+def create_invite(
+    session: Session, label: str, max_uses: int, valid_for: timedelta
+) -> tuple[str, InviteCode]:
+    """A new code; returns it formatted for people (shown once, never stored) and the row."""
+    if not 1 <= max_uses <= MAX_INVITE_USES:
+        raise ValueError(f"max uses must be between 1 and {MAX_INVITE_USES}")
+    if not timedelta(0) < valid_for <= timedelta(days=MAX_INVITE_DAYS):
+        raise ValueError(f"an invite code may be valid for at most {MAX_INVITE_DAYS} days")
+    label = label.strip()
+    if not label or len(label) > 64:
+        raise ValueError("label must have 1-64 characters")
+    code = "".join(secrets.choice(_CODE_ALPHABET) for _ in range(_CODE_LENGTH))
+    row = InviteCode(
+        code_hash=_digest(code),
+        label=label,
+        expires_at=utcnow() + valid_for,
+        max_uses=max_uses,
+        uses=0,
+    )
+    session.add(row)
+    return format_invite_code(code), row
+
+
+def consume_invite(session: Session, code: str) -> InviteCode | None:
+    """Spend one use of a live code, atomically: the conditional UPDATE means two sign-ups
+    racing for a code's last use cannot both win. The use is returned if the caller's
+    transaction rolls back. Returns the code's row, or None for a wrong, expired, used-up or
+    revoked code (the caller cannot tell which, and neither can the person signing up)."""
+    digest = _digest(normalise_invite_code(code))
+    now = utcnow()
+    result = session.execute(
+        update(InviteCode)
+        .where(
+            InviteCode.code_hash == digest,
+            InviteCode.revoked_at.is_(None),
+            InviteCode.expires_at > now,
+            InviteCode.uses < InviteCode.max_uses,
+        )
+        .values(uses=InviteCode.uses + 1)
+        .execution_options(synchronize_session=False)
+    )
+    if result.rowcount != 1:  # type: ignore[attr-defined]
+        return None
+    return session.scalar(select(InviteCode).where(InviteCode.code_hash == digest))
+
+
+def signup_username_problem(username: str) -> str | None:
+    """Why ``username`` cannot be chosen at sign-up, or None if it can."""
+    if not _SIGNUP_NAME.fullmatch(username):
+        return (
+            "Use 3-32 letters, digits, dots, dashes or underscores, starting with a letter or digit"
+        )
+    lowered = username.lower()
+    if lowered in _RESERVED_NAMES or lowered.startswith(_RESERVED_PREFIXES):
+        return "This username is reserved"
+    return None
+
+
+def recent_client_events(
+    session: Session, kinds: tuple[str, ...], client: str, since: datetime
+) -> int:
+    """Audit events of ``kinds`` from one client address since ``since`` (sign-up limits)."""
+    return (
+        session.scalar(
+            select(func.count())
+            .select_from(AuditEvent)
+            .where(
+                AuditEvent.kind.in_(kinds),
+                AuditEvent.at >= since,
+                AuditEvent.client == client[:64],
             )
         )
         or 0

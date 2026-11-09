@@ -1029,3 +1029,49 @@ checks are run and recorded.
 **Consequences.** GHCR packages start private: the owner either makes them public (they hold
 only public code and demo content) or gives each VM a read-only token. The runner gets
 security updates only during an installation window (about monthly, and before the pilot).
+
+## ADR-044 — Gated self-service sign-up with researcher-issued invite codes (2026-11-09)
+
+**Context.** The owner asked for a "Register / Sign up" option on the login page, so a new
+person does not need an operator to run `codeadapt-admin create-user` on the VM. The site is
+on the public internet, and real students must not be enrolled before the security and
+ethics gate (Gate C). Open sign-up would let anyone who finds the URL create an account.
+
+**Decision.**
+
+- Sign-up is **off** unless the API is started with `CODEADAPT_SIGNUP=invite-code`. Unset or
+  empty means off; any other value (including `open`) stops start-up. There is no open mode.
+- A person signs up at `POST /api/v1/auth/signup` with a username, a password and an invite
+  code. `GET /api/v1/auth/signup` tells the login page whether to offer the form.
+- The account is always role `student` and data class `dev`. The request schema forbids
+  extra fields, so a caller cannot ask for another role or data class. Researcher and admin
+  accounts stay operator-only (`codeadapt-admin create-user`).
+- Invite codes are issued with `codeadapt-admin invite-create --label --max-uses --days`
+  (at most 500 uses and 90 days), listed with `invite-list` and stopped with `invite-revoke`.
+  A code is 12 symbols from a 31-symbol alphabet with no look-alike characters (about 59
+  bits) and is printed once. Only its SHA-256 is stored (`invite_codes`, migration 0007).
+  A use is spent with one conditional `UPDATE`, so a code cannot admit more than its limit
+  under concurrent sign-ups; a failed sign-up gives the use back.
+- The code is checked before the username, so a caller without a valid code learns nothing
+  about which usernames exist. Wrong, expired, used-up and revoked codes get the same answer.
+- The password rule is the existing one (`auth.MIN_PASSWORD_LENGTH`, 12 characters, Argon2id).
+  Sign-up usernames are 3–32 letters, digits, `.`, `-` or `_`, starting with a letter or
+  digit; `dev-…` (the development stub's accounts) and staff-like names (`admin`, `root`,
+  `researcher`, …) are refused. Names stay unique ignoring case (ADR-041).
+- Limits per client address: 10 failed sign-ups (bad code or taken name) within the login
+  failure window, and 40 successful sign-ups per hour (a class often shares one campus
+  address; the code's own use limit is what bounds the number of accounts). Both are
+  configurable. Sign-up, failures, throttling, and issuing and revoking codes are written to
+  the audit log; the sign-up event records which invite was used.
+- A successful sign-up ends any session the browser held and starts a new one, as login
+  does (ADR-041). The worker role cannot read `invite_codes`.
+
+**Not changed.** Login, sessions, CSRF, the password rule, operator account creation, and
+all research logic (diagnosis, fingerprints, evidence, BKT, recommendation policy, content,
+evaluation).
+
+**Consequences.** Accounts made through sign-up are `dev` data and must not be analysed as
+real-student data. Enrolling real students still needs Gate C; when it is passed, a separate
+decision is needed on whether sign-up accounts may become `real` and what consent step the
+form needs. The invite code is a shared secret for a class: anyone it is passed to can sign
+up until it is revoked, expires or is used up.
