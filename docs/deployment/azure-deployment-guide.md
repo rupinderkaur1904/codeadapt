@@ -13,7 +13,7 @@ What has actually been done, with evidence, is recorded in
   `relay-nsg` or `relay-rg`, change it.
 - Everything for CodeAdapt goes in `codeadapt-rg`, Central India, tag `project=codeadapt`.
 - No secret goes into GitHub, a screenshot, a chat message or a log. Passwords are made on
-  the VM with `openssl rand -base64 32` and stay in `chmod 600` files there.
+  the VM with `openssl rand -hex 32` and stay in `chmod 600` files there.
 - The VMs never build images. CI builds them (`release-images` workflow) and the VMs pull
   them by digest with `deploy/pull-images.sh`.
 - Never click "Upgrade" to pay-as-you-go.
@@ -56,7 +56,7 @@ Portal → Virtual machines → Create → Azure virtual machine.
 | | Name | `codeadapt-app-vm` |
 | | Region | (Asia Pacific) Central India |
 | | Availability options | No infrastructure redundancy required |
-| | Security type | Trusted launch |
+| | Security type | Standard (B2pts v2 does not support Trusted launch) |
 | | Image | Ubuntu Server 24.04 LTS, **Arm64** |
 | | Size | **Standard_B2pts_v2** (shown as free-services eligible) |
 | | Authentication | SSH public key, a **new** key pair named `codeadapt-key` (never Relay's) |
@@ -88,6 +88,7 @@ SSH from your laptop: `ssh -i codeadapt-key.pem azureuser@<app public IP>`.
 ```
 # 1. Updates, and 1 GiB of swap (1 GiB RAM is tight for PostgreSQL + API + Caddy)
 sudo apt-get update && sudo apt-get -y upgrade
+echo 'PermitRootLogin no' | sudo tee /etc/ssh/sshd_config.d/10-codeadapt.conf && sudo sshd -t && sudo systemctl reload ssh
 cat /etc/apt/apt.conf.d/20auto-upgrades        # both lines should end in "1"
 sudo fallocate -l 1G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile
 sudo swapon /swapfile && echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
@@ -117,7 +118,7 @@ sudo deploy/pull-images.sh app release-images.env
 sudo deploy/db-tls/make-db-certs.sh /etc/codeadapt/db-tls db.codeadapt.internal
 sudo cp deploy/app.env.example deploy/app.env && sudo chmod 600 deploy/app.env
 sudo nano deploy/app.env     # SITE_HOST=<the DNS name>, DB_PRIVATE_BIND=10.30.1.4, IMAGE_TAG=<printed>,
-                             # each password from: openssl rand -base64 32
+                             # each password from: openssl rand -hex 32
 ```
 
 Move `ca.key` off the VM (runbook §1 step 5) before going further.
@@ -165,7 +166,7 @@ SSH through the App VM (the runner accepts SSH from the app subnet only):
 pick up the key, add the key with `ssh-add` first.
 
 ```
-sudo apt-get update && sudo apt-get -y upgrade
+sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get install -y bzip2   # gVisor's archive
 # Docker exactly as Step C.2, then:
 sudo git clone https://github.com/rupinderkaur1904/codeadapt.git /opt/codeadapt
 cd /opt/codeadapt && sudo git checkout <REVISION>
