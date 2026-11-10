@@ -35,6 +35,8 @@ the M9 decisions (ethics determination, consent, cohort, data retention).
 | `CODEADAPT_SANDBOX_MAX_CONCURRENCY` | worker | at most the VM's cores |
 | `CODEADAPT_SESSION_HOURS` | API | default 12 |
 | `CODEADAPT_SUBMISSIONS_PER_MINUTE` | API | default 10 in production; `none` disables |
+| `CODEADAPT_SIGNUP` | API | leave **unset** (sign-up off). `invite-code` shows "Create an account" on the login page; new accounts need an invite code from `codeadapt-admin invite-create` and are students with data class `dev` (ADR-044). Any other value stops start-up |
+| `CODEADAPT_SIGNUPS_PER_CLIENT_PER_HOUR` | API | default 40 successful sign-ups per client address per hour |
 | `CODEADAPT_POLICY_VERSION` | worker | recommendation policy, `1.5` (default) or `1.4` (ADR-038) |
 | `CODEADAPT_LOG_FORMAT`, `CODEADAPT_LOG_LEVEL` | API, worker | default `json` and `INFO` in production |
 | `CODEADAPT_WORKER_HEARTBEAT_FILE` | worker | e.g. `/tmp/codeadapt-worker.heartbeat`; enables `codeadapt-worker --check` as the container health check (ADR-042) |

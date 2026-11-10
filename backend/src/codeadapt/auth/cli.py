@@ -1,4 +1,5 @@
-"""`codeadapt-admin`: create accounts, set passwords, disable accounts (ADR-029); back up
+"""`codeadapt-admin`: create accounts, set passwords, disable accounts (ADR-029); issue
+sign-up invite codes (ADR-044); back up
 a SQLite database; report operational status (ADR-042).
 
 Passwords are read from the terminal without echo, or from stdin when it is not a
@@ -14,6 +15,7 @@ import json
 import os
 import sqlite3
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 from sqlalchemy import select
@@ -23,8 +25,8 @@ from sqlalchemy.orm import Session
 from codeadapt import auth, ops
 from codeadapt.config import Settings
 from codeadapt.db import roles
-from codeadapt.db.models import DataClass, Role, User, utcnow
-from codeadapt.db.session import make_engine, make_session_factory
+from codeadapt.db.models import DataClass, InviteCode, Role, User, utcnow
+from codeadapt.db.session import as_utc, make_engine, make_session_factory
 
 _OPERATOR = "codeadapt-admin"
 MIN_DB_PASSWORD_CHARS = 16
@@ -97,6 +99,59 @@ def _status(session: Session, args: argparse.Namespace) -> int:
     return 1 if problems else 0
 
 
+def _invites(session: Session, args: argparse.Namespace) -> int:
+    if args.command == "invite-create":
+        try:
+            code, row = auth.create_invite(
+                session, args.label, args.max_uses, timedelta(days=args.days)
+            )
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from None
+        session.flush()
+        auth.audit(
+            session,
+            auth.AuditKind.INVITE_CREATED,
+            username=_OPERATOR,
+            client=_OPERATOR,
+            target=f"invite={row.id} label={row.label} max_uses={row.max_uses}",
+        )
+        session.commit()
+        print(f"invite {row.id} ({row.label}): {code}")
+        print(f"  up to {row.max_uses} sign-ups until {as_utc(row.expires_at):%Y-%m-%d %H:%M} UTC")
+        print("  accounts created with it are students with data class 'dev'")
+        return 0
+    if args.command == "invite-list":
+        now = utcnow()
+        for row in session.scalars(select(InviteCode).order_by(InviteCode.id)):
+            if row.revoked_at is not None:
+                state = "revoked"
+            elif as_utc(row.expires_at) <= now:
+                state = "expired"
+            elif row.uses >= row.max_uses:
+                state = "used-up"
+            else:
+                state = "live"
+            expires = f"{as_utc(row.expires_at):%Y-%m-%d}"
+            print(f"{row.id}\t{row.label}\t{row.uses}/{row.max_uses}\t{expires}\t{state}")
+        return 0
+    target = session.get(InviteCode, args.invite_id)
+    if target is None:
+        raise SystemExit(f"no invite {args.invite_id}")
+    row = target
+    if row.revoked_at is None:
+        row.revoked_at = utcnow()
+        auth.audit(
+            session,
+            auth.AuditKind.INVITE_REVOKED,
+            username=_OPERATOR,
+            client=_OPERATOR,
+            target=f"invite={row.id}",
+        )
+        session.commit()
+    print(f"invite-revoke: {row.id} ({row.label})")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="codeadapt-admin", description=__doc__.split("\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -108,6 +163,17 @@ def main(argv: list[str] | None = None) -> int:
         p = sub.add_parser(name, help=f"{text}; ends the account's sessions")
         p.add_argument("username")
     sub.add_parser("list", help="list accounts")
+    invite = sub.add_parser(
+        "invite-create",
+        help="issue a sign-up invite code (ADR-044); prints the code once. Sign-up also "
+        "needs CODEADAPT_SIGNUP=invite-code on the API",
+    )
+    invite.add_argument("--label", required=True, help="e.g. the class or session name")
+    invite.add_argument("--max-uses", type=int, default=40)
+    invite.add_argument("--days", type=float, default=14.0, help="valid for (at most 90)")
+    sub.add_parser("invite-list", help="list invite codes (never the codes themselves)")
+    revoke = sub.add_parser("invite-revoke", help="stop an invite code admitting sign-ups")
+    revoke.add_argument("invite_id", type=int)
     backup = sub.add_parser("backup", help="consistent online copy of a SQLite database")
     backup.add_argument("destination", type=Path)
     status = sub.add_parser(
@@ -202,6 +268,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "db-fingerprint":
             print(json.dumps(ops.database_fingerprint(session), sort_keys=True))
             return 0
+        if args.command.startswith("invite-"):
+            return _invites(session, args)
         if args.command == "list":
             for u in session.scalars(select(User).order_by(User.username)):
                 login = "disabled" if u.disabled else ("login" if u.password_hash else "no-login")

@@ -776,6 +776,62 @@
         "title": "SampleTest",
         "type": "object"
       },
+      "SignupRequest": {
+        "additionalProperties": false,
+        "description": "Self-service sign-up with an invite code (ADR-044). The server checks the username's\nform and the password's length (``auth.MIN_PASSWORD_LENGTH``).",
+        "properties": {
+          "invite_code": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Invite Code",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "invite_code"
+        ],
+        "title": "SignupRequest",
+        "type": "object"
+      },
+      "SignupStatus": {
+        "additionalProperties": false,
+        "description": "Whether this deployment accepts sign-ups, so the login page can offer one.",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "min_password_length": {
+            "title": "Min Password Length",
+            "type": "integer"
+          },
+          "needs_invite_code": {
+            "title": "Needs Invite Code",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "needs_invite_code",
+          "min_password_length"
+        ],
+        "title": "SignupStatus",
+        "type": "object"
+      },
       "SkillEstimate": {
         "additionalProperties": false,
         "properties": {
@@ -1500,6 +1556,61 @@
           }
         },
         "summary": "Change Password"
+      }
+    },
+    "/api/v1/auth/signup": {
+      "get": {
+        "operationId": "signup_status_api_v1_auth_signup_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignupStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Signup Status"
+      },
+      "post": {
+        "description": "Create a student account with a researcher-issued invite code and log it in.\n\nOff unless the deployment sets CODEADAPT_SIGNUP=invite-code. The account is always\nrole `student`, data class `dev` (Gate C): nothing a caller sends can change either.\nThe invite code is checked before the username, so a caller without a code learns\nnothing about which names exist.",
+        "operationId": "signup_api_v1_auth_signup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthUser"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Signup"
       }
     },
     "/api/v1/health": {

@@ -14,6 +14,7 @@ export type ResearchMetrics = components["schemas"]["ResearchMetrics"];
 export type TraceView = components["schemas"]["TraceView"];
 export type LearnerModelView = components["schemas"]["LearnerModelView"];
 export type AuthUser = components["schemas"]["AuthUser"];
+export type SignupStatus = components["schemas"]["SignupStatus"];
 
 // The session's CSRF token (ADR-029), echoed on every state-changing request. The session
 // cookie itself is HttpOnly and never visible here. Null under the dev stub.
@@ -93,6 +94,14 @@ export const api = {
       body: JSON.stringify({ username, password }),
     }),
   logout: () => request<undefined>("/auth/logout", { method: "POST" }),
+  /** Whether this deployment accepts sign-ups with an invite code (ADR-044). */
+  signupStatus: () => request<SignupStatus>("/auth/signup"),
+  signup: (username: string, password: string, inviteCode: string) =>
+    request<AuthUser>("/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password, invite_code: inviteCode }),
+    }),
   changePassword: (currentPassword: string, newPassword: string) =>
     request<AuthUser>("/auth/password", {
       method: "POST",

@@ -10,6 +10,14 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
+class SignupMode(StrEnum):
+    """ADR-044. Deliberately no "open" value: anyone-can-register would enrol people before
+    the ethics gate."""
+
+    OFF = "off"
+    INVITE_CODE = "invite-code"
+
+
 class Environment(StrEnum):
     DEV = "dev"
     TEST = "test"
@@ -42,6 +50,19 @@ class Settings:
     # ADR-040: the only way to run student code outside gVisor in production. Set to
     # "local-demo-only" by compose.demo.yaml; never for a deployment students can reach.
     allow_runc_in_production: bool = False
+    # ADR-044: self-service sign-up. Off unless CODEADAPT_SIGNUP=invite-code; then a new
+    # account needs a researcher-issued invite code and is always a `student` with data class
+    # `dev` (Gate C: no real-student enrolment yet). There is no open sign-up mode.
+    signup_mode: SignupMode = SignupMode.OFF
+    # A class often signs up from one campus address (NAT), so these are per client address
+    # and generous; the invite code's own use limit is what bounds how many accounts exist.
+    signups_per_client_per_hour: int = 40
+    # Failed sign-ups (wrong code, name taken) per client within login_failure_window_minutes.
+    signup_max_failures: int = 10
+
+    @property
+    def signup_enabled(self) -> bool:
+        return self.signup_mode is SignupMode.INVITE_CODE
 
     @property
     def secure_cookies(self) -> bool:
@@ -102,6 +123,10 @@ class Settings:
                 if h.strip()
             ),
             allow_runc_in_production=_allow_runc(os.environ.get("CODEADAPT_SANDBOX_ALLOW_RUNC")),
+            signup_mode=_signup_mode(os.environ.get("CODEADAPT_SIGNUP")),
+            signups_per_client_per_hour=int(
+                os.environ.get("CODEADAPT_SIGNUPS_PER_CLIENT_PER_HOUR", "40")
+            ),
         )
 
 
@@ -140,6 +165,18 @@ def _allow_runc(raw: str | None) -> bool:
             f"CODEADAPT_SANDBOX_ALLOW_RUNC accepts only {ALLOW_RUNC_VALUE!r} (or unset)"
         )
     return True
+
+
+def _signup_mode(raw: str | None) -> SignupMode:
+    """Fail closed (ADR-044): unset or empty means off; an unknown value stops start-up
+    rather than guessing."""
+    if raw is None or raw.strip() == "":
+        return SignupMode.OFF
+    try:
+        return SignupMode(raw.strip())
+    except ValueError:
+        valid = ", ".join(m.value for m in SignupMode)
+        raise ConfigError(f"CODEADAPT_SIGNUP must be one of: {valid} (or unset)") from None
 
 
 def _optional_int(value: str | None, *, default: int | None) -> int | None:

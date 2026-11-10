@@ -76,6 +76,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signup Status */
+        get: operations["signup_status_api_v1_auth_signup_get"];
+        put?: never;
+        /**
+         * Signup
+         * @description Create a student account with a researcher-issued invite code and log it in.
+         *
+         *     Off unless the deployment sets CODEADAPT_SIGNUP=invite-code. The account is always
+         *     role `student`, data class `dev` (Gate C): nothing a caller sends can change either.
+         *     The invite code is checked before the username, so a caller without a code learns
+         *     nothing about which names exist.
+         */
+        post: operations["signup_api_v1_auth_signup_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -635,6 +661,31 @@ export interface components {
             /** Input */
             input: string;
         };
+        /**
+         * SignupRequest
+         * @description Self-service sign-up with an invite code (ADR-044). The server checks the username's
+         *     form and the password's length (``auth.MIN_PASSWORD_LENGTH``).
+         */
+        SignupRequest: {
+            /** Invite Code */
+            invite_code: string;
+            /** Password */
+            password: string;
+            /** Username */
+            username: string;
+        };
+        /**
+         * SignupStatus
+         * @description Whether this deployment accepts sign-ups, so the login page can offer one.
+         */
+        SignupStatus: {
+            /** Enabled */
+            enabled: boolean;
+            /** Min Password Length */
+            min_password_length: number;
+            /** Needs Invite Code */
+            needs_invite_code: boolean;
+        };
         /** SkillEstimate */
         SkillEstimate: {
             /** Counted */
@@ -945,6 +996,59 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthUser"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    signup_status_api_v1_auth_signup_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignupStatus"];
+                };
+            };
+        };
+    };
+    signup_api_v1_auth_signup_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignupRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
