@@ -232,6 +232,36 @@ def test_admin_cli_creates_resets_and_disables_accounts(
     assert kinds == ["account_created"]
 
 
+def test_admin_cli_keeps_a_single_researcher_login(
+    db_url: str, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """ADR-045: one researcher/admin account can log in unless the operator says otherwise."""
+    monkeypatch.setenv("CODEADAPT_DATABASE_URL", db_url)
+
+    def create(*argv: str) -> int:
+        monkeypatch.setattr("sys.stdin", io.StringIO(PASSWORD + "\n"))
+        return admin(["create-user", *argv])
+
+    assert create("res", "--role", "researcher", "--data-class", "dev") == 0
+    for role in ("researcher", "admin"):
+        with pytest.raises(SystemExit, match=r"already exists \(res\)"):
+            create("res2", "--role", role, "--data-class", "dev")
+    # Students are never limited.
+    assert create("stu1", "--role", "student", "--data-class", "dev") == 0
+    assert create("stu2", "--role", "student", "--data-class", "dev") == 0
+    # A disabled researcher no longer counts, so the login can be replaced.
+    assert admin(["disable", "res"]) == 0
+    assert create("res2", "--role", "researcher", "--data-class", "dev") == 0
+    # An explicit second staff login is still possible.
+    assert create("ops", "--role", "admin", "--data-class", "dev", "--allow-second-staff") == 0
+    capsys.readouterr()
+    admin(["list"])
+    out = capsys.readouterr().out
+    assert "res\tresearcher\tdev\tdisabled" in out
+    assert "res2\tresearcher\tdev\tlogin" in out
+    assert "ops\tadmin\tdev\tlogin" in out
+
+
 def test_admin_backup_copies_a_consistent_sqlite_database(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
