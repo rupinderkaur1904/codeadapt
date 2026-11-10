@@ -120,6 +120,24 @@ class AuditEvent(Base):
     target: Mapped[str] = mapped_column(String(255), default="")
 
 
+class InviteCode(Base):
+    """A sign-up code a researcher hands to a class (ADR-044). Only a SHA-256 of the code is
+    stored. A code admits at most ``max_uses`` accounts until ``expires_at``; revoking it
+    stops further sign-ups but leaves the accounts it created alone. It names no user, so
+    erasing a learner (ops.erase_learner) never has to touch it."""
+
+    __tablename__ = "invite_codes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    code_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    label: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = _ts()
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    max_uses: Mapped[int] = mapped_column(Integer)
+    uses: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
 class ProblemVersion(Base):
     __tablename__ = "problem_versions"
 

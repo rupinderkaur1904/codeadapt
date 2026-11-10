@@ -99,7 +99,7 @@ def test_backup_restores_every_row_into_a_new_database(
         assert isinstance(tables, dict)
         for name in ("users", "submissions", "jobs", "diagnoses", "auth_sessions"):
             assert tables[name]["rows"] > 0, name  # the comparison covered real data
-        assert source["schema_revision"] == "0006"
+        assert source["schema_revision"] == "0007"
 
         # Restoring over an existing database is refused, and leaves it untouched.
         again = subprocess.run(

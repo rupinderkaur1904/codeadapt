@@ -32,8 +32,11 @@ ROLES = {
 }
 # Routes that need no login by design. Anything else under /api must refuse anonymous callers.
 # /ready (ADR-042) is public like /health: a load balancer probes it without a session.
+# Sign-up (ADR-044) is public by nature; it is off unless configured and needs an invite code.
 PUBLIC = {
     ("POST", "/api/v1/auth/login"),
+    ("GET", "/api/v1/auth/signup"),
+    ("POST", "/api/v1/auth/signup"),
     ("GET", "/api/v1/health"),
     ("GET", "/api/v1/ready"),
 }

@@ -28,7 +28,7 @@ def test_every_revision_upgrades_and_downgrades_step_by_step(blank_db_url: str) 
     revisions = [
         r.revision for r in reversed(list(ScriptDirectory.from_config(cfg).walk_revisions()))
     ]
-    assert revisions[:1] == ["0001"] and revisions[-1] == "0006"
+    assert revisions[:1] == ["0001"] and revisions[-1] == "0007"
     for rev in revisions:
         command.upgrade(cfg, rev)
     for rev in reversed(revisions[:-1]):

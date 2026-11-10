@@ -39,6 +39,8 @@ from codeadapt.api.schemas import (
     ResearchSubmissionRow,
     RetiredSkillView,
     SampleTest,
+    SignupRequest,
+    SignupStatus,
     SubmissionAccepted,
     SubmissionCreate,
     SubmissionStatus,
@@ -342,6 +344,103 @@ def create_app(
             username=user.username,
             user=user,
             client=client,
+        )
+        session.commit()
+        set_session_cookie(response, token)
+        return AuthUser(username=user.username, role=user.role, csrf_token=row.csrf_token)
+
+    # ------------------------------------------------------------------ sign-up (ADR-044)
+    @app.get("/api/v1/auth/signup", response_model=SignupStatus)
+    def signup_status() -> SignupStatus:
+        return SignupStatus(
+            enabled=settings.signup_enabled,
+            needs_invite_code=True,
+            min_password_length=auth.MIN_PASSWORD_LENGTH,
+        )
+
+    @app.post("/api/v1/auth/signup", status_code=201, response_model=AuthUser)
+    def signup(body: SignupRequest, request: Request, response: Response, session: DB) -> AuthUser:
+        """Create a student account with a researcher-issued invite code and log it in.
+
+        Off unless the deployment sets CODEADAPT_SIGNUP=invite-code. The account is always
+        role `student`, data class `dev` (Gate C): nothing a caller sends can change either.
+        The invite code is checked before the username, so a caller without a code learns
+        nothing about which names exist."""
+        if not settings.signup_enabled:
+            raise ApiError(403, "signup-disabled", "Sign-up is not available")
+        client = client_of(request)
+        window = timedelta(minutes=settings.login_failure_window_minutes)
+        if (
+            auth.recent_client_events(
+                session, (auth.AuditKind.SIGNUP_FAILED,), client, utcnow() - window
+            )
+            >= settings.signup_max_failures
+            or auth.recent_client_events(
+                session, (auth.AuditKind.SIGNUP,), client, utcnow() - timedelta(hours=1)
+            )
+            >= settings.signups_per_client_per_hour
+        ):
+            auth.audit(
+                session, auth.AuditKind.SIGNUP_THROTTLED, username=body.username, client=client
+            )
+            session.commit()
+            raise ApiError(429, "too-many-attempts", "Too many sign-up attempts; try again later")
+        problem = auth.signup_username_problem(body.username)
+        if problem is not None:
+            raise ApiError(422, "bad-username", "Username not allowed", problem)
+        if len(body.password) < auth.MIN_PASSWORD_LENGTH:
+            raise ApiError(
+                422,
+                "weak-password",
+                "Password too short",
+                f"password must have at least {auth.MIN_PASSWORD_LENGTH} characters",
+            )
+        invite = auth.consume_invite(session, body.invite_code)
+        if invite is None:
+            session.rollback()
+            auth.audit(
+                session,
+                auth.AuditKind.SIGNUP_FAILED,
+                username=body.username,
+                client=client,
+                target="invite-code",
+            )
+            session.commit()
+            raise ApiError(403, "bad-invite-code", "Invite code not valid")
+        if auth.find_user(session, body.username) is not None:
+            session.rollback()  # gives the invite use back
+            # Counted like a bad code, so even a valid code cannot be used to probe names
+            # quickly.
+            auth.audit(
+                session,
+                auth.AuditKind.SIGNUP_FAILED,
+                username=body.username,
+                client=client,
+                target="username-taken",
+            )
+            session.commit()
+            raise ApiError(409, "username-taken", "That username is taken")
+        user = User(
+            username=body.username,
+            role=Role.STUDENT.value,
+            data_class=DataClass.DEV.value,
+            password_hash=auth.hash_password(body.password),
+        )
+        session.add(user)
+        try:
+            session.flush()
+        except IntegrityError:  # a concurrent sign-up took the name (unique lower(username))
+            session.rollback()
+            raise ApiError(409, "username-taken", "That username is taken") from None
+        auth.revoke_token(session, request.cookies.get(SESSION_COOKIE))
+        token, row = auth.start_session(session, user, timedelta(hours=settings.session_hours))
+        auth.audit(
+            session,
+            auth.AuditKind.SIGNUP,
+            username=user.username,
+            user=user,
+            client=client,
+            target=f"invite={invite.id}",
         )
         session.commit()
         set_session_cookie(response, token)
