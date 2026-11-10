@@ -179,7 +179,11 @@ codeadapt-admin ...`.
    changed).
 3. Take a backup.
 4. Accounts: create them with `codeadapt-admin create-user`. Use `--data-class real` only
-   after Gate C.
+   after Gate C. There is one researcher login (ADR-045): `create-user --role researcher`
+   or `--role admin` refuses while another researcher or admin can log in. Students are
+   not limited. To replace the researcher, `disable` the old one first; a deliberate second
+   staff login needs `--allow-second-staff`. `app exec api codeadapt-admin list` shows who
+   can log in.
 
 ## 6. Upgrades
 

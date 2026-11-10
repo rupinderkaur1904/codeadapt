@@ -28,6 +28,20 @@ from codeadapt.db.session import make_engine, make_session_factory
 
 _OPERATOR = "codeadapt-admin"
 MIN_DB_PASSWORD_CHARS = 16
+STAFF_ROLES = (Role.RESEARCHER.value, Role.ADMIN.value)
+
+
+def _staff_logins(session: Session) -> list[User]:
+    """Accounts that can log in and see every learner's data (ADR-045)."""
+    return list(
+        session.scalars(
+            select(User).where(
+                User.role.in_(STAFF_ROLES),
+                User.password_hash.is_not(None),
+                User.disabled.is_(False),
+            )
+        )
+    )
 
 
 def _read_password() -> str:
@@ -104,6 +118,11 @@ def main(argv: list[str] | None = None) -> int:
     create.add_argument("username")
     create.add_argument("--role", choices=[r.value for r in Role], required=True)
     create.add_argument("--data-class", choices=[d.value for d in DataClass], required=True)
+    create.add_argument(
+        "--allow-second-staff",
+        action="store_true",
+        help="create a researcher or admin even though one already can log in (ADR-045)",
+    )
     for name, text in (("set-password", "set a new password"), ("disable", "disable login")):
         p = sub.add_parser(name, help=f"{text}; ends the account's sessions")
         p.add_argument("username")
@@ -213,6 +232,16 @@ def main(argv: list[str] | None = None) -> int:
                 # Names ignore case (ADR-041); the unique index on lower(username) also
                 # refuses a concurrent duplicate at commit.
                 raise SystemExit(f"user {user.username!r} already exists (names ignore case)")
+            if args.role in STAFF_ROLES and not args.allow_second_staff:
+                existing = _staff_logins(session)
+                if existing:
+                    # One researcher login sees everything (ADR-045); a second one is an
+                    # explicit choice, not a typo in --role.
+                    names = ", ".join(u.username for u in existing)
+                    raise SystemExit(
+                        f"a researcher/admin login already exists ({names}); disable it "
+                        "first or pass --allow-second-staff"
+                    )
             user = User(
                 username=args.username,
                 role=args.role,
