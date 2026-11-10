@@ -50,8 +50,11 @@ check "unattended security upgrades enabled" \
 sshd_value() { sshd -T 2>/dev/null | awk -v k="$1" '$1 == k {print $2}'; }
 [ "$(sshd_value passwordauthentication)" = no ] && pass "SSH password login disabled" \
   || fail "SSH password login is not disabled"
-[ "$(sshd_value permitrootlogin)" = no ] || [ "$(sshd_value permitrootlogin)" = prohibit-password ] \
-  && pass "SSH root password login refused" || fail "SSH root login allowed with a password"
+# sshd -T prints prohibit-password under its old name, without-password.
+case "$(sshd_value permitrootlogin)" in
+  no | prohibit-password | without-password) pass "SSH root password login refused" ;;
+  *) fail "SSH root login allowed with a password" ;;
+esac
 
 # ---------------------------------------------------------------- Docker
 check "Docker daemon running" docker info
