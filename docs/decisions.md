@@ -1029,3 +1029,27 @@ checks are run and recorded.
 **Consequences.** GHCR packages start private: the owner either makes them public (they hold
 only public code and demo content) or gives each VM a read-only token. The runner gets
 security updates only during an installation window (about monthly, and before the pilot).
+
+## ADR-045 — One researcher login (2026-11-10)
+
+**Context.** The owner wants a single password-protected account that sees the Research and
+Learners pages, that is, everything happening on the site. Researcher and admin accounts
+already see every learner's submissions and evidence (ADR-029 audit-logs each view), and
+students see only their own. Nothing stopped an operator from creating more researcher
+accounts, each of which would see all learner data. (The number ADR-044 is used by the
+sign-up proposal in PR #6.)
+
+**Decision.** `codeadapt-admin create-user` refuses `--role researcher` or `--role admin`
+while another researcher or admin account can log in (has a password and is not disabled).
+The message names the existing account. A disabled account does not count, so the login can
+be replaced by disabling the old one first. A deliberate second staff login needs
+`--allow-second-staff`. Password-less dev-stub accounts (`dev-researcher`, used only when
+dev auth is on) do not count. Students are not limited.
+
+**Not changed.** Roles, what each role can see, the API checks, the web client, the
+database schema, sign-up (it only ever makes students), diagnosis, evidence, BKT and
+recommendations. Existing accounts are left as they are; the guard applies to new ones.
+
+**Consequences.** On the live site the owner's existing researcher account stays the single
+researcher login. A second researcher, for example a future collaborator, is an explicit
+operator choice with its own flag.
