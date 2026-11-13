@@ -362,7 +362,7 @@ def create_app(
     def signup(body: SignupRequest, request: Request, response: Response, session: DB) -> AuthUser:
         """Create a student account and log it in.
 
-        Off unless the deployment sets CODEADAPT_SIGNUP=open or invite-code (ADR-045). The
+        Off unless the deployment sets CODEADAPT_SIGNUP=open or invite-code (ADR-046). The
         account is always role `student`, data class `dev` (Gate C): nothing a caller sends
         can change either. In invite-code mode the code is checked before the username, so a
         caller without a code learns nothing about which names exist."""

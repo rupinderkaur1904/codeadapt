@@ -778,7 +778,7 @@
       },
       "SignupRequest": {
         "additionalProperties": false,
-        "description": "Self-service sign-up (ADR-044, ADR-045). The server checks the username's\nform and the password's length (``auth.MIN_PASSWORD_LENGTH``).",
+        "description": "Self-service sign-up (ADR-044, ADR-046). The server checks the username's\nform and the password's length (``auth.MIN_PASSWORD_LENGTH``).",
         "properties": {
           "invite_code": {
             "anyOf": [
@@ -1581,7 +1581,7 @@
         "summary": "Signup Status"
       },
       "post": {
-        "description": "Create a student account and log it in.\n\nOff unless the deployment sets CODEADAPT_SIGNUP=open or invite-code (ADR-045). The\naccount is always role `student`, data class `dev` (Gate C): nothing a caller sends\ncan change either. In invite-code mode the code is checked before the username, so a\ncaller without a code learns nothing about which names exist.",
+        "description": "Create a student account and log it in.\n\nOff unless the deployment sets CODEADAPT_SIGNUP=open or invite-code (ADR-046). The\naccount is always role `student`, data class `dev` (Gate C): nothing a caller sends\ncan change either. In invite-code mode the code is checked before the username, so a\ncaller without a code learns nothing about which names exist.",
         "operationId": "signup_api_v1_auth_signup_post",
         "requestBody": {
           "content": {

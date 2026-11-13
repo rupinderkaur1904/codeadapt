@@ -13,7 +13,7 @@ function message(error: unknown): string {
 }
 
 /** Login form. Accounts are created by the study team, or, where the deployment turns it
- * on, by the person themselves (ADR-044, ADR-045). */
+ * on, by the person themselves (ADR-044, ADR-046). */
 export function LoginPage({ onLoggedIn }: { onLoggedIn: (user: AuthUser) => void }) {
   const signup = useQuery({ queryKey: ["signup-status"], queryFn: api.signupStatus, retry: false });
   const [signingUp, setSigningUp] = useState(false);

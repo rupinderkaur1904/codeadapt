@@ -11,7 +11,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 class SignupMode(StrEnum):
-    """ADR-044 / ADR-045. `open` lets anyone with the link create a student account of data
+    """ADR-044 / ADR-046. `open` lets anyone with the link create a student account of data
     class `dev`; `invite-code` also requires a researcher-issued code."""
 
     OFF = "off"
@@ -60,7 +60,7 @@ class Settings:
     signups_per_client_per_hour: int = 40
     # Failed sign-ups (wrong code, name taken) per client within login_failure_window_minutes.
     signup_max_failures: int = 10
-    # ADR-045: accounts sign-up may create in any 24 hours, from all clients together. With
+    # ADR-046: accounts sign-up may create in any 24 hours, from all clients together. With
     # open sign-up nothing else bounds the number of accounts (and so of people able to run
     # code in the sandbox); sign-ups beyond it get 429 until the window moves on.
     signups_per_day: int = 100
