@@ -268,3 +268,15 @@ def recent_client_events(
         )
         or 0
     )
+
+
+def recent_events(session: Session, kinds: tuple[str, ...], since: datetime) -> int:
+    """Audit events of ``kinds`` from every client since ``since`` (the daily sign-up cap)."""
+    return (
+        session.scalar(
+            select(func.count())
+            .select_from(AuditEvent)
+            .where(AuditEvent.kind.in_(kinds), AuditEvent.at >= since)
+        )
+        or 0
+    )

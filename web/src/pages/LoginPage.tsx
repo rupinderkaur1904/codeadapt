@@ -13,7 +13,7 @@ function message(error: unknown): string {
 }
 
 /** Login form. Accounts are created by the study team, or, where the deployment turns it
- * on, by the person themselves with an invite code (ADR-044). */
+ * on, by the person themselves (ADR-044, ADR-045). */
 export function LoginPage({ onLoggedIn }: { onLoggedIn: (user: AuthUser) => void }) {
   const signup = useQuery({ queryKey: ["signup-status"], queryFn: api.signupStatus, retry: false });
   const [signingUp, setSigningUp] = useState(false);
@@ -40,6 +40,7 @@ export function LoginPage({ onLoggedIn }: { onLoggedIn: (user: AuthUser) => void
     return (
       <SignupPage
         minPasswordLength={signup.data.min_password_length}
+        needsInviteCode={signup.data.needs_invite_code}
         onSignedUp={onLoggedIn}
         onCancel={() => setSigningUp(false)}
       />
