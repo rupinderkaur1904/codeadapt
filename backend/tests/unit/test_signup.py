@@ -84,7 +84,10 @@ def test_signup_mode_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
     assert Settings.from_env().signup_mode is SignupMode.OFF
     monkeypatch.setenv("CODEADAPT_SIGNUP", "invite-code")
     assert Settings.from_env().signup_enabled
-    for bad in ("open", "on", "true", "Invite-Code"):
+    monkeypatch.setenv("CODEADAPT_SIGNUP", "open")
+    assert Settings.from_env().signup_enabled
+    assert not Settings.from_env().signup_needs_invite_code
+    for bad in ("on", "true", "Invite-Code", "OPEN"):
         monkeypatch.setenv("CODEADAPT_SIGNUP", bad)
         with pytest.raises(ConfigError, match="CODEADAPT_SIGNUP"):
             Settings.from_env()
@@ -269,3 +272,87 @@ def test_admin_cli_issues_lists_and_revokes_codes(
     with pytest.raises(SystemExit, match="at most"):
         admin(["invite-create", "--label", "x", "--days", "365"])
     assert {"invite_created", "invite_revoked"} <= set(_kinds(sessions))
+
+
+# ---------------------------------------------------------------- open sign-up (ADR-045)
+
+
+@pytest.fixture
+def open_client(settings: Settings, sessions: sessionmaker[Session]) -> TestClient:
+    return TestClient(create_app(_settings(settings, SignupMode.OPEN), sessions), base_url=BASE)
+
+
+def _open_signup(client: TestClient, username: str, password: str = PASSWORD) -> Any:
+    return client.post("/api/v1/auth/signup", json={"username": username, "password": password})
+
+
+def test_open_signup_needs_no_invite_code(
+    open_client: TestClient, sessions: sessionmaker[Session]
+) -> None:
+    status = open_client.get("/api/v1/auth/signup").json()
+    assert status == {"enabled": True, "needs_invite_code": False, "min_password_length": 12}
+    r = _open_signup(open_client, "Newbie")
+    assert r.status_code == 201, r.text
+    assert open_client.get("/api/v1/auth/me").json() == {
+        "username": "Newbie",
+        "role": "student",
+        "csrf_token": r.json()["csrf_token"],
+    }
+    with sessions() as s:
+        user = s.scalars(select(User).where(User.username == "Newbie")).one()
+        assert (user.role, user.data_class) == ("student", "dev")
+        event = s.scalars(select(AuditEvent).where(AuditEvent.kind == "signup")).one()
+        assert event.target == "open"
+
+
+def test_open_signup_keeps_every_other_rule(
+    open_client: TestClient, sessions: sessionmaker[Session]
+) -> None:
+    for extra in ({"role": "admin"}, {"data_class": "real"}):
+        body = {"username": "sneaky", "password": PASSWORD, **extra}
+        assert open_client.post("/api/v1/auth/signup", json=body).status_code == 422
+    assert _open_signup(open_client, "newbie", password="short").status_code == 422  # noqa: S106
+    assert _open_signup(open_client, "dev-student").status_code == 422
+    assert _open_signup(open_client, "admin").status_code == 422
+    with sessions() as s:
+        s.add(User(username="Ana", role="student", data_class="synthetic"))
+        s.commit()
+    assert _open_signup(open_client, "ana").status_code == 409
+    with sessions() as s:
+        assert s.scalar(select(User).where(User.username == "sneaky")) is None
+
+
+def test_open_signup_failures_and_successes_are_limited_per_client(
+    settings: Settings, sessions: sessionmaker[Session]
+) -> None:
+    app = create_app(
+        _settings(settings, SignupMode.OPEN, signup_max_failures=2, signups_per_client_per_hour=2),
+        sessions,
+    )
+    assert _open_signup(TestClient(app, base_url=BASE), "one").status_code == 201
+    assert _open_signup(TestClient(app, base_url=BASE), "two").status_code == 201
+    assert _open_signup(TestClient(app, base_url=BASE), "three").status_code == 429
+    with sessions() as s:
+        s.add(User(username="taken", role="student", data_class="synthetic"))
+        s.commit()
+    other = create_app(_settings(settings, SignupMode.OPEN, signup_max_failures=2), sessions)
+    c = TestClient(other, base_url=BASE, client=("10.0.0.9", 1234))
+    assert _open_signup(c, "taken").status_code == 409
+    assert _open_signup(c, "taken").status_code == 409
+    assert _open_signup(c, "fresh").status_code == 429
+
+
+def test_daily_cap_counts_every_client(settings: Settings, sessions: sessionmaker[Session]) -> None:
+    app = create_app(_settings(settings, SignupMode.OPEN, signups_per_day=2), sessions)
+    for i, name in enumerate(("one", "two", "three")):
+        c = TestClient(app, base_url=BASE, client=(f"10.0.0.{i + 1}", 1234))
+        assert _open_signup(c, name).status_code == (201 if i < 2 else 429)
+
+
+def test_invite_mode_still_requires_a_code(
+    client: TestClient, sessions: sessionmaker[Session]
+) -> None:
+    r = _open_signup(client, "newbie")
+    assert r.status_code == 403 and r.json()["type"].endswith("bad-invite-code")
+    with sessions() as s:
+        assert s.scalar(select(User).where(User.username == "newbie")) is None

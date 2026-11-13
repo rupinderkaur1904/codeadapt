@@ -1075,3 +1075,33 @@ real-student data. Enrolling real students still needs Gate C; when it is passed
 decision is needed on whether sign-up accounts may become `real` and what consent step the
 form needs. The invite code is a shared secret for a class: anyone it is passed to can sign
 up until it is revoked, expires or is used up.
+
+## ADR-045 — Open sign-up mode: no invite code (2026-11-13)
+
+**Context.** The owner found the invite code made sign-up hard to use and asked for it to be
+removed (2026-11-13). With open sign-up, anyone who finds the site can create an account and
+submit C++ code to the sandbox runner.
+
+**Decision.**
+
+- `CODEADAPT_SIGNUP` gains the value `open`: the form asks only for a username and a
+  password. `invite-code` (ADR-044) stays available; unset still means off, and any other
+  value still stops start-up. `GET /api/v1/auth/signup` reports `needs_invite_code`, and the
+  form shows the code field only when it is true.
+- Everything else from ADR-044 is kept: new accounts are always role `student` and data
+  class `dev`; the 12-character password rule; username rules and reserved names; the
+  per-client limits on failed sign-ups (10 per window) and successful ones (40 per hour);
+  session rotation; audit events (the sign-up event's target is `open`).
+- New: a cap on sign-ups across all clients, `CODEADAPT_SIGNUPS_PER_DAY` (default 100 in any
+  24 hours). With no invite code nothing else bounds the number of accounts.
+
+**Not changed.** Login, sessions, CSRF, the sandbox (gVisor, one sandbox at a time on the
+runner, per-run limits), the per-user submission limit (10 per minute in production), and
+all research logic.
+
+**Consequences.** In open mode a stranger can create an account (a username that is taken
+answers 409, so names can be probed slowly, within the failure limit) and run code in the
+gVisor sandbox. The isolation, the submission limit and the daily cap bound the damage; they
+do not stop a determined visitor using their quota. All sign-up accounts are `dev` data:
+they must not be analysed as real-student data, and enrolling real students still needs
+Gate C.

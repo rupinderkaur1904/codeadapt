@@ -97,12 +97,13 @@ change their own password at `POST /api/v1/auth/password` (current password requ
 session of the account ends; the browser gets a new one); wrong current passwords count
 towards the login throttle.
 
-**Sign-up (ADR-044).** Off unless `CODEADAPT_SIGNUP=invite-code`; there is no open mode.
-A new account needs a researcher-issued invite code (stored only as a SHA-256, limited uses
-and lifetime, revocable) and is always a `student` of data class `dev`. The code is checked
-before the username, so names cannot be probed without one. Failed and successful sign-ups
-are limited per client address and audited. Researcher and admin accounts are created only
-by an operator.
+**Sign-up (ADR-044, ADR-045).** Off unless `CODEADAPT_SIGNUP` is `open` or `invite-code`.
+A new account is always a `student` of data class `dev`. In `invite-code` mode it needs a
+researcher-issued code (stored only as a SHA-256, limited uses and lifetime, revocable),
+checked before the username. In `open` mode anyone can sign up, so anyone can run code in the
+gVisor sandbox. Failed and successful sign-ups are limited per client address, total
+sign-ups per day are capped (`CODEADAPT_SIGNUPS_PER_DAY`, default 100), and every sign-up is
+audited. Researcher and admin accounts are created only by an operator.
 
 **Fail-closed production (ADR-040).** An unset `CODEADAPT_ENV` means production; an
 unknown value stops start-up. The dev stub therefore needs an explicit `dev` or `test`. In

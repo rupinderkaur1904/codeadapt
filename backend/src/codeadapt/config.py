@@ -11,11 +11,12 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 class SignupMode(StrEnum):
-    """ADR-044. Deliberately no "open" value: anyone-can-register would enrol people before
-    the ethics gate."""
+    """ADR-044 / ADR-045. `open` lets anyone with the link create a student account of data
+    class `dev`; `invite-code` also requires a researcher-issued code."""
 
     OFF = "off"
     INVITE_CODE = "invite-code"
+    OPEN = "open"
 
 
 class Environment(StrEnum):
@@ -50,7 +51,7 @@ class Settings:
     # ADR-040: the only way to run student code outside gVisor in production. Set to
     # "local-demo-only" by compose.demo.yaml; never for a deployment students can reach.
     allow_runc_in_production: bool = False
-    # ADR-044: self-service sign-up. Off unless CODEADAPT_SIGNUP=invite-code; then a new
+    # ADR-044/045: self-service sign-up. Off unless CODEADAPT_SIGNUP=open or invite-code; a new
     # account needs a researcher-issued invite code and is always a `student` with data class
     # `dev` (Gate C: no real-student enrolment yet). There is no open sign-up mode.
     signup_mode: SignupMode = SignupMode.OFF
@@ -59,9 +60,17 @@ class Settings:
     signups_per_client_per_hour: int = 40
     # Failed sign-ups (wrong code, name taken) per client within login_failure_window_minutes.
     signup_max_failures: int = 10
+    # ADR-045: accounts sign-up may create in any 24 hours, from all clients together. With
+    # open sign-up nothing else bounds the number of accounts (and so of people able to run
+    # code in the sandbox); sign-ups beyond it get 429 until the window moves on.
+    signups_per_day: int = 100
 
     @property
     def signup_enabled(self) -> bool:
+        return self.signup_mode is not SignupMode.OFF
+
+    @property
+    def signup_needs_invite_code(self) -> bool:
         return self.signup_mode is SignupMode.INVITE_CODE
 
     @property
@@ -127,6 +136,7 @@ class Settings:
             signups_per_client_per_hour=int(
                 os.environ.get("CODEADAPT_SIGNUPS_PER_CLIENT_PER_HOUR", "40")
             ),
+            signups_per_day=int(os.environ.get("CODEADAPT_SIGNUPS_PER_DAY", "100")),
         )
 
 

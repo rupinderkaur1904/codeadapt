@@ -15,8 +15,9 @@ x-api-env: &api-env
   CODEADAPT_ENV: production
   CODEADAPT_DATABASE_URL: postgresql+psycopg://${API_DB_USER:?}:${API_DB_PASSWORD:?}@db:5432/${DB_NAME:?}?sslmode=verify-full&sslrootcert=/etc/codeadapt/db-ca.crt
   CODEADAPT_ALLOWED_HOSTS: ${SITE_HOST:?}
-  # ADR-044: empty (the default) keeps sign-up off; `invite-code` turns on sign-up with
-  # codes from `run --rm admin invite-create`. Any other value stops the API.
+  # ADR-044/045: empty (the default) keeps sign-up off; `open` turns on sign-up with no
+  # invite code; `invite-code` needs codes from `run --rm admin invite-create`. Any other
+  # value stops the API.
   CODEADAPT_SIGNUP: ${SIGNUP_MODE:-}
   # The proxy's fixed address on the internal network below: uvicorn trusts forwarded
   # headers from it only (never '*').

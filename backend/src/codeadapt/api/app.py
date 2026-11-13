@@ -354,18 +354,18 @@ def create_app(
     def signup_status() -> SignupStatus:
         return SignupStatus(
             enabled=settings.signup_enabled,
-            needs_invite_code=True,
+            needs_invite_code=settings.signup_needs_invite_code,
             min_password_length=auth.MIN_PASSWORD_LENGTH,
         )
 
     @app.post("/api/v1/auth/signup", status_code=201, response_model=AuthUser)
     def signup(body: SignupRequest, request: Request, response: Response, session: DB) -> AuthUser:
-        """Create a student account with a researcher-issued invite code and log it in.
+        """Create a student account and log it in.
 
-        Off unless the deployment sets CODEADAPT_SIGNUP=invite-code. The account is always
-        role `student`, data class `dev` (Gate C): nothing a caller sends can change either.
-        The invite code is checked before the username, so a caller without a code learns
-        nothing about which names exist."""
+        Off unless the deployment sets CODEADAPT_SIGNUP=open or invite-code (ADR-045). The
+        account is always role `student`, data class `dev` (Gate C): nothing a caller sends
+        can change either. In invite-code mode the code is checked before the username, so a
+        caller without a code learns nothing about which names exist."""
         if not settings.signup_enabled:
             raise ApiError(403, "signup-disabled", "Sign-up is not available")
         client = client_of(request)
@@ -379,6 +379,8 @@ def create_app(
                 session, (auth.AuditKind.SIGNUP,), client, utcnow() - timedelta(hours=1)
             )
             >= settings.signups_per_client_per_hour
+            or auth.recent_events(session, (auth.AuditKind.SIGNUP,), utcnow() - timedelta(days=1))
+            >= settings.signups_per_day
         ):
             auth.audit(
                 session, auth.AuditKind.SIGNUP_THROTTLED, username=body.username, client=client
@@ -395,8 +397,10 @@ def create_app(
                 "Password too short",
                 f"password must have at least {auth.MIN_PASSWORD_LENGTH} characters",
             )
-        invite = auth.consume_invite(session, body.invite_code)
-        if invite is None:
+        invite = None
+        if settings.signup_needs_invite_code:
+            invite = auth.consume_invite(session, body.invite_code or "")
+        if settings.signup_needs_invite_code and invite is None:
             session.rollback()
             auth.audit(
                 session,
@@ -408,9 +412,8 @@ def create_app(
             session.commit()
             raise ApiError(403, "bad-invite-code", "Invite code not valid")
         if auth.find_user(session, body.username) is not None:
-            session.rollback()  # gives the invite use back
-            # Counted like a bad code, so even a valid code cannot be used to probe names
-            # quickly.
+            session.rollback()  # gives any invite use back
+            # Counted as a failure, so names cannot be probed quickly.
             auth.audit(
                 session,
                 auth.AuditKind.SIGNUP_FAILED,
@@ -440,7 +443,7 @@ def create_app(
             username=user.username,
             user=user,
             client=client,
-            target=f"invite={invite.id}",
+            target=f"invite={invite.id}" if invite is not None else "open",
         )
         session.commit()
         set_session_cookie(response, token)
