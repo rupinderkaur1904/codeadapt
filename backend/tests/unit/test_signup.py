@@ -274,7 +274,7 @@ def test_admin_cli_issues_lists_and_revokes_codes(
     assert {"invite_created", "invite_revoked"} <= set(_kinds(sessions))
 
 
-# ---------------------------------------------------------------- open sign-up (ADR-045)
+# ---------------------------------------------------------------- open sign-up (ADR-046)
 
 
 @pytest.fixture

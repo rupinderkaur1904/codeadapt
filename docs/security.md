@@ -97,7 +97,7 @@ change their own password at `POST /api/v1/auth/password` (current password requ
 session of the account ends; the browser gets a new one); wrong current passwords count
 towards the login throttle.
 
-**Sign-up (ADR-044, ADR-045).** Off unless `CODEADAPT_SIGNUP` is `open` or `invite-code`.
+**Sign-up (ADR-044, ADR-046).** Off unless `CODEADAPT_SIGNUP` is `open` or `invite-code`.
 A new account is always a `student` of data class `dev`. In `invite-code` mode it needs a
 researcher-issued code (stored only as a SHA-256, limited uses and lifetime, revocable),
 checked before the username. In `open` mode anyone can sign up, so anyone can run code in the

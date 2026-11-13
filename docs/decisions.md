@@ -1076,7 +1076,7 @@ decision is needed on whether sign-up accounts may become `real` and what consen
 form needs. The invite code is a shared secret for a class: anyone it is passed to can sign
 up until it is revoked, expires or is used up.
 
-## ADR-045 — Open sign-up mode: no invite code (2026-11-13)
+## ADR-046 — Open sign-up mode: no invite code (2026-11-13)
 
 **Context.** The owner found the invite code made sign-up hard to use and asked for it to be
 removed (2026-11-13). With open sign-up, anyone who finds the site can create an account and

@@ -90,7 +90,7 @@ export interface paths {
          * Signup
          * @description Create a student account and log it in.
          *
-         *     Off unless the deployment sets CODEADAPT_SIGNUP=open or invite-code (ADR-045). The
+         *     Off unless the deployment sets CODEADAPT_SIGNUP=open or invite-code (ADR-046). The
          *     account is always role `student`, data class `dev` (Gate C): nothing a caller sends
          *     can change either. In invite-code mode the code is checked before the username, so a
          *     caller without a code learns nothing about which names exist.
@@ -663,7 +663,7 @@ export interface components {
         };
         /**
          * SignupRequest
-         * @description Self-service sign-up (ADR-044, ADR-045). The server checks the username's
+         * @description Self-service sign-up (ADR-044, ADR-046). The server checks the username's
          *     form and the password's length (``auth.MIN_PASSWORD_LENGTH``).
          */
         SignupRequest: {

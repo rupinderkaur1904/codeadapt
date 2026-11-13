@@ -14,7 +14,7 @@ function message(error: unknown): string {
   return "Could not create the account. Try again.";
 }
 
-/** Self-service sign-up (ADR-044, ADR-045), with an invite code field only when the
+/** Self-service sign-up (ADR-044, ADR-046), with an invite code field only when the
  * deployment asks for one. The new account is a student account; the server decides its
  * role and data class, not this form. */
 export function SignupPage({
