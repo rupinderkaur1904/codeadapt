@@ -45,7 +45,7 @@ the evidence behind it.
 | **Problem bank** | 25 demo problems in five families (binary search 12, arrays 5, two pointers 3, sliding window 3, prefix sums 2), with 384 diagnostic tests and 122 error models. 20 problems are recommendable; 5 binary-search problems are held back from recommendation. Content is validated by executing it. | `content/demo/`, [docs/content-format.md](docs/content-format.md), [docs/content-design/](docs/content-design/README.md) |
 | **Student workspace** | Browser editor (CodeMirror) with problem list, practice page, per-test feedback, diagnosis, recommendation and attempt history. | `web/src/pages` (`/problems`, `/practice/:slug`, `/attempts`) |
 | **Researcher console** | Submission traces from evidence to diagnosis and recommendation, learner list and per-learner BKT estimates. | `/research`, `/research/learners`, `/research/submissions/:id` |
-| **Accounts and sign-up** | Argon2id passwords, server-side sessions with rotation, CSRF protection, rate limits and an append-only audit log. Optional invite-code sign-up (ADR-044): off unless `CODEADAPT_SIGNUP=invite-code`; researchers issue codes with `codeadapt-admin invite-create`; sign-up accounts are always students with data class `dev`. Researcher accounts are created only by an operator. | `backend/src/codeadapt/auth`, `backend/src/codeadapt/api/security.py` |
+| **Accounts and sign-up** | Argon2id passwords, server-side sessions with rotation, CSRF protection, rate limits and an append-only audit log. Optional self-service sign-up, off unless `CODEADAPT_SIGNUP` is set: `open` needs only a username and password, with per-client limits and a daily cap (ADR-046); `invite-code` also needs a code from `codeadapt-admin invite-create` (ADR-044). Sign-up accounts are always students with data class `dev`. Researcher accounts are created only by an operator. | `backend/src/codeadapt/auth`, `backend/src/codeadapt/api/security.py` |
 | **Evaluation harness** | `codeadapt-eval` runs held-out and calibration case sets (kept apart) under any method version and writes reproducible JSON/Markdown reports. | `backend/src/codeadapt/evaluation`, `eval/` |
 
 ## Architecture
@@ -238,7 +238,7 @@ tool.
 | Core platform (M0–M7: sandbox, content model, API and worker, student workspace, evidence reliability, adaptation, researcher console, evaluation harness) | done |
 | Evidence ledger (EV1), researcher-only BKT (LM1), problem bank of 25 | done |
 | Security hardening (fail-closed production config, gVisor required, session and audit hardening, operational safety) | done (ADR-040 to ADR-042) |
-| Invite-code sign-up | done (ADR-044) |
+| Self-service sign-up (open or invite-code) | done (ADR-044, ADR-046) |
 | Azure deployment | in progress: hosts set up and app served over HTTPS; the end-to-end check on the hosts, gVisor host verification steps 5–7, database TLS on the hosts, backups and monitoring are still open |
 | Real-data validation (public corpus or student study) | not started: blocked on data-use permission and on ethics review |
 | Pilot with real students (Gate C) | not started |

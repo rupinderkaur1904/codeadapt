@@ -14,14 +14,17 @@ function message(error: unknown): string {
   return "Could not create the account. Try again.";
 }
 
-/** Sign-up with an invite code from the study team (ADR-044). The new account is a
- * student account; the server decides its role and data class, not this form. */
+/** Self-service sign-up (ADR-044, ADR-046), with an invite code field only when the
+ * deployment asks for one. The new account is a student account; the server decides its
+ * role and data class, not this form. */
 export function SignupPage({
   minPasswordLength,
+  needsInviteCode,
   onSignedUp,
   onCancel,
 }: {
   minPasswordLength: number;
+  needsInviteCode: boolean;
   onSignedUp: (user: AuthUser) => void;
   onCancel: () => void;
 }) {
@@ -45,7 +48,7 @@ export function SignupPage({
     setBusy(true);
     setError(null);
     try {
-      onSignedUp(await api.signup(username, password, inviteCode));
+      onSignedUp(await api.signup(username, password, needsInviteCode ? inviteCode : undefined));
     } catch (e) {
       setError(message(e));
     } finally {
@@ -56,17 +59,21 @@ export function SignupPage({
   return (
     <form className="login" onSubmit={(e) => void submit(e)}>
       <h1>Create an account</h1>
-      <p className="muted">You need the invite code your instructor gave your class.</p>
-      <label>
-        Invite code
-        <input
-          autoComplete="off"
-          spellCheck={false}
-          value={inviteCode}
-          onChange={(e) => setInviteCode(e.target.value)}
-          required
-        />
-      </label>
+      {needsInviteCode && (
+        <>
+          <p className="muted">You need the invite code your instructor gave your class.</p>
+          <label>
+            Invite code
+            <input
+              autoComplete="off"
+              spellCheck={false}
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value)}
+              required
+            />
+          </label>
+        </>
+      )}
       <label>
         Username
         <input

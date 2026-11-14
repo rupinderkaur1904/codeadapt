@@ -88,12 +88,12 @@ export interface paths {
         put?: never;
         /**
          * Signup
-         * @description Create a student account with a researcher-issued invite code and log it in.
+         * @description Create a student account and log it in.
          *
-         *     Off unless the deployment sets CODEADAPT_SIGNUP=invite-code. The account is always
-         *     role `student`, data class `dev` (Gate C): nothing a caller sends can change either.
-         *     The invite code is checked before the username, so a caller without a code learns
-         *     nothing about which names exist.
+         *     Off unless the deployment sets CODEADAPT_SIGNUP=open or invite-code (ADR-046). The
+         *     account is always role `student`, data class `dev` (Gate C): nothing a caller sends
+         *     can change either. In invite-code mode the code is checked before the username, so a
+         *     caller without a code learns nothing about which names exist.
          */
         post: operations["signup_api_v1_auth_signup_post"];
         delete?: never;
@@ -663,12 +663,12 @@ export interface components {
         };
         /**
          * SignupRequest
-         * @description Self-service sign-up with an invite code (ADR-044). The server checks the username's
+         * @description Self-service sign-up (ADR-044, ADR-046). The server checks the username's
          *     form and the password's length (``auth.MIN_PASSWORD_LENGTH``).
          */
         SignupRequest: {
             /** Invite Code */
-            invite_code: string;
+            invite_code?: string | null;
             /** Password */
             password: string;
             /** Username */
