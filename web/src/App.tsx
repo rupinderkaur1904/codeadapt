@@ -6,6 +6,7 @@ import { ApiError, api, setCsrfToken } from "./api/client";
 import { ErrorMessage } from "./components/ErrorMessage";
 import { Intro, introSeen } from "./components/Intro";
 import { type DevRole, getDevRole, setDevRole } from "./devRole";
+import { clearAllDrafts, clearDraftsExcept } from "./drafts";
 
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -125,6 +126,8 @@ function AppShell() {
           <LoginPage
             onLoggedIn={(user) => {
               setCsrfToken(user.csrf_token ?? null);
+              // Another account's drafts must never open in this one's editor.
+              clearDraftsExcept(user.username);
               // Drop every cached response and refetch as the new account.
               void queryClient.resetQueries();
             }}
@@ -161,6 +164,8 @@ function AppShell() {
             <button
               type="button"
               onClick={() => {
+                // Drafts stay on this computer otherwise; the next person must not see them.
+                clearAllDrafts();
                 void api.logout().finally(() => {
                   setCsrfToken(null);
                   void queryClient.resetQueries();
@@ -195,7 +200,7 @@ function AppShell() {
           <Routes>
             <Route path="/" element={<LandingPage loggedIn />} />
             <Route path="/problems" element={<ProblemListPage />} />
-            <Route path="/practice/:slug" element={<PracticePage />} />
+            <Route path="/practice/:slug" element={<PracticePage username={user.username} />} />
             <Route path="/attempts" element={<AttemptsPage />} />
             <Route path="/research" element={<ResearchPage />} />
             <Route path="/research/learners" element={<LearnersPage />} />
