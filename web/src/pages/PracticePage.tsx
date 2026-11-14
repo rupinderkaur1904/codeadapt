@@ -9,18 +9,20 @@ import { CodeEditor } from "../components/CodeEditor";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { RECOMMENDATION_KEY, RecommendationCard } from "../components/RecommendationCard";
 import { SubmissionResult } from "../components/SubmissionResult";
-import { loadDraft, saveDraft } from "../drafts";
+import { clearDraftsExcept, loadDraft, saveDraft } from "../drafts";
 
 export const POLL_MS = 1000;
 
-export function PracticePage() {
+/** `username` scopes the locally saved draft, so one account never opens another's code. */
+export function PracticePage({ username }: { username: string }) {
   const { slug = "" } = useParams();
   const problem = useQuery({ queryKey: ["problem", slug], queryFn: () => api.getProblem(slug) });
   if (problem.isPending) return <p>Loading problem…</p>;
   if (problem.isError) return <ErrorMessage error={problem.error} />;
   return (
     <Workspace
-      key={problem.data.version}
+      key={`${username}\n${problem.data.version}`}
+      username={username}
       slug={slug}
       title={problem.data.title}
       statement={problem.data.statement}
@@ -29,10 +31,19 @@ export function PracticePage() {
   );
 }
 
-function Workspace(props: { slug: string; title: string; statement: string; starter: string }) {
-  const { slug } = props;
+function Workspace(props: {
+  username: string;
+  slug: string;
+  title: string;
+  statement: string;
+  starter: string;
+}) {
+  const { username, slug } = props;
   const queryClient = useQueryClient();
-  const [source, setSource] = useState(() => loadDraft(slug) ?? props.starter);
+  const [source, setSource] = useState(() => {
+    clearDraftsExcept(username);
+    return loadDraft(username, slug) ?? props.starter;
+  });
   // "My attempts" links here with ?attempt=<id> to open that attempt's result.
   const [params] = useSearchParams();
   const [selectedId, setSelectedId] = useState<string | null>(() => params.get("attempt"));
@@ -80,7 +91,7 @@ function Workspace(props: { slug: string; title: string; statement: string; star
           value={source}
           onChange={(value) => {
             setSource(value);
-            saveDraft(slug, value);
+            saveDraft(username, slug, value);
           }}
         />
         <div className="actions">
@@ -92,7 +103,7 @@ function Workspace(props: { slug: string; title: string; statement: string; star
             className="secondary"
             onClick={() => {
               setSource(props.starter);
-              saveDraft(slug, props.starter);
+              saveDraft(username, slug, props.starter);
             }}
           >
             Reset to starter code
