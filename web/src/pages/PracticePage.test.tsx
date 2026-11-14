@@ -21,13 +21,13 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-function renderPage() {
+function renderPage(username = "alice") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={["/practice/lower-bound"]}>
         <Routes>
-          <Route path="/practice/:slug" element={<PracticePage />} />
+          <Route path="/practice/:slug" element={<PracticePage username={username} />} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
@@ -76,10 +76,48 @@ describe("PracticePage", () => {
     );
     expect(posted).toEqual([{ problem_slug: "lower-bound", source: "int f() { return 1; }" }]);
     expect(polls).toBeGreaterThanOrEqual(2);
-    // The draft is kept locally.
-    expect(window.localStorage.getItem("codeadapt:draft:lower-bound")).toBe(
+    // The draft is kept locally, under this account only.
+    expect(window.localStorage.getItem("codeadapt:draft:u:alice:lower-bound")).toBe(
       "int f() { return 1; }",
     );
+    expect(window.localStorage.getItem("codeadapt:draft:lower-bound")).toBeNull();
+  });
+
+  it("never opens another account's draft in the editor", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.endsWith("/problems/lower-bound")) return json(problem);
+      if (url.includes("/submissions?problem_slug=")) return json([]);
+      throw new Error(`unexpected request ${url}`);
+    });
+
+    // Account alice types code, then a different account opens the same problem.
+    const first = renderPage("alice");
+    const editor = await screen.findByLabelText("Solution code");
+    await userEvent.clear(editor);
+    await userEvent.type(editor, "// alice's secret");
+    first.unmount();
+
+    // A draft from before drafts were scoped to an account must not be read either.
+    window.localStorage.setItem("codeadapt:draft:lower-bound", "// legacy unscoped draft");
+
+    renderPage("bob");
+    expect(await screen.findByLabelText("Solution code")).toHaveValue(problem.starter_code);
+    // Opening the editor as bob also removes the other account's and the legacy draft.
+    expect(window.localStorage.getItem("codeadapt:draft:u:alice:lower-bound")).toBeNull();
+    expect(window.localStorage.getItem("codeadapt:draft:lower-bound")).toBeNull();
+  });
+
+  it("restores the same account's draft", async () => {
+    window.localStorage.setItem("codeadapt:draft:u:alice:lower-bound", "// mine");
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.endsWith("/problems/lower-bound")) return json(problem);
+      if (url.includes("/submissions?problem_slug=")) return json([]);
+      throw new Error(`unexpected request ${url}`);
+    });
+    renderPage("alice");
+    expect(await screen.findByLabelText("Solution code")).toHaveValue("// mine");
   });
 
   it("shows API errors as problem details", async () => {
