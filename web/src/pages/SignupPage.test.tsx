@@ -99,4 +99,36 @@ describe("sign-up", () => {
       invite_code: "ABCD-EFGH-JKMN",
     });
   });
+
+  it("asks for no invite code when the deployment runs open sign-up", async () => {
+    let signedUp = false;
+    const bodies: unknown[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (url.endsWith("/auth/signup") && (init?.method ?? "GET") === "GET") {
+          return json({ enabled: true, needs_invite_code: false, min_password_length: 12 });
+        }
+        if (url.endsWith("/auth/signup")) {
+          bodies.push(JSON.parse(String(init?.body)));
+          signedUp = true;
+          return json({ username: "newbie", role: "student", csrf_token: "tok" }, 201);
+        }
+        if (!signedUp) return unauthenticated();
+        if (url.endsWith("/auth/me"))
+          return json({ username: "newbie", role: "student", csrf_token: "tok" });
+        return json([]);
+      }),
+    );
+    const user = userEvent.setup();
+    renderApp();
+    await user.click(await screen.findByRole("button", { name: "Create an account" }));
+    expect(screen.queryByLabelText("Invite code")).not.toBeInTheDocument();
+    await user.type(screen.getByLabelText("Username"), "newbie");
+    await user.type(screen.getByLabelText("Password"), "correct horse battery");
+    await user.type(screen.getByLabelText("Repeat password"), "correct horse battery");
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByText("newbie")).toBeInTheDocument();
+    expect(bodies).toEqual([{ username: "newbie", password: "correct horse battery" }]);
+  });
 });

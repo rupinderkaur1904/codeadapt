@@ -94,13 +94,17 @@ export const api = {
       body: JSON.stringify({ username, password }),
     }),
   logout: () => request<undefined>("/auth/logout", { method: "POST" }),
-  /** Whether this deployment accepts sign-ups with an invite code (ADR-044). */
+  /** Whether this deployment accepts sign-ups, and whether they need an invite code. */
   signupStatus: () => request<SignupStatus>("/auth/signup"),
-  signup: (username: string, password: string, inviteCode: string) =>
+  signup: (username: string, password: string, inviteCode?: string) =>
     request<AuthUser>("/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, invite_code: inviteCode }),
+      body: JSON.stringify(
+        inviteCode === undefined
+          ? { username, password }
+          : { username, password, invite_code: inviteCode },
+      ),
     }),
   changePassword: (currentPassword: string, newPassword: string) =>
     request<AuthUser>("/auth/password", {
