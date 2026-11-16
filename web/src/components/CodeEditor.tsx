@@ -1,8 +1,21 @@
 import { cpp } from "@codemirror/lang-cpp";
-import CodeMirror from "@uiw/react-codemirror";
+import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { useSyncExternalStore } from "react";
 
-const extensions = [cpp()];
+/** Brand typography and spacing on top of CodeMirror's own light and dark themes. */
+const workspaceTheme = EditorView.theme({
+  "&": { height: "100%", fontSize: "14px" },
+  ".cm-scroller": {
+    fontFamily: "var(--font-mono)",
+    lineHeight: "1.65",
+  },
+  ".cm-content": { padding: "12px 0" },
+  ".cm-line": { padding: "0 16px 0 8px" },
+  ".cm-gutters": { borderRight: "1px solid var(--editor-gutter-border)", paddingLeft: "6px" },
+  ".cm-lineNumbers .cm-gutterElement": { minWidth: "2.5ch", padding: "0 8px 0 4px" },
+});
+
+const extensions = [cpp(), workspaceTheme];
 
 const DARK = "(prefers-color-scheme: dark)";
 
@@ -31,11 +44,12 @@ export function CodeEditor({
   const dark = usePrefersDark();
   return (
     <CodeMirror
+      className="code-editor"
       value={value}
       onChange={onChange}
       extensions={extensions}
       theme={dark ? "dark" : "light"}
-      height="360px"
+      height="100%"
       aria-label="Solution code"
       basicSetup={{ tabSize: 4 }}
     />

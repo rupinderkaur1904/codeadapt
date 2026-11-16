@@ -8,6 +8,13 @@ export function summarise(view: SubmissionView): string {
   return `${passed}/${tests.length} tests passed`;
 }
 
+function tone(view: SubmissionView): string {
+  if (view.status !== "completed") return view.status === "failed" ? "fail" : "neutral";
+  if (view.compile && !view.compile.ok) return "fail";
+  const tests = view.tests ?? [];
+  return tests.length > 0 && tests.every((t) => t.verdict === "passed") ? "pass" : "fail";
+}
+
 export function AttemptHistory({
   attempts,
   selectedId,
@@ -24,10 +31,16 @@ export function AttemptHistory({
         <li key={a.id}>
           <button
             type="button"
-            className={a.id === selectedId ? "link selected" : "link"}
+            className={a.id === selectedId ? "attempt selected" : "attempt"}
+            aria-current={a.id === selectedId ? "true" : undefined}
             onClick={() => onSelect(a.id)}
           >
-            {new Date(a.created_at).toLocaleTimeString()} · {summarise(a)}
+            <span className={`attempt-dot tone-${tone(a)}`} aria-hidden="true" />
+            <span className="attempt-time">{new Date(a.created_at).toLocaleTimeString()}</span>
+            <span className="attempt-sep" aria-hidden="true">
+              ·
+            </span>
+            <span className="attempt-summary">{summarise(a)}</span>
           </button>
         </li>
       ))}

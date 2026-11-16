@@ -142,8 +142,10 @@ function AppShell() {
   // A real session carries a CSRF token; the development stub has none.
   const devStub = user.csrf_token == null;
   const role = user.role;
+  // The practice workspace fills the window below the header; its panels scroll on their own.
+  const practice = location.pathname.startsWith("/practice/");
   return (
-    <div className="app">
+    <div className={practice ? "app app-workspace" : "app"}>
       <header className="app-header">
         <Brand />
         <nav>
@@ -195,7 +197,7 @@ function AppShell() {
           </label>
         )}
       </header>
-      <main className={landing ? "landing-main" : undefined}>
+      <main className={landing ? "landing-main" : practice ? "workspace-main" : undefined}>
         <Suspense fallback={<p>Loading…</p>}>
           <Routes>
             <Route path="/" element={<LandingPage loggedIn />} />
