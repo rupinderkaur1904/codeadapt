@@ -14,6 +14,19 @@ describe("SubmissionResult", () => {
     expect(screen.getByText("L 4 1 3 5 7 5")).toBeInTheDocument();
   });
 
+  it("names the feedback kind and marks sample and hidden tests", () => {
+    render(<SubmissionResult submission={supported} />);
+    expect(screen.getByTestId("feedback")).toHaveTextContent("Diagnosis");
+    expect(screen.getByText("Sample")).toBeInTheDocument();
+    expect(screen.getByText("Hidden")).toBeInTheDocument();
+  });
+
+  it("headlines a compile error instead of a test count", () => {
+    render(<SubmissionResult submission={compileError} />);
+    expect(screen.getByText("Did not compile")).toBeInTheDocument();
+    expect(screen.getByTestId("feedback")).toHaveTextContent("Compilation error");
+  });
+
   it("renders hidden tests without inputs or outputs", () => {
     render(<SubmissionResult submission={supported} />);
     const hiddenRow = screen.getAllByRole("row")[2];
