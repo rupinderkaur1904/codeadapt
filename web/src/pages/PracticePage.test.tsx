@@ -120,6 +120,44 @@ describe("PracticePage", () => {
     expect(await screen.findByLabelText("Solution code")).toHaveValue("// mine");
   });
 
+  it("shows the sample tests the API returns and a resizable divider", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.endsWith("/problems/lower-bound")) return json(problem);
+      if (url.includes("/submissions?problem_slug=")) return json([]);
+      throw new Error(`unexpected request ${url}`);
+    });
+    renderPage();
+    expect(await screen.findByRole("heading", { name: "Sample tests" })).toBeInTheDocument();
+    expect(screen.getByText("L 1 1 1")).toBeInTheDocument();
+    expect(await screen.findByText("No attempts yet.")).toBeInTheDocument();
+    expect(screen.getByText(/No submission selected/)).toBeInTheDocument();
+
+    const divider = screen.getByRole("separator", { name: /Resize/ });
+    expect(divider).toHaveAttribute("aria-valuenow", "40");
+    divider.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(divider).toHaveAttribute("aria-valuenow", "42");
+    expect(window.localStorage.getItem("codeadapt:layout:problem-width")).toBe("0.420");
+  });
+
+  it("enables reset only after the code changes, and reset restores the starter", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.endsWith("/problems/lower-bound")) return json(problem);
+      if (url.includes("/submissions?problem_slug=")) return json([]);
+      throw new Error(`unexpected request ${url}`);
+    });
+    renderPage();
+    const editor = await screen.findByLabelText("Solution code");
+    const reset = screen.getByRole("button", { name: "Reset to starter code" });
+    expect(reset).toBeDisabled();
+    await userEvent.type(editor, "// edit");
+    expect(reset).toBeEnabled();
+    await userEvent.click(reset);
+    expect(editor).toHaveValue(problem.starter_code);
+  });
+
   it("shows API errors as problem details", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       json({ type: "x/not-found", title: "Problem not found", status: 404 }, 404),
